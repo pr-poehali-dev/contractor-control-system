@@ -32,15 +32,18 @@ const Layout = ({ children }: LayoutProps) => {
     ? [
         { icon: 'LayoutDashboard', label: 'Дашборд', path: '/dashboard' },
         { icon: 'FolderKanban', label: 'Проекты', path: '/projects' },
+        { icon: 'AlertTriangle', label: 'Замечания', path: '/defects' },
         { icon: 'ClipboardList', label: 'Журнал действий', path: '/activity' },
         { icon: 'Users', label: 'Подрядчики', path: '/contractors' },
         { icon: 'BarChart3', label: 'Аналитика', path: '/analytics' },
+        { icon: 'MessageSquare', label: 'Сообщения', path: '/messages' },
         { icon: 'Settings', label: 'Настройки', path: '/settings' },
       ]
     : [
         { icon: 'LayoutDashboard', label: 'Дашборд', path: '/dashboard' },
         { icon: 'Wrench', label: 'Мои работы', path: '/my-works' },
         { icon: 'ClipboardCheck', label: 'Журнал работ', path: '/work-log' },
+        { icon: 'AlertTriangle', label: 'Замечания', path: '/defects' },
         { icon: 'MessageSquare', label: 'Сообщения', path: '/messages' },
         { icon: 'Settings', label: 'Настройки', path: '/settings' },
       ];

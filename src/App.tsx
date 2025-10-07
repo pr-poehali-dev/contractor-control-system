@@ -14,6 +14,14 @@ import ObjectDetail from "./pages/ObjectDetail";
 import WorkDetail from "./pages/WorkDetail";
 import Activity from "./pages/Activity";
 import Settings from "./pages/Settings";
+import MyWorks from "./pages/MyWorks";
+import WorkLog from "./pages/WorkLog";
+import CreateInspection from "./pages/CreateInspection";
+import Defects from "./pages/Defects";
+import Analytics from "./pages/Analytics";
+import Contractors from "./pages/Contractors";
+import Messages from "./pages/Messages";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +47,14 @@ const App = () => (
             <Route path="/projects/:projectId/objects/:objectId" element={<ProtectedRoute><ObjectDetail /></ProtectedRoute>} />
             <Route path="/projects/:projectId/objects/:objectId/works/:workId" element={<ProtectedRoute><WorkDetail /></ProtectedRoute>} />
             <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
+            <Route path="/my-works" element={<ProtectedRoute><MyWorks /></ProtectedRoute>} />
+            <Route path="/work-log" element={<ProtectedRoute><WorkLog /></ProtectedRoute>} />
+            <Route path="/create-inspection" element={<ProtectedRoute><CreateInspection /></ProtectedRoute>} />
+            <Route path="/defects" element={<ProtectedRoute><Defects /></ProtectedRoute>} />
+            <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+            <Route path="/contractors" element={<ProtectedRoute><Contractors /></ProtectedRoute>} />
+            <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
