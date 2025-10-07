@@ -102,7 +102,13 @@ const ProjectDetail = () => {
         </Card>
       </div>
 
-      <h2 className="text-2xl font-bold text-slate-900 mb-4">Объекты</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold text-slate-900">Объекты</h2>
+        <Button onClick={() => navigate(`/projects/${projectId}/objects/create`)}>
+          <Icon name="Plus" size={18} className="mr-2" />
+          Добавить объект
+        </Button>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {mockObjects.map((obj, index) => (
           <Card 

@@ -24,6 +24,9 @@ import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import JournalEntryDetail from "./pages/JournalEntryDetail";
 import InspectionDetail from "./pages/InspectionDetail";
+import CreateProject from "./pages/CreateProject";
+import CreateObject from "./pages/CreateObject";
+import CreateWork from "./pages/CreateWork";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,8 +48,11 @@ const App = () => (
             <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+            <Route path="/projects/create" element={<ProtectedRoute><CreateProject /></ProtectedRoute>} />
             <Route path="/projects/:projectId" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
+            <Route path="/projects/:projectId/objects/create" element={<ProtectedRoute><CreateObject /></ProtectedRoute>} />
             <Route path="/projects/:projectId/objects/:objectId" element={<ProtectedRoute><ObjectDetail /></ProtectedRoute>} />
+            <Route path="/projects/:projectId/objects/:objectId/works/create" element={<ProtectedRoute><CreateWork /></ProtectedRoute>} />
             <Route path="/projects/:projectId/objects/:objectId/works/:workId" element={<ProtectedRoute><WorkDetail /></ProtectedRoute>} />
             <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
             <Route path="/my-works" element={<ProtectedRoute><MyWorks /></ProtectedRoute>} />

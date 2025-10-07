@@ -51,7 +51,7 @@ const Projects = () => {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-3xl font-bold text-slate-900">Проекты</h1>
-          <Button>
+          <Button onClick={() => navigate('/projects/create')}>
             <Icon name="Plus" size={20} className="mr-2" />
             Создать проект
           </Button>

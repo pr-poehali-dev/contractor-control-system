@@ -78,13 +78,23 @@ const ObjectDetail = () => {
         <p className="text-slate-600">Капремонт Казани 2025</p>
       </div>
 
+      <div className="flex items-center justify-between mb-4">
+        <Tabs defaultValue="all" className="flex-1">
+          <TabsList>
+            <TabsTrigger value="all">Все работы</TabsTrigger>
+            <TabsTrigger value="inProgress">В работе</TabsTrigger>
+            <TabsTrigger value="review">На проверке</TabsTrigger>
+            <TabsTrigger value="defects">С замечаниями</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <Button onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}>
+          <Icon name="Plus" size={18} className="mr-2" />
+          Добавить работу
+        </Button>
+      </div>
+      
       <Tabs defaultValue="all" className="mb-8">
-        <TabsList>
-          <TabsTrigger value="all">Все работы</TabsTrigger>
-          <TabsTrigger value="inProgress">В работе</TabsTrigger>
-          <TabsTrigger value="review">На проверке</TabsTrigger>
-          <TabsTrigger value="defects">С замечаниями</TabsTrigger>
-        </TabsList>
+        <div className="hidden"><TabsList /></div>
 
         <TabsContent value="all" className="mt-6 space-y-4">
           {mockWorks.map((work, index) => (
