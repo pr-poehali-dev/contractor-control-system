@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -56,6 +57,7 @@ const mockEntries: LogEntry[] = [
 const WorkLog = () => {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleAddEntry = () => {
     toast({
@@ -178,7 +180,12 @@ const WorkLog = () => {
 
       <div className="space-y-4">
         {mockEntries.map((entry, index) => (
-          <Card key={entry.id} className="animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
+          <Card 
+            key={entry.id} 
+            className="animate-fade-in hover-scale cursor-pointer" 
+            style={{ animationDelay: `${index * 0.1}s` }}
+            onClick={() => navigate(`/journal-entry/${entry.id}`)}
+          >
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex-1">

@@ -94,18 +94,31 @@ const WorkDetail = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex gap-4 p-4 bg-slate-50 rounded-lg">
-                    <div className="w-16 h-16 bg-slate-200 rounded-lg flex items-center justify-center">
+                {[
+                  { id: '1', date: '05.10.2025', description: 'Выполнены работы по монтажу кровельного покрытия на площади 150 м²', author: 'Иванов С.С.', photos: 8 },
+                  { id: '2', date: '04.10.2025', description: 'Демонтаж старого кровельного покрытия, подготовка основания', author: 'Иванов С.С.', photos: 12 },
+                  { id: '3', date: '03.10.2025', description: 'Доставка материалов на объект, подготовка инструмента', author: 'Иванов С.С.', photos: 3 },
+                ].map((entry) => (
+                  <div 
+                    key={entry.id} 
+                    className="flex gap-4 p-4 bg-slate-50 rounded-lg hover-scale cursor-pointer"
+                    onClick={() => navigate(`/journal-entry/${entry.id}`)}
+                  >
+                    <div className="w-16 h-16 bg-slate-200 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Icon name="Image" className="text-slate-500" size={24} />
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium text-slate-900">Запись от 05.10.2025</p>
-                      <p className="text-sm text-slate-600 mt-1">
-                        Выполнены работы по монтажу кровельного покрытия на площади 150 м²
-                      </p>
-                      <p className="text-xs text-slate-500 mt-2">Внесено: Иванов С.С.</p>
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="font-medium text-slate-900">Запись от {entry.date}</p>
+                        <Badge variant="outline" className="flex items-center gap-1">
+                          <Icon name="Image" size={12} />
+                          {entry.photos}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-slate-600 mt-1">{entry.description}</p>
+                      <p className="text-xs text-slate-500 mt-2">Внесено: {entry.author}</p>
                     </div>
+                    <Icon name="ChevronRight" className="text-slate-400" size={20} />
                   </div>
                 ))}
               </div>
@@ -155,7 +168,7 @@ const WorkDetail = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Проверки</CardTitle>
-                <Button>
+                <Button onClick={() => navigate('/create-inspection')}>
                   <Icon name="Plus" size={18} className="mr-2" />
                   Создать проверку
                 </Button>
@@ -164,17 +177,25 @@ const WorkDetail = () => {
             <CardContent>
               <div className="space-y-3">
                 {[
-                  { date: '05.10.2025', result: 'Выявлены замечания', status: 'defects' },
-                  { date: '01.10.2025', result: 'Соответствует', status: 'ok' },
+                  { id: '1', date: '05.10.2025', result: 'Выявлены замечания', status: 'defects', checkedPoints: 5, defectsCount: 2 },
+                  { id: '2', date: '01.10.2025', result: 'Соответствует', status: 'ok', checkedPoints: 5, defectsCount: 0 },
                 ].map((check, i) => (
-                  <div key={i} className="flex justify-between items-center p-4 bg-slate-50 rounded-lg">
-                    <div>
+                  <div 
+                    key={i} 
+                    className="flex justify-between items-center p-4 bg-slate-50 rounded-lg hover-scale cursor-pointer"
+                    onClick={() => navigate(`/inspection/${check.id}`)}
+                  >
+                    <div className="flex-1">
                       <p className="font-medium text-slate-900">Проверка от {check.date}</p>
                       <p className="text-sm text-slate-600 mt-1">{check.result}</p>
+                      <p className="text-xs text-slate-500 mt-1">Проверено пунктов: {check.checkedPoints}</p>
                     </div>
-                    <Badge variant={check.status === 'ok' ? 'outline' : 'destructive'}>
-                      {check.status === 'ok' ? 'Без замечаний' : 'Замечания'}
-                    </Badge>
+                    <div className="flex items-center gap-3">
+                      <Badge variant={check.status === 'ok' ? 'outline' : 'destructive'}>
+                        {check.status === 'ok' ? 'Без замечаний' : `${check.defectsCount} замечаний`}
+                      </Badge>
+                      <Icon name="ChevronRight" className="text-slate-400" size={20} />
+                    </div>
                   </div>
                 ))}
               </div>

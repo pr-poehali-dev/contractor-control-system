@@ -22,6 +22,8 @@ import Analytics from "./pages/Analytics";
 import Contractors from "./pages/Contractors";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
+import JournalEntryDetail from "./pages/JournalEntryDetail";
+import InspectionDetail from "./pages/InspectionDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +52,8 @@ const App = () => (
             <Route path="/my-works" element={<ProtectedRoute><MyWorks /></ProtectedRoute>} />
             <Route path="/work-log" element={<ProtectedRoute><WorkLog /></ProtectedRoute>} />
             <Route path="/create-inspection" element={<ProtectedRoute><CreateInspection /></ProtectedRoute>} />
+            <Route path="/inspection/:inspectionId" element={<ProtectedRoute><InspectionDetail /></ProtectedRoute>} />
+            <Route path="/journal-entry/:entryId" element={<ProtectedRoute><JournalEntryDetail /></ProtectedRoute>} />
             <Route path="/defects" element={<ProtectedRoute><Defects /></ProtectedRoute>} />
             <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
             <Route path="/contractors" element={<ProtectedRoute><Contractors /></ProtectedRoute>} />
