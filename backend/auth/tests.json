@@ -1,0 +1,27 @@
+{
+  "tests": [
+    {
+      "name": "Login with valid phone",
+      "method": "POST",
+      "body": {
+        "phone": "+79991234501"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "id": "number",
+        "phone": "string",
+        "role": "string",
+        "name": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Login with invalid phone",
+      "method": "POST",
+      "body": {
+        "phone": "+79999999999"
+      },
+      "expectedStatus": 404
+    }
+  ]
+}

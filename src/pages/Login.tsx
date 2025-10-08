@@ -46,10 +46,10 @@ const Login = () => {
   };
 
   const handlePasswordLogin = async () => {
-    if (!email || !password) {
+    if (!email) {
       toast({
         title: 'Ошибка',
-        description: 'Заполните все поля',
+        description: 'Введите логин',
         variant: 'destructive',
       });
       return;
@@ -57,7 +57,7 @@ const Login = () => {
     
     setIsLoading(true);
     try {
-      await login(email, password);
+      await login(email);
       navigate('/dashboard');
       toast({
         title: 'Добро пожаловать!',
@@ -66,7 +66,7 @@ const Login = () => {
     } catch (error) {
       toast({
         title: 'Ошибка',
-        description: error instanceof Error ? error.message : 'Проверьте логин и пароль',
+        description: error instanceof Error ? error.message : 'Проверьте логин',
         variant: 'destructive',
       });
     } finally {
@@ -77,7 +77,7 @@ const Login = () => {
   const handleVerifyCode = async () => {
     setIsLoading(true);
     try {
-      await login('test1', '123456');
+      await login('test1');
       navigate('/dashboard');
       toast({
         title: 'Добро пожаловать!',
@@ -150,20 +150,6 @@ const Login = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Пароль
-                </label>
-                <Input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="h-12"
-                  onKeyDown={(e) => e.key === 'Enter' && handlePasswordLogin()}
-                />
-              </div>
-
               <Button
                 onClick={handlePasswordLogin}
                 disabled={isLoading}
@@ -178,9 +164,9 @@ const Login = () => {
 
               <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                 <p className="text-xs font-semibold text-blue-900 mb-1">Тестовые аккаунты:</p>
-                <p className="text-xs text-blue-700">Test1 / 123456 — Заказчик (3 проекта)</p>
-                <p className="text-xs text-blue-700">Test2 / 123456 — Подрядчик</p>
-                <p className="text-xs text-blue-700">Test3 / 123456 — Новый заказчик</p>
+                <p className="text-xs text-blue-700">Test1 — Заказчик (3 проекта)</p>
+                <p className="text-xs text-blue-700">Test2 — Подрядчик (работы Test1)</p>
+                <p className="text-xs text-blue-700">Test3 — Новый заказчик (пустой)</p>
               </div>
             </div>
           ) : step === 'phone' ? (

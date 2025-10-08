@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { getMockData } from '@/lib/mockData';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
@@ -9,11 +9,10 @@ import OnboardingBanner from '@/components/OnboardingBanner';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, userData } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState(false);
 
-  const mockData = user ? getMockData(user.id) : null;
-  const projects = mockData?.projects || [];
+  const projects = userData?.projects || [];
 
   useEffect(() => {
     if (!user) return;
@@ -23,7 +22,7 @@ const Dashboard = () => {
       return;
     }
 
-    if (user.id === 'test3' && projects.length === 0) {
+    if (user.id === 3 && projects.length === 0) {
       const hasSeenOnboarding = localStorage.getItem(`onboarding_${user.id}`);
       if (!hasSeenOnboarding) {
         setShowOnboarding(true);
@@ -31,15 +30,14 @@ const Dashboard = () => {
     }
   }, [user, projects.length, navigate]);
 
-  if (showOnboarding && user?.id === 'test3') {
+  if (showOnboarding && user?.id === 3) {
     return <OnboardingBanner onClose={() => setShowOnboarding(false)} />;
   }
 
   const activeProjects = projects.filter(p => p.status === 'active').length;
-  const sites = mockData?.sites || [];
-  const works = mockData?.works || [];
-  const logs = mockData?.logEntries || [];
-  const remarks = logs.filter(l => l.type === 'remark').length;
+  const sites = userData?.sites || [];
+  const works = userData?.works || [];
+  const remarks = userData?.remarks?.filter(r => r.status === 'open').length || 0;
 
   const stats = [
     { label: 'Проектов', value: String(activeProjects), icon: 'Building2', color: 'bg-blue-100 text-[#2563EB]' },

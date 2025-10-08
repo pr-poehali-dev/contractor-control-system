@@ -1,82 +1,87 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { api, type User as APIUser, type UserData } from '@/lib/api';
 
-type UserRole = 'customer' | 'contractor';
+type UserRole = 'contractor' | 'client';
 
 interface User {
-  id: string;
+  id: number;
   name: string;
   role: UserRole;
-  email: string;
-  login: string;
-  avatar?: string;
+  email?: string;
+  phone: string;
+  organization?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
+  userData: UserData | null;
+  login: (phone: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
+  isLoading: boolean;
 }
 
-const MOCK_USERS: Record<string, { password: string; user: User }> = {
-  test1: {
-    password: '123456',
-    user: {
-      id: 'test1',
-      login: 'Test1',
-      name: 'Заказчик Петров',
-      role: 'customer',
-      email: 'test1@podryad.pro',
-    },
-  },
-  test2: {
-    password: '123456',
-    user: {
-      id: 'test2',
-      login: 'Test2',
-      name: 'Подрядчик Иванов',
-      role: 'contractor',
-      email: 'test2@podryad.pro',
-    },
-  },
-  test3: {
-    password: '123456',
-    user: {
-      id: 'test3',
-      login: 'Test3',
-      name: 'Заказчик Сидоров',
-      role: 'customer',
-      email: 'test3@podryad.pro',
-    },
-  },
+const PHONE_MAP: Record<string, string> = {
+  'test1': '+79991234501',
+  'test2': '+79991234502',
+  'test3': '+79991234503',
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const login = async (email: string, password: string) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    const loginKey = email.toLowerCase();
-    const userData = MOCK_USERS[loginKey];
-    
-    if (userData && userData.password === password) {
-      setUser(userData.user);
-      localStorage.setItem('user', JSON.stringify(userData.user));
-    } else {
-      throw new Error('Неверный логин или пароль');
+  const login = async (input: string) => {
+    setIsLoading(true);
+    try {
+      const phone = PHONE_MAP[input.toLowerCase()] || input;
+      
+      const apiUser: APIUser = await api.login(phone);
+      
+      const mappedUser: User = {
+        id: apiUser.id,
+        name: apiUser.name,
+        role: apiUser.role === 'contractor' ? 'contractor' : 'client',
+        email: apiUser.email,
+        phone: apiUser.phone,
+        organization: apiUser.organization,
+      };
+      
+      setUser(mappedUser);
+      localStorage.setItem('user', JSON.stringify(mappedUser));
+      
+      const data = await api.getUserData(apiUser.id);
+      setUserData(data);
+      localStorage.setItem('userData', JSON.stringify(data));
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : 'Неверный логин');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const logout = () => {
     setUser(null);
+    setUserData(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('userData');
   };
 
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    const storedData = localStorage.getItem('userData');
+    
+    if (storedUser && storedData) {
+      setUser(JSON.parse(storedUser));
+      setUserData(JSON.parse(storedData));
+    }
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, userData, login, logout, isAuthenticated: !!user, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
