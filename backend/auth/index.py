@@ -1,6 +1,6 @@
 """
 Business: User authentication and authorization
-Args: event with httpMethod, body (phone, password for login)
+Args: event with httpMethod, body (phone for login)
 Returns: HTTP response with user data or error
 """
 import json
@@ -34,15 +34,18 @@ def handler(event, context):
                 'body': json.dumps({'error': 'Phone is required'})
             }
         
+        phone_escaped = phone.replace("'", "''")
+        
         dsn = os.environ.get('DATABASE_URL')
         
         conn = psycopg2.connect(dsn)
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
-        cur.execute(
-            "SELECT id, phone, email, role, name, organization FROM users WHERE phone = %s",
-            (phone,)
-        )
+        cur.execute(f"""
+            SELECT id, phone, email, role, name, organization 
+            FROM users 
+            WHERE phone = '{phone_escaped}'
+        """)
         
         user = cur.fetchone()
         

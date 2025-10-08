@@ -36,6 +36,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (input: string) => {
     setIsLoading(true);
+    
+    localStorage.removeItem('user');
+    localStorage.removeItem('userData');
+    setUser(null);
+    setUserData(null);
+    
     try {
       const phone = PHONE_MAP[input.toLowerCase()] || input;
       

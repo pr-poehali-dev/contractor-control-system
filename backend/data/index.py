@@ -34,12 +34,21 @@ def handler(event, context):
                 'body': json.dumps({'error': 'User ID required'})
             }
         
+        try:
+            user_id_int = int(user_id)
+        except (ValueError, TypeError):
+            return {
+                'statusCode': 400,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({'error': 'Invalid user ID'})
+            }
+        
         dsn = os.environ.get('DATABASE_URL')
         
         conn = psycopg2.connect(dsn)
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
-        cur.execute("SELECT role FROM users WHERE id = %s", (user_id,))
+        cur.execute(f"SELECT id, role FROM users WHERE id = {user_id_int}")
         user = cur.fetchone()
         
         if not user:
@@ -54,77 +63,75 @@ def handler(event, context):
         role = user['role']
         
         if role == 'contractor':
-            cur.execute("""
+            cur.execute(f"""
                 SELECT DISTINCT c.id as contractor_id
                 FROM contractors c
                 JOIN users u ON u.organization = c.name
-                WHERE u.id = %s
-            """, (user_id,))
+                WHERE u.id = {user_id_int}
+            """)
             contractor = cur.fetchone()
             contractor_id = contractor['contractor_id'] if contractor else None
             
             if contractor_id:
-                cur.execute("""
-                    SELECT p.id, p.title, p.description, p.status, p.created_at
+                cur.execute(f"""
+                    SELECT DISTINCT p.id, p.title, p.description, p.status, p.created_at
                     FROM projects p
                     JOIN objects o ON o.project_id = p.id
                     JOIN works w ON w.object_id = o.id
-                    WHERE w.contractor_id = %s
-                    GROUP BY p.id
-                """, (contractor_id,))
+                    WHERE w.contractor_id = {contractor_id}
+                """)
                 projects = cur.fetchall()
                 
-                cur.execute("""
-                    SELECT o.id, o.title, o.address, o.project_id, o.status
+                cur.execute(f"""
+                    SELECT DISTINCT o.id, o.title, o.address, o.project_id, o.status
                     FROM objects o
                     JOIN works w ON w.object_id = o.id
-                    WHERE w.contractor_id = %s
-                    GROUP BY o.id
-                """, (contractor_id,))
+                    WHERE w.contractor_id = {contractor_id}
+                """)
                 sites = cur.fetchall()
                 
-                cur.execute("""
+                cur.execute(f"""
                     SELECT w.id, w.title, w.description, w.object_id, w.contractor_id,
                            c.name as contractor_name, w.status, w.start_date, w.end_date
                     FROM works w
                     LEFT JOIN contractors c ON w.contractor_id = c.id
-                    WHERE w.contractor_id = %s
-                """, (contractor_id,))
+                    WHERE w.contractor_id = {contractor_id}
+                """)
                 works = cur.fetchall()
             else:
                 projects, sites, works = [], [], []
         else:
-            cur.execute("""
+            cur.execute(f"""
                 SELECT id, title, description, status, created_at
                 FROM projects
-                WHERE client_id = %s
-            """, (user_id,))
+                WHERE client_id = {user_id_int}
+            """)
             projects = cur.fetchall()
             
             project_ids = [p['id'] for p in projects]
             
             if project_ids:
-                placeholders = ','.join(['%s'] * len(project_ids))
+                project_ids_str = ','.join(str(pid) for pid in project_ids)
                 
                 cur.execute(f"""
                     SELECT id, title, address, project_id, status
                     FROM objects
-                    WHERE project_id IN ({placeholders})
-                """, project_ids)
+                    WHERE project_id IN ({project_ids_str})
+                """)
                 sites = cur.fetchall()
                 
                 site_ids = [s['id'] for s in sites]
                 
                 if site_ids:
-                    site_placeholders = ','.join(['%s'] * len(site_ids))
+                    site_ids_str = ','.join(str(sid) for sid in site_ids)
                     
                     cur.execute(f"""
                         SELECT w.id, w.title, w.description, w.object_id, w.contractor_id,
                                c.name as contractor_name, w.status, w.start_date, w.end_date
                         FROM works w
                         LEFT JOIN contractors c ON w.contractor_id = c.id
-                        WHERE w.object_id IN ({site_placeholders})
-                    """, site_ids)
+                        WHERE w.object_id IN ({site_ids_str})
+                    """)
                     works = cur.fetchall()
                 else:
                     works = []
@@ -134,7 +141,7 @@ def handler(event, context):
         work_ids = [w['id'] for w in works]
         
         if work_ids:
-            work_placeholders = ','.join(['%s'] * len(work_ids))
+            work_ids_str = ','.join(str(wid) for wid in work_ids)
             
             cur.execute(f"""
                 SELECT i.id, i.work_id, i.inspection_number, i.created_by, i.status,
@@ -142,28 +149,28 @@ def handler(event, context):
                        u.name as inspector_name
                 FROM inspections i
                 LEFT JOIN users u ON i.created_by = u.id
-                WHERE i.work_id IN ({work_placeholders})
-            """, work_ids)
+                WHERE i.work_id IN ({work_ids_str})
+            """)
             inspections = cur.fetchall()
             
             inspection_ids = [i['id'] for i in inspections]
             
             if inspection_ids:
-                insp_placeholders = ','.join(['%s'] * len(inspection_ids))
+                inspection_ids_str = ','.join(str(iid) for iid in inspection_ids)
                 
                 cur.execute(f"""
                     SELECT id, inspection_id, title, standard, status
                     FROM inspection_checkpoints
-                    WHERE inspection_id IN ({insp_placeholders})
-                """, inspection_ids)
+                    WHERE inspection_id IN ({inspection_ids_str})
+                """)
                 checkpoints = cur.fetchall()
                 
                 cur.execute(f"""
                     SELECT id, inspection_id, checkpoint_id, description,
                            normative_ref, photo_urls, status, created_at, resolved_at
                     FROM remarks
-                    WHERE inspection_id IN ({insp_placeholders})
-                """, inspection_ids)
+                    WHERE inspection_id IN ({inspection_ids_str})
+                """)
                 remarks = cur.fetchall()
             else:
                 checkpoints, remarks = [], []
@@ -174,9 +181,9 @@ def handler(event, context):
                        u.name as author_name, u.role as author_role
                 FROM work_logs wl
                 LEFT JOIN users u ON wl.created_by = u.id
-                WHERE wl.work_id IN ({work_placeholders})
+                WHERE wl.work_id IN ({work_ids_str})
                 ORDER BY wl.created_at DESC
-            """, work_ids)
+            """)
             work_logs = cur.fetchall()
         else:
             inspections, checkpoints, remarks, work_logs = [], [], [], []
