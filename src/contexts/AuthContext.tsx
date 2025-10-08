@@ -54,10 +54,7 @@ const MOCK_USERS: Record<string, { password: string; user: User }> = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    const stored = localStorage.getItem('user');
-    return stored ? JSON.parse(stored) : null;
-  });
+  const [user, setUser] = useState<User | null>(null);
 
   const login = async (email: string, password: string) => {
     await new Promise(resolve => setTimeout(resolve, 500));

@@ -47,10 +47,11 @@ const WorkLog = () => {
     setNewMessage('');
   };
 
-  const handleEntryClick = (entry: typeof logEntries[0]) => {
-    if (user?.role === 'customer') {
-      return;
-    }
+  const handleMenuAction = (action: string) => {
+    toast({
+      title: action,
+      description: 'Функция в разработке',
+    });
   };
 
   const getMenuForEntry = (entry: typeof logEntries[0]) => {
@@ -71,6 +72,39 @@ const WorkLog = () => {
 
     return [];
   };
+
+  const MessageCard = ({ entry, isOwn }: { entry: typeof logEntries[0]; isOwn: boolean }) => (
+    <CardContent className="p-3">
+      <div className="flex items-start justify-between gap-2 mb-1">
+        <p className="text-xs font-medium text-slate-600">
+          {entry.authorName}
+        </p>
+        {entry.type === 'inspection' && (
+          <Icon name="ClipboardCheck" size={14} className="text-green-600" />
+        )}
+        {entry.type === 'remark' && (
+          <Icon name="AlertCircle" size={14} className="text-red-600" />
+        )}
+      </div>
+
+      <p className="text-sm text-slate-900 whitespace-pre-wrap break-words">
+        {entry.content}
+      </p>
+
+      {entry.materials && entry.materials.length > 0 && (
+        <div className="mt-2 pt-2 border-t border-slate-200">
+          <p className="text-xs text-slate-500 mb-1">Материалы:</p>
+          {entry.materials.map((material, idx) => (
+            <p key={idx} className="text-xs text-slate-600">• {material}</p>
+          ))}
+        </div>
+      )}
+
+      <p className="text-xs text-slate-400 mt-2">
+        {formatTime(entry.timestamp)}
+      </p>
+    </CardContent>
+  );
 
   return (
     <div className="flex flex-col h-full bg-slate-50">
@@ -98,68 +132,47 @@ const WorkLog = () => {
                   isOwnMessage ? 'flex-row-reverse' : 'flex-row'
                 )}
               >
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Card
-                      className={cn(
-                        'max-w-[85%] md:max-w-[70%] cursor-pointer transition-shadow hover:shadow-md',
-                        isOwnMessage ? 'bg-blue-50' : 'bg-white',
-                        entry.type === 'system' && 'bg-yellow-50 border-yellow-200',
-                        entry.type === 'remark' && 'bg-red-50 border-red-200'
-                      )}
-                      onClick={() => handleEntryClick(entry)}
-                    >
-                      <CardContent className="p-3">
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <p className="text-xs font-medium text-slate-600">
-                            {entry.authorName}
-                          </p>
-                          {entry.type === 'inspection' && (
-                            <Icon name="ClipboardCheck" size={14} className="text-green-600" />
+                {menu.length > 0 ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <div className={cn('max-w-[85%] md:max-w-[70%]', isOwnMessage ? 'ml-auto' : 'mr-auto')}>
+                        <Card
+                          className={cn(
+                            'cursor-pointer transition-shadow hover:shadow-md',
+                            isOwnMessage ? 'bg-blue-50' : 'bg-white',
+                            entry.type === 'system' && 'bg-yellow-50 border-yellow-200',
+                            entry.type === 'remark' && 'bg-red-50 border-red-200'
                           )}
-                          {entry.type === 'remark' && (
-                            <Icon name="AlertCircle" size={14} className="text-red-600" />
-                          )}
-                        </div>
-
-                        <p className="text-sm text-slate-900 whitespace-pre-wrap break-words">
-                          {entry.content}
-                        </p>
-
-                        {entry.materials && entry.materials.length > 0 && (
-                          <div className="mt-2 pt-2 border-t border-slate-200">
-                            <p className="text-xs text-slate-500 mb-1">Материалы:</p>
-                            {entry.materials.map((material, idx) => (
-                              <p key={idx} className="text-xs text-slate-600">• {material}</p>
-                            ))}
-                          </div>
-                        )}
-
-                        <p className="text-xs text-slate-400 mt-2">
-                          {formatTime(entry.timestamp)}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </DropdownMenuTrigger>
-                  {menu.length > 0 && (
+                        >
+                          <MessageCard entry={entry} isOwn={isOwnMessage} />
+                        </Card>
+                      </div>
+                    </DropdownMenuTrigger>
                     <DropdownMenuContent align={isOwnMessage ? 'end' : 'start'}>
                       {menu.map((item) => (
                         <DropdownMenuItem
                           key={item.label}
-                          onClick={() => {
-                            toast({
-                              title: item.label,
-                              description: 'Функция в разработке',
-                            });
-                          }}
+                          onClick={() => handleMenuAction(item.label)}
                         >
                           <Icon name={item.icon as any} size={16} className="mr-2" />
                           {item.label}
                         </DropdownMenuItem>
                       ))}
                     </DropdownMenuContent>
-                  )}
-                </DropdownMenu>
+                  </DropdownMenu>
+                ) : (
+                  <div className={cn('max-w-[85%] md:max-w-[70%]', isOwnMessage ? 'ml-auto' : 'mr-auto')}>
+                    <Card
+                      className={cn(
+                        isOwnMessage ? 'bg-blue-50' : 'bg-white',
+                        entry.type === 'system' && 'bg-yellow-50 border-yellow-200',
+                        entry.type === 'remark' && 'bg-red-50 border-red-200'
+                      )}
+                    >
+                      <MessageCard entry={entry} isOwn={isOwnMessage} />
+                    </Card>
+                  </div>
+                )}
               </div>
             );
           })

@@ -16,13 +16,18 @@ const Dashboard = () => {
   const projects = mockData?.projects || [];
 
   useEffect(() => {
-    if (user?.role === 'contractor') {
+    if (!user) return;
+
+    if (user.role === 'contractor') {
       navigate('/objects');
       return;
     }
 
-    if (user?.id === 'test3' && projects.length === 0) {
-      setShowOnboarding(true);
+    if (user.id === 'test3' && projects.length === 0) {
+      const hasSeenOnboarding = localStorage.getItem(`onboarding_${user.id}`);
+      if (!hasSeenOnboarding) {
+        setShowOnboarding(true);
+      }
     }
   }, [user, projects.length, navigate]);
 

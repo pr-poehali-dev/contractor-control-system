@@ -61,6 +61,7 @@ const OnboardingBanner = ({ onClose }: OnboardingBannerProps) => {
             if (currentStep < steps.length - 1) {
               setCurrentStep(currentStep + 1);
             } else {
+              localStorage.setItem('onboarding_test3', 'true');
               onClose();
             }
           }}>
@@ -80,7 +81,10 @@ const OnboardingBanner = ({ onClose }: OnboardingBannerProps) => {
           </div>
 
           <button
-            onClick={onClose}
+            onClick={() => {
+              localStorage.setItem('onboarding_test3', 'true');
+              onClose();
+            }}
             className="text-sm text-slate-500 hover:text-slate-700"
           >
             Пропустить обучение
