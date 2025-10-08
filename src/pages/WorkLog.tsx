@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getMockData } from '@/lib/mockData';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,12 +15,21 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 const WorkLog = () => {
-  const { user } = useAuth();
+  const { user, userData } = useAuth();
   const { toast } = useToast();
   const [newMessage, setNewMessage] = useState('');
 
-  const mockData = user ? getMockData(user.id) : null;
-  const logEntries = mockData?.logEntries || [];
+  const logEntries = (userData?.workLogs || []).map(log => ({
+    id: log.id,
+    authorId: log.created_by,
+    authorName: log.author_name,
+    content: log.description,
+    timestamp: log.created_at,
+    type: log.author_role === 'contractor' ? 'work' : 'message',
+    materials: log.materials ? log.materials.split(',').map(m => m.trim()) : [],
+    volume: log.volume,
+    photos: log.photo_urls ? log.photo_urls.split(',') : [],
+  }));
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -55,7 +64,7 @@ const WorkLog = () => {
   };
 
   const getMenuForEntry = (entry: typeof logEntries[0]) => {
-    if (user?.role === 'customer' && entry.type === 'work') {
+    if (user?.role === 'client' && entry.type === 'work') {
       return [
         { label: 'Создать проверку', icon: 'ClipboardCheck' },
         { label: 'Добавить замечание', icon: 'MessageCircle' },

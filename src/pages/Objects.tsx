@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { getMockData } from '@/lib/mockData';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,28 +15,27 @@ const statusEmoji = {
 
 export default function Objects() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, userData } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
 
-  const mockData = user ? getMockData(user.id) : null;
-  const sites = mockData?.sites || [];
-  const works = mockData?.works || [];
-  const projects = mockData?.projects || [];
+  const sites = userData?.sites || [];
+  const works = userData?.works || [];
+  const projects = userData?.projects || [];
 
   const siteData = sites.map(site => {
-    const project = projects.find(p => p.id === site.projectId);
-    const siteWorks = works.filter(w => w.siteId === site.id);
+    const project = projects.find(p => p.id === site.project_id);
+    const siteWorks = works.filter(w => w.object_id === site.id);
     return {
       ...site,
-      projectName: project?.name || '',
+      projectName: project?.title || '',
       worksCount: siteWorks.length,
       works: siteWorks,
     };
   });
 
   const filteredSites = siteData.filter((site) => {
-    const matchesSearch = site.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch = site.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       site.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
       site.projectName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = selectedStatus === 'all' || site.status === selectedStatus;
@@ -44,7 +43,7 @@ export default function Objects() {
   });
 
   const handleSiteClick = (site: typeof siteData[0]) => {
-    navigate(`/projects/${site.projectId}/objects/${site.id}`);
+    navigate(`/projects/${site.project_id}/objects/${site.id}`);
   };
 
   return (
@@ -102,15 +101,15 @@ export default function Objects() {
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
-                    {site.name}
+                    {site.title}
                   </h3>
                   <span className="text-lg">{statusEmoji[site.status]}</span>
                 </div>
 
-                {user?.role === 'customer' && site.works[0]?.contractorName && (
+                {user?.role === 'client' && site.works[0]?.contractor_name && (
                   <div className="flex items-center gap-2 text-sm text-slate-600 mb-2">
                     <Icon name="User" size={14} />
-                    <span>{site.works[0].contractorName}</span>
+                    <span>{site.works[0].contractor_name}</span>
                   </div>
                 )}
 

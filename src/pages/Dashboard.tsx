@@ -87,9 +87,9 @@ const Dashboard = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           {projects.map((project, index) => {
-            const projectSites = sites.filter(s => s.projectId === project.id);
+            const projectSites = sites.filter(s => s.project_id === project.id);
             const projectWorks = works.filter(w => 
-              projectSites.some(s => s.id === w.siteId)
+              projectSites.some(s => s.id === w.object_id)
             );
             const completedWorks = projectWorks.filter(w => w.status === 'completed').length;
             const progress = projectWorks.length > 0 
@@ -106,7 +106,7 @@ const Dashboard = () => {
                 <CardContent className="p-4 md:p-6">
                   <div className="flex items-start justify-between mb-3">
                     <h3 className="font-semibold text-slate-900 text-base md:text-lg group-hover:text-blue-600 transition-colors">
-                      {project.name}
+                      {project.title}
                     </h3>
                     <div className={`
                       w-2 h-2 rounded-full
