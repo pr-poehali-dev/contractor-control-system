@@ -13,7 +13,7 @@ const CreateObject = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, setUserData } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     address: '',
@@ -44,6 +44,10 @@ const CreateObject = () => {
         status: 'active',
       });
 
+      const refreshedData = await api.getUserData(user.id);
+      setUserData(refreshedData);
+      localStorage.setItem('userData', JSON.stringify(refreshedData));
+
       toast({
         title: 'Объект создан!',
         description: `Объект "${formData.title}" успешно добавлен`,
@@ -51,7 +55,6 @@ const CreateObject = () => {
 
       setTimeout(() => {
         navigate(`/projects/${projectId}`);
-        window.location.reload();
       }, 300);
     } catch (error) {
       toast({

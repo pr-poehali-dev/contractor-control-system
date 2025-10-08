@@ -14,7 +14,7 @@ const CreateWork = () => {
   const { projectId, objectId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, setUserData } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -45,15 +45,19 @@ const CreateWork = () => {
         status: 'active',
       });
 
+      const newWorkId = result.data.id;
+      
+      const refreshedData = await api.getUserData(user.id);
+      setUserData(refreshedData);
+      localStorage.setItem('userData', JSON.stringify(refreshedData));
+
       toast({
         title: 'Работа создана!',
         description: `Работа "${formData.title}" успешно добавлена`,
       });
 
-      const newWorkId = result.data.id;
       setTimeout(() => {
         navigate(`/projects/${projectId}/objects/${objectId}/works/${newWorkId}`);
-        window.location.reload();
       }, 300);
     } catch (error) {
       toast({
