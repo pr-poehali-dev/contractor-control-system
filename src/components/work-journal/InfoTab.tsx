@@ -19,8 +19,8 @@ export default function InfoTab({
   handleCreateInspection,
 }: InfoTabProps) {
   return (
-    <div className="flex-1 overflow-y-auto p-3 md:p-6 bg-slate-50">
-      <div className="max-w-4xl mx-auto">
+    <div className="flex-1 overflow-y-auto p-3 md:p-6 lg:p-8 bg-slate-50">
+      <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold">Информация и история</h3>
           <Button size="sm" onClick={handleCreateInspection}>
@@ -29,9 +29,9 @@ export default function InfoTab({
           </Button>
         </div>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="p-4 lg:p-6">
               <h4 className="font-semibold mb-3">Детали работы</h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -56,10 +56,10 @@ export default function InfoTab({
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-4">
+          <Card className="lg:row-span-2">
+            <CardContent className="p-4 lg:p-6">
               <h4 className="font-semibold mb-3">История изменений</h4>
-              <div className="space-y-3">
+              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
                 <div className="flex gap-3 pb-3 border-b border-slate-100 last:border-b-0">
                   <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5" />
                   <div className="flex-1">

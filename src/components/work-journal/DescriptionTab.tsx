@@ -8,8 +8,8 @@ interface DescriptionTabProps {
 
 export default function DescriptionTab({ selectedWorkData }: DescriptionTabProps) {
   return (
-    <div className="flex-1 overflow-y-auto p-3 md:p-6 bg-slate-50">
-      <div className="max-w-4xl mx-auto">
+    <div className="flex-1 overflow-y-auto p-3 md:p-6 lg:p-8 bg-slate-50">
+      <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold">Описание работы</h3>
           <Button size="sm" variant="outline">
@@ -19,7 +19,7 @@ export default function DescriptionTab({ selectedWorkData }: DescriptionTabProps
         </div>
 
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-6 lg:p-8">
             <div className="prose prose-sm max-w-none">
               <h4 className="font-semibold mb-2">{selectedWorkData.title}</h4>
               <p className="text-slate-600 mb-4">
