@@ -78,10 +78,10 @@ export default function AnalyticsTab({ workId }: AnalyticsTabProps) {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-10 bg-slate-50">
+    <div className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-12 bg-slate-50">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <h3 className="text-xl md:text-2xl font-bold">Аналитика: План vs Факт</h3>
+        <div className="flex items-center justify-between mb-10">
+          <h3 className="text-2xl md:text-3xl font-bold">Аналитика: План vs Факт</h3>
           <Button variant="outline">
             <Icon name="Download" size={18} className="mr-2" />
             Экспорт отчёта
@@ -192,26 +192,26 @@ export default function AnalyticsTab({ workId }: AnalyticsTabProps) {
               <table className="w-full">
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
-                    <th className="text-left p-4 text-sm font-semibold text-slate-700">Категория</th>
-                    <th className="text-left p-4 text-sm font-semibold text-slate-700">Наименование</th>
-                    <th className="text-right p-4 text-sm font-semibold text-slate-700">План (кол.)</th>
-                    <th className="text-right p-4 text-sm font-semibold text-slate-700">Факт (кол.)</th>
-                    <th className="text-right p-4 text-sm font-semibold text-slate-700">План (₽)</th>
-                    <th className="text-right p-4 text-sm font-semibold text-slate-700">Факт (₽)</th>
-                    <th className="text-right p-4 text-sm font-semibold text-slate-700">Откл. (%)</th>
-                    <th className="text-left p-4 text-sm font-semibold text-slate-700">Статус</th>
+                    <th className="text-left p-5 text-base font-semibold text-slate-700">Категория</th>
+                    <th className="text-left p-5 text-base font-semibold text-slate-700">Наименование</th>
+                    <th className="text-right p-5 text-base font-semibold text-slate-700">План (кол.)</th>
+                    <th className="text-right p-5 text-base font-semibold text-slate-700">Факт (кол.)</th>
+                    <th className="text-right p-5 text-base font-semibold text-slate-700">План (₽)</th>
+                    <th className="text-right p-5 text-base font-semibold text-slate-700">Факт (₽)</th>
+                    <th className="text-right p-5 text-base font-semibold text-slate-700">Откл. (%)</th>
+                    <th className="text-left p-5 text-base font-semibold text-slate-700">Статус</th>
                   </tr>
                 </thead>
                 <tbody>
                   {mockPlanFactData.map((item) => (
                     <tr key={item.estimate_item_id} className="border-b border-slate-100 hover:bg-slate-50">
-                      <td className="p-4">
-                        <Badge variant="outline" className="text-sm">{item.category}</Badge>
+                      <td className="p-5">
+                        <Badge variant="outline" className="text-base">{item.category}</Badge>
                       </td>
-                      <td className="p-4 text-base">{item.name}</td>
-                      <td className="p-4 text-base text-right text-slate-600">{item.planned_quantity}</td>
-                      <td className="p-4 text-base text-right font-semibold">{item.actual_quantity}</td>
-                      <td className="p-4 text-base text-right text-slate-600">
+                      <td className="p-5 text-lg">{item.name}</td>
+                      <td className="p-5 text-lg text-right text-slate-600">{item.planned_quantity}</td>
+                      <td className="p-5 text-lg text-right font-semibold">{item.actual_quantity}</td>
+                      <td className="p-5 text-lg text-right text-slate-600">
                         {item.planned_cost.toLocaleString('ru-RU')}
                       </td>
                       <td className="p-4 text-base text-right font-semibold">

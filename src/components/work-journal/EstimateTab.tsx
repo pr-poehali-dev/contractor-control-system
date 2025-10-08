@@ -14,10 +14,10 @@ const mockEstimate = [
 
 export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) {
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-10 bg-slate-50">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl md:text-2xl font-bold">Смета</h3>
+    <div className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-12 bg-slate-50">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="text-2xl md:text-3xl font-bold">Смета</h3>
           <Button onClick={handleCreateEstimate}>
             <Icon name="Plus" size={18} className="mr-2" />
             Создать смету
@@ -30,20 +30,20 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
               <table className="w-full">
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
-                    <th className="text-left p-4 text-base font-semibold text-slate-700">Наименование</th>
-                    <th className="text-left p-4 text-base font-semibold text-slate-700">Количество</th>
-                    <th className="text-left p-4 text-base font-semibold text-slate-700">Цена</th>
-                    <th className="text-right p-4 text-base font-semibold text-slate-700">Итого</th>
+                    <th className="text-left p-5 text-lg font-semibold text-slate-700">Наименование</th>
+                    <th className="text-left p-5 text-lg font-semibold text-slate-700">Количество</th>
+                    <th className="text-left p-5 text-lg font-semibold text-slate-700">Цена</th>
+                    <th className="text-right p-5 text-lg font-semibold text-slate-700">Итого</th>
                     <th className="w-12"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {mockEstimate.map((item, index) => (
                     <tr key={index} className="border-b border-slate-100 hover:bg-slate-50">
-                      <td className="p-4 text-base">{item.name}</td>
-                      <td className="p-4 text-base text-slate-600">{item.quantity}</td>
-                      <td className="p-4 text-base text-slate-600">{item.price}</td>
-                      <td className="p-4 text-base font-semibold text-right">{item.total}</td>
+                      <td className="p-5 text-lg">{item.name}</td>
+                      <td className="p-5 text-lg text-slate-600">{item.quantity}</td>
+                      <td className="p-5 text-lg text-slate-600">{item.price}</td>
+                      <td className="p-5 text-lg font-semibold text-right">{item.total}</td>
                       <td className="p-4">
                         <Button variant="ghost" size="icon" className="h-8 w-8">
                           <Icon name="MoreVertical" size={16} />
@@ -54,8 +54,8 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
                 </tbody>
                 <tfoot className="bg-slate-50 border-t-2 border-slate-300">
                   <tr>
-                    <td colSpan={3} className="p-4 text-base font-semibold">Итого:</td>
-                    <td className="p-4 text-lg font-bold text-right">100 000 ₽</td>
+                    <td colSpan={3} className="p-5 text-lg font-semibold">Итого:</td>
+                    <td className="p-5 text-xl font-bold text-right">100 000 ₽</td>
                     <td></td>
                   </tr>
                 </tfoot>

@@ -49,17 +49,32 @@ const ObjectDetail = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Мобильный хедер */}
-      <div className="sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3">
-        <div className="flex items-center justify-between mb-2">
-          <Button variant="ghost" size="sm" onClick={() => navigate(`/projects/${projectId}`)}>
-            <Icon name="ChevronLeft" size={20} />
-          </Button>
+      {/* Хедер */}
+      <div className="sticky top-0 z-10 bg-white border-b border-slate-200 px-4 md:px-6 py-3">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3 min-w-0 flex-1">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="flex-shrink-0 mt-0.5"
+              onClick={() => navigate(`/projects/${projectId}`)}
+            >
+              <Icon name="ChevronLeft" size={24} />
+            </Button>
+            
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-slate-900 mb-1">{site.title}</h1>
+              <div className="flex items-center gap-2 text-sm text-slate-600">
+                <Icon name="MapPin" size={16} />
+                <span className="truncate">{site.address}</span>
+              </div>
+            </div>
+          </div>
           
           {user?.role === 'client' && (
             <Button 
               variant="ghost" 
-              size="sm"
+              size="icon"
               onClick={() => setShowActions(!showActions)}
             >
               <Icon name="MoreVertical" size={20} />
@@ -67,17 +82,10 @@ const ObjectDetail = () => {
           )}
         </div>
 
-        <h1 className="text-lg font-bold text-slate-900 mb-1">{site.title}</h1>
-        <div className="flex items-center gap-2 text-xs text-slate-600">
-          <Icon name="MapPin" size={14} />
-          <span className="truncate">{site.address}</span>
-        </div>
-
-        {/* Действия */}
         {showActions && (
-          <div className="mt-3 flex gap-2">
+          <div className="mt-4 flex gap-2">
             <Button variant="outline" size="sm" className="flex-1" onClick={handleEdit}>
-              <Icon name="Edit" size={16} className="mr-1" />
+              <Icon name="Edit" size={18} className="mr-1" />
               Изменить
             </Button>
             <Button variant="outline" size="sm" className="flex-1" onClick={handleDelete}>

@@ -19,21 +19,21 @@ export default function InfoTab({
   handleCreateInspection,
 }: InfoTabProps) {
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-10 bg-slate-50">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl md:text-2xl font-bold">Информация и история</h3>
+    <div className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-12 bg-slate-50">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="text-2xl md:text-3xl font-bold">Информация и история</h3>
           <Button onClick={handleCreateInspection}>
             <Icon name="Plus" size={18} className="mr-2" />
             Создать проверку
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
           <Card>
-            <CardContent className="p-5 lg:p-7">
-              <h4 className="text-lg font-semibold mb-4">Детали работы</h4>
-              <div className="space-y-3 text-base">
+            <CardContent className="p-6 lg:p-8">
+              <h4 className="text-xl font-semibold mb-5">Детали работы</h4>
+              <div className="space-y-4 text-lg">
                 <div className="flex justify-between">
                   <span className="text-slate-600">Статус:</span>
                   <Badge>

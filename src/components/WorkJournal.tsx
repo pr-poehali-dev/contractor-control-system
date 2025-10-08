@@ -214,17 +214,17 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
               <div className="flex-1 flex flex-col overflow-hidden">
                 {activeTab === 'journal' && (
                   <>
-                    <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 bg-slate-50">
+                    <div className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-12 bg-slate-50">
                       {mockEvents.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full">
                           <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-4">
                             <Icon name="MessageSquare" size={40} className="text-blue-400" />
                           </div>
-                          <p className="text-slate-500 text-sm mb-2">Записей пока нет</p>
-                          <p className="text-slate-400 text-xs">Начните вести журнал работ</p>
+                          <p className="text-slate-500 text-base mb-2">Записей пока нет</p>
+                          <p className="text-slate-400 text-sm">Начните вести журнал работ</p>
                         </div>
                       ) : (
-                        <div className="max-w-5xl mx-auto space-y-6">
+                        <div className="max-w-7xl mx-auto space-y-10">
                           {mockEvents.map((event, index) => {
                             const showDateSeparator = index === 0 || 
                               formatDate(mockEvents[index - 1].created_at) !== formatDate(event.created_at);

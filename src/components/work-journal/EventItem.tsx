@@ -30,27 +30,27 @@ export default function EventItem({
         return (
           <>
             {event.work_data && (
-              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-200">
-                <Icon name="Wrench" size={18} className="text-green-600" />
-                <span className="text-sm font-semibold text-green-600">Отчёт о работе</span>
+              <div className="flex items-center gap-3 mb-4 pb-3 border-b border-slate-200">
+                <Icon name="Wrench" size={20} className="text-green-600" />
+                <span className="text-base font-semibold text-green-600">Отчёт о работе</span>
               </div>
             )}
-            <p className="text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
+            <p className="text-lg leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
             
             {event.work_data?.volume && (
-              <div className="mt-4 p-3 bg-slate-50 rounded-lg">
-                <p className="text-sm text-slate-600">
-                  Объём: <span className="font-semibold text-base">{event.work_data.volume} {event.work_data.unit}</span>
+              <div className="mt-5 p-4 bg-slate-50 rounded-lg">
+                <p className="text-base text-slate-600">
+                  Объём: <span className="font-semibold text-lg">{event.work_data.volume} {event.work_data.unit}</span>
                 </p>
               </div>
             )}
             
             {event.work_data?.materials && event.work_data.materials.length > 0 && (
-              <div className="mt-3">
-                <p className="text-sm text-slate-600 mb-2">Материалы:</p>
+              <div className="mt-4">
+                <p className="text-base text-slate-600 mb-3">Материалы:</p>
                 <div className="flex flex-wrap gap-2">
                   {event.work_data.materials.map((material, idx) => (
-                    <Badge key={idx} variant="outline" className="text-sm py-1 px-2">
+                    <Badge key={idx} variant="outline" className="text-base py-1.5 px-3">
                       {material}
                     </Badge>
                   ))}
@@ -169,12 +169,12 @@ export default function EventItem({
         
       case 'chat_message':
         return (
-          <p className="text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
+          <p className="text-lg leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
         );
         
       default:
         return (
-          <p className="text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
+          <p className="text-lg leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
         );
     }
   };
@@ -197,19 +197,19 @@ export default function EventItem({
   }
 
   return (
-    <div className={cn('flex gap-4 group', isOwnEvent && 'flex-row-reverse')}>
-      <Avatar className="w-11 h-11 flex-shrink-0">
+    <div className={cn('flex gap-5 group', isOwnEvent && 'flex-row-reverse')}>
+      <Avatar className="w-12 h-12 flex-shrink-0">
         <AvatarFallback className={cn(
-          'text-sm font-semibold',
+          'text-base font-semibold',
           isOwnEvent ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-700'
         )}>
           {getInitials(event.author_name)}
         </AvatarFallback>
       </Avatar>
 
-      <div className={cn('flex-1 max-w-[80%]', isOwnEvent && 'flex flex-col items-end')}>
+      <div className={cn('flex-1 max-w-[85%]', isOwnEvent && 'flex flex-col items-end')}>
         <div className={cn('mb-2 flex items-center gap-2', isOwnEvent && 'flex-row-reverse')}>
-          <span className="text-base font-semibold text-slate-900">{event.author_name}</span>
+          <span className="text-lg font-semibold text-slate-900">{event.author_name}</span>
           {userRole === 'customer' && event.type === 'work_entry' && !isOwnEvent && (
             <Button
               variant="ghost"
@@ -229,9 +229,9 @@ export default function EventItem({
           event.type === 'work_entry' && !isOwnEvent && 'border-l-4 border-l-green-500',
           event.type === 'defect_added' && 'border-l-4 border-l-amber-500'
         )}>
-          <CardContent className="p-4">
+          <CardContent className="p-5">
             {renderEventContent()}
-            <p className={cn('mt-3 text-sm text-slate-400', isOwnEvent && 'text-right')}>
+            <p className={cn('mt-4 text-base text-slate-400', isOwnEvent && 'text-right')}>
               {formatTime(event.created_at)}
             </p>
           </CardContent>
