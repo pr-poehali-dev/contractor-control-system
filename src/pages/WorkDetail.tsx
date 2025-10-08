@@ -4,18 +4,34 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import EventItem from '@/components/work-journal/EventItem';
+import CreateInspectionModal from '@/components/work-journal/CreateInspectionModal';
+import InfoTab from '@/components/work-journal/InfoTab';
+import DescriptionTab from '@/components/work-journal/DescriptionTab';
+import EstimateTab from '@/components/work-journal/EstimateTab';
+import AnalyticsTab from '@/components/work-journal/AnalyticsTab';
+import type { JournalEvent, UserRole } from '@/types/journal';
 
 const WorkDetail = () => {
   const { projectId, objectId, workId } = useParams();
   const navigate = useNavigate();
   const { user, userData } = useAuth();
   const { toast } = useToast();
+  
   const [newMessage, setNewMessage] = useState('');
+  const [progress, setProgress] = useState('0');
+  const [volume, setVolume] = useState('');
+  const [materials, setMaterials] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isInspectionModalOpen, setIsInspectionModalOpen] = useState(false);
+  const [selectedEntryForInspection, setSelectedEntryForInspection] = useState<number | undefined>();
 
   const works = userData?.works || [];
   const workLogs = userData?.workLogs || [];
@@ -25,6 +41,87 @@ const WorkDetail = () => {
   const work = works.find(w => w.id === Number(workId));
   const site = sites.find(s => s.id === Number(objectId));
   const project = projects.find(p => p.id === Number(projectId));
+
+  const userRole: UserRole = user?.role || 'contractor';
+
+  const mockEvents: JournalEvent[] = [
+    {
+      id: 1,
+      type: 'work_entry',
+      work_id: Number(workId),
+      created_by: 1,
+      author_name: 'Иван Петров',
+      author_role: 'contractor',
+      created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+      content: 'Выполнена кирпичная кладка первого этажа. Уложено 500 кирпичей.',
+      work_data: {
+        volume: 50,
+        unit: 'м²',
+        materials: ['Кирпич керамический М150', 'Раствор цементный М100'],
+        photos: [],
+        progress: 25,
+      }
+    },
+    {
+      id: 2,
+      type: 'inspection_created',
+      work_id: Number(workId),
+      created_by: 2,
+      author_name: 'Система',
+      author_role: 'customer',
+      created_at: new Date(Date.now() - 86400000 * 1.5).toISOString(),
+      content: 'Проверка кирпичной кладки первого этажа',
+      inspection_data: {
+        inspection_id: 1,
+        inspection_number: '001',
+        status: 'completed',
+      }
+    },
+    {
+      id: 3,
+      type: 'defect_added',
+      work_id: Number(workId),
+      created_by: 2,
+      author_name: 'Алексей Смирнов',
+      author_role: 'customer',
+      created_at: new Date(Date.now() - 86400000 * 1.4).toISOString(),
+      defect_data: {
+        defect_id: 1,
+        inspection_id: 1,
+        inspection_number: '001',
+        description: 'Толщина горизонтальных швов превышает норму. Обнаружены участки с толщиной 15-18 мм.',
+        standard_reference: 'СНиП 3.03.01-87, п. 4.5 (допустимо 12 мм)',
+        photos: [],
+        status: 'open',
+      }
+    },
+    {
+      id: 4,
+      type: 'chat_message',
+      work_id: Number(workId),
+      created_by: 1,
+      author_name: 'Иван Петров',
+      author_role: 'contractor',
+      created_at: new Date(Date.now() - 86400000).toISOString(),
+      content: 'Принято к сведению. Исправим в течение 2 дней.',
+    },
+    {
+      id: 5,
+      type: 'inspection_completed',
+      work_id: Number(workId),
+      created_by: 2,
+      author_name: 'Система',
+      author_role: 'customer',
+      created_at: new Date(Date.now() - 86400000 * 0.5).toISOString(),
+      content: 'Повторная проверка после устранения замечаний',
+      inspection_data: {
+        inspection_id: 2,
+        inspection_number: '002',
+        status: 'completed',
+        defects_count: 0,
+      }
+    },
+  ];
 
   if (!work) {
     return (
@@ -39,20 +136,6 @@ const WorkDetail = () => {
       </div>
     );
   }
-
-  const workEntries = workLogs
-    .filter(log => log.work_id === work.id)
-    .map(log => ({
-      id: log.id,
-      authorId: log.created_by,
-      authorName: log.author_name,
-      content: log.description,
-      timestamp: log.created_at,
-      type: log.author_role === 'contractor' ? 'work' : 'message',
-      materials: log.materials ? log.materials.split(',').map(m => m.trim()) : [],
-      volume: log.volume,
-      photos: log.photo_urls ? log.photo_urls.split(',') : [],
-    }));
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -69,14 +152,22 @@ const WorkDetail = () => {
     return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!newMessage.trim()) return;
     
-    toast({
-      title: 'Запись добавлена',
-      description: 'Новая запись в журнале создана',
-    });
-    setNewMessage('');
+    setIsSubmitting(true);
+    
+    setTimeout(() => {
+      toast({
+        title: 'Запись добавлена',
+        description: 'Новая запись в журнале создана',
+      });
+      setNewMessage('');
+      setVolume('');
+      setMaterials('');
+      setProgress('0');
+      setIsSubmitting(false);
+    }, 500);
   };
 
   const getInitials = (name: string) => {
@@ -106,6 +197,19 @@ const WorkDetail = () => {
       case 'on_hold': return 'bg-red-100 text-red-700';
       default: return 'bg-slate-100 text-slate-700';
     }
+  };
+
+  const handleCreateInspection = (eventId: number) => {
+    setSelectedEntryForInspection(eventId);
+    setIsInspectionModalOpen(true);
+  };
+
+  const handleInspectionSubmit = (data: any) => {
+    console.log('Создание проверки:', data);
+    toast({
+      title: 'Проверка создана',
+      description: 'Проверка успешно добавлена в журнал',
+    });
   };
 
   return (
@@ -139,148 +243,181 @@ const WorkDetail = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-6">
-        {workEntries.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-              <Icon name="MessageSquare" size={32} className="text-slate-300" />
-            </div>
-            <p className="text-slate-500 text-lg mb-2">Записей пока нет</p>
-            <p className="text-slate-400 text-sm">Добавьте первую запись в журнал работ</p>
-          </div>
-        ) : (
-          <div className="max-w-4xl mx-auto space-y-6">
-            {workEntries.map((entry, index) => {
-              const isOwnMessage = entry.authorId === user?.id;
-              const showDateSeparator = index === 0 || 
-                formatDate(workEntries[index - 1].timestamp) !== formatDate(entry.timestamp);
+      <Tabs defaultValue="journal" className="flex-1 flex flex-col overflow-hidden">
+        <TabsList className="mx-4 md:mx-6 mt-4">
+          <TabsTrigger value="journal">
+            <Icon name="MessageSquare" size={16} className="mr-2" />
+            Журнал
+          </TabsTrigger>
+          <TabsTrigger value="info">
+            <Icon name="Info" size={16} className="mr-2" />
+            Информация
+          </TabsTrigger>
+          <TabsTrigger value="description">
+            <Icon name="FileText" size={16} className="mr-2" />
+            Описание
+          </TabsTrigger>
+          <TabsTrigger value="estimate">
+            <Icon name="Calculator" size={16} className="mr-2" />
+            Смета
+          </TabsTrigger>
+          <TabsTrigger value="analytics">
+            <Icon name="BarChart3" size={16} className="mr-2" />
+            Аналитика
+          </TabsTrigger>
+        </TabsList>
 
-              return (
-                <div key={entry.id}>
-                  {showDateSeparator && (
-                    <div className="flex items-center justify-center my-4">
-                      <div className="bg-slate-200 text-slate-600 text-xs font-medium px-3 py-1 rounded-full">
-                        {formatDate(entry.timestamp)}
-                      </div>
-                    </div>
-                  )}
+        <TabsContent value="journal" className="flex-1 flex flex-col overflow-hidden mt-0">
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50">
+            {mockEvents.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full">
+                <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                  <Icon name="MessageSquare" size={40} className="text-blue-400" />
+                </div>
+                <p className="text-slate-500 text-sm mb-2">Записей пока нет</p>
+                <p className="text-slate-400 text-xs">Начните вести журнал работ</p>
+              </div>
+            ) : (
+              <div className="max-w-4xl mx-auto space-y-6">
+                {mockEvents.map((event, index) => {
+                  const showDateSeparator = index === 0 || 
+                    formatDate(mockEvents[index - 1].created_at) !== formatDate(event.created_at);
 
-                  <div className={cn('flex gap-3', isOwnMessage && 'flex-row-reverse')}>
-                    <Avatar className="w-10 h-10 flex-shrink-0">
-                      <AvatarFallback className={cn(
-                        'text-xs font-semibold',
-                        isOwnMessage ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-700'
-                      )}>
-                        {getInitials(entry.authorName)}
-                      </AvatarFallback>
-                    </Avatar>
-
-                    <div className={cn('flex-1 max-w-[75%]', isOwnMessage && 'flex flex-col items-end')}>
-                      <div className={cn('mb-1', isOwnMessage && 'text-right')}>
-                        <span className="text-sm font-semibold text-slate-900">{entry.authorName}</span>
-                      </div>
-
-                      <Card className={cn(
-                        'border-none shadow-sm',
-                        isOwnMessage ? 'bg-blue-50' : 'bg-white',
-                        entry.type === 'work' && !isOwnMessage && 'border-l-4 border-l-green-500'
-                      )}>
-                        <CardContent className="p-3 md:p-4">
-                          {entry.type === 'work' && (
-                            <div className="flex items-center gap-2 mb-2 pb-2 border-b border-slate-200">
-                              <Icon name="Wrench" size={16} className="text-green-600" />
-                              <span className="text-xs font-semibold text-green-600">Отчёт о работе</span>
-                            </div>
-                          )}
-
-                          <p className="text-sm md:text-base text-slate-900 whitespace-pre-wrap break-words leading-relaxed">
-                            {entry.content}
-                          </p>
-
-                          {entry.volume && (
-                            <div className="mt-3 pt-3 border-t border-slate-200">
-                              <div className="flex items-center gap-2 text-sm text-slate-700">
-                                <Icon name="Package" size={14} className="text-slate-400" />
-                                <span className="font-medium">Объём:</span>
-                                <span>{entry.volume}</span>
-                              </div>
-                            </div>
-                          )}
-
-                          {entry.materials && entry.materials.length > 0 && (
-                            <div className="mt-2 pt-2 border-t border-slate-200">
-                              <div className="flex items-start gap-2 text-sm">
-                                <Icon name="Box" size={14} className="text-slate-400 mt-0.5" />
-                                <div className="flex-1">
-                                  <p className="font-medium text-slate-700 mb-1">Материалы:</p>
-                                  <ul className="space-y-1">
-                                    {entry.materials.map((material, idx) => (
-                                      <li key={idx} className="text-slate-600 text-xs md:text-sm pl-2">
-                                        • {material}
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-
-                          {entry.photos && entry.photos.length > 0 && (
-                            <div className="mt-3 pt-3 border-t border-slate-200">
-                              <div className="flex items-center gap-2 text-sm text-blue-600 cursor-pointer hover:text-blue-700">
-                                <Icon name="Camera" size={14} />
-                                <span>{entry.photos.length} {entry.photos.length === 1 ? 'фото' : 'фото'}</span>
-                              </div>
-                            </div>
-                          )}
-
-                          <div className={cn(
-                            'mt-2 text-xs text-slate-400',
-                            isOwnMessage && 'text-right'
-                          )}>
-                            {formatTime(entry.timestamp)}
+                  return (
+                    <div key={event.id}>
+                      {showDateSeparator && (
+                        <div className="flex justify-center my-4">
+                          <div className="bg-slate-200 text-slate-600 text-xs px-3 py-1 rounded-full font-medium">
+                            {formatDate(event.created_at)}
                           </div>
-                        </CardContent>
-                      </Card>
+                        </div>
+                      )}
+
+                      <EventItem
+                        event={event}
+                        isOwnEvent={event.created_by === user?.id}
+                        userRole={userRole}
+                        onCreateInspection={handleCreateInspection}
+                        formatTime={formatTime}
+                        getInitials={getInitials}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white border-t border-slate-200 p-3 md:p-4 flex-shrink-0">
+            <div className="max-w-4xl mx-auto space-y-3">
+              {userRole === 'contractor' && (
+                <>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Input
+                        placeholder="Объём (м², шт, кг...)"
+                        value={volume}
+                        onChange={(e) => setVolume(e.target.value)}
+                        className="text-sm"
+                      />
+                    </div>
+                    <div>
+                      <Select value={progress} onValueChange={setProgress}>
+                        <SelectTrigger className="text-sm">
+                          <SelectValue placeholder="Прогресс" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="0">0% - Не начато</SelectItem>
+                          <SelectItem value="25">25%</SelectItem>
+                          <SelectItem value="50">50%</SelectItem>
+                          <SelectItem value="75">75%</SelectItem>
+                          <SelectItem value="100">100% - Завершено</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
+                  <Input
+                    placeholder="Материалы (через запятую)"
+                    value={materials}
+                    onChange={(e) => setMaterials(e.target.value)}
+                    className="text-sm"
+                  />
+                </>
+              )}
+              
+              <div className="flex gap-2">
+                <Textarea
+                  placeholder={userRole === 'contractor' ? 'Описание выполненных работ...' : 'Написать сообщение...'}
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  className="resize-none text-sm flex-1"
+                  rows={2}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                />
+                <div className="flex flex-col gap-2">
+                  <Button variant="ghost" size="icon">
+                    <Icon name="Paperclip" size={18} />
+                  </Button>
+                  <Button variant="ghost" size="icon">
+                    <Icon name="Camera" size={18} />
+                  </Button>
+                  <Button 
+                    onClick={handleSendMessage}
+                    disabled={!newMessage.trim() || isSubmitting}
+                    size="icon"
+                  >
+                    {isSubmitting ? (
+                      <Icon name="Loader2" size={18} className="animate-spin" />
+                    ) : (
+                      <Icon name="Send" size={18} />
+                    )}
+                  </Button>
                 </div>
-              );
-            })}
+              </div>
+              <p className="text-xs text-slate-400">
+                Enter — отправить, Shift+Enter — новая строка
+              </p>
+            </div>
           </div>
-        )}
-      </div>
+        </TabsContent>
 
-      <div className="bg-white border-t border-slate-200 p-4 md:p-6 flex-shrink-0">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex gap-3">
-            <Textarea
-              placeholder="Написать в журнал работ..."
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              className="min-h-[60px] md:min-h-[80px] resize-none text-sm md:text-base"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-            />
-            <Button 
-              onClick={handleSendMessage}
-              disabled={!newMessage.trim()}
-              className="self-end"
-              size="icon"
-              data-tour="add-log-btn"
-            >
-              <Icon name="Send" size={20} />
-            </Button>
-          </div>
-          <p className="text-xs text-slate-400 mt-2">
-            Enter — отправить, Shift+Enter — новая строка
-          </p>
-        </div>
-      </div>
+        <TabsContent value="info" className="flex-1 overflow-hidden mt-0">
+          <InfoTab selectedWorkData={work} />
+        </TabsContent>
+
+        <TabsContent value="description" className="flex-1 overflow-hidden mt-0">
+          <DescriptionTab selectedWorkData={work} />
+        </TabsContent>
+
+        <TabsContent value="estimate" className="flex-1 overflow-hidden mt-0">
+          <EstimateTab handleCreateEstimate={() => {
+            toast({
+              title: 'Функция в разработке',
+              description: 'Импорт сметы будет доступен в ноябре',
+            });
+          }} />
+        </TabsContent>
+
+        <TabsContent value="analytics" className="flex-1 overflow-hidden mt-0">
+          <AnalyticsTab workId={Number(workId)} />
+        </TabsContent>
+      </Tabs>
+
+      <CreateInspectionModal
+        isOpen={isInspectionModalOpen}
+        onClose={() => {
+          setIsInspectionModalOpen(false);
+          setSelectedEntryForInspection(undefined);
+        }}
+        onSubmit={handleInspectionSubmit}
+        journalEntryId={selectedEntryForInspection}
+        workType={work.title}
+      />
     </div>
   );
 };
