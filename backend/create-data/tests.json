@@ -1,0 +1,35 @@
+{
+  "tests": [
+    {
+      "name": "Create project",
+      "method": "POST",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "body": {
+        "type": "project",
+        "data": {
+          "title": "Test Project",
+          "description": "Test Description",
+          "status": "active"
+        }
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Create without user ID",
+      "method": "POST",
+      "body": {
+        "type": "project",
+        "data": {
+          "title": "Test"
+        }
+      },
+      "expectedStatus": 401
+    }
+  ]
+}

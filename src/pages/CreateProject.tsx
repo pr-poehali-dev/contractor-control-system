@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { api } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 const CreateProject = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { userData, refreshUserData } = useAuth();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -31,29 +32,35 @@ const CreateProject = () => {
       return;
     }
 
+    if (!user) return;
+
     setIsSubmitting(true);
 
-    const newProject = {
-      id: Date.now(),
-      title: formData.title,
-      description: formData.description,
-      status: 'active',
-      created_at: new Date().toISOString(),
-    };
+    try {
+      const result = await api.createItem(user.id, 'project', {
+        title: formData.title,
+        description: formData.description,
+        status: 'active',
+      });
 
-    const updatedProjects = [...(userData?.projects || []), newProject];
-    const updatedData = { ...userData, projects: updatedProjects };
-    localStorage.setItem('userData', JSON.stringify(updatedData));
-    refreshUserData();
+      toast({
+        title: 'Проект создан!',
+        description: `Проект "${formData.title}" успешно добавлен`,
+      });
 
-    toast({
-      title: 'Проект создан!',
-      description: `Проект "${formData.title}" успешно добавлен`,
-    });
-
-    setTimeout(() => {
-      navigate(`/projects/${newProject.id}`);
-    }, 300);
+      const newProjectId = result.data.id;
+      setTimeout(() => {
+        navigate(`/projects/${newProjectId}`);
+        window.location.reload();
+      }, 300);
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: error instanceof Error ? error.message : 'Не удалось создать проект',
+        variant: 'destructive',
+      });
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -88,6 +95,7 @@ const CreateProject = () => {
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   required
                   autoFocus
+                  data-tour="project-title-input"
                 />
               </div>
 

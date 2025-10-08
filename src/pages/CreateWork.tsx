@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { api } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 
@@ -13,44 +14,59 @@ const CreateWork = () => {
   const { projectId, objectId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
-    name: '',
+    title: '',
     description: '',
-    contractor: '',
-    startDate: '',
-    endDate: '',
-    budget: '',
-    category: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: 'Работа создана',
-      description: `Работа "${formData.name}" добавлена к объекту`,
-    });
-    navigate(`/projects/${projectId}/objects/${objectId}`);
+    
+    if (!formData.title.trim()) {
+      toast({
+        title: 'Ошибка',
+        description: 'Введите название работы',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!user || !objectId) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const result = await api.createItem(user.id, 'work', {
+        object_id: Number(objectId),
+        title: formData.title,
+        description: formData.description,
+        status: 'active',
+      });
+
+      toast({
+        title: 'Работа создана!',
+        description: `Работа "${formData.title}" успешно добавлена`,
+      });
+
+      const newWorkId = result.data.id;
+      setTimeout(() => {
+        navigate(`/projects/${projectId}/objects/${objectId}/works/${newWorkId}`);
+        window.location.reload();
+      }, 300);
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: error instanceof Error ? error.message : 'Не удалось создать работу',
+        variant: 'destructive',
+      });
+      setIsSubmitting(false);
+    }
   };
 
-  const contractors = [
-    'ООО "СтройМастер"',
-    'ИП Иванов А.А.',
-    'ООО "Фасад-Мастер"',
-    'ООО "ТеплоДом"',
-    'ИП Петров С.С.',
-  ];
-
-  const categories = [
-    'Кровельные работы',
-    'Фасадные работы',
-    'Внутренние работы',
-    'Инженерные системы',
-    'Благоустройство',
-    'Прочие работы',
-  ];
-
   return (
-    <div className="p-8">
+    <div className="min-h-screen bg-slate-50 p-4 md:p-8 pb-24 md:pb-8">
       <Button 
         variant="ghost" 
         className="mb-6"
@@ -61,158 +77,82 @@ const CreateWork = () => {
       </Button>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Добавление работы</h1>
-        <p className="text-slate-600">ул. Ленина, д. 10 • Капремонт Казани 2025</p>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Создание работы</h1>
+        <p className="text-slate-600">Укажите вид работ для данного объекта</p>
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Информация о работе</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Название работы *</Label>
-                  <Input
-                    id="name"
-                    placeholder="Например: Замена кровли"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                  />
-                </div>
+        <div className="max-w-2xl space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Информация о работе</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">Название работы *</Label>
+                <Input
+                  id="title"
+                  placeholder="Например: Замена кровли"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  required
+                  autoFocus
+                  data-tour="work-title-input"
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="category">Категория</Label>
-                  <Select
-                    value={formData.category}
-                    onValueChange={(value) => setFormData({ ...formData, category: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Выберите категорию" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {cat}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="description">Описание работ</Label>
+                <Textarea
+                  id="description"
+                  placeholder="Подробное описание работ..."
+                  rows={4}
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                />
+              </div>
+            </CardContent>
+          </Card>
 
-                <div className="space-y-2">
-                  <Label htmlFor="description">Описание работ</Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Подробное описание объёма и характера работ..."
-                    rows={4}
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="contractor">Подрядчик *</Label>
-                  <Select
-                    value={formData.contractor}
-                    onValueChange={(value) => setFormData({ ...formData, contractor: value })}
-                    required
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Выберите подрядчика" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {contractors.map((contractor) => (
-                        <SelectItem key={contractor} value={contractor}>
-                          {contractor}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Сроки и бюджет</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="startDate">Дата начала</Label>
-                    <Input
-                      id="startDate"
-                      type="date"
-                      value={formData.startDate}
-                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="endDate">Дата окончания</Label>
-                    <Input
-                      id="endDate"
-                      type="date"
-                      value={formData.endDate}
-                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="budget">Бюджет работы (₽)</Label>
-                  <Input
-                    id="budget"
-                    type="number"
-                    placeholder="2220000"
-                    value={formData.budget}
-                    onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div>
-            <Card className="bg-blue-50 border-blue-200">
-              <CardHeader>
-                <CardTitle className="text-base">Что будет создано</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                <div className="flex items-start gap-2">
-                  <Icon name="ClipboardCheck" className="text-blue-600 mt-0.5" size={16} />
-                  <p className="text-slate-700">Журнал строительных работ для этой работы</p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Icon name="FileText" className="text-blue-600 mt-0.5" size={16} />
-                  <p className="text-slate-700">Раздел для загрузки сметы</p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Icon name="Search" className="text-blue-600 mt-0.5" size={16} />
-                  <p className="text-slate-700">Возможность создавать проверки</p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Icon name="BarChart3" className="text-blue-600 mt-0.5" size={16} />
-                  <p className="text-slate-700">Аналитика план/факт</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <Card className="bg-blue-50 border-blue-200">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Icon name="Info" size={18} />
+                Следующий шаг
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm text-slate-700">
+              После создания работы вы сможете добавлять записи в журнал и назначить подрядчика
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="flex gap-3 mt-8">
-          <Button type="submit" size="lg" className="min-w-[200px]">
-            <Icon name="Save" size={20} className="mr-2" />
-            Создать работу
+        <div className="flex flex-col md:flex-row gap-3 mt-8 max-w-2xl">
+          <Button 
+            type="submit" 
+            size="lg" 
+            className="md:min-w-[200px]"
+            disabled={isSubmitting}
+            data-tour="create-work-submit"
+          >
+            {isSubmitting ? (
+              <>
+                <Icon name="Loader2" size={20} className="mr-2 animate-spin" />
+                Создание...
+              </>
+            ) : (
+              <>
+                <Icon name="Save" size={20} className="mr-2" />
+                Создать работу
+              </>
+            )}
           </Button>
           <Button 
             type="button" 
             variant="outline" 
             size="lg"
             onClick={() => navigate(`/projects/${projectId}/objects/${objectId}`)}
+            disabled={isSubmitting}
           >
             Отмена
           </Button>

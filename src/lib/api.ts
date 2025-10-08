@@ -2,6 +2,7 @@ const API_BASE_URL = 'https://functions.poehali.dev';
 
 const AUTH_API = 'b9d6731e-788e-476b-bad5-047bd3d6adc1';
 const DATA_API = 'c30e1bf9-0423-48e8-b295-07120e205fa7';
+const CREATE_API = '8d57b03e-49c5-4589-abfb-691e6e084c6a';
 
 export interface User {
   id: number;
@@ -124,6 +125,24 @@ export const api = {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.error || 'Failed to fetch data');
+    }
+
+    return response.json();
+  },
+
+  async createItem(userId: number, type: string, data: any): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/${CREATE_API}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': String(userId),
+      },
+      body: JSON.stringify({ type, data }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create item');
     }
 
     return response.json();
