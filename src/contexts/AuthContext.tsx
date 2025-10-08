@@ -25,10 +25,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string, role: UserRole) => {
     await new Promise(resolve => setTimeout(resolve, 500));
     
+    const autoDetectedRole: UserRole = email.includes('contractor') ? 'contractor' : 'customer';
+    
     const mockUser: User = {
       id: '1',
-      name: role === 'customer' ? 'Инспектор Петров' : 'Иванов Сергей',
-      role,
+      name: autoDetectedRole === 'customer' ? 'Инспектор Петров' : 'Иванов Сергей',
+      role: autoDetectedRole,
       email,
     };
     
