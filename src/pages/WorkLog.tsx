@@ -1,15 +1,9 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -43,7 +37,7 @@ const WorkLog = () => {
     if (diffDays === 1) return 'вчера';
     if (diffDays < 7) return `${diffDays} д назад`;
     
-    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   };
 
   const handleSendMessage = () => {
@@ -56,161 +50,150 @@ const WorkLog = () => {
     setNewMessage('');
   };
 
-  const handleMenuAction = (action: string) => {
-    toast({
-      title: action,
-      description: 'Функция в разработке',
-    });
-  };
-
-  const getMenuForEntry = (entry: typeof logEntries[0]) => {
-    if (user?.role === 'client' && entry.type === 'work') {
-      return [
-        { label: 'Создать проверку', icon: 'ClipboardCheck' },
-        { label: 'Добавить замечание', icon: 'MessageCircle' },
-        { label: 'Просмотреть материалы', icon: 'Package' },
-      ];
-    }
-
-    if (user?.role === 'contractor' && entry.authorId === user.id) {
-      return [
-        { label: 'Редактировать запись', icon: 'Edit' },
-        { label: 'Добавить фото', icon: 'Camera' },
-      ];
-    }
-
-    return [];
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   const MessageCard = ({ entry, isOwn }: { entry: typeof logEntries[0]; isOwn: boolean }) => (
-    <CardContent className="p-3">
-      <div className="flex items-start justify-between gap-2 mb-1">
-        <p className="text-xs font-medium text-slate-600">
-          {entry.authorName}
-        </p>
-        {entry.type === 'inspection' && (
-          <Icon name="ClipboardCheck" size={14} className="text-green-600" />
-        )}
-        {entry.type === 'remark' && (
-          <Icon name="AlertCircle" size={14} className="text-red-600" />
-        )}
-      </div>
+    <div className={cn('flex gap-3 mb-4', isOwn && 'flex-row-reverse')}>
+      <Avatar className="w-9 h-9 md:w-10 md:h-10 flex-shrink-0">
+        <AvatarFallback className={cn(
+          'text-xs font-semibold',
+          isOwn ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-700'
+        )}>
+          {getInitials(entry.authorName)}
+        </AvatarFallback>
+      </Avatar>
 
-      <p className="text-sm text-slate-900 whitespace-pre-wrap break-words">
-        {entry.content}
-      </p>
-
-      {entry.materials && entry.materials.length > 0 && (
-        <div className="mt-2 pt-2 border-t border-slate-200">
-          <p className="text-xs text-slate-500 mb-1">Материалы:</p>
-          {entry.materials.map((material, idx) => (
-            <p key={idx} className="text-xs text-slate-600">• {material}</p>
-          ))}
+      <div className={cn('flex-1 max-w-[85%] md:max-w-[70%]', isOwn && 'flex flex-col items-end')}>
+        <div className={cn('mb-1 flex items-baseline gap-2', isOwn && 'flex-row-reverse')}>
+          <span className="text-sm font-semibold text-slate-900">{entry.authorName}</span>
+          <span className="text-xs text-slate-400">{formatTime(entry.timestamp)}</span>
         </div>
-      )}
 
-      <p className="text-xs text-slate-400 mt-2">
-        {formatTime(entry.timestamp)}
-      </p>
-    </CardContent>
+        <Card className={cn(
+          'border-none shadow-sm',
+          isOwn ? 'bg-blue-50' : 'bg-white',
+          entry.type === 'work' && 'border-l-4 border-l-blue-500'
+        )}>
+          <CardContent className="p-3 md:p-4">
+            {entry.type === 'work' && (
+              <div className="flex items-center gap-2 mb-2 pb-2 border-b border-slate-200">
+                <Icon name="Wrench" size={16} className="text-blue-600" />
+                <span className="text-xs font-semibold text-blue-600">Запись о работе</span>
+              </div>
+            )}
+
+            <p className="text-sm md:text-base text-slate-900 whitespace-pre-wrap break-words leading-relaxed">
+              {entry.content}
+            </p>
+
+            {entry.volume && (
+              <div className="mt-3 pt-3 border-t border-slate-200">
+                <div className="flex items-center gap-2 text-sm text-slate-700">
+                  <Icon name="Package" size={14} className="text-slate-400" />
+                  <span className="font-medium">Объём:</span>
+                  <span>{entry.volume}</span>
+                </div>
+              </div>
+            )}
+
+            {entry.materials && entry.materials.length > 0 && (
+              <div className="mt-2 pt-2 border-t border-slate-200">
+                <div className="flex items-start gap-2 text-sm">
+                  <Icon name="Box" size={14} className="text-slate-400 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="font-medium text-slate-700 mb-1">Материалы:</p>
+                    <ul className="space-y-1">
+                      {entry.materials.map((material, idx) => (
+                        <li key={idx} className="text-slate-600 text-xs md:text-sm pl-2">
+                          • {material}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {entry.photos && entry.photos.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-slate-200">
+                <div className="flex items-center gap-2 text-sm text-blue-600">
+                  <Icon name="Camera" size={14} />
+                  <span>{entry.photos.length} {entry.photos.length === 1 ? 'фото' : 'фото'}</span>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 
   return (
-    <div className="flex flex-col h-full bg-slate-50">
-      <div className="bg-white border-b border-slate-200 p-4 md:p-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">Журнал</h1>
-        <p className="text-sm text-slate-500">Все записи и проверки</p>
+    <div className="flex flex-col h-screen bg-slate-50">
+      <div className="bg-white border-b border-slate-200 p-4 md:p-6 flex-shrink-0">
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">Журнал работ</h1>
+        <p className="text-sm text-slate-500">Все записи и события по проектам</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-32 md:pb-6">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6">
         {logEntries.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <Icon name="FileText" size={48} className="text-slate-300 mb-4" />
-            <p className="text-slate-500">Записей пока нет</p>
+            <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+              <Icon name="FileText" size={32} className="text-slate-300" />
+            </div>
+            <p className="text-slate-500 text-lg mb-2">Записей пока нет</p>
+            <p className="text-slate-400 text-sm">Добавьте первую запись в журнал</p>
           </div>
         ) : (
-          logEntries.map((entry) => {
-            const menu = getMenuForEntry(entry);
-            const isOwnMessage = entry.authorId === user?.id;
-
-            return (
-              <div
-                key={entry.id}
-                className={cn(
-                  'flex gap-2',
-                  isOwnMessage ? 'flex-row-reverse' : 'flex-row'
-                )}
-              >
-                {menu.length > 0 ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <div className={cn('max-w-[85%] md:max-w-[70%]', isOwnMessage ? 'ml-auto' : 'mr-auto')}>
-                        <Card
-                          className={cn(
-                            'cursor-pointer transition-shadow hover:shadow-md',
-                            isOwnMessage ? 'bg-blue-50' : 'bg-white',
-                            entry.type === 'system' && 'bg-yellow-50 border-yellow-200',
-                            entry.type === 'remark' && 'bg-red-50 border-red-200'
-                          )}
-                        >
-                          <MessageCard entry={entry} isOwn={isOwnMessage} />
-                        </Card>
-                      </div>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align={isOwnMessage ? 'end' : 'start'}>
-                      {menu.map((item) => (
-                        <DropdownMenuItem
-                          key={item.label}
-                          onClick={() => handleMenuAction(item.label)}
-                        >
-                          <Icon name={item.icon as any} size={16} className="mr-2" />
-                          {item.label}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : (
-                  <div className={cn('max-w-[85%] md:max-w-[70%]', isOwnMessage ? 'ml-auto' : 'mr-auto')}>
-                    <Card
-                      className={cn(
-                        isOwnMessage ? 'bg-blue-50' : 'bg-white',
-                        entry.type === 'system' && 'bg-yellow-50 border-yellow-200',
-                        entry.type === 'remark' && 'bg-red-50 border-red-200'
-                      )}
-                    >
-                      <MessageCard entry={entry} isOwn={isOwnMessage} />
-                    </Card>
-                  </div>
-                )}
-              </div>
-            );
-          })
+          <div className="max-w-4xl mx-auto">
+            {logEntries.map((entry) => {
+              const isOwnMessage = entry.authorId === user?.id;
+              return (
+                <MessageCard 
+                  key={entry.id} 
+                  entry={entry} 
+                  isOwn={isOwnMessage}
+                />
+              );
+            })}
+          </div>
         )}
       </div>
 
-      <div className="bg-white border-t border-slate-200 p-3 md:p-4 fixed bottom-16 md:bottom-0 left-0 right-0 md:left-auto md:right-0">
-        <div className="flex gap-2 max-w-4xl mx-auto">
-          <Textarea
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Добавить запись..."
-            className="resize-none"
-            rows={1}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSendMessage();
-              }
-            }}
-          />
-          <Button
-            onClick={handleSendMessage}
-            disabled={!newMessage.trim()}
-            size="icon"
-            className="h-10 w-10"
-          >
-            <Icon name="Send" size={18} />
-          </Button>
+      <div className="bg-white border-t border-slate-200 p-4 md:p-6 flex-shrink-0">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex gap-3">
+            <Textarea
+              placeholder="Добавить запись в журнал..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              className="min-h-[60px] md:min-h-[80px] resize-none text-sm md:text-base"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
+            />
+            <Button 
+              onClick={handleSendMessage}
+              disabled={!newMessage.trim()}
+              className="self-end"
+              size="icon"
+            >
+              <Icon name="Send" size={20} />
+            </Button>
+          </div>
+          <p className="text-xs text-slate-400 mt-2">
+            Enter — отправить, Shift+Enter — новая строка
+          </p>
         </div>
       </div>
     </div>
