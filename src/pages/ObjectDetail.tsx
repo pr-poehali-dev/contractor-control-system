@@ -88,45 +88,8 @@ const ObjectDetail = () => {
         )}
       </div>
 
-      {/* Компактная статистика */}
-      <div className="px-4 py-3 bg-white border-b border-slate-200">
-        <div className="flex items-center justify-around text-center">
-          <div className="flex-1">
-            <p className="text-2xl font-bold text-slate-900">{siteWorks.length}</p>
-            <p className="text-xs text-slate-600">Работ</p>
-          </div>
-          <div className="w-px h-8 bg-slate-200" />
-          <div className="flex-1">
-            <p className="text-2xl font-bold text-blue-600">
-              {siteWorks.filter(w => w.status === 'active').length}
-            </p>
-            <p className="text-xs text-slate-600">В работе</p>
-          </div>
-          <div className="w-px h-8 bg-slate-200" />
-          <div className="flex-1">
-            <p className="text-2xl font-bold text-green-600">
-              {siteWorks.filter(w => w.status === 'completed').length}
-            </p>
-            <p className="text-xs text-slate-600">Готово</p>
-          </div>
-        </div>
-      </div>
-
       {/* Журнал работ */}
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-bold text-slate-900">Журнал работ</h2>
-          <Button 
-            size="sm"
-            onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}
-          >
-            <Icon name="Plus" size={16} className="mr-1" />
-            <span className="hidden sm:inline">Добавить</span>
-          </Button>
-        </div>
-
-        <WorkJournal objectId={Number(objectId)} />
-      </div>
+      <WorkJournal objectId={Number(objectId)} />
     </div>
   );
 };

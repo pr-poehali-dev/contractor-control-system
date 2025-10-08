@@ -114,7 +114,7 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-280px)] md:h-[calc(100vh-200px)] bg-white rounded-lg overflow-hidden border border-slate-200">
+    <div className="flex flex-col h-[calc(100vh-140px)] bg-white overflow-hidden border-t border-slate-200">
       <div className="md:hidden border-b border-slate-200 p-3">
         <Button 
           variant="outline" 
