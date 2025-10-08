@@ -7,6 +7,9 @@ import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 
 const Login = () => {
+  const [loginMethod, setLoginMethod] = useState<'password' | 'sms'>('password');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
   const [step, setStep] = useState<'phone' | 'code'>('phone');
@@ -40,6 +43,35 @@ const Login = () => {
         description: `Код отправлен на ${phone}`,
       });
     }, 800);
+  };
+
+  const handlePasswordLogin = async () => {
+    if (!email || !password) {
+      toast({
+        title: 'Ошибка',
+        description: 'Заполните все поля',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    setIsLoading(true);
+    try {
+      await login(email, password, 'contractor');
+      navigate('/dashboard');
+      toast({
+        title: 'Добро пожаловать!',
+        description: 'Вы успешно вошли в систему',
+      });
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Проверьте логин и пароль',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleVerifyCode = async () => {
@@ -82,8 +114,74 @@ const Login = () => {
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
-          {step === 'phone' ? (
-            <div className="space-y-6">
+          <div className="flex gap-2 mb-6">
+            <Button
+              variant={loginMethod === 'password' ? 'default' : 'outline'}
+              onClick={() => setLoginMethod('password')}
+              className="flex-1 h-12"
+            >
+              <Icon name="Key" size={18} className="mr-2" />
+              Логин/Пароль
+            </Button>
+            <Button
+              variant={loginMethod === 'sms' ? 'default' : 'outline'}
+              onClick={() => setLoginMethod('sms')}
+              className="flex-1 h-12"
+            >
+              <Icon name="Smartphone" size={18} className="mr-2" />
+              СМС
+            </Button>
+          </div>
+
+          {loginMethod === 'password' ? (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Email или логин
+                </label>
+                <Input
+                  type="text"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="user@example.com"
+                  className="h-12"
+                  autoFocus
+                  onKeyDown={(e) => e.key === 'Enter' && handlePasswordLogin()}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Пароль
+                </label>
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="h-12"
+                  onKeyDown={(e) => e.key === 'Enter' && handlePasswordLogin()}
+                />
+              </div>
+
+              <Button
+                onClick={handlePasswordLogin}
+                disabled={isLoading}
+                className="w-full h-12 text-base font-semibold"
+              >
+                {isLoading ? (
+                  <Icon name="Loader2" size={20} className="animate-spin" />
+                ) : (
+                  'Войти'
+                )}
+              </Button>
+
+              <p className="text-center text-xs text-slate-500">
+                Демо: любые данные
+              </p>
+            </div>
+          ) : step === 'phone' ? (
+            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Номер телефона
@@ -93,7 +191,7 @@ const Login = () => {
                   value={phone}
                   onChange={handlePhoneChange}
                   placeholder="+7 999 123-45-67"
-                  className="h-14 text-lg"
+                  className="h-12 text-base"
                   autoFocus
                 />
               </div>
@@ -101,21 +199,21 @@ const Login = () => {
               <Button
                 onClick={handleSendSMS}
                 disabled={phone.length < 18 || isLoading}
-                className="w-full h-14 text-lg font-semibold"
+                className="w-full h-12 text-base font-semibold"
               >
                 {isLoading ? (
-                  <Icon name="Loader2" size={24} className="animate-spin" />
+                  <Icon name="Loader2" size={20} className="animate-spin" />
                 ) : (
                   'Получить СМС'
                 )}
               </Button>
 
-              <p className="text-center text-sm text-slate-500">
+              <p className="text-center text-xs text-slate-500">
                 Мы отправим вам код подтверждения
               </p>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-slate-700">
@@ -125,10 +223,10 @@ const Login = () => {
                     onClick={() => setStep('phone')}
                     className="text-sm text-blue-600 hover:text-blue-700"
                   >
-                    Изменить номер
+                    Изменить
                   </button>
                 </div>
-                <p className="text-sm text-slate-500 mb-4">
+                <p className="text-xs text-slate-500 mb-3">
                   Отправлено на {phone}
                 </p>
                 <Input
@@ -137,7 +235,7 @@ const Login = () => {
                   value={code}
                   onChange={handleCodeChange}
                   placeholder="••••"
-                  className="h-14 text-2xl text-center tracking-widest font-semibold"
+                  className="h-12 text-2xl text-center tracking-widest font-semibold"
                   maxLength={4}
                   autoFocus
                 />
@@ -146,10 +244,10 @@ const Login = () => {
               <Button
                 onClick={handleVerifyCode}
                 disabled={code.length < 4 || isLoading}
-                className="w-full h-14 text-lg font-semibold"
+                className="w-full h-12 text-base font-semibold"
               >
                 {isLoading ? (
-                  <Icon name="Loader2" size={24} className="animate-spin" />
+                  <Icon name="Loader2" size={20} className="animate-spin" />
                 ) : (
                   'Войти'
                 )}
@@ -157,7 +255,7 @@ const Login = () => {
 
               <button
                 onClick={handleSendSMS}
-                className="w-full text-sm text-slate-600 hover:text-slate-900"
+                className="w-full text-xs text-slate-600 hover:text-slate-900"
               >
                 Отправить код повторно
               </button>
