@@ -9,10 +9,8 @@ import { cn } from '@/lib/utils';
 
 import WorksList from '@/components/work-journal/WorksList';
 import WorkHeader from '@/components/work-journal/WorkHeader';
-import ChatTab from '@/components/work-journal/ChatTab';
 import InfoTab from '@/components/work-journal/InfoTab';
 import DescriptionTab from '@/components/work-journal/DescriptionTab';
-import SubtasksTab from '@/components/work-journal/SubtasksTab';
 import EstimateTab from '@/components/work-journal/EstimateTab';
 
 interface WorkJournalProps {
@@ -109,9 +107,7 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
     toast({ title: 'Создание проверки', description: 'Функция в разработке' });
   };
 
-  const handleAddSubtask = () => {
-    toast({ title: 'Добавление подзадачи', description: 'Функция в разработке' });
-  };
+
 
   return (
     <div className="flex flex-col h-[calc(100vh-140px)] bg-white overflow-hidden border-t border-slate-200">
@@ -170,23 +166,6 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
               />
 
               <div className="flex-1 overflow-hidden">
-                {activeTab === 'chat' && (
-                  <ChatTab
-                    workEntries={workEntries}
-                    user={user}
-                    selectedWorkData={selectedWorkData}
-                    newMessage={newMessage}
-                    setNewMessage={setNewMessage}
-                    progress={progress}
-                    setProgress={setProgress}
-                    isSubmitting={isSubmitting}
-                    handleSendMessage={handleSendMessage}
-                    getInitials={getInitials}
-                    formatTime={formatTime}
-                    formatDate={formatDate}
-                  />
-                )}
-
                 {activeTab === 'info' && (
                   <InfoTab
                     selectedWorkData={selectedWorkData}
@@ -199,10 +178,6 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
 
                 {activeTab === 'description' && (
                   <DescriptionTab selectedWorkData={selectedWorkData} />
-                )}
-
-                {activeTab === 'subtasks' && (
-                  <SubtasksTab handleAddSubtask={handleAddSubtask} />
                 )}
 
                 {activeTab === 'estimate' && (
