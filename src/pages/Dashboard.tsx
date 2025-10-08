@@ -1,34 +1,50 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { getMockData } from '@/lib/mockData';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import OnboardingBanner from '@/components/OnboardingBanner';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
-  const stats = [
-    { label: 'Всего проектов', value: '3', subtext: 'активных', icon: 'Building2', color: 'bg-blue-100 text-[#2563EB]' },
-    { label: 'Объектов', value: '25', subtext: 'в работе', icon: 'MapPin', color: 'bg-green-100 text-green-600' },
-    { label: 'Работ', value: '107', subtext: 'контролируется', icon: 'ClipboardCheck', color: 'bg-purple-100 text-purple-600' },
-    { label: 'Замечания', value: '8', subtext: 'требуют внимания', icon: 'AlertCircle', color: 'bg-red-100 text-red-600' },
-  ];
+  const mockData = user ? getMockData(user.id) : null;
+  const projects = mockData?.projects || [];
 
-  const recentProjects = [
-    { id: '1', name: 'Капремонт Казани 2025', progress: 67, objects: 12, works: 48 },
-    { id: '2', name: 'Благоустройство дворов', progress: 34, objects: 8, works: 24 },
-    { id: '3', name: 'Реконструкция школ', progress: 12, objects: 5, works: 35 },
-  ];
+  useEffect(() => {
+    if (user?.role === 'contractor') {
+      navigate('/objects');
+      return;
+    }
 
-  if (user?.role === 'contractor') {
-    navigate('/objects');
-    return null;
+    if (user?.id === 'test3' && projects.length === 0) {
+      setShowOnboarding(true);
+    }
+  }, [user, projects.length, navigate]);
+
+  if (showOnboarding && user?.id === 'test3') {
+    return <OnboardingBanner onClose={() => setShowOnboarding(false)} />;
   }
 
+  const activeProjects = projects.filter(p => p.status === 'active').length;
+  const sites = mockData?.sites || [];
+  const works = mockData?.works || [];
+  const logs = mockData?.logEntries || [];
+  const remarks = logs.filter(l => l.type === 'remark').length;
+
+  const stats = [
+    { label: 'Проектов', value: String(activeProjects), icon: 'Building2', color: 'bg-blue-100 text-[#2563EB]' },
+    { label: 'Объектов', value: String(sites.length), icon: 'MapPin', color: 'bg-green-100 text-green-600' },
+    { label: 'Работ', value: String(works.length), icon: 'ClipboardCheck', color: 'bg-purple-100 text-purple-600' },
+    { label: 'Замечания', value: String(remarks), icon: 'AlertCircle', color: 'bg-red-100 text-red-600' },
+  ];
+
   return (
-    <div className="p-4 md:p-8">
+    <div className="p-4 md:p-8 pb-24 md:pb-8">
       <div className="mb-6 md:mb-8">
         <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Главная</h1>
         <p className="text-slate-600">Обзор всех проектов</p>
@@ -43,7 +59,6 @@ const Dashboard = () => {
               </div>
               <p className="text-2xl md:text-3xl font-bold text-slate-900">{stat.value}</p>
               <p className="text-xs text-slate-600 font-medium">{stat.label}</p>
-              <p className="text-xs text-slate-500 mt-1">{stat.subtext}</p>
             </CardContent>
           </Card>
         ))}
@@ -51,44 +66,69 @@ const Dashboard = () => {
 
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl md:text-2xl font-bold text-slate-900">Проекты</h2>
-        <Button onClick={() => navigate('/projects')} variant="ghost" size="sm">
-          Все проекты
-          <Icon name="ArrowRight" size={16} className="ml-1" />
+        <Button onClick={() => navigate('/projects')} size="sm">
+          <Icon name="Plus" size={16} className="mr-1" />
+          Создать
         </Button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-        {recentProjects.map((project, index) => (
-          <Card 
-            key={project.id}
-            className="cursor-pointer hover:shadow-lg transition-shadow animate-fade-in"
-            style={{ animationDelay: `${index * 0.1}s` }}
-            onClick={() => navigate(`/projects/${project.id}`)}
-          >
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base md:text-lg">{project.name}</CardTitle>
-              <div className="flex items-center gap-3 md:gap-4 text-xs md:text-sm text-slate-600 mt-2">
-                <span className="flex items-center gap-1">
-                  <Icon name="Building" size={14} />
-                  {project.objects}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Icon name="Wrench" size={14} />
-                  {project.works}
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-600">Прогресс</span>
-                  <span className="font-semibold text-blue-600">{project.progress}%</span>
-                </div>
-                <Progress value={project.progress} className="h-2" />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+
+      {projects.length === 0 ? (
+        <Card className="p-12 text-center">
+          <Icon name="Folder" size={48} className="mx-auto text-slate-300 mb-4" />
+          <p className="text-slate-500 mb-4">Нет проектов</p>
+          <Button onClick={() => navigate('/projects')}>
+            <Icon name="Plus" size={16} className="mr-2" />
+            Создать первый проект
+          </Button>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          {projects.map((project, index) => {
+            const projectSites = sites.filter(s => s.projectId === project.id);
+            const projectWorks = works.filter(w => 
+              projectSites.some(s => s.id === w.siteId)
+            );
+            const completedWorks = projectWorks.filter(w => w.status === 'completed').length;
+            const progress = projectWorks.length > 0 
+              ? Math.round((completedWorks / projectWorks.length) * 100)
+              : 0;
+
+            return (
+              <Card 
+                key={project.id}
+                className="cursor-pointer hover:shadow-lg transition-shadow animate-fade-in group"
+                style={{ animationDelay: `${index * 0.1}s` }}
+                onClick={() => navigate(`/projects/${project.id}`)}
+              >
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="font-semibold text-slate-900 text-base md:text-lg group-hover:text-blue-600 transition-colors">
+                      {project.name}
+                    </h3>
+                    <div className={`
+                      w-2 h-2 rounded-full
+                      ${project.status === 'active' ? 'bg-green-500' : ''}
+                      ${project.status === 'pending' ? 'bg-yellow-500' : ''}
+                      ${project.status === 'completed' ? 'bg-slate-400' : ''}
+                    `} />
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-slate-600">
+                    <span className="flex items-center gap-1">
+                      <Icon name="MapPin" size={14} />
+                      {projectSites.length}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Icon name="Wrench" size={14} />
+                      {projectWorks.length}
+                    </span>
+                    <span className="text-blue-600 font-medium ml-auto">{progress}%</span>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

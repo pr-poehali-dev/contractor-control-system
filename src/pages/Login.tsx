@@ -57,7 +57,7 @@ const Login = () => {
     
     setIsLoading(true);
     try {
-      await login(email, password, 'contractor');
+      await login(email, password);
       navigate('/dashboard');
       toast({
         title: 'Добро пожаловать!',
@@ -66,7 +66,7 @@ const Login = () => {
     } catch (error) {
       toast({
         title: 'Ошибка',
-        description: 'Проверьте логин и пароль',
+        description: error instanceof Error ? error.message : 'Проверьте логин и пароль',
         variant: 'destructive',
       });
     } finally {
@@ -77,7 +77,7 @@ const Login = () => {
   const handleVerifyCode = async () => {
     setIsLoading(true);
     try {
-      await login('demo@example.com', 'password', 'contractor');
+      await login('test1', '123456');
       navigate('/dashboard');
       toast({
         title: 'Добро пожаловать!',
@@ -176,9 +176,12 @@ const Login = () => {
                 )}
               </Button>
 
-              <p className="text-center text-xs text-slate-500">
-                Демо: любые данные
-              </p>
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                <p className="text-xs font-semibold text-blue-900 mb-1">Тестовые аккаунты:</p>
+                <p className="text-xs text-blue-700">Test1 / 123456 — Заказчик (3 проекта)</p>
+                <p className="text-xs text-blue-700">Test2 / 123456 — Подрядчик</p>
+                <p className="text-xs text-blue-700">Test3 / 123456 — Новый заказчик</p>
+              </div>
             </div>
           ) : step === 'phone' ? (
             <div className="space-y-4">

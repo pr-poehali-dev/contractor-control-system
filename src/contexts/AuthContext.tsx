@@ -7,35 +7,70 @@ interface User {
   name: string;
   role: UserRole;
   email: string;
+  login: string;
   avatar?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string, role: UserRole) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
 }
 
+const MOCK_USERS: Record<string, { password: string; user: User }> = {
+  test1: {
+    password: '123456',
+    user: {
+      id: 'test1',
+      login: 'Test1',
+      name: 'Заказчик Петров',
+      role: 'customer',
+      email: 'test1@podryad.pro',
+    },
+  },
+  test2: {
+    password: '123456',
+    user: {
+      id: 'test2',
+      login: 'Test2',
+      name: 'Подрядчик Иванов',
+      role: 'contractor',
+      email: 'test2@podryad.pro',
+    },
+  },
+  test3: {
+    password: '123456',
+    user: {
+      id: 'test3',
+      login: 'Test3',
+      name: 'Заказчик Сидоров',
+      role: 'customer',
+      email: 'test3@podryad.pro',
+    },
+  },
+};
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    const stored = localStorage.getItem('user');
+    return stored ? JSON.parse(stored) : null;
+  });
 
-  const login = async (email: string, password: string, role: UserRole) => {
+  const login = async (email: string, password: string) => {
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    const autoDetectedRole: UserRole = email.includes('contractor') ? 'contractor' : 'customer';
+    const loginKey = email.toLowerCase();
+    const userData = MOCK_USERS[loginKey];
     
-    const mockUser: User = {
-      id: '1',
-      name: autoDetectedRole === 'customer' ? 'Инспектор Петров' : 'Иванов Сергей',
-      role: autoDetectedRole,
-      email,
-    };
-    
-    setUser(mockUser);
-    localStorage.setItem('user', JSON.stringify(mockUser));
+    if (userData && userData.password === password) {
+      setUser(userData.user);
+      localStorage.setItem('user', JSON.stringify(userData.user));
+    } else {
+      throw new Error('Неверный логин или пароль');
+    }
   };
 
   const logout = () => {
