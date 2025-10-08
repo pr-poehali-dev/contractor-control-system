@@ -1,15 +1,21 @@
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { api } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
+import { useToast } from '@/hooks/use-toast';
+import EditProjectDialog from '@/components/EditProjectDialog';
 
 const ProjectDetail = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
-  const { userData } = useAuth();
+  const { user, userData, setUserData } = useAuth();
+  const { toast } = useToast();
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const projects = userData?.projects || [];
   const sites = userData?.sites || [];
@@ -78,24 +84,69 @@ const ProjectDetail = () => {
       </Button>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">{project.title}</h1>
-        <div className="flex items-center gap-4 text-slate-600 mb-4">
-          <span className="flex items-center gap-2">
-            <Icon name="Building" size={18} />
-            {projectSites.length} объектов
-          </span>
-          <span className="flex items-center gap-2">
-            <Icon name="Wrench" size={18} />
-            {projectWorks.length} работ
-          </span>
-          <Badge variant={project.status === 'active' ? 'default' : 'secondary'}>
-            {getStatusLabel(project.status)}
-          </Badge>
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">{project.title}</h1>
+            <div className="flex items-center gap-4 text-slate-600 mb-4">
+              <span className="flex items-center gap-2">
+                <Icon name="Building" size={18} />
+                {projectSites.length} объектов
+              </span>
+              <span className="flex items-center gap-2">
+                <Icon name="Wrench" size={18} />
+                {projectWorks.length} работ
+              </span>
+              <Badge variant={project.status === 'active' ? 'default' : 'secondary'}>
+                {getStatusLabel(project.status)}
+              </Badge>
+            </div>
+            {project.description && (
+              <p className="text-slate-600">{project.description}</p>
+            )}
+          </div>
+          {user?.role === 'client' && (
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setEditDialogOpen(true)}>
+                <Icon name="Edit" size={16} className="mr-2" />
+                Редактировать
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={async () => {
+                  if (!confirm('Удалить проект? Это действие нельзя отменить.')) return;
+                  try {
+                    await api.deleteItem(user.id, 'project', project.id);
+                    const refreshed = await api.getUserData(user.id);
+                    setUserData(refreshed);
+                    localStorage.setItem('userData', JSON.stringify(refreshed));
+                    toast({ title: 'Проект удалён' });
+                    navigate('/projects');
+                  } catch (error) {
+                    toast({ 
+                      title: 'Ошибка', 
+                      description: error instanceof Error ? error.message : 'Не удалось удалить',
+                      variant: 'destructive'
+                    });
+                  }
+                }}
+              >
+                <Icon name="Trash2" size={16} className="mr-2" />
+                Удалить
+              </Button>
+            </div>
+          )}
         </div>
-        {project.description && (
-          <p className="text-slate-600">{project.description}</p>
-        )}
       </div>
+
+      {editDialogOpen && (
+        <EditProjectDialog
+          project={project}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          onSuccess={() => {}}
+        />
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <Card>

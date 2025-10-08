@@ -3,6 +3,7 @@ const API_BASE_URL = 'https://functions.poehali.dev';
 const AUTH_API = 'b9d6731e-788e-476b-bad5-047bd3d6adc1';
 const DATA_API = 'c30e1bf9-0423-48e8-b295-07120e205fa7';
 const CREATE_API = '8d57b03e-49c5-4589-abfb-691e6e084c6a';
+const UPDATE_API = 'b69598bf-df90-4a71-93a1-6108c6c39317';
 
 export interface User {
   id: number;
@@ -143,6 +144,42 @@ export const api = {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.error || 'Failed to create item');
+    }
+
+    return response.json();
+  },
+
+  async updateItem(userId: number, type: string, id: number, data: any): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/${UPDATE_API}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': String(userId),
+      },
+      body: JSON.stringify({ type, id, data }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to update item');
+    }
+
+    return response.json();
+  },
+
+  async deleteItem(userId: number, type: string, id: number): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/${UPDATE_API}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': String(userId),
+      },
+      body: JSON.stringify({ type, id }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to delete item');
     }
 
     return response.json();
