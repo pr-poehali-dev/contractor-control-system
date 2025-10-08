@@ -39,15 +39,15 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
       <div className="border-b border-slate-200">
         <div className="flex gap-6">
           <button
-            onClick={() => setActiveTab('chat')}
+            onClick={() => setActiveTab('journal')}
             className={`pb-3 px-1 text-sm font-medium transition-colors relative ${
-              activeTab === 'chat'
+              activeTab === 'journal'
                 ? 'text-blue-600'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            Чат
-            {activeTab === 'chat' && (
+            Журнал
+            {activeTab === 'journal' && (
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
             )}
           </button>
@@ -78,19 +78,6 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
             )}
           </button>
           <button
-            onClick={() => setActiveTab('subtasks')}
-            className={`pb-3 px-1 text-sm font-medium transition-colors relative ${
-              activeTab === 'subtasks'
-                ? 'text-blue-600'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Подзадачи
-            {activeTab === 'subtasks' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
-            )}
-          </button>
-          <button
             onClick={() => setActiveTab('estimate')}
             className={`pb-3 px-1 text-sm font-medium transition-colors relative ${
               activeTab === 'estimate'
@@ -100,6 +87,19 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
           >
             Смета
             {activeTab === 'estimate' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`pb-3 px-1 text-sm font-medium transition-colors relative ${
+              activeTab === 'analytics'
+                ? 'text-blue-600'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Аналитика
+            {activeTab === 'analytics' && (
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
             )}
           </button>

@@ -12,6 +12,13 @@ import WorkHeader from '@/components/work-journal/WorkHeader';
 import InfoTab from '@/components/work-journal/InfoTab';
 import DescriptionTab from '@/components/work-journal/DescriptionTab';
 import EstimateTab from '@/components/work-journal/EstimateTab';
+import AnalyticsTab from '@/components/work-journal/AnalyticsTab';
+import EventItem from '@/components/work-journal/EventItem';
+import CreateInspectionModal from '@/components/work-journal/CreateInspectionModal';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import type { JournalEvent, UserRole } from '@/types/journal';
 
 interface WorkJournalProps {
   objectId: number;
@@ -32,9 +39,15 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
   const [selectedWork, setSelectedWork] = useState(works[0]?.id || null);
   const [newMessage, setNewMessage] = useState('');
   const [progress, setProgress] = useState('0');
+  const [volume, setVolume] = useState('');
+  const [materials, setMaterials] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showWorksList, setShowWorksList] = useState(false);
-  const [activeTab, setActiveTab] = useState('chat');
+  const [activeTab, setActiveTab] = useState('journal');
+  const [isInspectionModalOpen, setIsInspectionModalOpen] = useState(false);
+  const [selectedEntryForInspection, setSelectedEntryForInspection] = useState<number | undefined>();
+
+  const userRole: UserRole = user?.role || 'contractor';
 
   const selectedWorkData = works.find(w => w.id === selectedWork);
   const workEntries = workLogs
@@ -75,6 +88,8 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
         work_id: selectedWork,
         description: newMessage,
         progress: parseInt(progress),
+        volume: volume || null,
+        materials: materials || null,
       });
 
       const refreshedData = await api.getUserData(user.id);
@@ -88,6 +103,8 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
 
       setNewMessage('');
       setProgress('0');
+      setVolume('');
+      setMaterials('');
     } catch (error) {
       toast({
         title: 'Ошибка',
@@ -99,13 +116,42 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
     }
   };
 
+  const handleCreateInspectionClick = (eventId: number) => {
+    setSelectedEntryForInspection(eventId);
+    setIsInspectionModalOpen(true);
+  };
+
+  const handleInspectionSubmit = (data: any) => {
+    console.log('Создание проверки:', data);
+    toast({
+      title: 'Проверка создана',
+      description: 'Проверка успешно добавлена в журнал',
+    });
+    setIsInspectionModalOpen(false);
+    setSelectedEntryForInspection(undefined);
+  };
+
   const handleCreateEstimate = () => {
     toast({ title: 'Создание сметы', description: 'Функция в разработке' });
   };
 
-  const handleCreateInspection = () => {
-    toast({ title: 'Создание проверки', description: 'Функция в разработке' });
-  };
+  const mockEvents: JournalEvent[] = workEntries.map(log => ({
+    id: log.id,
+    type: 'work_entry' as const,
+    work_id: log.work_id,
+    created_by: log.created_by,
+    author_name: log.author_name,
+    author_role: (log.author_role || 'contractor') as UserRole,
+    created_at: log.created_at,
+    content: log.description,
+    work_data: {
+      volume: log.volume,
+      unit: log.unit,
+      materials: log.materials ? log.materials.split(',').map(m => m.trim()) : [],
+      photos: log.photo_urls ? log.photo_urls.split(',') : [],
+      progress: log.progress,
+    },
+  }));
 
 
 
@@ -165,14 +211,131 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
                 organizationName={currentProject?.client_name}
               />
 
-              <div className="flex-1 overflow-hidden">
+              <div className="flex-1 flex flex-col overflow-hidden">
+                {activeTab === 'journal' && (
+                  <>
+                    <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50">
+                      {mockEvents.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-full">
+                          <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                            <Icon name="MessageSquare" size={40} className="text-blue-400" />
+                          </div>
+                          <p className="text-slate-500 text-sm mb-2">Записей пока нет</p>
+                          <p className="text-slate-400 text-xs">Начните вести журнал работ</p>
+                        </div>
+                      ) : (
+                        <div className="max-w-4xl mx-auto space-y-6">
+                          {mockEvents.map((event, index) => {
+                            const showDateSeparator = index === 0 || 
+                              formatDate(mockEvents[index - 1].created_at) !== formatDate(event.created_at);
+
+                            return (
+                              <div key={event.id}>
+                                {showDateSeparator && (
+                                  <div className="flex justify-center my-4">
+                                    <div className="bg-slate-200 text-slate-600 text-xs px-3 py-1 rounded-full font-medium">
+                                      {formatDate(event.created_at)}
+                                    </div>
+                                  </div>
+                                )}
+
+                                <EventItem
+                                  event={event}
+                                  isOwnEvent={event.created_by === user?.id}
+                                  userRole={userRole}
+                                  onCreateInspection={handleCreateInspectionClick}
+                                  formatTime={formatTime}
+                                  getInitials={getInitials}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="bg-white border-t border-slate-200 p-3 md:p-4 flex-shrink-0">
+                      <div className="max-w-4xl mx-auto space-y-3">
+                        {userRole === 'contractor' && (
+                          <>
+                            <div className="grid grid-cols-2 gap-2">
+                              <Input
+                                placeholder="Объём (м², шт, кг...)"
+                                value={volume}
+                                onChange={(e) => setVolume(e.target.value)}
+                                className="text-sm"
+                              />
+                              <Select value={progress} onValueChange={setProgress}>
+                                <SelectTrigger className="text-sm">
+                                  <SelectValue placeholder="Прогресс" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="0">0% - Не начато</SelectItem>
+                                  <SelectItem value="25">25%</SelectItem>
+                                  <SelectItem value="50">50%</SelectItem>
+                                  <SelectItem value="75">75%</SelectItem>
+                                  <SelectItem value="100">100% - Завершено</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <Input
+                              placeholder="Материалы (через запятую)"
+                              value={materials}
+                              onChange={(e) => setMaterials(e.target.value)}
+                              className="text-sm"
+                            />
+                          </>
+                        )}
+                        
+                        <div className="flex gap-2">
+                          <Textarea
+                            placeholder={userRole === 'contractor' ? 'Описание выполненных работ...' : 'Написать сообщение...'}
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            className="resize-none text-sm flex-1"
+                            rows={2}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                handleSendMessage();
+                              }
+                            }}
+                          />
+                          <div className="flex flex-col gap-2">
+                            <Button variant="ghost" size="icon">
+                              <Icon name="Paperclip" size={18} />
+                            </Button>
+                            <Button variant="ghost" size="icon">
+                              <Icon name="Camera" size={18} />
+                            </Button>
+                            <Button 
+                              onClick={handleSendMessage}
+                              disabled={!newMessage.trim() || isSubmitting}
+                              size="icon"
+                            >
+                              {isSubmitting ? (
+                                <Icon name="Loader2" size={18} className="animate-spin" />
+                              ) : (
+                                <Icon name="Send" size={18} />
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                        <p className="text-xs text-slate-400">
+                          Enter — отправить, Shift+Enter — новая строка
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                )}
+
                 {activeTab === 'info' && (
                   <InfoTab
                     selectedWorkData={selectedWorkData}
                     workEntries={workEntries}
                     formatDate={formatDate}
                     formatTime={formatTime}
-                    handleCreateInspection={handleCreateInspection}
+                    handleCreateInspection={() => toast({ title: 'Функция в разработке' })}
                   />
                 )}
 
@@ -183,7 +346,22 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
                 {activeTab === 'estimate' && (
                   <EstimateTab handleCreateEstimate={handleCreateEstimate} />
                 )}
+
+                {activeTab === 'analytics' && (
+                  <AnalyticsTab workId={selectedWork || 0} />
+                )}
               </div>
+
+              <CreateInspectionModal
+                isOpen={isInspectionModalOpen}
+                onClose={() => {
+                  setIsInspectionModalOpen(false);
+                  setSelectedEntryForInspection(undefined);
+                }}
+                onSubmit={handleInspectionSubmit}
+                journalEntryId={selectedEntryForInspection}
+                workType={selectedWorkData?.title}
+              />
             </>
           ) : (
             <div className="flex-1 flex items-center justify-center">
