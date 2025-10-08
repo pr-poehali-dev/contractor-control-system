@@ -214,37 +214,42 @@ const WorkDetail = () => {
 
   return (
     <div className="flex flex-col h-screen bg-slate-50">
-      <div className="bg-white border-b border-slate-200 p-4 md:p-6 flex-shrink-0">
-        <Button 
-          variant="ghost" 
-          className="mb-4"
-          onClick={() => navigate(`/projects/${projectId}/objects/${objectId}`)}
-        >
-          <Icon name="ChevronLeft" size={20} className="mr-2" />
-          К работам объекта
-        </Button>
-
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">{work.title}</h1>
-          <p className="text-sm text-slate-600 mb-3">
-            {site?.title} • {project?.title}
-          </p>
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge className={getStatusColor(work.status)}>
-              {getStatusLabel(work.status)}
-            </Badge>
-            {work.contractor_name && (
-              <span className="text-sm text-slate-600 flex items-center gap-1">
-                <Icon name="User" size={14} />
-                {work.contractor_name}
-              </span>
-            )}
+      <div className="bg-white border-b border-slate-200 px-4 md:px-6 py-3 md:py-4 flex-shrink-0">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3 min-w-0 flex-1">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="flex-shrink-0 mt-1"
+              onClick={() => navigate(`/projects/${projectId}/objects/${objectId}`)}
+            >
+              <Icon name="ChevronLeft" size={24} />
+            </Button>
+            
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-slate-900 mb-1">{work.title}</h1>
+              <p className="text-xs md:text-sm text-slate-500 mb-2">
+                <Icon name="MapPin" size={14} className="inline mr-1" />
+                {site?.title} • {project?.title}
+              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge className={getStatusColor(work.status)}>
+                  {getStatusLabel(work.status)}
+                </Badge>
+                {work.contractor_name && (
+                  <span className="text-xs md:text-sm text-slate-600 flex items-center gap-1">
+                    <Icon name="User" size={14} />
+                    {work.contractor_name}
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <Tabs defaultValue="journal" className="flex-1 flex flex-col overflow-hidden">
-        <TabsList className="mx-4 md:mx-6 mt-4">
+        <TabsList className="mx-4 md:mx-6 lg:mx-8 mt-3 md:mt-4">
           <TabsTrigger value="journal">
             <Icon name="MessageSquare" size={16} className="mr-2" />
             Журнал
@@ -268,17 +273,17 @@ const WorkDetail = () => {
         </TabsList>
 
         <TabsContent value="journal" className="flex-1 flex flex-col overflow-hidden mt-0">
-          <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 bg-slate-50">
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-10 bg-slate-50">
             {mockEvents.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full">
                 <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-4">
                   <Icon name="MessageSquare" size={40} className="text-blue-400" />
                 </div>
-                <p className="text-slate-500 text-sm mb-2">Записей пока нет</p>
-                <p className="text-slate-400 text-xs">Начните вести журнал работ</p>
+                <p className="text-slate-500 text-base mb-2">Записей пока нет</p>
+                <p className="text-slate-400 text-sm">Начните вести журнал работ</p>
               </div>
             ) : (
-              <div className="max-w-5xl mx-auto space-y-6">
+              <div className="max-w-6xl mx-auto space-y-8">
                 {mockEvents.map((event, index) => {
                   const showDateSeparator = index === 0 || 
                     formatDate(mockEvents[index - 1].created_at) !== formatDate(event.created_at);
@@ -308,22 +313,22 @@ const WorkDetail = () => {
             )}
           </div>
 
-          <div className="bg-white border-t border-slate-200 p-3 md:p-4 lg:p-6 flex-shrink-0">
-            <div className="max-w-5xl mx-auto space-y-3">
+          <div className="bg-white border-t border-slate-200 p-4 md:p-5 lg:p-6 flex-shrink-0">
+            <div className="max-w-6xl mx-auto space-y-4">
               {userRole === 'contractor' && (
                 <>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
                       <Input
                         placeholder="Объём (м², шт, кг...)"
                         value={volume}
                         onChange={(e) => setVolume(e.target.value)}
-                        className="text-sm"
+                        className="text-base h-11"
                       />
                     </div>
                     <div>
                       <Select value={progress} onValueChange={setProgress}>
-                        <SelectTrigger className="text-sm">
+                        <SelectTrigger className="text-base h-11">
                           <SelectValue placeholder="Прогресс" />
                         </SelectTrigger>
                         <SelectContent>
@@ -340,18 +345,18 @@ const WorkDetail = () => {
                     placeholder="Материалы (через запятую)"
                     value={materials}
                     onChange={(e) => setMaterials(e.target.value)}
-                    className="text-sm"
+                    className="text-base h-11"
                   />
                 </>
               )}
               
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <Textarea
                   placeholder={userRole === 'contractor' ? 'Описание выполненных работ...' : 'Написать сообщение...'}
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  className="resize-none text-sm flex-1"
-                  rows={2}
+                  className="resize-none text-base flex-1"
+                  rows={3}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
@@ -360,26 +365,27 @@ const WorkDetail = () => {
                   }}
                 />
                 <div className="flex flex-col gap-2">
-                  <Button variant="ghost" size="icon">
-                    <Icon name="Paperclip" size={18} />
+                  <Button variant="ghost" size="icon" className="h-10 w-10">
+                    <Icon name="Paperclip" size={20} />
                   </Button>
-                  <Button variant="ghost" size="icon">
-                    <Icon name="Camera" size={18} />
+                  <Button variant="ghost" size="icon" className="h-10 w-10">
+                    <Icon name="Camera" size={20} />
                   </Button>
                   <Button 
                     onClick={handleSendMessage}
                     disabled={!newMessage.trim() || isSubmitting}
                     size="icon"
+                    className="h-10 w-10"
                   >
                     {isSubmitting ? (
-                      <Icon name="Loader2" size={18} className="animate-spin" />
+                      <Icon name="Loader2" size={20} className="animate-spin" />
                     ) : (
-                      <Icon name="Send" size={18} />
+                      <Icon name="Send" size={20} />
                     )}
                   </Button>
                 </div>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-sm text-slate-400">
                 Enter — отправить, Shift+Enter — новая строка
               </p>
             </div>

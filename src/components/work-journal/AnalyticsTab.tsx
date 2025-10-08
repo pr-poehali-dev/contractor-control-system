@@ -78,62 +78,62 @@ export default function AnalyticsTab({ workId }: AnalyticsTabProps) {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-3 md:p-6 lg:p-8 bg-slate-50">
+    <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-10 bg-slate-50">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-bold">Аналитика: План vs Факт</h3>
-          <Button size="sm" variant="outline">
-            <Icon name="Download" size={16} className="mr-2" />
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="text-xl md:text-2xl font-bold">Аналитика: План vs Факт</h3>
+          <Button variant="outline">
+            <Icon name="Download" size={18} className="mr-2" />
             Экспорт отчёта
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Icon name="Calculator" size={20} className="text-blue-600" />
+            <CardContent className="p-5">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Icon name="Calculator" size={26} className="text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-600">Плановый бюджет</p>
-                  <p className="text-lg font-bold">{mockSummary.total_planned_budget.toLocaleString('ru-RU')} ₽</p>
+                  <p className="text-sm text-slate-600">Плановый бюджет</p>
+                  <p className="text-xl font-bold">{mockSummary.total_planned_budget.toLocaleString('ru-RU')} ₽</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Icon name="TrendingUp" size={20} className="text-purple-600" />
+            <CardContent className="p-5">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <Icon name="TrendingUp" size={26} className="text-purple-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-600">Фактические затраты</p>
-                  <p className="text-lg font-bold">{mockSummary.total_actual_cost.toLocaleString('ru-RU')} ₽</p>
+                  <p className="text-sm text-slate-600">Фактические затраты</p>
+                  <p className="text-xl font-bold">{mockSummary.total_actual_cost.toLocaleString('ru-RU')} ₽</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-4">
                 <div className={cn(
-                  'w-10 h-10 rounded-lg flex items-center justify-center',
+                  'w-14 h-14 rounded-lg flex items-center justify-center',
                   mockSummary.total_deviation >= 0 ? 'bg-red-100' : 'bg-green-100'
                 )}>
                   <Icon 
                     name={mockSummary.total_deviation >= 0 ? 'TrendingDown' : 'TrendingUp'} 
-                    size={20} 
+                    size={26} 
                     className={mockSummary.total_deviation >= 0 ? 'text-red-600' : 'text-green-600'} 
                   />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-600">Отклонение</p>
+                  <p className="text-sm text-slate-600">Отклонение</p>
                   <p className={cn(
-                    'text-lg font-bold',
+                    'text-xl font-bold',
                     mockSummary.total_deviation >= 0 ? 'text-red-600' : 'text-green-600'
                   )}>
                     {mockSummary.total_deviation >= 0 ? '+' : ''}{mockSummary.total_deviation.toLocaleString('ru-RU')} ₽
@@ -144,15 +144,15 @@ export default function AnalyticsTab({ workId }: AnalyticsTabProps) {
           </Card>
 
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-                  <Icon name="Percent" size={20} className="text-amber-600" />
+            <CardContent className="p-5">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-amber-100 rounded-lg flex items-center justify-center">
+                  <Icon name="Percent" size={26} className="text-amber-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-600">Отклонение, %</p>
+                  <p className="text-sm text-slate-600">Отклонение, %</p>
                   <p className={cn(
-                    'text-lg font-bold',
+                    'text-xl font-bold',
                     mockSummary.total_deviation_percent > 5 ? 'text-amber-600' : 'text-green-600'
                   )}>
                     {mockSummary.total_deviation_percent >= 0 ? '+' : ''}{mockSummary.total_deviation_percent.toFixed(1)}%
@@ -163,21 +163,21 @@ export default function AnalyticsTab({ workId }: AnalyticsTabProps) {
           </Card>
         </div>
 
-        <div className="bg-white rounded-lg p-4 mb-6 border border-slate-200">
+        <div className="bg-white rounded-lg p-5 mb-8 border border-slate-200">
           <div className="flex items-center justify-between">
-            <h4 className="font-semibold text-sm">Цветовая индикация отклонений:</h4>
-            <div className="flex gap-4">
+            <h4 className="font-semibold text-base">Цветовая индикация отклонений:</h4>
+            <div className="flex gap-6">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-xs text-slate-600">≤ 5% — норма</span>
+                <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+                <span className="text-sm text-slate-600">≤ 5% — норма</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
-                <span className="text-xs text-slate-600">5–15% — предупреждение</span>
+                <div className="w-4 h-4 bg-amber-500 rounded-full"></div>
+                <span className="text-sm text-slate-600">5–15% — предупреждение</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                <span className="text-xs text-slate-600">&gt; 15% — критично</span>
+                <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+                <span className="text-sm text-slate-600">&gt; 15% — критично</span>
               </div>
             </div>
           </div>
@@ -185,39 +185,39 @@ export default function AnalyticsTab({ workId }: AnalyticsTabProps) {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Детализация по позициям сметы</CardTitle>
+            <CardTitle className="text-lg">Детализация по позициям сметы</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
-                    <th className="text-left p-3 text-xs font-semibold text-slate-700">Категория</th>
-                    <th className="text-left p-3 text-xs font-semibold text-slate-700">Наименование</th>
-                    <th className="text-right p-3 text-xs font-semibold text-slate-700">План (кол.)</th>
-                    <th className="text-right p-3 text-xs font-semibold text-slate-700">Факт (кол.)</th>
-                    <th className="text-right p-3 text-xs font-semibold text-slate-700">План (₽)</th>
-                    <th className="text-right p-3 text-xs font-semibold text-slate-700">Факт (₽)</th>
-                    <th className="text-right p-3 text-xs font-semibold text-slate-700">Откл. (%)</th>
-                    <th className="text-left p-3 text-xs font-semibold text-slate-700">Статус</th>
+                    <th className="text-left p-4 text-sm font-semibold text-slate-700">Категория</th>
+                    <th className="text-left p-4 text-sm font-semibold text-slate-700">Наименование</th>
+                    <th className="text-right p-4 text-sm font-semibold text-slate-700">План (кол.)</th>
+                    <th className="text-right p-4 text-sm font-semibold text-slate-700">Факт (кол.)</th>
+                    <th className="text-right p-4 text-sm font-semibold text-slate-700">План (₽)</th>
+                    <th className="text-right p-4 text-sm font-semibold text-slate-700">Факт (₽)</th>
+                    <th className="text-right p-4 text-sm font-semibold text-slate-700">Откл. (%)</th>
+                    <th className="text-left p-4 text-sm font-semibold text-slate-700">Статус</th>
                   </tr>
                 </thead>
                 <tbody>
                   {mockPlanFactData.map((item) => (
                     <tr key={item.estimate_item_id} className="border-b border-slate-100 hover:bg-slate-50">
-                      <td className="p-3">
-                        <Badge variant="outline" className="text-xs">{item.category}</Badge>
+                      <td className="p-4">
+                        <Badge variant="outline" className="text-sm">{item.category}</Badge>
                       </td>
-                      <td className="p-3 text-sm">{item.name}</td>
-                      <td className="p-3 text-sm text-right text-slate-600">{item.planned_quantity}</td>
-                      <td className="p-3 text-sm text-right font-semibold">{item.actual_quantity}</td>
-                      <td className="p-3 text-sm text-right text-slate-600">
+                      <td className="p-4 text-base">{item.name}</td>
+                      <td className="p-4 text-base text-right text-slate-600">{item.planned_quantity}</td>
+                      <td className="p-4 text-base text-right font-semibold">{item.actual_quantity}</td>
+                      <td className="p-4 text-base text-right text-slate-600">
                         {item.planned_cost.toLocaleString('ru-RU')}
                       </td>
-                      <td className="p-3 text-sm text-right font-semibold">
+                      <td className="p-4 text-base text-right font-semibold">
                         {item.actual_cost.toLocaleString('ru-RU')}
                       </td>
-                      <td className="p-3 text-sm text-right">
+                      <td className="p-4 text-base text-right">
                         <span className={cn(
                           'font-semibold',
                           item.status === 'normal' && 'text-green-600',
@@ -227,8 +227,8 @@ export default function AnalyticsTab({ workId }: AnalyticsTabProps) {
                           {item.deviation_percent >= 0 ? '+' : ''}{item.deviation_percent}%
                         </span>
                       </td>
-                      <td className="p-3">
-                        <Badge className={cn('text-xs border', getStatusColor(item.status))}>
+                      <td className="p-4">
+                        <Badge className={cn('text-sm border', getStatusColor(item.status))}>
                           {getStatusLabel(item.status)}
                         </Badge>
                       </td>

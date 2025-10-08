@@ -14,12 +14,12 @@ const mockEstimate = [
 
 export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) {
   return (
-    <div className="flex-1 overflow-y-auto p-3 md:p-6 lg:p-8 bg-slate-50">
+    <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-10 bg-slate-50">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold">Смета</h3>
-          <Button size="sm" onClick={handleCreateEstimate}>
-            <Icon name="Plus" size={16} className="mr-1" />
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl md:text-2xl font-bold">Смета</h3>
+          <Button onClick={handleCreateEstimate}>
+            <Icon name="Plus" size={18} className="mr-2" />
             Создать смету
           </Button>
         </div>
@@ -30,23 +30,23 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
               <table className="w-full">
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
-                    <th className="text-left p-3 text-sm font-semibold text-slate-700">Наименование</th>
-                    <th className="text-left p-3 text-sm font-semibold text-slate-700">Количество</th>
-                    <th className="text-left p-3 text-sm font-semibold text-slate-700">Цена</th>
-                    <th className="text-right p-3 text-sm font-semibold text-slate-700">Итого</th>
-                    <th className="w-10"></th>
+                    <th className="text-left p-4 text-base font-semibold text-slate-700">Наименование</th>
+                    <th className="text-left p-4 text-base font-semibold text-slate-700">Количество</th>
+                    <th className="text-left p-4 text-base font-semibold text-slate-700">Цена</th>
+                    <th className="text-right p-4 text-base font-semibold text-slate-700">Итого</th>
+                    <th className="w-12"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {mockEstimate.map((item, index) => (
                     <tr key={index} className="border-b border-slate-100 hover:bg-slate-50">
-                      <td className="p-3 text-sm">{item.name}</td>
-                      <td className="p-3 text-sm text-slate-600">{item.quantity}</td>
-                      <td className="p-3 text-sm text-slate-600">{item.price}</td>
-                      <td className="p-3 text-sm font-semibold text-right">{item.total}</td>
-                      <td className="p-3">
-                        <Button variant="ghost" size="icon" className="h-6 w-6">
-                          <Icon name="MoreVertical" size={14} />
+                      <td className="p-4 text-base">{item.name}</td>
+                      <td className="p-4 text-base text-slate-600">{item.quantity}</td>
+                      <td className="p-4 text-base text-slate-600">{item.price}</td>
+                      <td className="p-4 text-base font-semibold text-right">{item.total}</td>
+                      <td className="p-4">
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Icon name="MoreVertical" size={16} />
                         </Button>
                       </td>
                     </tr>
@@ -54,8 +54,8 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
                 </tbody>
                 <tfoot className="bg-slate-50 border-t-2 border-slate-300">
                   <tr>
-                    <td colSpan={3} className="p-3 text-sm font-semibold">Итого:</td>
-                    <td className="p-3 text-base font-bold text-right">100 000 ₽</td>
+                    <td colSpan={3} className="p-4 text-base font-semibold">Итого:</td>
+                    <td className="p-4 text-lg font-bold text-right">100 000 ₽</td>
                     <td></td>
                   </tr>
                 </tfoot>
@@ -64,44 +64,44 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
           </CardContent>
         </Card>
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Icon name="Calculator" size={20} className="text-blue-600" />
+            <CardContent className="p-5">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Icon name="Calculator" size={26} className="text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-600">Бюджет</p>
-                  <p className="text-lg font-bold">100 000 ₽</p>
+                  <p className="text-sm text-slate-600">Бюджет</p>
+                  <p className="text-xl font-bold">100 000 ₽</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Icon name="TrendingDown" size={20} className="text-green-600" />
+            <CardContent className="p-5">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Icon name="TrendingDown" size={26} className="text-green-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-600">Потрачено</p>
-                  <p className="text-lg font-bold">45 000 ₽</p>
+                  <p className="text-sm text-slate-600">Потрачено</p>
+                  <p className="text-xl font-bold">45 000 ₽</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Icon name="Wallet" size={20} className="text-purple-600" />
+            <CardContent className="p-5">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <Icon name="Wallet" size={26} className="text-purple-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-600">Остаток</p>
-                  <p className="text-lg font-bold">55 000 ₽</p>
+                  <p className="text-sm text-slate-600">Остаток</p>
+                  <p className="text-xl font-bold">55 000 ₽</p>
                 </div>
               </div>
             </CardContent>

@@ -254,19 +254,19 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
                       )}
                     </div>
 
-                    <div className="bg-white border-t border-slate-200 p-3 md:p-4 lg:p-6 flex-shrink-0">
-                      <div className="max-w-5xl mx-auto space-y-3">
+                    <div className="bg-white border-t border-slate-200 p-4 md:p-5 lg:p-6 flex-shrink-0">
+                      <div className="max-w-6xl mx-auto space-y-4">
                         {userRole === 'contractor' && (
                           <>
-                            <div className="grid grid-cols-2 gap-2">
+                            <div className="grid grid-cols-2 gap-3">
                               <Input
                                 placeholder="Объём (м², шт, кг...)"
                                 value={volume}
                                 onChange={(e) => setVolume(e.target.value)}
-                                className="text-sm"
+                                className="text-base h-11"
                               />
                               <Select value={progress} onValueChange={setProgress}>
-                                <SelectTrigger className="text-sm">
+                                <SelectTrigger className="text-base h-11">
                                   <SelectValue placeholder="Прогресс" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -282,18 +282,18 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
                               placeholder="Материалы (через запятую)"
                               value={materials}
                               onChange={(e) => setMaterials(e.target.value)}
-                              className="text-sm"
+                              className="text-base h-11"
                             />
                           </>
                         )}
                         
-                        <div className="flex gap-2">
+                        <div className="flex gap-3">
                           <Textarea
                             placeholder={userRole === 'contractor' ? 'Описание выполненных работ...' : 'Написать сообщение...'}
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
-                            className="resize-none text-sm flex-1"
-                            rows={2}
+                            className="resize-none text-base flex-1"
+                            rows={3}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter' && !e.shiftKey) {
                                 e.preventDefault();
@@ -302,26 +302,27 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
                             }}
                           />
                           <div className="flex flex-col gap-2">
-                            <Button variant="ghost" size="icon">
-                              <Icon name="Paperclip" size={18} />
+                            <Button variant="ghost" size="icon" className="h-10 w-10">
+                              <Icon name="Paperclip" size={20} />
                             </Button>
-                            <Button variant="ghost" size="icon">
-                              <Icon name="Camera" size={18} />
+                            <Button variant="ghost" size="icon" className="h-10 w-10">
+                              <Icon name="Camera" size={20} />
                             </Button>
                             <Button 
                               onClick={handleSendMessage}
                               disabled={!newMessage.trim() || isSubmitting}
                               size="icon"
+                              className="h-10 w-10"
                             >
                               {isSubmitting ? (
-                                <Icon name="Loader2" size={18} className="animate-spin" />
+                                <Icon name="Loader2" size={20} className="animate-spin" />
                               ) : (
-                                <Icon name="Send" size={18} />
+                                <Icon name="Send" size={20} />
                               )}
                             </Button>
                           </div>
                         </div>
-                        <p className="text-xs text-slate-400">
+                        <p className="text-sm text-slate-400">
                           Enter — отправить, Shift+Enter — новая строка
                         </p>
                       </div>
