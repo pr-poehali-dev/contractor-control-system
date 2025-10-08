@@ -1,14 +1,26 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { api } from '@/lib/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { useToast } from '@/hooks/use-toast';
+import EditProjectDialog from '@/components/EditProjectDialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const Projects = () => {
   const navigate = useNavigate();
-  const { userData } = useAuth();
+  const { user, userData, setUserData } = useAuth();
+  const { toast } = useToast();
+  const [editProject, setEditProject] = useState<any>(null);
 
   const projects = userData?.projects || [];
   const sites = userData?.sites || [];
@@ -78,10 +90,53 @@ const Projects = () => {
             >
               <CardHeader>
                 <div className="flex items-start justify-between mb-2">
-                  <CardTitle className="text-lg font-bold text-slate-900">{project.title}</CardTitle>
-                  <Badge variant={project.status === 'active' ? 'default' : 'secondary'}>
-                    {getStatusLabel(project.status)}
-                  </Badge>
+                  <CardTitle className="text-lg font-bold text-slate-900 flex-1">{project.title}</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={project.status === 'active' ? 'default' : 'secondary'}>
+                      {getStatusLabel(project.status)}
+                    </Badge>
+                    {user?.role === 'client' && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Icon name="MoreVertical" size={16} />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={(e) => {
+                            e.stopPropagation();
+                            setEditProject(project);
+                          }}>
+                            <Icon name="Edit" size={16} className="mr-2" />
+                            Изменить
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="text-red-600"
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              if (!confirm('Удалить проект?')) return;
+                              try {
+                                await api.deleteItem(user.id, 'project', project.id);
+                                const refreshed = await api.getUserData(user.id);
+                                setUserData(refreshed);
+                                localStorage.setItem('userData', JSON.stringify(refreshed));
+                                toast({ title: 'Проект удалён' });
+                              } catch (error) {
+                                toast({ 
+                                  title: 'Ошибка', 
+                                  description: 'Не удалось удалить',
+                                  variant: 'destructive'
+                                });
+                              }
+                            }}
+                          >
+                            <Icon name="Trash2" size={16} className="mr-2" />
+                            Удалить
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </div>
                 </div>
                 <CardDescription>
                   <div className="flex items-center gap-4 text-sm mt-3">
@@ -108,6 +163,15 @@ const Projects = () => {
             </Card>
           ))}
         </div>
+      )}
+
+      {editProject && (
+        <EditProjectDialog
+          project={editProject}
+          open={!!editProject}
+          onOpenChange={(open) => !open && setEditProject(null)}
+          onSuccess={() => setEditProject(null)}
+        />
       )}
     </div>
   );

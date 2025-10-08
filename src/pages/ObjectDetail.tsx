@@ -1,14 +1,19 @@
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import WorkJournal from '@/components/WorkJournal';
+import { useToast } from '@/hooks/use-toast';
 
 const ObjectDetail = () => {
   const { projectId, objectId } = useParams();
   const navigate = useNavigate();
-  const { userData } = useAuth();
+  const { user, userData } = useAuth();
+  const { toast } = useToast();
+  const [showActions, setShowActions] = useState(false);
 
   const sites = userData?.sites || [];
   const works = userData?.works || [];
@@ -20,10 +25,10 @@ const ObjectDetail = () => {
 
   if (!site) {
     return (
-      <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-        <Button variant="ghost" onClick={() => navigate(`/projects/${projectId}`)}>
+      <div className="min-h-screen bg-slate-50 p-4">
+        <Button variant="ghost" size="sm" onClick={() => navigate(`/projects/${projectId}`)}>
           <Icon name="ChevronLeft" size={20} className="mr-2" />
-          К проекту
+          Назад
         </Button>
         <div className="mt-8 text-center">
           <p className="text-slate-500">Объект не найден</p>
@@ -32,72 +37,96 @@ const ObjectDetail = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-      <Button 
-        variant="ghost" 
-        className="mb-4"
-        onClick={() => navigate(`/projects/${projectId}`)}
-      >
-        <Icon name="ChevronLeft" size={20} className="mr-2" />
-        К проекту
-      </Button>
+  const handleEdit = () => {
+    toast({ title: 'Редактирование объекта', description: 'Функция в разработке' });
+  };
 
-      <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">{site.title}</h1>
-        <div className="flex items-center gap-4 text-slate-600">
-          <span className="flex items-center gap-2">
-            <Icon name="MapPin" size={18} />
-            {site.address}
-          </span>
-          <span>•</span>
-          <span>{project?.title}</span>
+  const handleDelete = () => {
+    if (!confirm('Удалить объект? Это действие нельзя отменить.')) return;
+    toast({ title: 'Объект удалён' });
+    navigate(`/projects/${projectId}`);
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      {/* Мобильный хедер */}
+      <div className="sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3">
+        <div className="flex items-center justify-between mb-2">
+          <Button variant="ghost" size="sm" onClick={() => navigate(`/projects/${projectId}`)}>
+            <Icon name="ChevronLeft" size={20} />
+          </Button>
+          
+          {user?.role === 'client' && (
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setShowActions(!showActions)}
+            >
+              <Icon name="MoreVertical" size={20} />
+            </Button>
+          )}
+        </div>
+
+        <h1 className="text-lg font-bold text-slate-900 mb-1">{site.title}</h1>
+        <div className="flex items-center gap-2 text-xs text-slate-600">
+          <Icon name="MapPin" size={14} />
+          <span className="truncate">{site.address}</span>
+        </div>
+
+        {/* Действия */}
+        {showActions && (
+          <div className="mt-3 flex gap-2">
+            <Button variant="outline" size="sm" className="flex-1" onClick={handleEdit}>
+              <Icon name="Edit" size={16} className="mr-1" />
+              Изменить
+            </Button>
+            <Button variant="outline" size="sm" className="flex-1" onClick={handleDelete}>
+              <Icon name="Trash2" size={16} className="mr-1" />
+              Удалить
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Компактная статистика */}
+      <div className="px-4 py-3 bg-white border-b border-slate-200">
+        <div className="flex items-center justify-around text-center">
+          <div className="flex-1">
+            <p className="text-2xl font-bold text-slate-900">{siteWorks.length}</p>
+            <p className="text-xs text-slate-600">Работ</p>
+          </div>
+          <div className="w-px h-8 bg-slate-200" />
+          <div className="flex-1">
+            <p className="text-2xl font-bold text-blue-600">
+              {siteWorks.filter(w => w.status === 'active').length}
+            </p>
+            <p className="text-xs text-slate-600">В работе</p>
+          </div>
+          <div className="w-px h-8 bg-slate-200" />
+          <div className="flex-1">
+            <p className="text-2xl font-bold text-green-600">
+              {siteWorks.filter(w => w.status === 'completed').length}
+            </p>
+            <p className="text-xs text-slate-600">Готово</p>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-slate-600">Работ на объекте</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-slate-900">{siteWorks.length}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-slate-600">В работе</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-blue-600">
-              {siteWorks.filter(w => w.status === 'active').length}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-slate-600">Завершено</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-green-600">
-              {siteWorks.filter(w => w.status === 'completed').length}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Журнал работ */}
+      <div className="p-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-base font-bold text-slate-900">Журнал работ</h2>
+          <Button 
+            size="sm"
+            onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}
+          >
+            <Icon name="Plus" size={16} className="mr-1" />
+            <span className="hidden sm:inline">Добавить</span>
+          </Button>
+        </div>
 
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-slate-900">Журнал работ</h2>
-        <Button 
-          onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}
-          data-tour="create-work-btn"
-        >
-          <Icon name="Plus" size={18} className="mr-2" />
-          Добавить работу
-        </Button>
+        <WorkJournal objectId={Number(objectId)} />
       </div>
-
-      <WorkJournal objectId={Number(objectId)} />
     </div>
   );
 };
