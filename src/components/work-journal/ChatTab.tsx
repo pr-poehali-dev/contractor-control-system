@@ -45,8 +45,8 @@ export default function ChatTab({
             <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-4">
               <Icon name="MessageSquare" size={40} className="text-blue-400" />
             </div>
-            <p className="text-slate-500 text-sm mb-2">No messages in this chat yet</p>
-            <p className="text-slate-400 text-xs">Start conversation</p>
+            <p className="text-slate-500 text-sm mb-2">Записей пока нет</p>
+            <p className="text-slate-400 text-xs">Начните вести журнал работ</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -128,7 +128,7 @@ export default function ChatTab({
             <Icon name="Paperclip" size={18} />
           </Button>
           <Textarea
-            placeholder="Write message"
+            placeholder="Написать сообщение..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             className="resize-none text-sm flex-1"
@@ -163,7 +163,7 @@ export default function ChatTab({
           </Button>
         </div>
         <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
-          <span>Chat participants:</span>
+          <span>Участники:</span>
           <div className="flex items-center gap-1">
             <Avatar className="w-5 h-5">
               <AvatarFallback className="bg-blue-500 text-white text-[10px]">
@@ -179,7 +179,7 @@ export default function ChatTab({
             )}
           </div>
           <Button variant="link" className="text-blue-600 h-auto p-0 text-xs">
-            Unsubscribe
+            Отписаться
           </Button>
         </div>
       </div>

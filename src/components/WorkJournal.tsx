@@ -3,7 +3,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -26,6 +25,11 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
 
   const works = (userData?.works || []).filter(w => w.object_id === objectId);
   const workLogs = userData?.workLogs || [];
+  const sites = userData?.sites || [];
+  const projects = userData?.projects || [];
+  
+  const currentSite = sites.find(s => s.id === objectId);
+  const currentProject = currentSite ? projects.find(p => p.id === currentSite.project_id) : null;
 
   const [selectedWork, setSelectedWork] = useState(works[0]?.id || null);
   const [newMessage, setNewMessage] = useState('');
@@ -162,49 +166,48 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
                 selectedWorkData={selectedWorkData}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
+                organizationName={currentProject?.client_name}
               />
 
               <div className="flex-1 overflow-hidden">
-                <Tabs value={activeTab} className="h-full flex flex-col">
-                  <TabsContent value="chat" className="flex-1 flex flex-col mt-0 overflow-hidden">
-                    <ChatTab
-                      workEntries={workEntries}
-                      user={user}
-                      selectedWorkData={selectedWorkData}
-                      newMessage={newMessage}
-                      setNewMessage={setNewMessage}
-                      progress={progress}
-                      setProgress={setProgress}
-                      isSubmitting={isSubmitting}
-                      handleSendMessage={handleSendMessage}
-                      getInitials={getInitials}
-                      formatTime={formatTime}
-                      formatDate={formatDate}
-                    />
-                  </TabsContent>
+                {activeTab === 'chat' && (
+                  <ChatTab
+                    workEntries={workEntries}
+                    user={user}
+                    selectedWorkData={selectedWorkData}
+                    newMessage={newMessage}
+                    setNewMessage={setNewMessage}
+                    progress={progress}
+                    setProgress={setProgress}
+                    isSubmitting={isSubmitting}
+                    handleSendMessage={handleSendMessage}
+                    getInitials={getInitials}
+                    formatTime={formatTime}
+                    formatDate={formatDate}
+                  />
+                )}
 
-                  <TabsContent value="info" className="flex-1 flex flex-col mt-0 overflow-hidden">
-                    <InfoTab
-                      selectedWorkData={selectedWorkData}
-                      workEntries={workEntries}
-                      formatDate={formatDate}
-                      formatTime={formatTime}
-                      handleCreateInspection={handleCreateInspection}
-                    />
-                  </TabsContent>
+                {activeTab === 'info' && (
+                  <InfoTab
+                    selectedWorkData={selectedWorkData}
+                    workEntries={workEntries}
+                    formatDate={formatDate}
+                    formatTime={formatTime}
+                    handleCreateInspection={handleCreateInspection}
+                  />
+                )}
 
-                  <TabsContent value="description" className="flex-1 flex flex-col mt-0 overflow-hidden">
-                    <DescriptionTab selectedWorkData={selectedWorkData} />
-                  </TabsContent>
+                {activeTab === 'description' && (
+                  <DescriptionTab selectedWorkData={selectedWorkData} />
+                )}
 
-                  <TabsContent value="subtasks" className="flex-1 flex flex-col mt-0 overflow-hidden">
-                    <SubtasksTab handleAddSubtask={handleAddSubtask} />
-                  </TabsContent>
+                {activeTab === 'subtasks' && (
+                  <SubtasksTab handleAddSubtask={handleAddSubtask} />
+                )}
 
-                  <TabsContent value="estimate" className="flex-1 flex flex-col mt-0 overflow-hidden">
-                    <EstimateTab handleCreateEstimate={handleCreateEstimate} />
-                  </TabsContent>
-                </Tabs>
+                {activeTab === 'estimate' && (
+                  <EstimateTab handleCreateEstimate={handleCreateEstimate} />
+                )}
               </div>
             </>
           ) : (
