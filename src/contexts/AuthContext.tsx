@@ -15,8 +15,10 @@ interface User {
 interface AuthContextType {
   user: User | null;
   userData: UserData | null;
+  setUserData: (data: UserData | null) => void;
   login: (phone: string) => Promise<void>;
   logout: () => void;
+  refreshUserData: () => void;
   isAuthenticated: boolean;
   isLoading: boolean;
 }
@@ -76,6 +78,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('userData');
   };
 
+  const refreshUserData = () => {
+    const storedData = localStorage.getItem('userData');
+    if (storedData) {
+      setUserData(JSON.parse(storedData));
+    }
+  };
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const storedData = localStorage.getItem('userData');
@@ -87,7 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, userData, login, logout, isAuthenticated: !!user, isLoading }}>
+    <AuthContext.Provider value={{ user, userData, setUserData, login, logout, refreshUserData, isAuthenticated: !!user, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

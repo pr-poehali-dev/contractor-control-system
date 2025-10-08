@@ -16,16 +16,16 @@ interface NavItem {
   label: string;
   icon: string;
   path: string;
-  roles?: ('customer' | 'contractor')[];
+  roles?: ('client' | 'contractor')[];
 }
 
 const navItems: NavItem[] = [
-  { id: 'dashboard', label: 'Главная', icon: 'LayoutDashboard', path: '/dashboard', roles: ['customer'] },
+  { id: 'dashboard', label: 'Главная', icon: 'LayoutDashboard', path: '/dashboard', roles: ['client'] },
   { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects', roles: ['contractor'] },
-  { id: 'projects', label: 'Проекты', icon: 'FolderKanban', path: '/projects', roles: ['customer'] },
-  { id: 'defects', label: 'Замечания', icon: 'AlertTriangle', path: '/defects', roles: ['customer', 'contractor'] },
-  { id: 'analytics', label: 'Аналитика', icon: 'BarChart3', path: '/analytics', roles: ['customer'] },
-  { id: 'contractors', label: 'Подрядчики', icon: 'Users', path: '/contractors', roles: ['customer'] },
+  { id: 'projects', label: 'Проекты', icon: 'FolderKanban', path: '/projects', roles: ['client'] },
+  { id: 'defects', label: 'Замечания', icon: 'AlertTriangle', path: '/defects', roles: ['client', 'contractor'] },
+  { id: 'analytics', label: 'Аналитика', icon: 'BarChart3', path: '/analytics', roles: ['client'] },
+  { id: 'contractors', label: 'Подрядчики', icon: 'Users', path: '/contractors', roles: ['client'] },
 ];
 
 export default function TopNavigation() {
