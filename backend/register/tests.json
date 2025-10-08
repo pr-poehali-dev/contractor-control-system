@@ -1,0 +1,26 @@
+{
+  "tests": [
+    {
+      "name": "Register new client",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "phone": "+79991234567",
+        "email": "newuser@test.com",
+        "name": "New User",
+        "role": "client"
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "success": true,
+        "user": {
+          "id": "number",
+          "phone": "string",
+          "name": "string",
+          "role": "string"
+        }
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

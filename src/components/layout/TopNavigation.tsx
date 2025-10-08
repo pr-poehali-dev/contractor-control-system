@@ -23,6 +23,7 @@ const navItems: NavItem[] = [
   { id: 'dashboard', label: 'Главная', icon: 'LayoutDashboard', path: '/dashboard', roles: ['client'] },
   { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects', roles: ['contractor'] },
   { id: 'projects', label: 'Проекты', icon: 'FolderKanban', path: '/projects', roles: ['client'] },
+  { id: 'work-templates', label: 'Справочник', icon: 'BookOpen', path: '/work-templates', roles: ['client', 'contractor'] },
   { id: 'defects', label: 'Замечания', icon: 'AlertTriangle', path: '/defects', roles: ['client', 'contractor'] },
   { id: 'analytics', label: 'Аналитика', icon: 'BarChart3', path: '/analytics', roles: ['client'] },
   { id: 'contractors', label: 'Подрядчики', icon: 'Users', path: '/contractors', roles: ['client'] },

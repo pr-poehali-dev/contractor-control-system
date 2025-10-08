@@ -1,11 +1,19 @@
+import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
+import { useToast } from '@/hooks/use-toast';
 
 const Contractors = () => {
   const { userData } = useAuth();
+  const { toast } = useToast();
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteData, setInviteData] = useState({ email: '', organization: '', inn: '' });
 
   const works = userData?.works || [];
 
@@ -39,11 +47,64 @@ const Contractors = () => {
       .slice(0, 2);
   };
 
+  const handleInvite = () => {
+    toast({
+      title: 'Приглашение отправлено',
+      description: `Приглашение отправлено на ${inviteData.email}`,
+    });
+    setInviteOpen(false);
+    setInviteData({ email: '', organization: '', inn: '' });
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-      <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Подрядчики</h1>
-        <p className="text-slate-600">Организации, выполняющие работы по вашим проектам</p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Подрядчики</h1>
+          <p className="text-slate-600">Организации, выполняющие работы по вашим проектам</p>
+        </div>
+        <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Icon name="UserPlus" size={18} className="mr-2" />
+              Пригласить подрядчика
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Пригласить подрядчика</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div>
+                <label className="text-sm font-medium">Email *</label>
+                <Input
+                  value={inviteData.email}
+                  onChange={(e) => setInviteData({ ...inviteData, email: e.target.value })}
+                  placeholder="contractor@example.com"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Организация</label>
+                <Input
+                  value={inviteData.organization}
+                  onChange={(e) => setInviteData({ ...inviteData, organization: e.target.value })}
+                  placeholder="ООО Стройка"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">ИНН</label>
+                <Input
+                  value={inviteData.inn}
+                  onChange={(e) => setInviteData({ ...inviteData, inn: e.target.value })}
+                  placeholder="1234567890"
+                />
+              </div>
+              <Button onClick={handleInvite} className="w-full">
+                Отправить приглашение
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

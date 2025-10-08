@@ -252,7 +252,19 @@ const Login = () => {
           )}
         </div>
 
-        <div className="mt-8 text-center text-sm text-slate-500">
+        <div className="mt-6 text-center">
+          <p className="text-sm text-slate-600">
+            Нет аккаунта?{' '}
+            <button
+              onClick={() => navigate('/register')}
+              className="text-blue-600 hover:underline font-medium"
+            >
+              Зарегистрироваться
+            </button>
+          </p>
+        </div>
+
+        <div className="mt-4 text-center text-xs text-slate-500">
           <p>
             Входя в систему, вы соглашаетесь с{' '}
             <a href="#" className="text-blue-600 hover:underline">
