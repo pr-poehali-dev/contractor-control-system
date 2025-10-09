@@ -1,0 +1,32 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS request for CORS",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Invite contractor without admin key",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "name": "Test Contractor",
+        "phone": "+79001234567"
+      },
+      "expectedStatus": 403
+    },
+    {
+      "name": "Invite contractor with missing fields",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-Admin-Key": "admin123"
+      },
+      "body": {
+        "name": "Test"
+      },
+      "expectedStatus": 400
+    }
+  ]
+}

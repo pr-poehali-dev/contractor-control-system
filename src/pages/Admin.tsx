@@ -5,6 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 
 interface AdminUser {
   id: number;
@@ -23,6 +32,14 @@ const Admin = () => {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [inviteData, setInviteData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    organization: '',
+  });
+  const [isSendingInvite, setIsSendingInvite] = useState(false);
   const { toast } = useToast();
 
   const handleAuth = () => {
@@ -60,6 +77,50 @@ const Admin = () => {
     }
   };
 
+  const handleInviteContractor = async () => {
+    if (!inviteData.name || !inviteData.phone) {
+      toast({
+        title: 'Ошибка',
+        description: 'Заполните обязательные поля: имя и телефон',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsSendingInvite(true);
+    try {
+      const response = await fetch('https://functions.poehali.dev/5865695e-cb4a-4795-bc42-5465c2b7ad0b', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Key': 'admin123',
+        },
+        body: JSON.stringify(inviteData),
+      });
+
+      if (!response.ok) throw new Error('Failed to invite contractor');
+
+      const data = await response.json();
+      
+      toast({
+        title: 'Успешно!',
+        description: `Подрядчик ${inviteData.name} приглашён. SMS с паролем отправлено на ${inviteData.phone}`,
+      });
+
+      setIsInviteOpen(false);
+      setInviteData({ name: '', phone: '', email: '', organization: '' });
+      loadUsers();
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось отправить приглашение',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSendingInvite(false);
+    }
+  };
+
   if (!isAuthorized) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
@@ -94,10 +155,85 @@ const Admin = () => {
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Админ-панель</h1>
           <p className="text-slate-600">Управление пользователями системы</p>
         </div>
-        <Button onClick={loadUsers} variant="outline">
-          <Icon name="RefreshCw" size={18} className="mr-2" />
-          Обновить
-        </Button>
+        <div className="flex gap-3">
+          <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Icon name="UserPlus" size={18} className="mr-2" />
+                Пригласить подрядчика
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Пригласить подрядчика</DialogTitle>
+                <DialogDescription>
+                  Введите данные подрядчика. На указанный телефон будет отправлен пароль для входа.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Имя *</Label>
+                  <Input
+                    id="name"
+                    placeholder="Иван Иванов"
+                    value={inviteData.name}
+                    onChange={(e) => setInviteData({ ...inviteData, name: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Телефон *</Label>
+                  <Input
+                    id="phone"
+                    placeholder="+7 (900) 123-45-67"
+                    value={inviteData.phone}
+                    onChange={(e) => setInviteData({ ...inviteData, phone: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="contractor@example.com"
+                    value={inviteData.email}
+                    onChange={(e) => setInviteData({ ...inviteData, email: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="organization">Организация</Label>
+                  <Input
+                    id="organization"
+                    placeholder="ООО 'Стройпроект'"
+                    value={inviteData.organization}
+                    onChange={(e) => setInviteData({ ...inviteData, organization: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3">
+                <Button variant="outline" onClick={() => setIsInviteOpen(false)}>
+                  Отмена
+                </Button>
+                <Button onClick={handleInviteContractor} disabled={isSendingInvite}>
+                  {isSendingInvite ? (
+                    <>
+                      <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                      Отправка...
+                    </>
+                  ) : (
+                    <>
+                      <Icon name="Send" size={18} className="mr-2" />
+                      Отправить приглашение
+                    </>
+                  )}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+          <Button onClick={loadUsers} variant="outline">
+            <Icon name="RefreshCw" size={18} className="mr-2" />
+            Обновить
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (
