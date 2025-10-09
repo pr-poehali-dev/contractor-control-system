@@ -9,6 +9,7 @@ import os
 import psycopg2
 import bcrypt
 import jwt
+import hashlib
 from datetime import datetime, timedelta
 from typing import Dict, Any
 
@@ -22,7 +23,15 @@ def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
 def verify_password(password: str, hashed: str) -> bool:
-    return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+    # Support both SHA-256 (legacy/admin reset) and bcrypt
+    if len(hashed) == 64:  # SHA-256 hash is 64 characters
+        return hashlib.sha256(password.encode()).hexdigest() == hashed
+    else:  # bcrypt hash
+        try:
+            return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+        except ValueError:
+            # If bcrypt fails, try SHA-256 as fallback
+            return hashlib.sha256(password.encode()).hexdigest() == hashed
 
 def create_jwt_token(user_id: int, role: str) -> str:
     payload = {
