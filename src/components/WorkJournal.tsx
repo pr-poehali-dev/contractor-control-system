@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
@@ -23,11 +24,14 @@ import type { JournalEvent, UserRole } from '@/types/journal';
 
 interface WorkJournalProps {
   objectId: number;
+  selectedWorkId?: number;
 }
 
-export default function WorkJournal({ objectId }: WorkJournalProps) {
+export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalProps) {
   const { user, userData, setUserData } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { projectId } = useParams();
 
   const works = (userData?.works || []).filter(w => w.object_id === objectId);
   const workLogs = userData?.workLogs || [];
@@ -37,7 +41,38 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
   const currentSite = sites.find(s => s.id === objectId);
   const currentProject = currentSite ? projects.find(p => p.id === currentSite.project_id) : null;
 
-  const [selectedWork, setSelectedWork] = useState(works[0]?.id || null);
+  const selectedWork = selectedWorkId || works[0]?.id || null;
+  
+  const handleWorkSelect = (workId: number) => {
+    if (projectId) {
+      navigate(`/projects/${projectId}/objects/${objectId}/works/${workId}`);
+    }
+  };
+
+  // If no works, show empty state
+  if (works.length === 0) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <Icon name="Briefcase" size={48} className="mx-auto text-slate-300 mb-4" />
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">Пока нет работ</h3>
+          <p className="text-slate-600 mb-6">Создайте первую работу для этого объекта</p>
+          <Button onClick={() => projectId && navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}>
+            <Icon name="Plus" size={18} className="mr-2" />
+            Создать работу
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!selectedWork) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <p className="text-slate-500">Работа не выбрана</p>
+      </div>
+    );
+  }
   const [newMessage, setNewMessage] = useState('');
   const [progress, setProgress] = useState('0');
   const [volume, setVolume] = useState('');
@@ -226,7 +261,7 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
               <button
                 key={work.id}
                 onClick={() => {
-                  setSelectedWork(work.id);
+                  handleWorkSelect(work.id);
                   setShowWorksList(false);
                 }}
                 className={cn(
@@ -249,7 +284,7 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
           works={works}
           workLogs={workLogs}
           selectedWork={selectedWork}
-          setSelectedWork={setSelectedWork}
+          setSelectedWork={handleWorkSelect}
           getInitials={getInitials}
           formatTime={formatTime}
           objectId={objectId}

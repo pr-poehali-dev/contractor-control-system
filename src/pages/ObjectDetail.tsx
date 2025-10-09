@@ -1,18 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
-import WorkJournal from '@/components/WorkJournal';
 import { useToast } from '@/hooks/use-toast';
 
 const ObjectDetail = () => {
   const { projectId, objectId } = useParams();
   const navigate = useNavigate();
-  const { user, userData } = useAuth();
+  const { user, userData, setUserData } = useAuth();
   const { toast } = useToast();
   const [showActions, setShowActions] = useState(false);
 
@@ -23,6 +22,13 @@ const ObjectDetail = () => {
   const site = sites.find(s => s.id === Number(objectId));
   const project = projects.find(p => p.id === Number(projectId));
   const siteWorks = works.filter(w => w.object_id === Number(objectId));
+
+  // Auto-redirect to first work if exists
+  useEffect(() => {
+    if (siteWorks.length > 0) {
+      navigate(`/projects/${projectId}/objects/${objectId}/works/${siteWorks[0].id}`, { replace: true });
+    }
+  }, [siteWorks.length, projectId, objectId, navigate]);
 
   if (!site) {
     return (
@@ -111,8 +117,61 @@ const ObjectDetail = () => {
         )}
       </div>
 
-      {/* Журнал работ */}
-      <WorkJournal objectId={Number(objectId)} />
+      {/* Список работ или пустое состояние */}
+      <div className="p-4 md:p-6">
+        {siteWorks.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <Icon name="Briefcase" size={48} className="text-slate-300 mb-4" />
+              <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                Пока нет работ
+              </h3>
+              <p className="text-sm text-slate-600 mb-6 text-center max-w-md">
+                Создайте первую работу для этого объекта, чтобы начать отслеживать прогресс
+              </p>
+              <Button onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}>
+                <Icon name="Plus" size={18} className="mr-2" />
+                Создать работу
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {siteWorks.map((work) => (
+              <Card 
+                key={work.id}
+                className="cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/${work.id}`)}
+              >
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <CardTitle className="text-lg">{work.title}</CardTitle>
+                    <Badge variant={work.status === 'completed' ? 'default' : 'secondary'}>
+                      {work.status === 'active' && 'В работе'}
+                      {work.status === 'pending' && 'Ожидание'}
+                      {work.status === 'completed' && 'Завершено'}
+                      {work.status === 'on_hold' && 'Приостановлено'}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {work.description && (
+                    <p className="text-sm text-slate-600 mb-3 line-clamp-2">
+                      {work.description}
+                    </p>
+                  )}
+                  {work.contractor_name && (
+                    <div className="flex items-center text-sm text-slate-500">
+                      <Icon name="User" size={14} className="mr-1" />
+                      {work.contractor_name}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
