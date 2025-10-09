@@ -345,46 +345,15 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                       )}
                     </div>
 
-                    <div className="bg-white border-t border-slate-200 p-4 md:p-5 lg:p-6 flex-shrink-0">
-                      <div className="max-w-6xl mx-auto space-y-4">
-                        {userRole === 'contractor' && (
-                          <>
-                            <div className="grid grid-cols-2 gap-3">
-                              <Input
-                                placeholder="Объём (м², шт, кг...)"
-                                value={volume}
-                                onChange={(e) => setVolume(e.target.value)}
-                                className="text-base h-11"
-                              />
-                              <Select value={progress} onValueChange={setProgress}>
-                                <SelectTrigger className="text-base h-11">
-                                  <SelectValue placeholder="Прогресс" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="0">0% - Не начато</SelectItem>
-                                  <SelectItem value="25">25%</SelectItem>
-                                  <SelectItem value="50">50%</SelectItem>
-                                  <SelectItem value="75">75%</SelectItem>
-                                  <SelectItem value="100">100% - Завершено</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            <Input
-                              placeholder="Материалы (через запятую)"
-                              value={materials}
-                              onChange={(e) => setMaterials(e.target.value)}
-                              className="text-base h-11"
-                            />
-                          </>
-                        )}
-                        
-                        <div className="flex gap-3">
+                    <div className="bg-white border-t border-slate-200 p-4 flex-shrink-0">
+                      <div className="max-w-4xl mx-auto">
+                        <div className="flex gap-2 items-end">
                           <Textarea
-                            placeholder={userRole === 'contractor' ? 'Описание выполненных работ...' : 'Написать сообщение...'}
+                            placeholder="Написать сообщение..."
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
-                            className="resize-none text-base flex-1"
-                            rows={3}
+                            className="resize-none flex-1"
+                            rows={2}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter' && !e.shiftKey) {
                                 e.preventDefault();
@@ -392,28 +361,29 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                               }
                             }}
                           />
-                          <div className="flex flex-col gap-2">
-                            <Button variant="ghost" size="icon" className="h-10 w-10">
-                              <Icon name="Paperclip" size={20} />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-10 w-10">
-                              <Icon name="Camera" size={20} />
+                          <div className="flex gap-2">
+                            <Button 
+                              variant="outline"
+                              onClick={() => setIsInspectionModalOpen(true)}
+                              className="h-10"
+                            >
+                              <Icon name="FileText" size={18} className="mr-2" />
+                              Отчёт
                             </Button>
                             <Button 
                               onClick={handleSendMessage}
                               disabled={!newMessage.trim() || isSubmitting}
-                              size="icon"
-                              className="h-10 w-10"
+                              className="h-10"
                             >
                               {isSubmitting ? (
-                                <Icon name="Loader2" size={20} className="animate-spin" />
+                                <Icon name="Loader2" size={18} className="animate-spin" />
                               ) : (
-                                <Icon name="Send" size={20} />
+                                <Icon name="Send" size={18} />
                               )}
                             </Button>
                           </div>
                         </div>
-                        <p className="text-sm text-slate-400">
+                        <p className="text-xs text-slate-400 mt-2">
                           Enter — отправить, Shift+Enter — новая строка
                         </p>
                       </div>
