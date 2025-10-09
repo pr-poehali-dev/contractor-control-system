@@ -1,19 +1,10 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+import { AdminAuthForm } from '@/components/admin/AdminAuthForm';
+import { AdminHeader } from '@/components/admin/AdminHeader';
+import { UsersTable } from '@/components/admin/UsersTable';
+import { EditUserDialog } from '@/components/admin/EditUserDialog';
 
 interface AdminUser {
   id: number;
@@ -25,6 +16,7 @@ interface AdminUser {
   created_at: string;
   projects_count: number;
   works_count: number;
+  is_active?: boolean;
 }
 
 const Admin = () => {
@@ -272,267 +264,49 @@ const Admin = () => {
 
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Icon name="Shield" size={24} />
-              Админ-панель
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Input
-              type="password"
-              placeholder="Введите ключ администратора"
-              value={adminKey}
-              onChange={(e) => setAdminKey(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAuth()}
-            />
-            <Button onClick={handleAuth} className="w-full">
-              Войти
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      <AdminAuthForm
+        adminKey={adminKey}
+        onAdminKeyChange={setAdminKey}
+        onAuth={handleAuth}
+      />
     );
   }
 
   return (
     <div className="p-8">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Админ-панель</h1>
-          <p className="text-slate-600">Управление пользователями системы</p>
-        </div>
-        <div className="flex gap-3">
-          <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Icon name="UserPlus" size={18} className="mr-2" />
-                Пригласить подрядчика
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Пригласить подрядчика</DialogTitle>
-                <DialogDescription>
-                  Введите данные подрядчика. На указанный телефон будет отправлен пароль для входа.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Имя *</Label>
-                  <Input
-                    id="name"
-                    placeholder="Иван Иванов"
-                    value={inviteData.name}
-                    onChange={(e) => setInviteData({ ...inviteData, name: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Телефон *</Label>
-                  <Input
-                    id="phone"
-                    placeholder="+7 (900) 123-45-67"
-                    value={inviteData.phone}
-                    onChange={(e) => setInviteData({ ...inviteData, phone: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="contractor@example.com"
-                    value={inviteData.email}
-                    onChange={(e) => setInviteData({ ...inviteData, email: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="organization">Организация</Label>
-                  <Input
-                    id="organization"
-                    placeholder="ООО 'Стройпроект'"
-                    value={inviteData.organization}
-                    onChange={(e) => setInviteData({ ...inviteData, organization: e.target.value })}
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end gap-3">
-                <Button variant="outline" onClick={() => setIsInviteOpen(false)}>
-                  Отмена
-                </Button>
-                <Button onClick={handleInviteContractor} disabled={isSendingInvite}>
-                  {isSendingInvite ? (
-                    <>
-                      <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
-                      Отправка...
-                    </>
-                  ) : (
-                    <>
-                      <Icon name="Send" size={18} className="mr-2" />
-                      Отправить приглашение
-                    </>
-                  )}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-          <Button onClick={loadUsers} variant="outline">
-            <Icon name="RefreshCw" size={18} className="mr-2" />
-            Обновить
-          </Button>
-        </div>
-      </div>
+      <AdminHeader
+        isInviteOpen={isInviteOpen}
+        onInviteOpenChange={setIsInviteOpen}
+        inviteData={inviteData}
+        onInviteDataChange={setInviteData}
+        onInvite={handleInviteContractor}
+        isSendingInvite={isSendingInvite}
+        onRefresh={loadUsers}
+      />
 
       {isLoading ? (
         <div className="text-center py-12">
           <Icon name="Loader2" size={48} className="animate-spin text-slate-400 mx-auto" />
         </div>
       ) : (
-        <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-slate-50 border-b border-slate-200">
-                <tr>
-                  <th className="text-left p-4 text-sm font-semibold text-slate-700">ID</th>
-                  <th className="text-left p-4 text-sm font-semibold text-slate-700">Имя</th>
-                  <th className="text-left p-4 text-sm font-semibold text-slate-700">Email</th>
-                  <th className="text-left p-4 text-sm font-semibold text-slate-700">Телефон</th>
-                  <th className="text-left p-4 text-sm font-semibold text-slate-700">Роль</th>
-                  <th className="text-left p-4 text-sm font-semibold text-slate-700">Организация</th>
-                  <th className="text-left p-4 text-sm font-semibold text-slate-700">Статус</th>
-                  <th className="text-right p-4 text-sm font-semibold text-slate-700">Действия</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.id} className="border-b border-slate-100 hover:bg-slate-50">
-                    <td className="p-4 text-sm text-slate-700">{user.id}</td>
-                    <td className="p-4 text-sm font-medium text-slate-900">{user.name}</td>
-                    <td className="p-4 text-sm text-slate-600">{user.email || '-'}</td>
-                    <td className="p-4 text-sm text-slate-600">{user.phone}</td>
-                    <td className="p-4">
-                      <Badge variant={user.role === 'admin' ? 'default' : user.role === 'client' ? 'secondary' : 'outline'}>
-                        {user.role === 'admin' ? 'admin' : user.role === 'client' ? 'client' : 'contractor'}
-                      </Badge>
-                    </td>
-                    <td className="p-4 text-sm text-slate-600">{user.organization || '-'}</td>
-                    <td className="p-4">
-                      <Badge variant={user.is_active ? 'default' : 'secondary'}>
-                        {user.is_active ? 'Активен' : 'Заблокирован'}
-                      </Badge>
-                    </td>
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleEditUser(user)}
-                          title="Редактировать"
-                        >
-                          <Icon name="Edit" size={16} />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleToggleStatus(user.id)}
-                          title={user.is_active ? 'Заблокировать' : 'Активировать'}
-                        >
-                          {user.is_active ? <Icon name="Ban" size={16} /> : <Icon name="CheckCircle" size={16} />}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => handleDeleteUser(user.id, user.name)}
-                          title="Удалить"
-                        >
-                          <Icon name="Trash2" size={16} />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+        <UsersTable
+          users={users}
+          onEditUser={handleEditUser}
+          onToggleStatus={handleToggleStatus}
+          onDeleteUser={handleDeleteUser}
+        />
       )}
 
-      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Редактировать пользователя</DialogTitle>
-            <DialogDescription>
-              Изменение данных пользователя {editingUser?.name}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-name">Имя</Label>
-              <Input
-                id="edit-name"
-                value={editData.name}
-                onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-email">Email</Label>
-              <Input
-                id="edit-email"
-                type="email"
-                value={editData.email}
-                onChange={(e) => setEditData({ ...editData, email: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-phone">Телефон</Label>
-              <Input
-                id="edit-phone"
-                value={editData.phone}
-                onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-organization">Организация</Label>
-              <Input
-                id="edit-organization"
-                value={editData.organization}
-                onChange={(e) => setEditData({ ...editData, organization: e.target.value })}
-              />
-            </div>
-
-            {newPassword && (
-              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                <Label className="text-green-900">Новый пароль:</Label>
-                <p className="font-mono font-bold text-lg text-green-900 mt-1">{newPassword}</p>
-                <p className="text-xs text-green-700 mt-2">Сохраните пароль, он больше не будет показан</p>
-              </div>
-            )}
-
-            <div className="pt-4 border-t">
-              <Button
-                variant="outline"
-                onClick={handleResetPassword}
-                className="w-full"
-              >
-                <Icon name="Key" size={18} className="mr-2" />
-                Сбросить пароль
-              </Button>
-            </div>
-          </div>
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setIsEditOpen(false)}>
-              Отмена
-            </Button>
-            <Button onClick={handleSaveUser}>
-              <Icon name="Save" size={18} className="mr-2" />
-              Сохранить
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <EditUserDialog
+        isOpen={isEditOpen}
+        onOpenChange={setIsEditOpen}
+        editingUser={editingUser}
+        editData={editData}
+        onEditDataChange={setEditData}
+        onSave={handleSaveUser}
+        onResetPassword={handleResetPassword}
+        newPassword={newPassword}
+      />
 
       <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
         <p className="text-sm text-yellow-800">
