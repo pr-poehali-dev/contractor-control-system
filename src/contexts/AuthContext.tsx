@@ -14,9 +14,22 @@ interface User {
   organization?: string;
 }
 
+interface UserData {
+  projects: any[];
+  sites: any[];
+  works: any[];
+  inspections: any[];
+  remarks: any[];
+  workLogs: any[];
+  checkpoints: any[];
+  contractors: any[];
+}
+
 interface AuthContextType {
   user: User | null;
   token: string | null;
+  userData: UserData | null;
+  setUserData: (data: UserData) => void;
   login: (email: string, password: string) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
@@ -39,6 +52,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const saveAuth = (authToken: string, authUser: User) => {
@@ -151,6 +165,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider value={{ 
       user, 
       token,
+      userData,
+      setUserData,
       login, 
       register,
       logout, 
