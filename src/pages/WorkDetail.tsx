@@ -168,11 +168,18 @@ const WorkDetail = () => {
   };
 
   const handleEditClick = () => {
+    if (!work) {
+      console.error('Work not found');
+      return;
+    }
+    
+    console.log('Opening edit dialog for work:', work);
+    
     setEditFormData({
-      title: work.title,
+      title: work.title || '',
       description: work.description || '',
       contractor_id: work.contractor_id?.toString() || '',
-      status: work.status,
+      status: work.status || 'active',
     });
     setIsEditDialogOpen(true);
   };
