@@ -20,7 +20,7 @@ import { api } from '@/lib/api';
 const WorkDetail = () => {
   const { projectId, objectId, workId } = useParams();
   const navigate = useNavigate();
-  const { user, userData, setUserData } = useAuth();
+  const { user, userData, setUserData, isLoading } = useAuth();
   const { toast } = useToast();
   
   const [newMessage, setNewMessage] = useState('');
@@ -44,18 +44,22 @@ const WorkDetail = () => {
   const projects = userData?.projects || [];
   const contractors = userData?.contractors || [];
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-slate-600">Загрузка...</p>
+        </div>
+      </div>
+    );
+  }
+
   const work = works.find(w => w.id === Number(workId));
   const site = sites.find(s => s.id === Number(objectId));
   const project = projects.find(p => p.id === Number(projectId));
 
   const userRole: UserRole = user?.role || 'contractor';
-  
-  console.log('=== WorkDetail Debug ===');
-  console.log('user object:', user);
-  console.log('user.role:', user?.role);
-  console.log('userRole computed:', userRole);
-  console.log('Should show edit button:', userRole === 'client');
-  console.log('=======================')
 
   const events: JournalEvent[] = workLogs
     .filter(log => log.work_id === Number(workId))
