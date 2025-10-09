@@ -57,13 +57,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     try:
-        body = json.loads(event.get('body', '{}'))
         path = event.get('queryStringParameters', {}).get('action', '')
         
         conn = get_db_connection()
         cur = conn.cursor()
         
         if method == 'POST' and path == 'register':
+            body = json.loads(event.get('body', '{}'))
             email = body.get('email')
             phone = body.get('phone')
             password = body.get('password')
@@ -134,6 +134,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         elif method == 'POST' and path == 'login':
+            body = json.loads(event.get('body', '{}'))
             email = body.get('email')
             phone = body.get('phone')
             password = body.get('password')
@@ -303,6 +304,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         elif method == 'POST' and path == 'work-types':
+            body = json.loads(event.get('body', '{}'))
             auth_header = event.get('headers', {}).get('X-Auth-Token') or event.get('headers', {}).get('x-auth-token')
             
             if not auth_header:
