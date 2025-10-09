@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -43,9 +44,11 @@ const ObjectDetail = () => {
 
   const handleDelete = async () => {
     if (!confirm('Удалить объект? Это действие нельзя отменить.')) return;
+    if (!user) return;
+    
     try {
-      await api.deleteItem(user!.id, 'object', site.id);
-      const refreshed = await api.getUserData(user!.id);
+      await api.deleteItem(user.id, 'object', site.id);
+      const refreshed = await api.getUserData(user.id);
       setUserData(refreshed);
       localStorage.setItem('userData', JSON.stringify(refreshed));
       toast({ title: 'Объект удалён' });

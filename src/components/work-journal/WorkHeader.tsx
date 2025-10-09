@@ -23,7 +23,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
           )}
         </div>
         <div className="flex items-center gap-2">
-          {userRole === 'client' && onEdit && (
+          {(userRole === 'client' || userRole === 'admin') && onEdit && (
             <Button variant="outline" size="sm" onClick={onEdit}>
               <Icon name="Edit" size={16} className="mr-1" />
               Редактировать

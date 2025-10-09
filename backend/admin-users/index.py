@@ -239,14 +239,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.execute(f"DELETE FROM {schema}.activity_log WHERE user_id = {user_id}")
             cur.execute(f"DELETE FROM {schema}.user_sessions WHERE user_id = {user_id}")
             
+            # First, set contractor_id to NULL in works table
             cur.execute(f"""
-                DELETE FROM {schema}.contractors 
-                WHERE user_id = {user_id} OR id IN (
-                    SELECT contractor_id FROM {schema}.works WHERE contractor_id IN (
-                        SELECT id FROM {schema}.contractors WHERE user_id = {user_id}
-                    )
+                UPDATE {schema}.works 
+                SET contractor_id = NULL 
+                WHERE contractor_id IN (
+                    SELECT id FROM {schema}.contractors WHERE user_id = {user_id}
                 )
             """)
+            
+            # Then delete contractors
+            cur.execute(f"DELETE FROM {schema}.contractors WHERE user_id = {user_id}")
             
             cur.execute(f"DELETE FROM {schema}.users WHERE id = {user_id}")
             
