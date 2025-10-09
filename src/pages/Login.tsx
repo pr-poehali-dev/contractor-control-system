@@ -27,18 +27,17 @@ const Login = () => {
     setIsLoading(true);
     try {
       await login(email, password);
-      navigate('/dashboard');
-      toast({
-        title: 'Добро пожаловать!',
-        description: 'Вы успешно вошли в систему',
-      });
+      console.log('Login complete, checking localStorage before navigate...');
+      console.log('Token in localStorage:', localStorage.getItem('auth_token')?.substring(0, 20));
+      console.log('User in localStorage:', localStorage.getItem('user') ? 'EXISTS' : 'NULL');
+      
+      window.location.href = '/dashboard';
     } catch (error) {
       toast({
         title: 'Ошибка входа',
         description: error instanceof Error ? error.message : 'Проверьте email и пароль',
         variant: 'destructive',
       });
-    } finally {
       setIsLoading(false);
     }
   };
