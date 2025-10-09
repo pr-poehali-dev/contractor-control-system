@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -37,8 +37,31 @@ export default function Objects() {
   const [selectedProject, setSelectedProject] = useState<string>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [sortBy, setSortBy] = useState<string>('date');
+  const [contractorObjects, setContractorObjects] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const sites = userData?.sites || [];
+  const isContractor = user?.role === 'contractor';
+
+  useEffect(() => {
+    const loadContractorObjects = async () => {
+      if (!isContractor || !user?.id) return;
+      
+      setIsLoading(true);
+      try {
+        const response = await fetch(`https://functions.poehali.dev/354c1d24-5775-4678-ba82-bb1acd986337?contractor_id=${user.id}`);
+        const data = await response.json();
+        setContractorObjects(data.objects || []);
+      } catch (error) {
+        console.error('Failed to load contractor objects:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadContractorObjects();
+  }, [isContractor, user]);
+
+  const sites = isContractor ? contractorObjects : (userData?.sites || []);
   const works = userData?.works || [];
   const projects = userData?.projects || [];
 
@@ -97,25 +120,29 @@ export default function Objects() {
               <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Реестр объектов</h1>
               <p className="text-lg text-slate-600">Управление строительными объектами</p>
             </div>
-            <Button size="lg" onClick={() => navigate('/projects')}>
-              <Icon name="Plus" size={20} className="mr-2" />
+            {!isContractor && (
+              <Button size="lg" onClick={() => navigate('/projects')}>
+                <Icon name="Plus" size={20} className="mr-2" />
               Добавить объект
-            </Button>
+              </Button>
+            )}
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            {stats.map((stat) => (
-              <Card key={stat.label}>
-                <CardContent className="p-4">
-                  <div className={`w-10 h-10 ${stat.color} rounded-lg flex items-center justify-center mb-3`}>
-                    <Icon name={stat.icon as any} size={20} />
-                  </div>
-                  <p className="text-2xl font-bold text-slate-900 mb-1">{stat.value}</p>
-                  <p className="text-sm text-slate-600">{stat.label}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {!isContractor && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              {stats.map((stat) => (
+                <Card key={stat.label}>
+                  <CardContent className="p-4">
+                    <div className={`w-10 h-10 ${stat.color} rounded-lg flex items-center justify-center mb-3`}>
+                      <Icon name={stat.icon as any} size={20} />
+                    </div>
+                    <p className="text-2xl font-bold text-slate-900 mb-1">{stat.value}</p>
+                    <p className="text-sm text-slate-600">{stat.label}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
           
           <div className="flex flex-col md:flex-row gap-3 mb-4">
             <div className="relative flex-1">

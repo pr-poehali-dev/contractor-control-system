@@ -18,17 +18,33 @@ const Dashboard = () => {
   useEffect(() => {
     if (!user) return;
 
-    if (user.role === 'contractor') {
-      navigate('/objects');
-      return;
-    }
+    const checkContractorRedirect = async () => {
+      if (user.role === 'contractor') {
+        try {
+          const response = await fetch(`https://functions.poehali.dev/354c1d24-5775-4678-ba82-bb1acd986337?contractor_id=${user.id}`);
+          const data = await response.json();
+          const objects = data.objects || [];
 
-    if (user.id === 3 && projects.length === 0) {
-      const hasSeenOnboarding = localStorage.getItem(`onboarding_${user.id}`);
-      if (!hasSeenOnboarding) {
-        setShowOnboarding(true);
+          if (objects.length === 1) {
+            navigate(`/projects/${objects[0].project_id}/objects/${objects[0].id}`);
+          } else {
+            navigate('/objects');
+          }
+        } catch (error) {
+          navigate('/objects');
+        }
+        return;
       }
-    }
+
+      if (user.id === 3 && projects.length === 0) {
+        const hasSeenOnboarding = localStorage.getItem(`onboarding_${user.id}`);
+        if (!hasSeenOnboarding) {
+          setShowOnboarding(true);
+        }
+      }
+    };
+
+    checkContractorRedirect();
   }, [user, projects.length, navigate]);
 
   if (showOnboarding && user?.id === 3) {

@@ -57,6 +57,42 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         if method == 'GET':
             object_id = event.get('queryStringParameters', {}).get('id')
             project_id = event.get('queryStringParameters', {}).get('project_id')
+            contractor_id = event.get('queryStringParameters', {}).get('contractor_id')
+            
+            if contractor_id:
+                schema = 't_p8942561_contractor_control_s'
+                cur.execute(
+                    f"""
+                    SELECT DISTINCT o.id, o.title, o.address, o.project_id, o.status, o.created_at, o.updated_at
+                    FROM {schema}.objects o
+                    INNER JOIN {schema}.works w ON o.id = w.object_id
+                    WHERE w.contractor_id = {contractor_id}
+                    ORDER BY o.created_at DESC
+                    """
+                )
+                objects = cur.fetchall()
+                
+                objects_list = []
+                for obj in objects:
+                    objects_list.append({
+                        'id': obj[0],
+                        'title': obj[1],
+                        'address': obj[2],
+                        'project_id': obj[3],
+                        'status': obj[4],
+                        'created_at': obj[5].isoformat() if obj[5] else None,
+                        'updated_at': obj[6].isoformat() if obj[6] else None
+                    })
+                
+                cur.close()
+                conn.close()
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'objects': objects_list}),
+                    'isBase64Encoded': False
+                }
             
             if object_id:
                 cur.execute(

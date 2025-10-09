@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
@@ -34,6 +34,12 @@ const Projects = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [sortBy, setSortBy] = useState<string>('date');
+
+  useEffect(() => {
+    if (user?.role === 'contractor') {
+      navigate('/objects');
+    }
+  }, [user, navigate]);
 
   const projects = userData?.projects || [];
   const sites = userData?.sites || [];
