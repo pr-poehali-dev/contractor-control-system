@@ -28,19 +28,29 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     if method == 'POST':
-        password = "123"
-        password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
         
+        password_123 = "123"
+        hash_123 = bcrypt.hashpw(password_123.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
         cur.execute(
             "UPDATE users SET password_hash = %s WHERE id IN (1, 2, 3, 5)",
-            (password_hash,)
+            (hash_123,)
         )
+        
+        password_admin = "admin123"
+        hash_admin = bcrypt.hashpw(password_admin.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
+        cur.execute(
+            "UPDATE users SET password_hash = %s WHERE email = 'admin@example.com'",
+            (hash_admin,)
+        )
+        
         conn.commit()
         
-        updated_count = cur.rowcount
+        cur.execute("SELECT COUNT(*) FROM users WHERE password_hash IS NOT NULL")
+        total_users = cur.fetchone()[0]
         
         cur.close()
         conn.close()
@@ -51,8 +61,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'isBase64Encoded': False,
             'body': json.dumps({
                 'success': True,
-                'message': f'Updated {updated_count} users with password "123"',
-                'hash': password_hash
+                'message': f'Updated passwords: test users="123", admin="admin123"',
+                'total_users_with_passwords': total_users
             })
         }
     
