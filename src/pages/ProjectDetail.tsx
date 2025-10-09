@@ -13,7 +13,7 @@ import EditProjectDialog from '@/components/EditProjectDialog';
 const ProjectDetail = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
-  const { user, userData, setUserData } = useAuth();
+  const { user, token, userData, setUserData } = useAuth();
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [showActions, setShowActions] = useState(false);
@@ -73,10 +73,11 @@ const ProjectDetail = () => {
   const handleDelete = async () => {
     if (!confirm('Удалить проект? Это действие нельзя отменить.')) return;
     try {
-      await api.deleteItem(user!.id, 'project', project.id);
-      const refreshed = await api.getUserData(user!.id);
-      setUserData(refreshed);
-      localStorage.setItem('userData', JSON.stringify(refreshed));
+      await api.deleteItem(token!, 'project', project.id);
+      if (token) {
+        const refreshed = await api.getUserData(token);
+        setUserData(refreshed);
+      }
       toast({ title: 'Проект удалён' });
       navigate('/projects');
     } catch (error) {

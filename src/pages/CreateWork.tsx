@@ -44,7 +44,7 @@ const CreateWork = () => {
   const { projectId, objectId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, setUserData, userData } = useAuth();
+  const { user, token, setUserData, userData } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -159,7 +159,7 @@ const CreateWork = () => {
     setIsSubmitting(true);
 
     try {
-      const result = await api.createItem(user.id, 'work', {
+      const result = await api.createItem(token!, 'work', {
         object_id: Number(objectId),
         title: formData.title,
         description: formData.description,
@@ -169,9 +169,10 @@ const CreateWork = () => {
 
       const newWorkId = result.data.id;
       
-      const refreshedData = await api.getUserData(user.id);
-      setUserData(refreshedData);
-      localStorage.setItem('userData', JSON.stringify(refreshedData));
+      if (token) {
+        const refreshedData = await api.getUserData(token);
+        setUserData(refreshedData);
+      }
 
       toast({
         title: 'Работа создана!',

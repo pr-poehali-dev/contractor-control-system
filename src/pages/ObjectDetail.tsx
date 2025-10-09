@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 const ObjectDetail = () => {
   const { projectId, objectId } = useParams();
   const navigate = useNavigate();
-  const { user, userData, setUserData } = useAuth();
+  const { user, token, userData, setUserData } = useAuth();
   const { toast } = useToast();
   const [showActions, setShowActions] = useState(false);
 
@@ -53,10 +53,11 @@ const ObjectDetail = () => {
     if (!user) return;
     
     try {
-      await api.deleteItem(user.id, 'object', site.id);
-      const refreshed = await api.getUserData(user.id);
-      setUserData(refreshed);
-      localStorage.setItem('userData', JSON.stringify(refreshed));
+      await api.deleteItem(token!, 'object', site.id);
+      if (token) {
+        const refreshed = await api.getUserData(token);
+        setUserData(refreshed);
+      }
       toast({ title: 'Объект удалён' });
       navigate(`/projects/${projectId}`);
     } catch (error) {

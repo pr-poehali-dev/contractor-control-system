@@ -39,7 +39,7 @@ const statusLabels = {
 
 export default function Objects() {
   const navigate = useNavigate();
-  const { user, userData, setUserData } = useAuth();
+  const { user, token, userData, setUserData } = useAuth();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -52,10 +52,11 @@ export default function Objects() {
     e.stopPropagation();
     if (!confirm('Удалить объект? Это действие нельзя отменить.')) return;
     try {
-      await api.deleteItem(user!.id, 'object', objectId);
-      const refreshed = await api.getUserData(user!.id);
-      setUserData(refreshed);
-      localStorage.setItem('userData', JSON.stringify(refreshed));
+      await api.deleteItem(token!, 'object', objectId);
+      if (token) {
+        const refreshed = await api.getUserData(token);
+        setUserData(refreshed);
+      }
       toast({ title: 'Объект удалён' });
     } catch (error) {
       toast({ 

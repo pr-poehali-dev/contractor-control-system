@@ -27,7 +27,7 @@ type ViewMode = 'grid' | 'table';
 
 const Projects = () => {
   const navigate = useNavigate();
-  const { user, userData, setUserData } = useAuth();
+  const { user, token, userData, setUserData } = useAuth();
   const { toast } = useToast();
   const [editProject, setEditProject] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -287,10 +287,11 @@ const Projects = () => {
                                   e.stopPropagation();
                                   if (!confirm('Удалить проект?')) return;
                                   try {
-                                    await api.deleteItem(user.id, 'project', project.id);
-                                    const refreshed = await api.getUserData(user.id);
-                                    setUserData(refreshed);
-                                    localStorage.setItem('userData', JSON.stringify(refreshed));
+                                    await api.deleteItem(token!, 'project', project.id);
+                                    if (token) {
+                                      const refreshed = await api.getUserData(token);
+                                      setUserData(refreshed);
+                                    }
                                     toast({ title: 'Проект удалён' });
                                   } catch (error) {
                                     toast({ 
@@ -412,10 +413,11 @@ const Projects = () => {
                                       e.stopPropagation();
                                       if (!confirm('Удалить проект?')) return;
                                       try {
-                                        await api.deleteItem(user.id, 'project', project.id);
-                                        const refreshed = await api.getUserData(user.id);
-                                        setUserData(refreshed);
-                                        localStorage.setItem('userData', JSON.stringify(refreshed));
+                                        await api.deleteItem(token!, 'project', project.id);
+                                        if (token) {
+                                          const refreshed = await api.getUserData(token);
+                                          setUserData(refreshed);
+                                        }
                                         toast({ title: 'Проект удалён' });
                                       } catch (error) {
                                         toast({ 

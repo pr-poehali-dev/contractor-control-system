@@ -124,11 +124,11 @@ export const api = {
     return response.json();
   },
 
-  async getUserData(userId: number): Promise<UserData> {
-    const response = await fetch(`${API_BASE_URL}/${DATA_API}`, {
+  async getUserData(token: string): Promise<UserData> {
+    const response = await fetch(`${API_BASE_URL}/bdee636b-a6c0-42d0-8f77-23c316751e34`, {
       method: 'GET',
       headers: {
-        'X-User-Id': String(userId),
+        'X-Auth-Token': token,
       },
     });
 
@@ -140,12 +140,12 @@ export const api = {
     return response.json();
   },
 
-  async createItem(userId: number, type: string, data: any): Promise<any> {
+  async createItem(token: string, type: string, data: any): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/${CREATE_API}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-User-Id': String(userId),
+        'X-Auth-Token': token,
       },
       body: JSON.stringify({ type, data }),
     });
@@ -158,12 +158,12 @@ export const api = {
     return response.json();
   },
 
-  async updateItem(userId: number, type: string, id: number, data: any): Promise<any> {
+  async updateItem(token: string, type: string, id: number, data: any): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/${UPDATE_API}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'X-User-Id': String(userId),
+        'X-Auth-Token': token,
       },
       body: JSON.stringify({ type, id, data }),
     });
@@ -176,12 +176,12 @@ export const api = {
     return response.json();
   },
 
-  async deleteItem(userId: number, type: string, id: number): Promise<any> {
+  async deleteItem(token: string, type: string, id: number): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/${UPDATE_API}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'X-User-Id': String(userId),
+        'X-Auth-Token': token,
       },
       body: JSON.stringify({ type, id }),
     });

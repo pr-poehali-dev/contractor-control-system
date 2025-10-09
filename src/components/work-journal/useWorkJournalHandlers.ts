@@ -4,7 +4,7 @@ import { api } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 
 export function useWorkJournalHandlers(selectedWork: number | null) {
-  const { user, setUserData } = useAuth();
+  const { user, token, setUserData } = useAuth();
   const { toast } = useToast();
 
   const [newMessage, setNewMessage] = useState('');
@@ -29,7 +29,7 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
     setIsSubmitting(true);
 
     try {
-      await api.createItem(user.id, 'work_log', {
+      await api.createItem(token!, 'work_log', {
         work_id: selectedWork,
         description: newMessage,
         progress: parseInt(progress),
@@ -37,9 +37,10 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
         materials: materials || null,
       });
 
-      const refreshedData = await api.getUserData(user.id);
-      setUserData(refreshedData);
-      localStorage.setItem('userData', JSON.stringify(refreshedData));
+      if (token) {
+        const refreshedData = await api.getUserData(token);
+        setUserData(refreshedData);
+      }
 
       toast({
         title: 'Запись добавлена',
@@ -87,7 +88,7 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
     setIsSubmitting(true);
 
     try {
-      await api.createItem(user.id, 'work_log', {
+      await api.createItem(token!, 'work_log', {
         work_id: selectedWork,
         description: data.text_content,
         progress: 0,
@@ -96,9 +97,10 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
         photo_urls: data.photo_urls.join(',') || null,
       });
 
-      const refreshedData = await api.getUserData(user.id);
-      setUserData(refreshedData);
-      localStorage.setItem('userData', JSON.stringify(refreshedData));
+      if (token) {
+        const refreshedData = await api.getUserData(token);
+        setUserData(refreshedData);
+      }
 
       toast({
         title: 'Отчёт создан',
@@ -134,16 +136,17 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
     
     try {
       setIsSubmitting(true);
-      await api.updateItem(user.id, 'work', selectedWorkData.id, {
+      await api.updateItem(token!, 'work', selectedWorkData.id, {
         title: editFormData.title,
         description: editFormData.description,
         contractor_id: editFormData.contractor_id ? Number(editFormData.contractor_id) : null,
         status: editFormData.status,
       });
 
-      const refreshedData = await api.getUserData(user.id);
-      setUserData(refreshedData);
-      localStorage.setItem('userData', JSON.stringify(refreshedData));
+      if (token) {
+        const refreshedData = await api.getUserData(token);
+        setUserData(refreshedData);
+      }
 
       toast({
         title: 'Работа обновлена',

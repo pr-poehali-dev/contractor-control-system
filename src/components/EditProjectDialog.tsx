@@ -28,7 +28,7 @@ interface EditProjectDialogProps {
 }
 
 export default function EditProjectDialog({ project, open, onOpenChange, onSuccess }: EditProjectDialogProps) {
-  const { user, setUserData } = useAuth();
+  const { user, token, setUserData } = useAuth();
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     title: project.title,
@@ -43,15 +43,16 @@ export default function EditProjectDialog({ project, open, onOpenChange, onSucce
     setIsSubmitting(true);
 
     try {
-      await api.updateItem(user.id, 'project', project.id, {
+      await api.updateItem(token!, 'project', project.id, {
         title: formData.title,
         description: formData.description,
         status: project.status,
       });
 
-      const refreshedData = await api.getUserData(user.id);
-      setUserData(refreshedData);
-      localStorage.setItem('userData', JSON.stringify(refreshedData));
+      if (token) {
+        const refreshedData = await api.getUserData(token);
+        setUserData(refreshedData);
+      }
 
       toast({
         title: 'Проект обновлён',

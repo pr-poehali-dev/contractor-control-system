@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 const CreateProject = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, setUserData } = useAuth();
+  const { user, token, setUserData } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -43,7 +43,7 @@ const CreateProject = () => {
     setIsSubmitting(true);
 
     try {
-      const result = await api.createItem(user.id, 'project', {
+      const result = await api.createItem(token!, 'project', {
         title: formData.title,
         description: formData.description,
         status: 'active',
@@ -51,9 +51,10 @@ const CreateProject = () => {
 
       const newProjectId = result.data.id;
       
-      const refreshedData = await api.getUserData(user.id);
-      setUserData(refreshedData);
-      localStorage.setItem('userData', JSON.stringify(refreshedData));
+      if (token) {
+        const refreshedData = await api.getUserData(token);
+        setUserData(refreshedData);
+      }
 
       toast({
         title: 'Проект создан!',

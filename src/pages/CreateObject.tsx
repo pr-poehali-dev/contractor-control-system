@@ -13,7 +13,7 @@ const CreateObject = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, setUserData } = useAuth();
+  const { user, token, setUserData } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     address: '',
@@ -43,16 +43,17 @@ const CreateObject = () => {
     setIsSubmitting(true);
 
     try {
-      await api.createItem(user.id, 'object', {
+      await api.createItem(token!, 'object', {
         project_id: Number(projectId),
         title: formData.title,
         address: formData.address,
         status: 'active',
       });
 
-      const refreshedData = await api.getUserData(user.id);
-      setUserData(refreshedData);
-      localStorage.setItem('userData', JSON.stringify(refreshedData));
+      if (token) {
+        const refreshedData = await api.getUserData(token);
+        setUserData(refreshedData);
+      }
 
       toast({
         title: 'Объект создан!',
