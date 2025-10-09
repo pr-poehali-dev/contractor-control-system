@@ -272,6 +272,105 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'error': str(e)})
                 }
         
+        elif method == 'GET' and path == 'work-types':
+            cur.execute(
+                """
+                SELECT id, name, description, category, unit, created_at
+                FROM work_types
+                ORDER BY category, name
+                """
+            )
+            work_types = cur.fetchall()
+            
+            work_types_list = []
+            for wt in work_types:
+                work_types_list.append({
+                    'id': wt[0],
+                    'name': wt[1],
+                    'description': wt[2],
+                    'category': wt[3],
+                    'unit': wt[4],
+                    'created_at': wt[5].isoformat() if wt[5] else None
+                })
+            
+            cur.close()
+            conn.close()
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'work_types': work_types_list})
+            }
+        
+        elif method == 'POST' and path == 'work-types':
+            auth_header = event.get('headers', {}).get('X-Auth-Token') or event.get('headers', {}).get('x-auth-token')
+            
+            if not auth_header:
+                return {
+                    'statusCode': 401,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'No token provided'})
+                }
+            
+            try:
+                payload = verify_jwt_token(auth_header)
+                user_role = payload['role']
+                
+                if user_role != 'admin':
+                    return {
+                        'statusCode': 403,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Only admins can add work types'})
+                    }
+                
+                name = body.get('name')
+                description = body.get('description', '')
+                category = body.get('category')
+                unit = body.get('unit')
+                
+                if not name or not category or not unit:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Missing required fields'})
+                    }
+                
+                cur.execute(
+                    """
+                    INSERT INTO work_types (name, description, category, unit, created_at)
+                    VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP)
+                    RETURNING id, name, description, category, unit, created_at
+                    """,
+                    (name, description, category, unit)
+                )
+                work_type = cur.fetchone()
+                conn.commit()
+                
+                work_type_data = {
+                    'id': work_type[0],
+                    'name': work_type[1],
+                    'description': work_type[2],
+                    'category': work_type[3],
+                    'unit': work_type[4],
+                    'created_at': work_type[5].isoformat() if work_type[5] else None
+                }
+                
+                cur.close()
+                conn.close()
+                
+                return {
+                    'statusCode': 201,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps(work_type_data)
+                }
+            
+            except ValueError as e:
+                return {
+                    'statusCode': 401,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': str(e)})
+                }
+        
         else:
             return {
                 'statusCode': 404,

@@ -121,10 +121,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const verifyToken = async (): Promise<boolean> => {
     const storedToken = localStorage.getItem('auth_token');
+    const storedUser = localStorage.getItem('user');
     
     if (!storedToken) {
       setIsLoading(false);
       return false;
+    }
+
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        setToken(storedToken);
+      } catch (e) {
+        console.error('Failed to parse stored user', e);
+      }
     }
 
     try {
@@ -144,6 +155,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const data = await response.json();
       setUser(data.user);
       setToken(storedToken);
+      localStorage.setItem('user', JSON.stringify(data.user));
       setIsLoading(false);
       return true;
     } catch (error) {

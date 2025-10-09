@@ -99,7 +99,7 @@ const WorkTemplates = () => {
     }
 
     try {
-      const response = await fetch('https://functions.poehali.dev/b9d6731e-788e-476b-bad5-047bd3d6adc1?action=add-work-type', {
+      const response = await fetch('https://functions.poehali.dev/b9d6731e-788e-476b-bad5-047bd3d6adc1?action=work-types', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -113,7 +113,10 @@ const WorkTemplates = () => {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to add template');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to add template');
+      }
 
       toast({
         title: 'Работа добавлена',
@@ -126,7 +129,7 @@ const WorkTemplates = () => {
     } catch (error) {
       toast({
         title: 'Ошибка',
-        description: 'Не удалось добавить работу',
+        description: error instanceof Error ? error.message : 'Не удалось добавить работу',
         variant: 'destructive',
       });
     }
