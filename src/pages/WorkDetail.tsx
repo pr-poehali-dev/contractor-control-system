@@ -1,33 +1,21 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
-import EventItem from '@/components/work-journal/EventItem';
 import CreateInspectionModal from '@/components/work-journal/CreateInspectionModal';
 import InfoTab from '@/components/work-journal/InfoTab';
 import DescriptionTab from '@/components/work-journal/DescriptionTab';
 import EstimateTab from '@/components/work-journal/EstimateTab';
 import AnalyticsTab from '@/components/work-journal/AnalyticsTab';
 import WorksList from '@/components/work-journal/WorksList';
+import WorkDetailHeader from '@/components/work-detail/WorkDetailHeader';
+import WorkDetailJournal from '@/components/work-detail/WorkDetailJournal';
+import WorkEditDialog from '@/components/work-detail/WorkEditDialog';
 import type { JournalEvent, UserRole } from '@/types/journal';
 import { api } from '@/lib/api';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
 
 const WorkDetail = () => {
   const { projectId, objectId, workId } = useParams();
@@ -49,7 +37,6 @@ const WorkDetail = () => {
     contractor_id: '',
     status: 'active',
   });
-  const [showWorksList, setShowWorksList] = useState(false);
 
   const works = userData?.works?.filter(w => w.object_id === Number(objectId)) || [];
   const workLogs = userData?.workLogs || [];
@@ -228,48 +215,15 @@ const WorkDetail = () => {
       />
 
       <div className="flex flex-col flex-1 overflow-hidden">
-        <div className="bg-white border-b border-slate-200 px-4 md:px-6 py-3 md:py-4 flex-shrink-0">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-start gap-3 min-w-0 flex-1">
-              <Button 
-                variant="ghost" 
-                size="icon"
-                className="flex-shrink-0 mt-1 md:hidden"
-                onClick={() => navigate(`/projects/${projectId}/objects/${objectId}`)}
-              >
-                <Icon name="ChevronLeft" size={24} />
-              </Button>
-              
-              <div className="min-w-0 flex-1">
-                <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-slate-900 mb-1">{work.title}</h1>
-                <p className="text-xs md:text-sm text-slate-500 mb-2">
-                  <Icon name="MapPin" size={14} className="inline mr-1" />
-                  {site?.title} • {project?.title}
-                </p>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge className={getStatusColor(work.status)}>
-                    {getStatusLabel(work.status)}
-                  </Badge>
-                  {work.contractor_name && (
-                    <span className="text-xs md:text-sm text-slate-600 flex items-center gap-1">
-                      <Icon name="User" size={14} />
-                      {work.contractor_name}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-            
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={handleEditClick}
-            >
-              <Icon name="Edit" size={16} className="mr-1" />
-              Редактировать
-            </Button>
-          </div>
-        </div>
+        <WorkDetailHeader
+          work={work}
+          site={site}
+          project={project}
+          onBack={() => navigate(`/projects/${projectId}/objects/${objectId}`)}
+          onEdit={handleEditClick}
+          getStatusLabel={getStatusLabel}
+          getStatusColor={getStatusColor}
+        />
 
         <Tabs defaultValue="journal" className="flex-1 flex flex-col overflow-hidden">
           <TabsList className="mx-4 md:mx-6 lg:mx-8 mt-3 md:mt-4">
@@ -296,120 +250,25 @@ const WorkDetail = () => {
           </TabsList>
 
           <TabsContent value="journal" className="flex-1 flex flex-col overflow-hidden mt-0">
-            <div className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-12 bg-slate-50">
-              {events.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full">
-                  <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-4">
-                    <Icon name="MessageSquare" size={40} className="text-blue-400" />
-                  </div>
-                  <p className="text-slate-500 text-base mb-2">Записей пока нет</p>
-                  <p className="text-slate-400 text-sm">Начните вести журнал работ</p>
-                </div>
-              ) : (
-                <div className="max-w-7xl mx-auto space-y-10">
-                  {events.map((event, index) => {
-                    const showDateSeparator = index === 0 || 
-                      formatDate(events[index - 1].created_at) !== formatDate(event.created_at);
-
-                    return (
-                      <div key={event.id}>
-                        {showDateSeparator && (
-                          <div className="flex justify-center my-4">
-                            <div className="bg-slate-200 text-slate-600 text-xs px-3 py-1 rounded-full font-medium">
-                              {formatDate(event.created_at)}
-                            </div>
-                          </div>
-                        )}
-
-                        <EventItem
-                          event={event}
-                          isOwnEvent={event.created_by === user?.id}
-                          userRole={userRole}
-                          onCreateInspection={handleCreateInspection}
-                          formatTime={formatTime}
-                          getInitials={getInitials}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            <div className="bg-white border-t border-slate-200 p-4 md:p-5 lg:p-6 flex-shrink-0">
-              <div className="max-w-6xl mx-auto space-y-4">
-                {userRole === 'contractor' && (
-                  <>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Input
-                          placeholder="Объём (м², шт, кг...)"
-                          value={volume}
-                          onChange={(e) => setVolume(e.target.value)}
-                          className="text-base h-11"
-                        />
-                      </div>
-                      <div>
-                        <Select value={progress} onValueChange={setProgress}>
-                          <SelectTrigger className="text-base h-11">
-                            <SelectValue placeholder="Прогресс" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="0">0%</SelectItem>
-                            <SelectItem value="25">25%</SelectItem>
-                            <SelectItem value="50">50%</SelectItem>
-                            <SelectItem value="75">75%</SelectItem>
-                            <SelectItem value="100">100%</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <div>
-                      <Input
-                        placeholder="Материалы (через запятую)"
-                        value={materials}
-                        onChange={(e) => setMaterials(e.target.value)}
-                        className="text-base h-11"
-                      />
-                    </div>
-                  </>
-                )}
-
-                <div className="flex gap-2">
-                  <Textarea
-                    placeholder="Написать сообщение..."
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    className="flex-1 min-h-[60px] text-base resize-none"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSendMessage();
-                      }
-                    }}
-                  />
-                  <div className="flex flex-col gap-2">
-                    <Button variant="ghost" size="icon" className="h-10 w-10">
-                      <Icon name="Paperclip" size={20} />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-10 w-10">
-                      <Icon name="Camera" size={20} />
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleSendMessage}
-                    disabled={isSubmitting || !newMessage.trim()}
-                    className="flex-1"
-                  >
-                    <Icon name="Send" size={18} className="mr-2" />
-                    Отправить
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <WorkDetailJournal
+              events={events}
+              userRole={userRole}
+              userId={user?.id}
+              onCreateInspection={handleCreateInspection}
+              onSendMessage={handleSendMessage}
+              formatTime={formatTime}
+              formatDate={formatDate}
+              getInitials={getInitials}
+              newMessage={newMessage}
+              setNewMessage={setNewMessage}
+              progress={progress}
+              setProgress={setProgress}
+              volume={volume}
+              setVolume={setVolume}
+              materials={materials}
+              setMaterials={setMaterials}
+              isSubmitting={isSubmitting}
+            />
           </TabsContent>
 
           <TabsContent value="info" className="flex-1 overflow-hidden mt-0">
@@ -437,83 +296,15 @@ const WorkDetail = () => {
         workEntryId={selectedEntryForInspection}
       />
 
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Редактировать работу</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-title">Название</Label>
-              <Input
-                id="edit-title"
-                value={editFormData.title}
-                onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-description">Описание</Label>
-              <Textarea
-                id="edit-description"
-                value={editFormData.description}
-                onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-                rows={3}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-contractor">Подрядчик</Label>
-              <Select 
-                value={editFormData.contractor_id} 
-                onValueChange={(value) => setEditFormData({ ...editFormData, contractor_id: value })}
-              >
-                <SelectTrigger id="edit-contractor">
-                  <SelectValue placeholder="Выберите подрядчика" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Без подрядчика</SelectItem>
-                  {contractors.map((contractor) => (
-                    <SelectItem key={contractor.id} value={contractor.id.toString()}>
-                      {contractor.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-status">Статус</Label>
-              <Select 
-                value={editFormData.status} 
-                onValueChange={(value) => setEditFormData({ ...editFormData, status: value })}
-              >
-                <SelectTrigger id="edit-status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">В работе</SelectItem>
-                  <SelectItem value="pending">Ожидание</SelectItem>
-                  <SelectItem value="completed">Завершено</SelectItem>
-                  <SelectItem value="on_hold">Приостановлено</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-              Отмена
-            </Button>
-            <Button onClick={handleEditSubmit} disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Icon name="Loader2" size={16} className="mr-2 animate-spin" />
-                  Сохранение...
-                </>
-              ) : (
-                'Сохранить'
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <WorkEditDialog
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        onSubmit={handleEditSubmit}
+        formData={editFormData}
+        setFormData={setEditFormData}
+        contractors={contractors}
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
 };
