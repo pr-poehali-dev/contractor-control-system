@@ -44,84 +44,26 @@ const WorkDetail = () => {
 
   const userRole: UserRole = user?.role || 'contractor';
 
-  const mockEvents: JournalEvent[] = [
-    {
-      id: 1,
-      type: 'work_entry',
-      work_id: Number(workId),
-      created_by: 1,
-      author_name: 'Иван Петров',
-      author_role: 'contractor',
-      created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-      content: 'Выполнена кирпичная кладка первого этажа. Уложено 500 кирпичей.',
+  const events: JournalEvent[] = workLogs
+    .filter(log => log.work_id === Number(workId))
+    .map(log => ({
+      id: log.id,
+      type: 'work_entry' as const,
+      work_id: log.work_id,
+      created_by: log.created_by,
+      author_name: log.author_name,
+      author_role: log.author_role,
+      created_at: log.created_at,
+      content: log.description,
       work_data: {
-        volume: 50,
+        volume: log.volume ? parseFloat(log.volume) : undefined,
         unit: 'м²',
-        materials: ['Кирпич керамический М150', 'Раствор цементный М100'],
-        photos: [],
-        progress: 25,
+        materials: log.materials ? log.materials.split(',').map(m => m.trim()) : [],
+        photos: log.photo_urls ? log.photo_urls.split(',') : [],
+        progress: 0,
       }
-    },
-    {
-      id: 2,
-      type: 'inspection_created',
-      work_id: Number(workId),
-      created_by: 2,
-      author_name: 'Система',
-      author_role: 'customer',
-      created_at: new Date(Date.now() - 86400000 * 1.5).toISOString(),
-      content: 'Проверка кирпичной кладки первого этажа',
-      inspection_data: {
-        inspection_id: 1,
-        inspection_number: '001',
-        status: 'completed',
-      }
-    },
-    {
-      id: 3,
-      type: 'defect_added',
-      work_id: Number(workId),
-      created_by: 2,
-      author_name: 'Алексей Смирнов',
-      author_role: 'customer',
-      created_at: new Date(Date.now() - 86400000 * 1.4).toISOString(),
-      defect_data: {
-        defect_id: 1,
-        inspection_id: 1,
-        inspection_number: '001',
-        description: 'Толщина горизонтальных швов превышает норму. Обнаружены участки с толщиной 15-18 мм.',
-        standard_reference: 'СНиП 3.03.01-87, п. 4.5 (допустимо 12 мм)',
-        photos: [],
-        status: 'open',
-      }
-    },
-    {
-      id: 4,
-      type: 'chat_message',
-      work_id: Number(workId),
-      created_by: 1,
-      author_name: 'Иван Петров',
-      author_role: 'contractor',
-      created_at: new Date(Date.now() - 86400000).toISOString(),
-      content: 'Принято к сведению. Исправим в течение 2 дней.',
-    },
-    {
-      id: 5,
-      type: 'inspection_completed',
-      work_id: Number(workId),
-      created_by: 2,
-      author_name: 'Система',
-      author_role: 'customer',
-      created_at: new Date(Date.now() - 86400000 * 0.5).toISOString(),
-      content: 'Повторная проверка после устранения замечаний',
-      inspection_data: {
-        inspection_id: 2,
-        inspection_number: '002',
-        status: 'completed',
-        defects_count: 0,
-      }
-    },
-  ];
+    }))
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
 
   if (!work) {
     return (
@@ -274,7 +216,7 @@ const WorkDetail = () => {
 
         <TabsContent value="journal" className="flex-1 flex flex-col overflow-hidden mt-0">
           <div className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-12 bg-slate-50">
-            {mockEvents.length === 0 ? (
+            {events.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full">
                 <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-4">
                   <Icon name="MessageSquare" size={40} className="text-blue-400" />
@@ -284,9 +226,9 @@ const WorkDetail = () => {
               </div>
             ) : (
               <div className="max-w-7xl mx-auto space-y-10">
-                {mockEvents.map((event, index) => {
+                {events.map((event, index) => {
                   const showDateSeparator = index === 0 || 
-                    formatDate(mockEvents[index - 1].created_at) !== formatDate(event.created_at);
+                    formatDate(events[index - 1].created_at) !== formatDate(event.created_at);
 
                   return (
                     <div key={event.id}>

@@ -189,7 +189,7 @@ const CreateWork = () => {
   };
 
   const handleAddContractor = () => {
-    navigate('/contractors/invite');
+    navigate('/contractors');
   };
 
   const handleContinueWithoutContractor = () => {
