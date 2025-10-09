@@ -62,7 +62,28 @@ def handler(event, context):
         
         role = user['role']
         
-        if role == 'contractor':
+        if role == 'admin':
+            cur.execute("""
+                SELECT id, title, description, status, created_at
+                FROM projects
+                WHERE status != 'archived'
+            """)
+            projects = cur.fetchall()
+            
+            cur.execute("""
+                SELECT id, title, address, project_id, status
+                FROM objects
+            """)
+            sites = cur.fetchall()
+            
+            cur.execute("""
+                SELECT w.id, w.title, w.description, w.object_id, w.contractor_id,
+                       c.name as contractor_name, w.status, w.start_date, w.end_date
+                FROM works w
+                LEFT JOIN contractors c ON w.contractor_id = c.id
+            """)
+            works = cur.fetchall()
+        elif role == 'contractor':
             cur.execute(f"""
                 SELECT DISTINCT c.id as contractor_id
                 FROM contractors c

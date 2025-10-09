@@ -65,13 +65,19 @@ def handler(event, context):
         if method == 'DELETE':
             if item_type == 'project':
                 if is_admin:
+                    cur.execute(f"DELETE FROM works WHERE object_id IN (SELECT id FROM objects WHERE project_id = {int(item_id)})")
+                    cur.execute(f"DELETE FROM objects WHERE project_id = {int(item_id)}")
                     cur.execute(f"DELETE FROM projects WHERE id = {int(item_id)}")
                 else:
+                    cur.execute(f"DELETE FROM works WHERE object_id IN (SELECT id FROM objects WHERE project_id = {int(item_id)})")
+                    cur.execute(f"DELETE FROM objects WHERE project_id = {int(item_id)}")
                     cur.execute(f"DELETE FROM projects WHERE id = {int(item_id)} AND client_id = {user_id_int}")
             elif item_type == 'object':
                 if is_admin:
+                    cur.execute(f"DELETE FROM works WHERE object_id = {int(item_id)}")
                     cur.execute(f"DELETE FROM objects WHERE id = {int(item_id)}")
                 else:
+                    cur.execute(f"DELETE FROM works WHERE object_id = {int(item_id)}")
                     cur.execute(f"""
                         DELETE FROM objects 
                         WHERE id = {int(item_id)} 

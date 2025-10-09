@@ -167,6 +167,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
+            cur.execute(f"DELETE FROM {schema}.works WHERE object_id IN (SELECT id FROM {schema}.objects WHERE project_id IN (SELECT id FROM {schema}.projects WHERE client_id = {user_id}))")
+            cur.execute(f"DELETE FROM {schema}.objects WHERE project_id IN (SELECT id FROM {schema}.projects WHERE client_id = {user_id})")
+            cur.execute(f"DELETE FROM {schema}.projects WHERE client_id = {user_id}")
+            cur.execute(f"DELETE FROM {schema}.works WHERE contractor_id = {user_id}")
             cur.execute(f"DELETE FROM {schema}.users WHERE id = {user_id}")
             
             conn.commit()
