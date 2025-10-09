@@ -223,6 +223,7 @@ const WorkDetail = () => {
           onEdit={handleEditClick}
           getStatusLabel={getStatusLabel}
           getStatusColor={getStatusColor}
+          userRole={userRole}
         />
 
         <Tabs defaultValue="journal" className="flex-1 flex flex-col overflow-hidden">

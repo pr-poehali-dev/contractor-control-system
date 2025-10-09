@@ -11,6 +11,7 @@ interface WorkDetailHeaderProps {
   onEdit: () => void;
   getStatusLabel: (status: string) => string;
   getStatusColor: (status: string) => string;
+  userRole: string;
 }
 
 export default function WorkDetailHeader({
@@ -21,6 +22,7 @@ export default function WorkDetailHeader({
   onEdit,
   getStatusLabel,
   getStatusColor,
+  userRole,
 }: WorkDetailHeaderProps) {
   return (
     <div className="bg-white border-b border-slate-200 px-4 md:px-6 py-3 md:py-4 flex-shrink-0">
@@ -55,14 +57,16 @@ export default function WorkDetailHeader({
           </div>
         </div>
         
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={onEdit}
-        >
-          <Icon name="Edit" size={16} className="mr-1" />
-          Редактировать
-        </Button>
+        {userRole === 'client' && (
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={onEdit}
+          >
+            <Icon name="Edit" size={16} className="mr-1" />
+            Редактировать
+          </Button>
+        )}
       </div>
     </div>
   );
