@@ -1,42 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 
 const Contractors = () => {
-  const { userData } = useAuth();
+  const { user, userData } = useAuth();
   const { toast } = useToast();
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [inviteData, setInviteData] = useState({ email: '', organization: '', inn: '' });
+  const [inviteData, setInviteData] = useState({ name: '', email: '', phone: '', inn: '' });
+  const [isChecking, setIsChecking] = useState(false);
+  const [existingContractor, setExistingContractor] = useState<any>(null);
+  const [contractors, setContractors] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const works = userData?.works || [];
+  useEffect(() => {
+    loadContractors();
+  }, [user]);
 
-  const contractorsMap = new Map<number, { id: number; name: string; worksCount: number; activeWorks: number }>();
-
-  works.forEach(work => {
-    if (work.contractor_id && work.contractor_name) {
-      const existing = contractorsMap.get(work.contractor_id);
-      if (existing) {
-        existing.worksCount++;
-        if (work.status === 'active') existing.activeWorks++;
-      } else {
-        contractorsMap.set(work.contractor_id, {
-          id: work.contractor_id,
-          name: work.contractor_name,
-          worksCount: 1,
-          activeWorks: work.status === 'active' ? 1 : 0,
-        });
-      }
+  const loadContractors = async () => {
+    if (!user?.id) return;
+    
+    setIsLoading(true);
+    try {
+      const response = await fetch(`https://functions.poehali.dev/4bcd4efc-3b22-4eea-9434-44cc201a86f8?client_id=${user.id}`);
+      const data = await response.json();
+      setContractors(data.contractors || []);
+    } catch (error) {
+      console.error('Failed to load contractors:', error);
+    } finally {
+      setIsLoading(false);
     }
-  });
-
-  const contractors = Array.from(contractorsMap.values());
+  };
 
   const getInitials = (name: string) => {
     return name
@@ -47,13 +49,92 @@ const Contractors = () => {
       .slice(0, 2);
   };
 
-  const handleInvite = () => {
-    toast({
-      title: 'Приглашение отправлено',
-      description: `Приглашение отправлено на ${inviteData.email}`,
-    });
-    setInviteOpen(false);
-    setInviteData({ email: '', organization: '', inn: '' });
+  const handleCheckINN = async () => {
+    if (!inviteData.inn || !inviteData.name) {
+      toast({
+        title: 'Ошибка',
+        description: 'Заполните ИНН и название организации',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsChecking(true);
+    setExistingContractor(null);
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/5865695e-cb4a-4795-bc42-5465c2b7ad0b', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          inn: inviteData.inn,
+          name: inviteData.name,
+          email: inviteData.email,
+          phone: inviteData.phone,
+          client_id: user?.id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.exists && data.already_linked) {
+        toast({
+          title: 'Подрядчик уже добавлен',
+          description: 'Этот подрядчик уже есть в вашем списке',
+        });
+        setInviteOpen(false);
+      } else if (data.exists && !data.already_linked) {
+        setExistingContractor(data.contractor);
+      } else if (data.created) {
+        toast({
+          title: 'Подрядчик приглашён!',
+          description: `Пароль отправлен на ${data.contractor.email}: ${data.credentials.password}`,
+        });
+        setInviteOpen(false);
+        setInviteData({ name: '', email: '', phone: '', inn: '' });
+        loadContractors();
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось проверить подрядчика',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
+  const handleLinkExisting = async () => {
+    if (!existingContractor) return;
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/f25f4572-bf91-47c2-aca5-059ebc3b870e', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          client_id: user?.id,
+          contractor_id: existingContractor.id,
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: 'Подрядчик добавлен',
+          description: `${existingContractor.name} добавлен в ваш список`,
+        });
+        setInviteOpen(false);
+        setExistingContractor(null);
+        setInviteData({ name: '', email: '', phone: '', inn: '' });
+        loadContractors();
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось добавить подрядчика',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -70,79 +151,132 @@ const Contractors = () => {
               Пригласить подрядчика
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Пригласить подрядчика</DialogTitle>
+              <DialogDescription>
+                Введите ИНН и данные организации. Система проверит, есть ли уже такой подрядчик.
+              </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div>
-                <label className="text-sm font-medium">Email *</label>
-                <Input
-                  value={inviteData.email}
-                  onChange={(e) => setInviteData({ ...inviteData, email: e.target.value })}
-                  placeholder="contractor@example.com"
-                />
+            
+            {existingContractor ? (
+              <div className="space-y-4 py-4">
+                <Alert>
+                  <Icon name="Info" size={16} className="mt-0.5" />
+                  <AlertDescription>
+                    Подрядчик с ИНН {inviteData.inn} уже зарегистрирован в системе
+                  </AlertDescription>
+                </Alert>
+                
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="space-y-2">
+                      <div>
+                        <Label className="text-slate-600">Организация</Label>
+                        <p className="font-medium">{existingContractor.name}</p>
+                      </div>
+                      <div>
+                        <Label className="text-slate-600">ИНН</Label>
+                        <p className="font-medium">{existingContractor.inn}</p>
+                      </div>
+                      {existingContractor.email && (
+                        <div>
+                          <Label className="text-slate-600">Email</Label>
+                          <p className="font-medium">{existingContractor.email}</p>
+                        </div>
+                      )}
+                      {existingContractor.phone && (
+                        <div>
+                          <Label className="text-slate-600">Телефон</Label>
+                          <p className="font-medium">{existingContractor.phone}</p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={() => setExistingContractor(null)} className="flex-1">
+                    Назад
+                  </Button>
+                  <Button onClick={handleLinkExisting} className="flex-1">
+                    <Icon name="Plus" size={18} className="mr-2" />
+                    Добавить в мой список
+                  </Button>
+                </div>
               </div>
-              <div>
-                <label className="text-sm font-medium">Организация</label>
-                <Input
-                  value={inviteData.organization}
-                  onChange={(e) => setInviteData({ ...inviteData, organization: e.target.value })}
-                  placeholder="ООО Стройка"
-                />
+            ) : (
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="inn">ИНН организации *</Label>
+                  <Input
+                    id="inn"
+                    value={inviteData.inn}
+                    onChange={(e) => setInviteData({ ...inviteData, inn: e.target.value })}
+                    placeholder="1234567890"
+                    maxLength={12}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="name">Название организации *</Label>
+                  <Input
+                    id="name"
+                    value={inviteData.name}
+                    onChange={(e) => setInviteData({ ...inviteData, name: e.target.value })}
+                    placeholder="ООО 'СтройПроект'"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={inviteData.email}
+                    onChange={(e) => setInviteData({ ...inviteData, email: e.target.value })}
+                    placeholder="contractor@example.com"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Телефон</Label>
+                  <Input
+                    id="phone"
+                    value={inviteData.phone}
+                    onChange={(e) => setInviteData({ ...inviteData, phone: e.target.value })}
+                    placeholder="+7 (900) 123-45-67"
+                  />
+                </div>
+                
+                <Button onClick={handleCheckINN} className="w-full" disabled={isChecking}>
+                  {isChecking ? (
+                    <>
+                      <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                      Проверка...
+                    </>
+                  ) : (
+                    <>
+                      <Icon name="Search" size={18} className="mr-2" />
+                      Проверить и пригласить
+                    </>
+                  )}
+                </Button>
               </div>
-              <div>
-                <label className="text-sm font-medium">ИНН</label>
-                <Input
-                  value={inviteData.inn}
-                  onChange={(e) => setInviteData({ ...inviteData, inn: e.target.value })}
-                  placeholder="1234567890"
-                />
-              </div>
-              <Button onClick={handleInvite} className="w-full">
-                Отправить приглашение
-              </Button>
-            </div>
+            )}
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-slate-600">Всего подрядчиков</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-slate-900">{contractors.length}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-slate-600">Активных работ</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-blue-600">
-              {contractors.reduce((sum, c) => sum + c.activeWorks, 0)}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-slate-600">Всего работ</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-slate-900">
-              {contractors.reduce((sum, c) => sum + c.worksCount, 0)}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {contractors.length === 0 ? (
+      {isLoading ? (
+        <div className="text-center py-12">
+          <Icon name="Loader2" size={48} className="animate-spin text-slate-400 mx-auto" />
+        </div>
+      ) : contractors.length === 0 ? (
         <Card className="p-12 text-center">
           <Icon name="Users" size={64} className="mx-auto text-slate-300 mb-4" />
           <h3 className="text-lg font-semibold text-slate-900 mb-2">Нет подрядчиков</h3>
-          <p className="text-slate-500">Подрядчики появятся после назначения на работы</p>
+          <p className="text-slate-500">Пригласите подрядчиков для работы над проектами</p>
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -167,24 +301,36 @@ const Contractors = () => {
 
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm text-slate-600">
-                        <Icon name="Wrench" size={16} />
-                        <span>{contractor.worksCount} {contractor.worksCount === 1 ? 'работа' : 'работ'}</span>
+                        <Icon name="FileText" size={16} />
+                        <span>ИНН: {contractor.inn}</span>
                       </div>
 
-                      {contractor.activeWorks > 0 && (
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs">
-                            <Icon name="Activity" size={12} className="mr-1" />
-                            {contractor.activeWorks} в работе
-                          </Badge>
+                      {contractor.user?.email && (
+                        <div className="flex items-center gap-2 text-sm text-slate-600">
+                          <Icon name="Mail" size={16} />
+                          <span className="truncate">{contractor.user.email}</span>
+                        </div>
+                      )}
+
+                      {contractor.user?.phone && (
+                        <div className="flex items-center gap-2 text-sm text-slate-600">
+                          <Icon name="Phone" size={16} />
+                          <span>{contractor.user.phone}</span>
                         </div>
                       )}
                     </div>
 
                     <div className="mt-4 pt-4 border-t border-slate-100">
-                      <div className="flex items-center gap-2 text-xs text-slate-500">
-                        <Icon name="Building2" size={14} />
-                        <span>Подрядная организация</span>
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="text-xs">
+                          <Icon name="Building2" size={12} className="mr-1" />
+                          Подрядчик
+                        </Badge>
+                        {contractor.added_at && (
+                          <span className="text-xs text-slate-500">
+                            Добавлен {new Date(contractor.added_at).toLocaleDateString('ru-RU')}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
