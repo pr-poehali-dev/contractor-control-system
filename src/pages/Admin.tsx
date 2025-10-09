@@ -235,6 +235,41 @@ const Admin = () => {
     }
   };
 
+  const handleDeleteUser = async (userId: number, userName: string) => {
+    if (!confirm(`Вы уверены что хотите УДАЛИТЬ пользователя "${userName}"? Это действие необратимо!`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/3f6bb7ff-3e84-4770-8884-3e96062db7f2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Key': 'admin123',
+        },
+        body: JSON.stringify({
+          action: 'delete_user',
+          user_id: userId,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to delete user');
+
+      toast({
+        title: 'Пользователь удалён',
+        description: `${userName} удалён из системы`,
+      });
+
+      loadUsers();
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось удалить пользователя',
+        variant: 'destructive',
+      });
+    }
+  };
+
   if (!isAuthorized) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
@@ -388,21 +423,34 @@ const Admin = () => {
                         {user.is_active ? 'Активен' : 'Заблокирован'}
                       </Badge>
                     </td>
-                    <td className="p-4 text-right space-x-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleEditUser(user)}
-                      >
-                        <Icon name="Edit" size={16} />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleToggleStatus(user.id)}
-                      >
-                        {user.is_active ? <Icon name="Ban" size={16} /> : <Icon name="CheckCircle" size={16} />}
-                      </Button>
+                    <td className="p-4 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleEditUser(user)}
+                          title="Редактировать"
+                        >
+                          <Icon name="Edit" size={16} />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleToggleStatus(user.id)}
+                          title={user.is_active ? 'Заблокировать' : 'Активировать'}
+                        >
+                          {user.is_active ? <Icon name="Ban" size={16} /> : <Icon name="CheckCircle" size={16} />}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => handleDeleteUser(user.id, user.name)}
+                          title="Удалить"
+                        >
+                          <Icon name="Trash2" size={16} />
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))}

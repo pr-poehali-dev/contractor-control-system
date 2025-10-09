@@ -90,7 +90,8 @@ const CreateProject = () => {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="max-w-2xl space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Основная информация</CardTitle>
@@ -189,28 +190,7 @@ const CreateProject = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-blue-50 border-blue-200">
-            <CardHeader>
-              <CardTitle className="text-base">Следующие шаги</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="flex items-start gap-2">
-                <Icon name="CheckCircle2" className="text-blue-600 mt-0.5 flex-shrink-0" size={16} />
-                <p className="text-slate-700">После создания проекта добавьте объекты</p>
-              </div>
-              <div className="flex items-start gap-2">
-                <Icon name="CheckCircle2" className="text-blue-600 mt-0.5 flex-shrink-0" size={16} />
-                <p className="text-slate-700">Для каждого объекта создайте работы</p>
-              </div>
-              <div className="flex items-start gap-2">
-                <Icon name="CheckCircle2" className="text-blue-600 mt-0.5 flex-shrink-0" size={16} />
-                <p className="text-slate-700">Назначьте подрядчиков на работы</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-3 mt-8 max-w-2xl">
+          <div className="flex flex-col md:flex-row gap-3 lg:col-span-2">
           <Button 
             type="submit" 
             size="lg" 
@@ -238,6 +218,56 @@ const CreateProject = () => {
           >
             Отмена
           </Button>
+          </div>
+        </div>
+
+        <aside className="space-y-6">
+          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Icon name="Lightbulb" className="text-blue-600" size={18} />
+                Советы по заполнению
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-slate-700">
+              <div className="space-y-2">
+                <p className="font-medium text-slate-900">📝 Название проекта</p>
+                <p className="text-xs">Используйте понятное название, включающее год и регион. Например: "Капремонт школ Казани 2025"</p>
+              </div>
+              <div className="space-y-2">
+                <p className="font-medium text-slate-900">📅 Сроки</p>
+                <p className="text-xs">Указывайте реалистичные сроки с учётом возможных задержек</p>
+              </div>
+              <div className="space-y-2">
+                <p className="font-medium text-slate-900">💰 Бюджет</p>
+                <p className="text-xs">Планируйте бюджет с запасом 10-15% на непредвиденные расходы</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-green-200 bg-green-50">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Icon name="Info" className="text-green-600" size={18} />
+                Что дальше?
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-xs text-slate-700">
+              <div className="flex gap-2">
+                <span className="font-bold text-green-600">1.</span>
+                <p>Создайте объекты в проекте (дома, здания)</p>
+              </div>
+              <div className="flex gap-2">
+                <span className="font-bold text-green-600">2.</span>
+                <p>Для каждого объекта добавьте виды работ</p>
+              </div>
+              <div className="flex gap-2">
+                <span className="font-bold text-green-600">3.</span>
+                <p>Назначьте подрядчиков и начните вести журнал</p>
+              </div>
+            </CardContent>
+          </Card>
+        </aside>
         </div>
       </form>
     </div>

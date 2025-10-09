@@ -100,7 +100,8 @@ const CreateWork = () => {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="max-w-2xl space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Информация о работе</CardTitle>
@@ -204,20 +205,7 @@ const CreateWork = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-blue-50 border-blue-200">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Icon name="Info" size={18} />
-                Следующий шаг
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-slate-700">
-              После создания работы вы сможете добавлять записи в журнал и назначить подрядчика
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-3 mt-8 max-w-2xl">
+          <div className="flex flex-col md:flex-row gap-3 lg:col-span-2">
           <Button 
             type="submit" 
             size="lg" 
@@ -246,6 +234,56 @@ const CreateWork = () => {
           >
             Отмена
           </Button>
+          </div>
+        </div>
+
+        <aside className="space-y-6">
+          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Icon name="Lightbulb" className="text-blue-600" size={18} />
+                Советы по заполнению
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-slate-700">
+              <div className="space-y-2">
+                <p className="font-medium text-slate-900">📑 Описание</p>
+                <p className="text-xs">Укажите ссылки на нормативы и требования к выполнению</p>
+              </div>
+              <div className="space-y-2">
+                <p className="font-medium text-slate-900">📅 Сроки</p>
+                <p className="text-xs">Учитывайте время на согласования и проверки</p>
+              </div>
+              <div className="space-y-2">
+                <p className="font-medium text-slate-900">🔥 Приоритет</p>
+                <p className="text-xs">Высокий приоритет - для критичных работ на критическом пути</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-green-200 bg-green-50">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Icon name="Info" className="text-green-600" size={18} />
+                Что дальше?
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-xs text-slate-700">
+              <div className="flex gap-2">
+                <span className="font-bold text-green-600">1.</span>
+                <p>Назначьте подрядчика на работу</p>
+              </div>
+              <div className="flex gap-2">
+                <span className="font-bold text-green-600">2.</span>
+                <p>Создайте первую запись в журнале работ</p>
+              </div>
+              <div className="flex gap-2">
+                <span className="font-bold text-green-600">3.</span>
+                <p>Отслеживайте прогресс и вносите замечания</p>
+              </div>
+            </CardContent>
+          </Card>
+        </aside>
         </div>
       </form>
     </div>

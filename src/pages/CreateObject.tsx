@@ -89,7 +89,8 @@ const CreateObject = () => {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="max-w-2xl space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Информация об объекте</CardTitle>
@@ -190,20 +191,7 @@ const CreateObject = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-blue-50 border-blue-200">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Icon name="Info" size={18} />
-                Следующий шаг
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-slate-700">
-              После создания объекта добавьте работы и назначьте подрядчиков
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-3 mt-8 max-w-2xl">
+          <div className="flex flex-col md:flex-row gap-3 lg:col-span-2">
           <Button 
             type="submit" 
             size="lg" 
@@ -232,6 +220,56 @@ const CreateObject = () => {
           >
             Отмена
           </Button>
+          </div>
+        </div>
+
+        <aside className="space-y-6">
+          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Icon name="Lightbulb" className="text-blue-600" size={18} />
+                Советы по заполнению
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-slate-700">
+              <div className="space-y-2">
+                <p className="font-medium text-slate-900">🏗️ Адрес</p>
+                <p className="text-xs">Указывайте полный адрес с индексом для лучшей идентификации</p>
+              </div>
+              <div className="space-y-2">
+                <p className="font-medium text-slate-900">📏 Характеристики</p>
+                <p className="text-xs">Площадь и этажность помогут в планировании работ</p>
+              </div>
+              <div className="space-y-2">
+                <p className="font-medium text-slate-900">📞 Контакты</p>
+                <p className="text-xs">Укажите ответственного за объект для быстрой связи</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-green-200 bg-green-50">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Icon name="Info" className="text-green-600" size={18} />
+                Что дальше?
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-xs text-slate-700">
+              <div className="flex gap-2">
+                <span className="font-bold text-green-600">1.</span>
+                <p>После создания добавьте виды работ на объекте</p>
+              </div>
+              <div className="flex gap-2">
+                <span className="font-bold text-green-600">2.</span>
+                <p>Назначьте подрядчиков на каждую работу</p>
+              </div>
+              <div className="flex gap-2">
+                <span className="font-bold text-green-600">3.</span>
+                <p>Начните вести журнал выполненных работ</p>
+              </div>
+            </CardContent>
+          </Card>
+        </aside>
         </div>
       </form>
     </div>
