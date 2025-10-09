@@ -1,27 +1,60 @@
 {
   "tests": [
     {
-      "name": "Login with valid phone",
+      "name": "Register new client",
       "method": "POST",
+      "path": "/?action=register",
       "body": {
-        "phone": "+79991234501"
+        "email": "test@example.com",
+        "phone": "+79991234567",
+        "password": "SecurePass123",
+        "name": "Test Client",
+        "role": "client",
+        "organization": "Test Company"
       },
-      "expectedStatus": 200,
+      "expectedStatus": 201,
       "expectedBody": {
-        "id": "number",
-        "phone": "string",
-        "role": "string",
-        "name": "string"
+        "token": "string",
+        "user": {
+          "id": "number",
+          "email": "string",
+          "phone": "string",
+          "name": "string",
+          "role": "string"
+        }
       },
       "bodyMatcher": "partial"
     },
     {
-      "name": "Login with invalid phone",
+      "name": "Login with email and password",
       "method": "POST",
+      "path": "/?action=login",
       "body": {
-        "phone": "+79999999999"
+        "email": "test@example.com",
+        "password": "SecurePass123"
       },
-      "expectedStatus": 404
+      "expectedStatus": 200,
+      "expectedBody": {
+        "token": "string",
+        "user": {
+          "id": "number"
+        }
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Register - missing password",
+      "method": "POST",
+      "path": "/?action=register",
+      "body": {
+        "email": "test2@example.com",
+        "name": "Test User"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
     }
   ]
 }

@@ -1,0 +1,27 @@
+{
+  "tests": [
+    {
+      "name": "Get works - requires auth",
+      "method": "GET",
+      "path": "/?object_id=1",
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Create work - requires auth",
+      "method": "POST",
+      "body": {
+        "object_id": 1,
+        "title": "Test Work"
+      },
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "tests": [
+    {
+      "name": "Get objects - requires auth",
+      "method": "GET",
+      "path": "/?project_id=1",
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Create object - requires auth",
+      "method": "POST",
+      "body": {
+        "project_id": 1,
+        "title": "Test Object",
+        "address": "Test Address"
+      },
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

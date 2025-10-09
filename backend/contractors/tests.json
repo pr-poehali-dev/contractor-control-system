@@ -1,0 +1,28 @@
+{
+  "tests": [
+    {
+      "name": "Check INN - not exists",
+      "method": "POST",
+      "path": "/?action=check-inn",
+      "body": {
+        "inn": "9999999999"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "exists": false,
+        "inn": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get contractors list - requires client_id",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
