@@ -50,8 +50,12 @@ const WorkDetail = () => {
 
   const userRole: UserRole = user?.role || 'contractor';
   
-  console.log('WorkDetail - user:', user);
-  console.log('WorkDetail - userRole:', userRole);
+  console.log('=== WorkDetail Debug ===');
+  console.log('user object:', user);
+  console.log('user.role:', user?.role);
+  console.log('userRole computed:', userRole);
+  console.log('Should show edit button:', userRole === 'client');
+  console.log('=======================')
 
   const events: JournalEvent[] = workLogs
     .filter(log => log.work_id === Number(workId))

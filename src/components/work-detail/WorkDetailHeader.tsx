@@ -24,9 +24,6 @@ export default function WorkDetailHeader({
   getStatusColor,
   userRole,
 }: WorkDetailHeaderProps) {
-  console.log('WorkDetailHeader - userRole:', userRole);
-  console.log('WorkDetailHeader - showing button:', userRole === 'client');
-  
   return (
     <div className="bg-white border-b border-slate-200 px-4 md:px-6 py-3 md:py-4 flex-shrink-0">
       <div className="flex items-start justify-between gap-4">
