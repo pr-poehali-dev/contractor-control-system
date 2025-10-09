@@ -16,6 +16,7 @@ import EstimateTab from '@/components/work-journal/EstimateTab';
 import AnalyticsTab from '@/components/work-journal/AnalyticsTab';
 import EventItem from '@/components/work-journal/EventItem';
 import CreateInspectionModal from '@/components/work-journal/CreateInspectionModal';
+import WorkReportModal from '@/components/work-journal/WorkReportModal';
 import WorkEditDialog from '@/components/work-detail/WorkEditDialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -81,6 +82,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
   const [showWorksList, setShowWorksList] = useState(false);
   const [activeTab, setActiveTab] = useState('journal');
   const [isInspectionModalOpen, setIsInspectionModalOpen] = useState(false);
+  const [isWorkReportModalOpen, setIsWorkReportModalOpen] = useState(false);
   const [selectedEntryForInspection, setSelectedEntryForInspection] = useState<number | undefined>();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editFormData, setEditFormData] = useState({
@@ -177,6 +179,47 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
 
   const handleCreateEstimate = () => {
     toast({ title: 'Создание сметы', description: 'Функция в разработке' });
+  };
+
+  const handleWorkReportSubmit = async (data: {
+    text_content: string;
+    work_volume: string;
+    materials: Array<{ name: string; quantity: number; unit: string }>;
+    photo_urls: string[];
+  }) => {
+    if (!user || !selectedWork) return;
+    
+    setIsSubmitting(true);
+
+    try {
+      await api.createItem(user.id, 'work_log', {
+        work_id: selectedWork,
+        description: data.text_content,
+        progress: 0,
+        volume: data.work_volume || null,
+        materials: data.materials.map(m => `${m.name} ${m.quantity} ${m.unit}`).join(', ') || null,
+        photo_urls: data.photo_urls.join(',') || null,
+      });
+
+      const refreshedData = await api.getUserData(user.id);
+      setUserData(refreshedData);
+      localStorage.setItem('userData', JSON.stringify(refreshedData));
+
+      toast({
+        title: 'Отчёт создан',
+        description: 'Запись в журнале добавлена',
+      });
+
+      setIsWorkReportModalOpen(false);
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось создать отчёт',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleEditClick = () => {
@@ -364,7 +407,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                           <div className="flex gap-2">
                             <Button 
                               variant="outline"
-                              onClick={() => setIsInspectionModalOpen(true)}
+                              onClick={() => setIsWorkReportModalOpen(true)}
                               className="h-10"
                             >
                               <Icon name="FileText" size={18} className="mr-2" />
@@ -435,6 +478,13 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
           )}
         </div>
       </div>
+
+      <WorkReportModal
+        isOpen={isWorkReportModalOpen}
+        onClose={() => setIsWorkReportModalOpen(false)}
+        onSubmit={handleWorkReportSubmit}
+        isSubmitting={isSubmitting}
+      />
 
       <WorkEditDialog
         isOpen={isEditDialogOpen}
