@@ -15,6 +15,7 @@ interface JournalTabContentProps {
   handleSendMessage: () => void;
   handleCreateInspectionClick: (eventId: number) => void;
   setIsWorkReportModalOpen: (value: boolean) => void;
+  setIsInspectionModalOpen: (value: boolean) => void;
   formatDate: (timestamp: string) => string;
   formatTime: (timestamp: string) => string;
   getInitials: (name: string) => string;
@@ -30,6 +31,7 @@ export default function JournalTabContent({
   handleSendMessage,
   handleCreateInspectionClick,
   setIsWorkReportModalOpen,
+  setIsInspectionModalOpen,
   formatDate,
   formatTime,
   getInitials,
@@ -87,14 +89,25 @@ export default function JournalTabContent({
               }}
             />
             <div className="flex gap-2">
-              <Button 
-                variant="outline"
-                onClick={() => setIsWorkReportModalOpen(true)}
-                className="h-10"
-              >
-                <Icon name="FileText" size={18} className="mr-2" />
-                Отчёт
-              </Button>
+              {userRole === 'contractor' ? (
+                <Button 
+                  variant="outline"
+                  onClick={() => setIsWorkReportModalOpen(true)}
+                  className="h-10"
+                >
+                  <Icon name="FileText" size={18} className="mr-2" />
+                  Отчёт
+                </Button>
+              ) : (
+                <Button 
+                  variant="outline"
+                  onClick={() => setIsInspectionModalOpen(true)}
+                  className="h-10"
+                >
+                  <Icon name="ClipboardCheck" size={18} className="mr-2" />
+                  Проверка
+                </Button>
+              )}
               <Button 
                 onClick={handleSendMessage}
                 disabled={!newMessage.trim() || isSubmitting}

@@ -186,6 +186,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                     handleSendMessage={handlers.handleSendMessage}
                     handleCreateInspectionClick={handlers.handleCreateInspectionClick}
                     setIsWorkReportModalOpen={handlers.setIsWorkReportModalOpen}
+                    setIsInspectionModalOpen={handlers.setIsInspectionModalOpen}
                     formatDate={formatDate}
                     formatTime={formatTime}
                     getInitials={getInitials}
