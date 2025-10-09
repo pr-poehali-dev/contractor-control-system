@@ -48,7 +48,7 @@ const Profile = () => {
               <CardTitle className="text-xl mb-2">{user?.name}</CardTitle>
               <CardDescription>{user?.email}</CardDescription>
               <Badge className="mt-3" variant="outline">
-                {user?.role === 'customer' ? 'Заказчик' : 'Подрядчик'}
+                {user?.role === 'admin' ? 'Администратор' : user?.role === 'client' ? 'Заказчик' : 'Подрядчик'}
               </Badge>
             </div>
           </CardHeader>

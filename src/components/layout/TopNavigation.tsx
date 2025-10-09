@@ -16,13 +16,14 @@ interface NavItem {
   label: string;
   icon: string;
   path: string;
-  roles?: ('client' | 'contractor')[];
+  roles?: ('client' | 'contractor' | 'admin')[];
 }
 
 const navItems: NavItem[] = [
   { id: 'dashboard', label: 'Главная', icon: 'LayoutDashboard', path: '/dashboard', roles: ['client'] },
   { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects', roles: ['contractor'] },
   { id: 'projects', label: 'Проекты', icon: 'FolderKanban', path: '/projects', roles: ['client'] },
+  { id: 'admin', label: 'Админ-панель', icon: 'Shield', path: '/admin', roles: ['admin'] },
   { id: 'work-templates', label: 'Справочник', icon: 'BookOpen', path: '/work-templates', roles: ['client', 'contractor'] },
   { id: 'defects', label: 'Замечания', icon: 'AlertTriangle', path: '/defects', roles: ['client', 'contractor'] },
   { id: 'analytics', label: 'Аналитика', icon: 'BarChart3', path: '/analytics', roles: ['client'] },
@@ -35,7 +36,7 @@ export default function TopNavigation() {
   const { user, logout } = useAuth();
 
   const visibleNavItems = navItems.filter(
-    (item) => !item.roles || item.roles.includes(user?.role || 'contractor')
+    (item) => !item.roles || item.roles.includes(user?.role as any || 'contractor')
   );
 
   const handleLogout = () => {
