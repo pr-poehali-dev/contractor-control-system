@@ -199,6 +199,7 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
           setSelectedWork={setSelectedWork}
           getInitials={getInitials}
           formatTime={formatTime}
+          objectId={objectId}
         />
 
         <div className="flex-1 flex flex-col bg-slate-50">

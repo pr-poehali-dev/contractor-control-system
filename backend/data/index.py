@@ -188,10 +188,21 @@ def handler(event, context):
         else:
             inspections, checkpoints, remarks, work_logs = [], [], [], []
         
+        if role == 'client':
+            cur.execute(f"""
+                SELECT c.id, c.name, c.inn, c.contact_info, c.email, c.phone, c.user_id
+                FROM contractors c
+                JOIN client_contractors cc ON cc.contractor_id = c.id
+                WHERE cc.client_id = {user_id_int}
+            """)
+            contractors = cur.fetchall()
+        else:
+            contractors = []
+        
         cur.close()
         conn.close()
         
-        for item in projects + sites + works + inspections + checkpoints + remarks + work_logs:
+        for item in projects + sites + works + inspections + checkpoints + remarks + work_logs + contractors:
             for key, value in item.items():
                 if hasattr(value, 'isoformat'):
                     item[key] = value.isoformat()
@@ -203,7 +214,8 @@ def handler(event, context):
             'inspections': [dict(i) for i in inspections],
             'checkpoints': [dict(c) for c in checkpoints],
             'remarks': [dict(r) for r in remarks],
-            'workLogs': [dict(wl) for wl in work_logs]
+            'workLogs': [dict(wl) for wl in work_logs],
+            'contractors': [dict(c) for c in contractors]
         }
         
         return {

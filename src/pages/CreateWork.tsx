@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
@@ -10,18 +10,41 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+
+interface WorkTemplate {
+  id: string;
+  name: string;
+  category: string;
+  unit: string;
+}
+
+interface GroupedTemplates {
+  [category: string]: WorkTemplate[];
+}
 
 const CreateWork = () => {
   const { projectId, objectId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, setUserData } = useAuth();
+  const { user, setUserData, userData } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -33,7 +56,94 @@ const CreateWork = () => {
     contractor_id: '',
     priority: 'medium',
   });
+  const [selectedTemplateId, setSelectedTemplateId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [templates, setTemplates] = useState<WorkTemplate[]>([]);
+  const [groupedTemplates, setGroupedTemplates] = useState<GroupedTemplates>({});
+  const [hasContractors, setHasContractors] = useState(true);
+  const [showNoContractorsDialog, setShowNoContractorsDialog] = useState(false);
+  const [isLoadingTemplates, setIsLoadingTemplates] = useState(true);
+
+  // Load work templates
+  useEffect(() => {
+    const loadTemplates = async () => {
+      try {
+        setIsLoadingTemplates(true);
+        const response = await fetch(
+          'https://functions.poehali.dev/b9d6731e-788e-476b-bad5-047bd3d6adc1?action=work-types',
+          {
+            headers: {
+              'X-Auth-Token': localStorage.getItem('auth_token') || '',
+            },
+          }
+        );
+        const data = await response.json();
+        
+        const workTypes = data.work_types || [];
+        if (Array.isArray(workTypes)) {
+          setTemplates(workTypes.map((t: any) => ({
+            id: String(t.id),
+            name: t.name,
+            category: t.category || 'Прочие работы',
+            unit: t.unit,
+          })));
+          
+          // Group templates by category
+          const grouped = workTypes.reduce((acc: GroupedTemplates, template: any) => {
+            const cat = template.category || 'Прочие работы';
+            const tmpl: WorkTemplate = {
+              id: String(template.id),
+              name: template.name,
+              category: cat,
+              unit: template.unit,
+            };
+            if (!acc[cat]) {
+              acc[cat] = [];
+            }
+            acc[cat].push(tmpl);
+            return acc;
+          }, {});
+          
+          setGroupedTemplates(grouped);
+        }
+      } catch (error) {
+        console.error('Failed to load work templates:', error);
+        toast({
+          title: 'Ошибка',
+          description: 'Не удалось загрузить шаблоны работ',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoadingTemplates(false);
+      }
+    };
+
+    loadTemplates();
+  }, [toast]);
+
+  // Check if user has contractors
+  useEffect(() => {
+    if (userData?.contractors) {
+      const contractorsCount = userData.contractors.length;
+      setHasContractors(contractorsCount > 0);
+      
+      if (contractorsCount === 0) {
+        setShowNoContractorsDialog(true);
+      }
+    }
+  }, [userData]);
+
+  const handleTemplateSelect = (templateId: string) => {
+    setSelectedTemplateId(templateId);
+    const selectedTemplate = templates.find(t => t.id === templateId);
+    if (selectedTemplate) {
+      setFormData({
+        ...formData,
+        title: selectedTemplate.name,
+        unit: selectedTemplate.unit,
+      });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,8 +193,35 @@ const CreateWork = () => {
     }
   };
 
+  const handleAddContractor = () => {
+    navigate('/contractors/invite');
+  };
+
+  const handleContinueWithoutContractor = () => {
+    setShowNoContractorsDialog(false);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8 pb-24 md:pb-8">
+      <AlertDialog open={showNoContractorsDialog} onOpenChange={setShowNoContractorsDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>У вас пока нет подрядчиков с которыми вы работаете</AlertDialogTitle>
+            <AlertDialogDescription>
+              Чтобы назначать работы подрядчикам, сначала добавьте их в систему. Вы также можете продолжить без подрядчика и добавить его позже.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleContinueWithoutContractor}>
+              Продолжить без подрядчика
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleAddContractor}>
+              Добавить подрядчика
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Button 
         variant="ghost" 
         className="mb-6"
@@ -109,15 +246,27 @@ const CreateWork = () => {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="title">Название работы *</Label>
-                <Input
-                  id="title"
-                  placeholder="Например: Замена кровли"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  required
-                  autoFocus
-                  data-tour="work-title-input"
-                />
+                <Select 
+                  value={selectedTemplateId} 
+                  onValueChange={handleTemplateSelect}
+                  disabled={isLoadingTemplates}
+                >
+                  <SelectTrigger data-tour="work-title-input">
+                    <SelectValue placeholder={isLoadingTemplates ? "Загрузка шаблонов..." : "Выберите вид работ"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(groupedTemplates).map(([category, items]) => (
+                      <SelectGroup key={category}>
+                        <SelectLabel>{category}</SelectLabel>
+                        {items.map((template) => (
+                          <SelectItem key={template.id} value={template.id}>
+                            {template.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">

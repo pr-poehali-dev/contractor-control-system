@@ -1,7 +1,9 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface WorksListProps {
   works: any[];
@@ -10,6 +12,7 @@ interface WorksListProps {
   setSelectedWork: (id: number) => void;
   getInitials: (name: string) => string;
   formatTime: (timestamp: string) => string;
+  objectId: number;
 }
 
 export default function WorksList({
@@ -19,17 +22,37 @@ export default function WorksList({
   setSelectedWork,
   getInitials,
   formatTime,
+  objectId,
 }: WorksListProps) {
+  const navigate = useNavigate();
+  const { projectId } = useParams();
   return (
     <div className="hidden md:block w-80 bg-white border-r border-slate-200 flex-col">
       <div className="p-4 border-b border-slate-200">
-        <h3 className="font-bold text-lg">Работы ({works.length})</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-bold text-lg">Работы ({works.length})</h3>
+          <Button
+            size="sm"
+            onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}
+          >
+            <Icon name="Plus" size={16} className="mr-1" />
+            Добавить
+          </Button>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">
         {works.length === 0 ? (
-          <div className="p-4 text-center text-slate-500">
-            <p className="text-sm">Нет работ</p>
+          <div className="p-8 text-center">
+            <Icon name="Briefcase" size={48} className="text-slate-300 mx-auto mb-4" />
+            <p className="text-sm text-slate-600 mb-4">Нет работ на этом объекте</p>
+            <Button
+              size="sm"
+              onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}
+            >
+              <Icon name="Plus" size={16} className="mr-2" />
+              Добавить первую работу
+            </Button>
           </div>
         ) : (
           <div className="p-2">
