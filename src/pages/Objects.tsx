@@ -46,9 +46,6 @@ export default function Objects() {
   const [selectedProject, setSelectedProject] = useState<string>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [sortBy, setSortBy] = useState<string>('date');
-  const [contractorObjects, setContractorObjects] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-
   const isContractor = user?.role === 'contractor';
 
   const handleDeleteObject = async (objectId: number, e: React.MouseEvent) => {
@@ -69,26 +66,7 @@ export default function Objects() {
     }
   };
 
-  useEffect(() => {
-    const loadContractorObjects = async () => {
-      if (!isContractor || !user?.id) return;
-      
-      setIsLoading(true);
-      try {
-        const response = await fetch(`https://functions.poehali.dev/354c1d24-5775-4678-ba82-bb1acd986337?contractor_id=${user.id}`);
-        const data = await response.json();
-        setContractorObjects(data.objects || []);
-      } catch (error) {
-        console.error('Failed to load contractor objects:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadContractorObjects();
-  }, [isContractor, user]);
-
-  const sites = isContractor ? contractorObjects : (userData?.sites || []);
+  const sites = userData?.sites || [];
   const works = userData?.works || [];
   const projects = userData?.projects || [];
 
