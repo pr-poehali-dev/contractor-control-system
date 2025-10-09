@@ -49,6 +49,9 @@ const WorkDetail = () => {
   const project = projects.find(p => p.id === Number(projectId));
 
   const userRole: UserRole = user?.role || 'contractor';
+  
+  console.log('WorkDetail - user:', user);
+  console.log('WorkDetail - userRole:', userRole);
 
   const events: JournalEvent[] = workLogs
     .filter(log => log.work_id === Number(workId))
