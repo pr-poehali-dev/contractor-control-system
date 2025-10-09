@@ -50,8 +50,19 @@ interface RegisterData {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        return JSON.parse(storedUser);
+      } catch (e) {
+        console.error('Failed to parse stored user', e);
+        return null;
+      }
+    }
+    return null;
+  });
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem('auth_token'));
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -65,6 +76,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const clearAuth = () => {
     setToken(null);
     setUser(null);
+    setUserData(null);
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
   };
@@ -121,22 +133,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const verifyToken = async (): Promise<boolean> => {
     const storedToken = localStorage.getItem('auth_token');
-    const storedUser = localStorage.getItem('user');
     
     if (!storedToken) {
       setIsLoading(false);
       return false;
     }
 
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        setToken(storedToken);
-      } catch (e) {
-        console.error('Failed to parse stored user', e);
-      }
-    }
+    setIsLoading(true);
 
     try {
       const response = await fetch(`${AUTH_API}?action=verify`, {
@@ -159,6 +162,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(false);
       return true;
     } catch (error) {
+      console.error('Token verification failed:', error);
       clearAuth();
       setIsLoading(false);
       return false;

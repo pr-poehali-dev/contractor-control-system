@@ -68,16 +68,22 @@ const WorkTemplates = () => {
   const loadTemplates = async () => {
     try {
       const response = await fetch('https://functions.poehali.dev/b9d6731e-788e-476b-bad5-047bd3d6adc1?action=work-types', {
+        method: 'GET',
         headers: {
-          'X-Auth-Token': localStorage.getItem('auth_token') || '',
+          'Content-Type': 'application/json',
         },
       });
 
-      if (!response.ok) throw new Error('Failed to load templates');
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Failed to load templates:', response.status, errorText);
+        throw new Error('Failed to load templates');
+      }
 
       const data = await response.json();
       setTemplates(data.work_types || []);
     } catch (error) {
+      console.error('Load templates error:', error);
       toast({
         title: 'Ошибка',
         description: 'Не удалось загрузить справочник работ',
