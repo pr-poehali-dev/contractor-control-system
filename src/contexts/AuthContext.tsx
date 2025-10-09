@@ -110,6 +110,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
+      console.log('Login attempt:', email);
       const response = await fetch(`${AUTH_API}?action=login`, {
         method: 'POST',
         headers: {
@@ -119,14 +120,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       const data = await response.json();
+      console.log('Login response:', { status: response.status, hasToken: !!data.token, hasUser: !!data.user });
 
       if (!response.ok) {
         throw new Error(data.error || 'Ошибка входа');
       }
 
+      console.log('Saving auth, token:', data.token?.substring(0, 20) + '...');
       saveAuth(data.token, data.user);
+      console.log('Token saved to localStorage:', localStorage.getItem('auth_token')?.substring(0, 20) + '...');
       await loadUserData(data.token);
     } catch (error) {
+      console.error('Login error:', error);
       throw new Error(error instanceof Error ? error.message : 'Ошибка входа');
     } finally {
       setIsLoading(false);

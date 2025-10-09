@@ -1,0 +1,20 @@
+{
+  "tests": [
+    {
+      "name": "Get all work types",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "work_types": "array"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "OPTIONS for CORS",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}

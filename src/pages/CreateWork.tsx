@@ -70,12 +70,7 @@ const CreateWork = () => {
       try {
         setIsLoadingTemplates(true);
         const response = await fetch(
-          'https://functions.poehali.dev/b9d6731e-788e-476b-bad5-047bd3d6adc1?action=work-types',
-          {
-            headers: {
-              'X-Auth-Token': localStorage.getItem('auth_token') || '',
-            },
-          }
+          'https://functions.poehali.dev/f7c65aa6-e261-44c6-a6cb-65fd7bac3fdf'
         );
         const data = await response.json();
         

@@ -67,7 +67,7 @@ const WorkTemplates = () => {
 
   const loadTemplates = async () => {
     try {
-      const response = await fetch('https://functions.poehali.dev/b9d6731e-788e-476b-bad5-047bd3d6adc1?action=work-types', {
+      const response = await fetch('https://functions.poehali.dev/f7c65aa6-e261-44c6-a6cb-65fd7bac3fdf', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

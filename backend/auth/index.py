@@ -379,8 +379,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
     
     except Exception as e:
+        import traceback
+        print(f"ERROR: {str(e)}")
+        print(f"TRACEBACK: {traceback.format_exc()}")
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': str(e)})
+            'body': json.dumps({'error': str(e), 'traceback': traceback.format_exc()})
         }
