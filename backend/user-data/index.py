@@ -61,6 +61,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         payload = verify_jwt_token(auth_header)
         user_id = payload['user_id']
         user_role = payload['role']
+        print(f"DEBUG USER-DATA: user_id={user_id}, role={user_role}")
     except ValueError as e:
         return {
             'statusCode': 401,
