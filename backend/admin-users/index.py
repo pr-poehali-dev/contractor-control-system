@@ -167,10 +167,85 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
-            cur.execute(f"DELETE FROM {schema}.works WHERE object_id IN (SELECT id FROM {schema}.objects WHERE project_id IN (SELECT id FROM {schema}.projects WHERE client_id = {user_id}))")
+            cur.execute(f"""
+                DELETE FROM {schema}.remarks 
+                WHERE inspection_id IN (
+                    SELECT i.id FROM {schema}.inspections i
+                    JOIN {schema}.works w ON i.work_id = w.id
+                    JOIN {schema}.objects o ON w.object_id = o.id
+                    JOIN {schema}.projects p ON o.project_id = p.id
+                    WHERE p.client_id = {user_id} OR i.created_by = {user_id}
+                )
+            """)
+            
+            cur.execute(f"""
+                DELETE FROM {schema}.inspection_checkpoints 
+                WHERE inspection_id IN (
+                    SELECT i.id FROM {schema}.inspections i
+                    JOIN {schema}.works w ON i.work_id = w.id
+                    JOIN {schema}.objects o ON w.object_id = o.id
+                    JOIN {schema}.projects p ON o.project_id = p.id
+                    WHERE p.client_id = {user_id} OR i.created_by = {user_id}
+                )
+            """)
+            
+            cur.execute(f"""
+                DELETE FROM {schema}.inspections 
+                WHERE work_id IN (
+                    SELECT w.id FROM {schema}.works w
+                    JOIN {schema}.objects o ON w.object_id = o.id
+                    JOIN {schema}.projects p ON o.project_id = p.id
+                    WHERE p.client_id = {user_id}
+                ) OR created_by = {user_id}
+            """)
+            
+            cur.execute(f"""
+                DELETE FROM {schema}.work_logs 
+                WHERE work_id IN (
+                    SELECT w.id FROM {schema}.works w
+                    JOIN {schema}.objects o ON w.object_id = o.id
+                    JOIN {schema}.projects p ON o.project_id = p.id
+                    WHERE p.client_id = {user_id}
+                ) OR created_by = {user_id}
+            """)
+            
+            cur.execute(f"""
+                DELETE FROM {schema}.estimates 
+                WHERE work_id IN (
+                    SELECT w.id FROM {schema}.works w
+                    JOIN {schema}.objects o ON w.object_id = o.id
+                    JOIN {schema}.projects p ON o.project_id = p.id
+                    WHERE p.client_id = {user_id}
+                ) OR uploaded_by = {user_id}
+            """)
+            
+            cur.execute(f"""
+                DELETE FROM {schema}.works 
+                WHERE object_id IN (
+                    SELECT id FROM {schema}.objects 
+                    WHERE project_id IN (
+                        SELECT id FROM {schema}.projects WHERE client_id = {user_id}
+                    )
+                )
+            """)
+            
             cur.execute(f"DELETE FROM {schema}.objects WHERE project_id IN (SELECT id FROM {schema}.projects WHERE client_id = {user_id})")
             cur.execute(f"DELETE FROM {schema}.projects WHERE client_id = {user_id}")
-            cur.execute(f"DELETE FROM {schema}.works WHERE contractor_id = {user_id}")
+            
+            cur.execute(f"DELETE FROM {schema}.client_contractors WHERE client_id = {user_id}")
+            cur.execute(f"DELETE FROM {schema}.contractor_invites WHERE client_id = {user_id} OR invited_by = {user_id}")
+            cur.execute(f"DELETE FROM {schema}.activity_log WHERE user_id = {user_id}")
+            cur.execute(f"DELETE FROM {schema}.user_sessions WHERE user_id = {user_id}")
+            
+            cur.execute(f"""
+                DELETE FROM {schema}.contractors 
+                WHERE user_id = {user_id} OR id IN (
+                    SELECT contractor_id FROM {schema}.works WHERE contractor_id IN (
+                        SELECT id FROM {schema}.contractors WHERE user_id = {user_id}
+                    )
+                )
+            """)
+            
             cur.execute(f"DELETE FROM {schema}.users WHERE id = {user_id}")
             
             conn.commit()

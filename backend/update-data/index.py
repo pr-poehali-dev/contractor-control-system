@@ -64,38 +64,90 @@ def handler(event, context):
     try:
         if method == 'DELETE':
             if item_type == 'project':
-                if is_admin:
-                    cur.execute(f"DELETE FROM works WHERE object_id IN (SELECT id FROM objects WHERE project_id = {int(item_id)})")
-                    cur.execute(f"DELETE FROM objects WHERE project_id = {int(item_id)}")
-                    cur.execute(f"DELETE FROM projects WHERE id = {int(item_id)}")
-                else:
-                    cur.execute(f"DELETE FROM works WHERE object_id IN (SELECT id FROM objects WHERE project_id = {int(item_id)})")
-                    cur.execute(f"DELETE FROM objects WHERE project_id = {int(item_id)}")
-                    cur.execute(f"DELETE FROM projects WHERE id = {int(item_id)} AND client_id = {user_id_int}")
+                project_filter = f"WHERE id = {int(item_id)}" if is_admin else f"WHERE id = {int(item_id)} AND client_id = {user_id_int}"
+                
+                cur.execute(f"""
+                    DELETE FROM remarks 
+                    WHERE inspection_id IN (
+                        SELECT i.id FROM inspections i
+                        JOIN works w ON i.work_id = w.id
+                        JOIN objects o ON w.object_id = o.id
+                        WHERE o.project_id = {int(item_id)}
+                    )
+                """)
+                cur.execute(f"""
+                    DELETE FROM inspection_checkpoints 
+                    WHERE inspection_id IN (
+                        SELECT i.id FROM inspections i
+                        JOIN works w ON i.work_id = w.id
+                        JOIN objects o ON w.object_id = o.id
+                        WHERE o.project_id = {int(item_id)}
+                    )
+                """)
+                cur.execute(f"""
+                    DELETE FROM inspections 
+                    WHERE work_id IN (
+                        SELECT w.id FROM works w
+                        JOIN objects o ON w.object_id = o.id
+                        WHERE o.project_id = {int(item_id)}
+                    )
+                """)
+                cur.execute(f"""
+                    DELETE FROM work_logs 
+                    WHERE work_id IN (
+                        SELECT w.id FROM works w
+                        JOIN objects o ON w.object_id = o.id
+                        WHERE o.project_id = {int(item_id)}
+                    )
+                """)
+                cur.execute(f"""
+                    DELETE FROM estimates 
+                    WHERE work_id IN (
+                        SELECT w.id FROM works w
+                        JOIN objects o ON w.object_id = o.id
+                        WHERE o.project_id = {int(item_id)}
+                    )
+                """)
+                cur.execute(f"DELETE FROM works WHERE object_id IN (SELECT id FROM objects WHERE project_id = {int(item_id)})")
+                cur.execute(f"DELETE FROM objects WHERE project_id = {int(item_id)}")
+                cur.execute(f"DELETE FROM projects {project_filter}")
             elif item_type == 'object':
-                if is_admin:
-                    cur.execute(f"DELETE FROM works WHERE object_id = {int(item_id)}")
-                    cur.execute(f"DELETE FROM objects WHERE id = {int(item_id)}")
-                else:
-                    cur.execute(f"DELETE FROM works WHERE object_id = {int(item_id)}")
-                    cur.execute(f"""
-                        DELETE FROM objects 
-                        WHERE id = {int(item_id)} 
-                        AND project_id IN (SELECT id FROM projects WHERE client_id = {user_id_int})
-                    """)
+                object_filter = f"WHERE id = {int(item_id)}" if is_admin else f"WHERE id = {int(item_id)} AND project_id IN (SELECT id FROM projects WHERE client_id = {user_id_int})"
+                
+                cur.execute(f"""
+                    DELETE FROM remarks 
+                    WHERE inspection_id IN (
+                        SELECT i.id FROM inspections i
+                        JOIN works w ON i.work_id = w.id
+                        WHERE w.object_id = {int(item_id)}
+                    )
+                """)
+                cur.execute(f"""
+                    DELETE FROM inspection_checkpoints 
+                    WHERE inspection_id IN (
+                        SELECT i.id FROM inspections i
+                        JOIN works w ON i.work_id = w.id
+                        WHERE w.object_id = {int(item_id)}
+                    )
+                """)
+                cur.execute(f"DELETE FROM inspections WHERE work_id IN (SELECT id FROM works WHERE object_id = {int(item_id)})")
+                cur.execute(f"DELETE FROM work_logs WHERE work_id IN (SELECT id FROM works WHERE object_id = {int(item_id)})")
+                cur.execute(f"DELETE FROM estimates WHERE work_id IN (SELECT id FROM works WHERE object_id = {int(item_id)})")
+                cur.execute(f"DELETE FROM works WHERE object_id = {int(item_id)}")
+                cur.execute(f"DELETE FROM objects {object_filter}")
             elif item_type == 'work':
-                if is_admin:
-                    cur.execute(f"DELETE FROM works WHERE id = {int(item_id)}")
-                else:
-                    cur.execute(f"""
-                        DELETE FROM works 
-                        WHERE id = {int(item_id)} 
-                        AND object_id IN (
-                            SELECT o.id FROM objects o 
-                            JOIN projects p ON o.project_id = p.id 
-                            WHERE p.client_id = {user_id_int}
-                        )
-                    """)
+                work_filter = f"WHERE id = {int(item_id)}" if is_admin else f"""WHERE id = {int(item_id)} AND object_id IN (
+                    SELECT o.id FROM objects o 
+                    JOIN projects p ON o.project_id = p.id 
+                    WHERE p.client_id = {user_id_int}
+                )"""
+                
+                cur.execute(f"DELETE FROM remarks WHERE inspection_id IN (SELECT id FROM inspections WHERE work_id = {int(item_id)})")
+                cur.execute(f"DELETE FROM inspection_checkpoints WHERE inspection_id IN (SELECT id FROM inspections WHERE work_id = {int(item_id)})")
+                cur.execute(f"DELETE FROM inspections WHERE work_id = {int(item_id)}")
+                cur.execute(f"DELETE FROM work_logs WHERE work_id = {int(item_id)}")
+                cur.execute(f"DELETE FROM estimates WHERE work_id = {int(item_id)}")
+                cur.execute(f"DELETE FROM works {work_filter}")
             else:
                 cur.close()
                 conn.close()
