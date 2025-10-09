@@ -53,6 +53,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(() => {
     const storedUser = localStorage.getItem('user');
+    console.log('AuthProvider init: storedUser =', storedUser ? 'EXISTS' : 'NULL');
     if (storedUser) {
       try {
         return JSON.parse(storedUser);
@@ -63,7 +64,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     return null;
   });
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('auth_token'));
+  const [token, setToken] = useState<string | null>(() => {
+    const storedToken = localStorage.getItem('auth_token');
+    console.log('AuthProvider init: storedToken =', storedToken ? storedToken.substring(0, 20) + '...' : 'NULL');
+    return storedToken;
+  });
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -100,6 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const clearAuth = () => {
+    console.log('CLEARING AUTH - called from:', new Error().stack);
     setToken(null);
     setUser(null);
     setUserData(null);
