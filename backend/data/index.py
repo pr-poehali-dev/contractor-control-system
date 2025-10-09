@@ -104,7 +104,7 @@ def handler(event, context):
             cur.execute(f"""
                 SELECT id, title, description, status, created_at
                 FROM projects
-                WHERE client_id = {user_id_int}
+                WHERE client_id = {user_id_int} AND status != 'archived'
             """)
             projects = cur.fetchall()
             
