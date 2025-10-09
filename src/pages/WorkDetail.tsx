@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
-import WorkJournal from '@/components/WorkJournal';
+import WorkJournalChat from '@/components/WorkJournalChat';
 
 const WorkDetail = () => {
   const { projectId, objectId, workId } = useParams();
@@ -39,7 +39,7 @@ const WorkDetail = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <WorkJournal 
+      <WorkJournalChat 
         objectId={Number(objectId)} 
         selectedWorkId={Number(workId)}
       />
