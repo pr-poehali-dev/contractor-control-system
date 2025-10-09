@@ -88,10 +88,12 @@ const Contractors = () => {
       } else if (data.created) {
         toast({
           title: 'Подрядчик приглашён!',
-          description: `Пароль отправлен на ${data.contractor.email}: ${data.credentials.password}`,
+          description: `Создан аккаунт для ${data.contractor.name}. Email: ${data.contractor.email}, Пароль: ${data.credentials.password}`,
+          duration: 10000,
         });
         setInviteOpen(false);
         setInviteData({ name: '', email: '', phone: '', inn: '' });
+        setExistingContractor(null);
         loadContractors();
       }
     } catch (error) {

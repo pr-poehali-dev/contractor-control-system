@@ -40,6 +40,10 @@ const Admin = () => {
     organization: '',
   });
   const [isSendingInvite, setIsSendingInvite] = useState(false);
+  const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editData, setEditData] = useState({ name: '', email: '', phone: '', organization: '' });
+  const [newPassword, setNewPassword] = useState('');
   const { toast } = useToast();
 
   const handleAuth = () => {
@@ -58,7 +62,7 @@ const Admin = () => {
   const loadUsers = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/TODO_ADMIN_URL', {
+      const response = await fetch('https://functions.poehali.dev/3f6bb7ff-3e84-4770-8884-3e96062db7f2', {
         headers: { 'X-Admin-Key': 'admin123' },
       });
 
@@ -118,6 +122,116 @@ const Admin = () => {
       });
     } finally {
       setIsSendingInvite(false);
+    }
+  };
+
+  const handleEditUser = (user: AdminUser) => {
+    setEditingUser(user);
+    setEditData({
+      name: user.name,
+      email: user.email || '',
+      phone: user.phone,
+      organization: user.organization || '',
+    });
+    setNewPassword('');
+    setIsEditOpen(true);
+  };
+
+  const handleSaveUser = async () => {
+    if (!editingUser) return;
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/3f6bb7ff-3e84-4770-8884-3e96062db7f2', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Key': 'admin123',
+        },
+        body: JSON.stringify({
+          user_id: editingUser.id,
+          ...editData,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update user');
+
+      toast({
+        title: 'Успешно!',
+        description: 'Данные пользователя обновлены',
+      });
+
+      setIsEditOpen(false);
+      loadUsers();
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось обновить пользователя',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!editingUser) return;
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/3f6bb7ff-3e84-4770-8884-3e96062db7f2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Key': 'admin123',
+        },
+        body: JSON.stringify({
+          action: 'reset_password',
+          user_id: editingUser.id,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to reset password');
+
+      const data = await response.json();
+      setNewPassword(data.password);
+
+      toast({
+        title: 'Пароль сброшен!',
+        description: `Новый пароль: ${data.password}`,
+      });
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось сбросить пароль',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleToggleStatus = async (userId: number) => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/3f6bb7ff-3e84-4770-8884-3e96062db7f2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Key': 'admin123',
+        },
+        body: JSON.stringify({
+          action: 'toggle_status',
+          user_id: userId,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to toggle status');
+
+      toast({
+        title: 'Статус изменён',
+      });
+
+      loadUsers();
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось изменить статус',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -241,47 +355,136 @@ const Admin = () => {
           <Icon name="Loader2" size={48} className="animate-spin text-slate-400 mx-auto" />
         </div>
       ) : (
-        <div className="grid gap-4">
-          {users.map((user) => (
-            <Card key={user.id}>
-              <CardContent className="pt-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="font-semibold text-lg">{user.name}</h3>
-                    <p className="text-sm text-slate-600">{user.phone}</p>
-                    {user.email && <p className="text-sm text-slate-600">{user.email}</p>}
-                  </div>
-                  <Badge variant={user.role === 'client' ? 'default' : 'secondary'}>
-                    {user.role === 'client' ? 'Заказчик' : 'Подрядчик'}
-                  </Badge>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4 text-sm">
-                  <div>
-                    <span className="text-slate-500">ID:</span>
-                    <p className="font-medium">{user.id}</p>
-                  </div>
-                  <div>
-                    <span className="text-slate-500">Проектов:</span>
-                    <p className="font-medium">{user.projects_count}</p>
-                  </div>
-                  <div>
-                    <span className="text-slate-500">Работ:</span>
-                    <p className="font-medium">{user.works_count}</p>
-                  </div>
-                </div>
-
-                {user.organization && (
-                  <div className="mt-3 pt-3 border-t">
-                    <span className="text-sm text-slate-500">Организация:</span>
-                    <p className="text-sm font-medium">{user.organization}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <Card>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-slate-50 border-b border-slate-200">
+                <tr>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-700">ID</th>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-700">Имя</th>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-700">Email</th>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-700">Телефон</th>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-700">Роль</th>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-700">Организация</th>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-700">Статус</th>
+                  <th className="text-right p-4 text-sm font-semibold text-slate-700">Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <tr key={user.id} className="border-b border-slate-100 hover:bg-slate-50">
+                    <td className="p-4 text-sm text-slate-700">{user.id}</td>
+                    <td className="p-4 text-sm font-medium text-slate-900">{user.name}</td>
+                    <td className="p-4 text-sm text-slate-600">{user.email || '-'}</td>
+                    <td className="p-4 text-sm text-slate-600">{user.phone}</td>
+                    <td className="p-4">
+                      <Badge variant={user.role === 'admin' ? 'default' : user.role === 'client' ? 'secondary' : 'outline'}>
+                        {user.role === 'admin' ? 'admin' : user.role === 'client' ? 'client' : 'contractor'}
+                      </Badge>
+                    </td>
+                    <td className="p-4 text-sm text-slate-600">{user.organization || '-'}</td>
+                    <td className="p-4">
+                      <Badge variant={user.is_active ? 'default' : 'secondary'}>
+                        {user.is_active ? 'Активен' : 'Заблокирован'}
+                      </Badge>
+                    </td>
+                    <td className="p-4 text-right space-x-2">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleEditUser(user)}
+                      >
+                        <Icon name="Edit" size={16} />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleToggleStatus(user.id)}
+                      >
+                        {user.is_active ? <Icon name="Ban" size={16} /> : <Icon name="CheckCircle" size={16} />}
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
+
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Редактировать пользователя</DialogTitle>
+            <DialogDescription>
+              Изменение данных пользователя {editingUser?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-name">Имя</Label>
+              <Input
+                id="edit-name"
+                value={editData.name}
+                onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-email">Email</Label>
+              <Input
+                id="edit-email"
+                type="email"
+                value={editData.email}
+                onChange={(e) => setEditData({ ...editData, email: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-phone">Телефон</Label>
+              <Input
+                id="edit-phone"
+                value={editData.phone}
+                onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-organization">Организация</Label>
+              <Input
+                id="edit-organization"
+                value={editData.organization}
+                onChange={(e) => setEditData({ ...editData, organization: e.target.value })}
+              />
+            </div>
+
+            {newPassword && (
+              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                <Label className="text-green-900">Новый пароль:</Label>
+                <p className="font-mono font-bold text-lg text-green-900 mt-1">{newPassword}</p>
+                <p className="text-xs text-green-700 mt-2">Сохраните пароль, он больше не будет показан</p>
+              </div>
+            )}
+
+            <div className="pt-4 border-t">
+              <Button
+                variant="outline"
+                onClick={handleResetPassword}
+                className="w-full"
+              >
+                <Icon name="Key" size={18} className="mr-2" />
+                Сбросить пароль
+              </Button>
+            </div>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setIsEditOpen(false)}>
+              Отмена
+            </Button>
+            <Button onClick={handleSaveUser}>
+              <Icon name="Save" size={18} className="mr-2" />
+              Сохранить
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
         <p className="text-sm text-yellow-800">

@@ -1,0 +1,29 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS request for CORS",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Get users without admin key",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 403
+    },
+    {
+      "name": "Get users with admin key",
+      "method": "GET",
+      "path": "/",
+      "headers": {
+        "X-Admin-Key": "admin123"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "users": "array"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
