@@ -149,9 +149,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 """
                 SELECT id, email, phone, name, role, organization, password_hash, is_active
                 FROM users
-                WHERE (email = %s OR phone = %s) AND password_hash IS NOT NULL
+                WHERE ((email IS NOT NULL AND email = %s) OR (phone IS NOT NULL AND phone = %s)) 
+                  AND password_hash IS NOT NULL
                 """,
-                (email, phone)
+                (email or '', phone or '')
             )
             user = cur.fetchone()
             
