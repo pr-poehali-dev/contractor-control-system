@@ -62,6 +62,7 @@ const CreateWork = () => {
   const [groupedTemplates, setGroupedTemplates] = useState<GroupedTemplates>({});
   const [hasContractors, setHasContractors] = useState(true);
   const [showNoContractorsDialog, setShowNoContractorsDialog] = useState(false);
+  const [contractorDialogShown, setContractorDialogShown] = useState(false);
   const [isLoadingTemplates, setIsLoadingTemplates] = useState(true);
 
   // Load work templates
@@ -118,15 +119,16 @@ const CreateWork = () => {
 
   // Check if user has contractors
   useEffect(() => {
-    if (userData?.contractors) {
+    if (userData?.contractors && !contractorDialogShown) {
       const contractorsCount = userData.contractors.length;
       setHasContractors(contractorsCount > 0);
       
       if (contractorsCount === 0) {
         setShowNoContractorsDialog(true);
+        setContractorDialogShown(true);
       }
     }
-  }, [userData]);
+  }, [userData, contractorDialogShown]);
 
   const handleTemplateSelect = (templateId: string) => {
     setSelectedTemplateId(templateId);

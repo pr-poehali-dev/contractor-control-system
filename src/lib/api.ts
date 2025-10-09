@@ -87,6 +87,14 @@ export interface WorkLog {
   author_role: 'contractor' | 'client';
 }
 
+export interface Contractor {
+  id: number;
+  name: string;
+  phone?: string;
+  email?: string;
+  organization?: string;
+}
+
 export interface UserData {
   projects: Project[];
   sites: Site[];
@@ -95,6 +103,7 @@ export interface UserData {
   checkpoints: InspectionCheckpoint[];
   remarks: Remark[];
   workLogs: WorkLog[];
+  contractors: Contractor[];
 }
 
 export const api = {
