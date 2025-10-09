@@ -59,6 +59,13 @@ const WorkDetail = () => {
   const site = sites.find(s => s.id === Number(objectId));
   const project = projects.find(p => p.id === Number(projectId));
 
+  console.log('=== WorkDetail Debug ===');
+  console.log('workId from URL:', workId);
+  console.log('All works:', works);
+  console.log('Found work:', work);
+  console.log('userRole:', user?.role);
+  console.log('=======================');
+
   const userRole: UserRole = user?.role || 'contractor';
 
   const events: JournalEvent[] = workLogs
