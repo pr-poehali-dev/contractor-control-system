@@ -41,10 +41,22 @@ const ObjectDetail = () => {
     toast({ title: 'Редактирование объекта', description: 'Функция в разработке' });
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!confirm('Удалить объект? Это действие нельзя отменить.')) return;
-    toast({ title: 'Объект удалён' });
-    navigate(`/projects/${projectId}`);
+    try {
+      await api.deleteItem(user!.id, 'object', site.id);
+      const refreshed = await api.getUserData(user!.id);
+      setUserData(refreshed);
+      localStorage.setItem('userData', JSON.stringify(refreshed));
+      toast({ title: 'Объект удалён' });
+      navigate(`/projects/${projectId}`);
+    } catch (error) {
+      toast({ 
+        title: 'Ошибка', 
+        description: error instanceof Error ? error.message : 'Не удалось удалить',
+        variant: 'destructive'
+      });
+    }
   };
 
   return (
@@ -71,7 +83,7 @@ const ObjectDetail = () => {
             </div>
           </div>
           
-          {user?.role === 'client' && (
+          {(user?.role === 'client' || user?.role === 'admin') && (
             <Button 
               variant="ghost" 
               size="icon"

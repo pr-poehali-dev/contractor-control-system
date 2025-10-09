@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { api } from '@/lib/api';
+import { useToast } from '@/hooks/use-toast';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,6 +15,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import Icon from '@/components/ui/icon';
 
 type ViewMode = 'grid' | 'table';
@@ -31,7 +39,8 @@ const statusLabels = {
 
 export default function Objects() {
   const navigate = useNavigate();
-  const { user, userData } = useAuth();
+  const { user, userData, setUserData } = useAuth();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedProject, setSelectedProject] = useState<string>('all');
@@ -41,6 +50,24 @@ export default function Objects() {
   const [isLoading, setIsLoading] = useState(false);
 
   const isContractor = user?.role === 'contractor';
+
+  const handleDeleteObject = async (objectId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm('Удалить объект? Это действие нельзя отменить.')) return;
+    try {
+      await api.deleteItem(user!.id, 'object', objectId);
+      const refreshed = await api.getUserData(user!.id);
+      setUserData(refreshed);
+      localStorage.setItem('userData', JSON.stringify(refreshed));
+      toast({ title: 'Объект удалён' });
+    } catch (error) {
+      toast({ 
+        title: 'Ошибка', 
+        description: 'Не удалось удалить',
+        variant: 'destructive'
+      });
+    }
+  };
 
   useEffect(() => {
     const loadContractorObjects = async () => {
@@ -263,16 +290,36 @@ export default function Objects() {
                 >
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between gap-2 mb-4">
-                      <h3 className="font-bold text-lg text-slate-900 group-hover:text-blue-600 transition-colors">
+                      <h3 className="font-bold text-lg text-slate-900 group-hover:text-blue-600 transition-colors flex-1">
                         {site.title}
                       </h3>
-                      <Badge className={
-                        site.status === 'active' ? 'bg-green-100 text-green-700' :
-                        site.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-slate-100 text-slate-700'
-                      }>
-                        {statusLabels[site.status]}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge className={
+                          site.status === 'active' ? 'bg-green-100 text-green-700' :
+                          site.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-slate-100 text-slate-700'
+                        }>
+                          {statusLabels[site.status]}
+                        </Badge>
+                        {(user?.role === 'client' || user?.role === 'admin') && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <Icon name="MoreVertical" size={16} />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem 
+                                className="text-red-600"
+                                onClick={(e) => handleDeleteObject(site.id, e)}
+                              >
+                                <Icon name="Trash2" size={16} className="mr-2" />
+                                Удалить
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
+                      </div>
                     </div>
 
                     <div className="flex items-center gap-2 text-sm text-slate-600 mb-4">
@@ -332,6 +379,9 @@ export default function Objects() {
                         <th className="text-left p-4 text-sm font-semibold text-slate-700">Статус</th>
                         <th className="text-left p-4 text-sm font-semibold text-slate-700">Прогресс</th>
                         <th className="text-right p-4 text-sm font-semibold text-slate-700">Работы</th>
+                        {(user?.role === 'client' || user?.role === 'admin') && (
+                          <th className="text-right p-4 text-sm font-semibold text-slate-700">Действия</th>
+                        )}
                       </tr>
                     </thead>
                     <tbody>
@@ -371,6 +421,26 @@ export default function Objects() {
                               {site.completedWorks}/{site.worksCount}
                             </span>
                           </td>
+                          {(user?.role === 'client' || user?.role === 'admin') && (
+                            <td className="p-4 text-right">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <Icon name="MoreVertical" size={16} />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem 
+                                    className="text-red-600"
+                                    onClick={(e) => handleDeleteObject(site.id, e)}
+                                  >
+                                    <Icon name="Trash2" size={16} className="mr-2" />
+                                    Удалить
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </td>
+                          )}
                         </tr>
                       ))}
                     </tbody>

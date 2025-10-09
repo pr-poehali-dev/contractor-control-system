@@ -57,26 +57,39 @@ def handler(event, context):
     conn = psycopg2.connect(dsn)
     cur = conn.cursor(cursor_factory=RealDictCursor)
     
+    cur.execute(f"SELECT role FROM users WHERE id = {user_id_int}")
+    user_result = cur.fetchone()
+    is_admin = user_result and user_result['role'] == 'admin'
+    
     try:
         if method == 'DELETE':
             if item_type == 'project':
-                cur.execute(f"DELETE FROM projects WHERE id = {int(item_id)} AND client_id = {user_id_int}")
+                if is_admin:
+                    cur.execute(f"DELETE FROM projects WHERE id = {int(item_id)}")
+                else:
+                    cur.execute(f"DELETE FROM projects WHERE id = {int(item_id)} AND client_id = {user_id_int}")
             elif item_type == 'object':
-                cur.execute(f"""
-                    DELETE FROM objects 
-                    WHERE id = {int(item_id)} 
-                    AND project_id IN (SELECT id FROM projects WHERE client_id = {user_id_int})
-                """)
+                if is_admin:
+                    cur.execute(f"DELETE FROM objects WHERE id = {int(item_id)}")
+                else:
+                    cur.execute(f"""
+                        DELETE FROM objects 
+                        WHERE id = {int(item_id)} 
+                        AND project_id IN (SELECT id FROM projects WHERE client_id = {user_id_int})
+                    """)
             elif item_type == 'work':
-                cur.execute(f"""
-                    DELETE FROM works 
-                    WHERE id = {int(item_id)} 
-                    AND object_id IN (
-                        SELECT o.id FROM objects o 
-                        JOIN projects p ON o.project_id = p.id 
-                        WHERE p.client_id = {user_id_int}
-                    )
-                """)
+                if is_admin:
+                    cur.execute(f"DELETE FROM works WHERE id = {int(item_id)}")
+                else:
+                    cur.execute(f"""
+                        DELETE FROM works 
+                        WHERE id = {int(item_id)} 
+                        AND object_id IN (
+                            SELECT o.id FROM objects o 
+                            JOIN projects p ON o.project_id = p.id 
+                            WHERE p.client_id = {user_id_int}
+                        )
+                    """)
             else:
                 cur.close()
                 conn.close()
@@ -97,12 +110,20 @@ def handler(event, context):
                 description = data.get('description', '').replace("'", "''")
                 status = data.get('status', 'active')
                 
-                cur.execute(f"""
-                    UPDATE projects 
-                    SET title = '{title}', description = '{description}', status = '{status}'
-                    WHERE id = {int(item_id)} AND client_id = {user_id_int}
-                    RETURNING id, title, description, status, created_at
-                """)
+                if is_admin:
+                    cur.execute(f"""
+                        UPDATE projects 
+                        SET title = '{title}', description = '{description}', status = '{status}'
+                        WHERE id = {int(item_id)}
+                        RETURNING id, title, description, status, created_at
+                    """)
+                else:
+                    cur.execute(f"""
+                        UPDATE projects 
+                        SET title = '{title}', description = '{description}', status = '{status}'
+                        WHERE id = {int(item_id)} AND client_id = {user_id_int}
+                        RETURNING id, title, description, status, created_at
+                    """)
                 result_data = cur.fetchone()
                 
             elif item_type == 'object':
@@ -110,13 +131,21 @@ def handler(event, context):
                 address = data.get('address', '').replace("'", "''")
                 status = data.get('status', 'active')
                 
-                cur.execute(f"""
-                    UPDATE objects 
-                    SET title = '{title}', address = '{address}', status = '{status}'
-                    WHERE id = {int(item_id)}
-                    AND project_id IN (SELECT id FROM projects WHERE client_id = {user_id_int})
-                    RETURNING id, title, address, project_id, status
-                """)
+                if is_admin:
+                    cur.execute(f"""
+                        UPDATE objects 
+                        SET title = '{title}', address = '{address}', status = '{status}'
+                        WHERE id = {int(item_id)}
+                        RETURNING id, title, address, project_id, status
+                    """)
+                else:
+                    cur.execute(f"""
+                        UPDATE objects 
+                        SET title = '{title}', address = '{address}', status = '{status}'
+                        WHERE id = {int(item_id)}
+                        AND project_id IN (SELECT id FROM projects WHERE client_id = {user_id_int})
+                        RETURNING id, title, address, project_id, status
+                    """)
                 result_data = cur.fetchone()
                 
             elif item_type == 'work':
@@ -125,31 +154,48 @@ def handler(event, context):
                 status = data.get('status', 'active')
                 contractor_id = data.get('contractor_id')
                 
-                if contractor_id:
-                    cur.execute(f"""
-                        UPDATE works 
-                        SET title = '{title}', description = '{description}', 
-                            status = '{status}', contractor_id = {int(contractor_id)}
-                        WHERE id = {int(item_id)}
-                        AND object_id IN (
-                            SELECT o.id FROM objects o 
-                            JOIN projects p ON o.project_id = p.id 
-                            WHERE p.client_id = {user_id_int}
-                        )
-                        RETURNING id, title, description, object_id, contractor_id, status
-                    """)
+                if is_admin:
+                    if contractor_id:
+                        cur.execute(f"""
+                            UPDATE works 
+                            SET title = '{title}', description = '{description}', 
+                                status = '{status}', contractor_id = {int(contractor_id)}
+                            WHERE id = {int(item_id)}
+                            RETURNING id, title, description, object_id, contractor_id, status
+                        """)
+                    else:
+                        cur.execute(f"""
+                            UPDATE works 
+                            SET title = '{title}', description = '{description}', status = '{status}'
+                            WHERE id = {int(item_id)}
+                            RETURNING id, title, description, object_id, contractor_id, status
+                        """)
                 else:
-                    cur.execute(f"""
-                        UPDATE works 
-                        SET title = '{title}', description = '{description}', status = '{status}'
-                        WHERE id = {int(item_id)}
-                        AND object_id IN (
-                            SELECT o.id FROM objects o 
-                            JOIN projects p ON o.project_id = p.id 
-                            WHERE p.client_id = {user_id_int}
-                        )
-                        RETURNING id, title, description, object_id, contractor_id, status
-                    """)
+                    if contractor_id:
+                        cur.execute(f"""
+                            UPDATE works 
+                            SET title = '{title}', description = '{description}', 
+                                status = '{status}', contractor_id = {int(contractor_id)}
+                            WHERE id = {int(item_id)}
+                            AND object_id IN (
+                                SELECT o.id FROM objects o 
+                                JOIN projects p ON o.project_id = p.id 
+                                WHERE p.client_id = {user_id_int}
+                            )
+                            RETURNING id, title, description, object_id, contractor_id, status
+                        """)
+                    else:
+                        cur.execute(f"""
+                            UPDATE works 
+                            SET title = '{title}', description = '{description}', status = '{status}'
+                            WHERE id = {int(item_id)}
+                            AND object_id IN (
+                                SELECT o.id FROM objects o 
+                                JOIN projects p ON o.project_id = p.id 
+                                WHERE p.client_id = {user_id_int}
+                            )
+                            RETURNING id, title, description, object_id, contractor_id, status
+                        """)
                 result_data = cur.fetchone()
             else:
                 cur.close()

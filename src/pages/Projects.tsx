@@ -266,7 +266,7 @@ const Projects = () => {
                         <Badge className={getStatusColor(project.status)}>
                           {getStatusLabel(project.status)}
                         </Badge>
-                        {user?.role === 'client' && (
+                        {(user?.role === 'client' || user?.role === 'admin') && (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                               <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -391,7 +391,7 @@ const Projects = () => {
                             </span>
                           </td>
                           <td className="p-4 text-right">
-                            {user?.role === 'client' && (
+                            {(user?.role === 'client' || user?.role === 'admin') && (
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                                   <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
