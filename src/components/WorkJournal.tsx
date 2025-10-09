@@ -15,6 +15,7 @@ import EstimateTab from '@/components/work-journal/EstimateTab';
 import AnalyticsTab from '@/components/work-journal/AnalyticsTab';
 import EventItem from '@/components/work-journal/EventItem';
 import CreateInspectionModal from '@/components/work-journal/CreateInspectionModal';
+import WorkEditDialog from '@/components/work-detail/WorkEditDialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -46,8 +47,16 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
   const [activeTab, setActiveTab] = useState('journal');
   const [isInspectionModalOpen, setIsInspectionModalOpen] = useState(false);
   const [selectedEntryForInspection, setSelectedEntryForInspection] = useState<number | undefined>();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    title: '',
+    description: '',
+    contractor_id: '',
+    status: 'active',
+  });
 
   const userRole: UserRole = user?.role || 'contractor';
+  const contractors = userData?.contractors || [];
 
   const selectedWorkData = works.find(w => w.id === selectedWork);
   const workEntries = workLogs
@@ -135,6 +144,50 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
     toast({ title: 'Создание сметы', description: 'Функция в разработке' });
   };
 
+  const handleEditClick = () => {
+    if (!selectedWorkData) return;
+    
+    setEditFormData({
+      title: selectedWorkData.title || '',
+      description: selectedWorkData.description || '',
+      contractor_id: selectedWorkData.contractor_id?.toString() || '',
+      status: selectedWorkData.status || 'active',
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleEditSubmit = async () => {
+    if (!user || !selectedWorkData) return;
+    
+    try {
+      setIsSubmitting(true);
+      await api.updateItem(user.id, 'work', selectedWorkData.id, {
+        title: editFormData.title,
+        description: editFormData.description,
+        contractor_id: editFormData.contractor_id ? Number(editFormData.contractor_id) : null,
+        status: editFormData.status,
+      });
+
+      const refreshedData = await api.getUserData(user.id);
+      setUserData(refreshedData);
+      localStorage.setItem('userData', JSON.stringify(refreshedData));
+
+      toast({
+        title: 'Работа обновлена',
+        description: 'Изменения успешно сохранены',
+      });
+      setIsEditDialogOpen(false);
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: error instanceof Error ? error.message : 'Не удалось обновить работу',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const mockEvents: JournalEvent[] = workEntries.map(log => ({
     id: log.id,
     type: 'work_entry' as const,
@@ -210,6 +263,8 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 organizationName={currentProject?.client_name}
+                userRole={userRole}
+                onEdit={handleEditClick}
               />
 
               <div className="flex-1 flex flex-col overflow-hidden">
@@ -375,6 +430,16 @@ export default function WorkJournal({ objectId }: WorkJournalProps) {
           )}
         </div>
       </div>
+
+      <WorkEditDialog
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        onSubmit={handleEditSubmit}
+        formData={editFormData}
+        setFormData={setEditFormData}
+        contractors={contractors}
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
 }

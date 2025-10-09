@@ -6,9 +6,11 @@ interface WorkHeaderProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   organizationName?: string;
+  userRole?: string;
+  onEdit?: () => void;
 }
 
-export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, organizationName }: WorkHeaderProps) {
+export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, organizationName, userRole, onEdit }: WorkHeaderProps) {
   return (
     <div className="bg-white border-b border-slate-200 px-3 md:px-6 pt-3 md:pt-4 pb-0">
       <div className="flex items-center justify-between mb-3">
@@ -21,6 +23,12 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
           )}
         </div>
         <div className="flex items-center gap-2">
+          {userRole === 'client' && onEdit && (
+            <Button variant="outline" size="sm" onClick={onEdit}>
+              <Icon name="Edit" size={16} className="mr-1" />
+              Редактировать
+            </Button>
+          )}
           <Button variant="ghost" size="icon">
             <Icon name="Search" size={18} />
           </Button>
