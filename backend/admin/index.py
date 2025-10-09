@@ -210,6 +210,89 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'templates': templates_list})
                 }
             
+            elif action == 'work-types':
+                cur.execute(
+                    """
+                    SELECT id, name, description, unit, category, created_at
+                    FROM work_types
+                    ORDER BY category, name
+                    """
+                )
+                work_types = cur.fetchall()
+                work_types_list = []
+                
+                for wt in work_types:
+                    work_types_list.append({
+                        'id': wt[0],
+                        'name': wt[1],
+                        'description': wt[2],
+                        'unit': wt[3],
+                        'category': wt[4],
+                        'created_at': wt[5].isoformat() if wt[5] else None
+                    })
+                
+                cur.close()
+                conn.close()
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'work_types': work_types_list})
+                }
+            
+            else:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Invalid action'})
+                }
+        
+        elif method == 'POST':
+            body = json.loads(event.get('body', '{}'))
+            action = event.get('queryStringParameters', {}).get('action')
+            
+            if action == 'add-work-type':
+                name = body.get('name')
+                description = body.get('description')
+                unit = body.get('unit')
+                category = body.get('category')
+                
+                if not name or not unit:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'name and unit are required'})
+                    }
+                
+                cur.execute(
+                    """
+                    INSERT INTO work_types (name, description, unit, category, created_at)
+                    VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP)
+                    RETURNING id, name, description, unit, category, created_at
+                    """,
+                    (name, description, unit, category)
+                )
+                work_type = cur.fetchone()
+                conn.commit()
+                
+                work_type_data = {
+                    'id': work_type[0],
+                    'name': work_type[1],
+                    'description': work_type[2],
+                    'unit': work_type[3],
+                    'category': work_type[4],
+                    'created_at': work_type[5].isoformat() if work_type[5] else None
+                }
+                
+                cur.close()
+                conn.close()
+                
+                return {
+                    'statusCode': 201,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps(work_type_data)
+                }
+            
             else:
                 return {
                     'statusCode': 400,
