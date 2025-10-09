@@ -7,6 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 
@@ -18,6 +25,13 @@ const CreateWork = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    volume: '',
+    unit: '',
+    start_date: '',
+    end_date: '',
+    estimated_cost: '',
+    contractor_id: '',
+    priority: 'medium',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -114,6 +128,78 @@ const CreateWork = () => {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="volume">Объём работ</Label>
+                  <Input
+                    id="volume"
+                    type="number"
+                    placeholder="0"
+                    value={formData.volume}
+                    onChange={(e) => setFormData({ ...formData, volume: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="unit">Единица измерения</Label>
+                  <Input
+                    id="unit"
+                    placeholder="м², м³, шт..."
+                    value={formData.unit}
+                    onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="start_date">Плановое начало</Label>
+                  <Input
+                    id="start_date"
+                    type="date"
+                    value={formData.start_date}
+                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="end_date">Плановое окончание</Label>
+                  <Input
+                    id="end_date"
+                    type="date"
+                    value={formData.end_date}
+                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="estimated_cost">Плановая стоимость (руб.)</Label>
+                  <Input
+                    id="estimated_cost"
+                    type="number"
+                    placeholder="0"
+                    value={formData.estimated_cost}
+                    onChange={(e) => setFormData({ ...formData, estimated_cost: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="priority">Приоритет</Label>
+                  <Select value={formData.priority} onValueChange={(value) => setFormData({ ...formData, priority: value })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Низкий</SelectItem>
+                      <SelectItem value="medium">Средний</SelectItem>
+                      <SelectItem value="high">Высокий</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardContent>
           </Card>

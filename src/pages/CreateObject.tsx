@@ -17,6 +17,12 @@ const CreateObject = () => {
   const [formData, setFormData] = useState({
     title: '',
     address: '',
+    area: '',
+    floors: '',
+    building_type: '',
+    construction_year: '',
+    responsible_person: '',
+    phone: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -111,6 +117,75 @@ const CreateObject = () => {
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   required
                 />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="area">Площадь (м²)</Label>
+                  <Input
+                    id="area"
+                    type="number"
+                    placeholder="0"
+                    value={formData.area}
+                    onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="floors">Этажность</Label>
+                  <Input
+                    id="floors"
+                    type="number"
+                    placeholder="0"
+                    value={formData.floors}
+                    onChange={(e) => setFormData({ ...formData, floors: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="building_type">Тип здания</Label>
+                  <Input
+                    id="building_type"
+                    placeholder="Жилой дом, офис..."
+                    value={formData.building_type}
+                    onChange={(e) => setFormData({ ...formData, building_type: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="construction_year">Год постройки</Label>
+                  <Input
+                    id="construction_year"
+                    type="number"
+                    placeholder="2024"
+                    value={formData.construction_year}
+                    onChange={(e) => setFormData({ ...formData, construction_year: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="responsible_person">Ответственное лицо</Label>
+                  <Input
+                    id="responsible_person"
+                    placeholder="ФИО"
+                    value={formData.responsible_person}
+                    onChange={(e) => setFormData({ ...formData, responsible_person: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Телефон</Label>
+                  <Input
+                    id="phone"
+                    placeholder="+7 (900) 123-45-67"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>

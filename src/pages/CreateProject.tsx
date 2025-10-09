@@ -17,6 +17,12 @@ const CreateProject = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    customer: '',
+    contractor: '',
+    start_date: '',
+    end_date: '',
+    budget: '',
+    location: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -112,6 +118,73 @@ const CreateProject = () => {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="customer">Заказчик</Label>
+                  <Input
+                    id="customer"
+                    placeholder="Название организации"
+                    value={formData.customer}
+                    onChange={(e) => setFormData({ ...formData, customer: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="contractor">Генподрядчик</Label>
+                  <Input
+                    id="contractor"
+                    placeholder="Название организации"
+                    value={formData.contractor}
+                    onChange={(e) => setFormData({ ...formData, contractor: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="start_date">Дата начала</Label>
+                  <Input
+                    id="start_date"
+                    type="date"
+                    value={formData.start_date}
+                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="end_date">Дата окончания</Label>
+                  <Input
+                    id="end_date"
+                    type="date"
+                    value={formData.end_date}
+                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="budget">Бюджет (руб.)</Label>
+                  <Input
+                    id="budget"
+                    type="number"
+                    placeholder="0"
+                    value={formData.budget}
+                    onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="location">Адрес / Местоположение</Label>
+                  <Input
+                    id="location"
+                    placeholder="Город, регион"
+                    value={formData.location}
+                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>

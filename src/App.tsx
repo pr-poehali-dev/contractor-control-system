@@ -30,7 +30,7 @@ import CreateProject from "./pages/CreateProject";
 import CreateObject from "./pages/CreateObject";
 import CreateWork from "./pages/CreateWork";
 import WorkTemplates from "./pages/WorkTemplates";
-import AdminPanel from "./pages/AdminPanel";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -73,7 +73,7 @@ const App = () => (
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/work-templates" element={<ProtectedRoute><WorkTemplates /></ProtectedRoute>} />
-            <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
