@@ -119,6 +119,22 @@ const ObjectDetail = () => {
 
       {/* Список работ или пустое состояние */}
       <div className="p-4 md:p-6">
+        {/* Заголовок секции работ */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">Работы</h2>
+            <p className="text-sm text-slate-500 mt-1">
+              {site.title} • {siteWorks.length} {siteWorks.length === 1 ? 'работа' : siteWorks.length < 5 ? 'работы' : 'работ'}
+            </p>
+          </div>
+          {siteWorks.length > 0 && (
+            <Button onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}>
+              <Icon name="Plus" size={18} className="mr-2" />
+              Добавить
+            </Button>
+          )}
+        </div>
+
         {siteWorks.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
