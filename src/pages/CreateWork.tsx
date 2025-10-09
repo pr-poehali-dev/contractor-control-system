@@ -353,14 +353,14 @@ const CreateWork = () => {
               <div className="space-y-2">
                 <Label htmlFor="contractor">Подрядчик</Label>
                 <Select 
-                  value={formData.contractor_id} 
-                  onValueChange={(value) => setFormData({ ...formData, contractor_id: value })}
+                  value={formData.contractor_id || 'none'} 
+                  onValueChange={(value) => setFormData({ ...formData, contractor_id: value === 'none' ? '' : value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Выберите подрядчика (необязательно)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Без подрядчика</SelectItem>
+                    <SelectItem value="none">Без подрядчика</SelectItem>
                     {userData?.contractors?.map((contractor: any) => (
                       <SelectItem key={contractor.id} value={contractor.id.toString()}>
                         {contractor.name}

@@ -66,14 +66,14 @@ export default function WorkEditDialog({
           <div className="space-y-2">
             <Label htmlFor="edit-contractor">Подрядчик</Label>
             <Select 
-              value={formData.contractor_id} 
-              onValueChange={(value) => setFormData({ ...formData, contractor_id: value })}
+              value={formData.contractor_id || 'none'} 
+              onValueChange={(value) => setFormData({ ...formData, contractor_id: value === 'none' ? '' : value })}
             >
               <SelectTrigger id="edit-contractor">
                 <SelectValue placeholder="Выберите подрядчика" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Без подрядчика</SelectItem>
+                <SelectItem value="none">Без подрядчика</SelectItem>
                 {contractors.map((contractor) => (
                   <SelectItem key={contractor.id} value={contractor.id.toString()}>
                     {contractor.name}
