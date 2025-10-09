@@ -163,6 +163,7 @@ const CreateWork = () => {
         object_id: Number(objectId),
         title: formData.title,
         description: formData.description,
+        contractor_id: formData.contractor_id ? Number(formData.contractor_id) : null,
         status: 'active',
       });
 
@@ -347,6 +348,38 @@ const CreateWork = () => {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="contractor">Подрядчик</Label>
+                <Select 
+                  value={formData.contractor_id} 
+                  onValueChange={(value) => setFormData({ ...formData, contractor_id: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Выберите подрядчика (необязательно)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Без подрядчика</SelectItem>
+                    {userData?.contractors?.map((contractor: any) => (
+                      <SelectItem key={contractor.id} value={contractor.id.toString()}>
+                        {contractor.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {!hasContractors && (
+                  <p className="text-sm text-slate-500">
+                    У вас пока нет подрядчиков.{' '}
+                    <button
+                      type="button"
+                      onClick={handleAddContractor}
+                      className="text-blue-600 hover:underline"
+                    >
+                      Добавить подрядчика
+                    </button>
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>

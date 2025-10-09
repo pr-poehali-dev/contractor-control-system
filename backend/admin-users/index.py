@@ -2,6 +2,7 @@ import json
 import os
 import secrets
 import string
+import hashlib
 from typing import Dict, Any
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
@@ -118,8 +119,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             new_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(8))
+            password_hash = hashlib.sha256(new_password.encode()).hexdigest()
             
-            cur.execute(f"UPDATE {schema}.users SET password_hash = '{new_password}' WHERE id = {user_id}")
+            cur.execute(f"UPDATE {schema}.users SET password_hash = '{password_hash}' WHERE id = {user_id}")
             
             conn.commit()
             cur.close()

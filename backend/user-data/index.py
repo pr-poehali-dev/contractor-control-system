@@ -126,10 +126,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         elif role == 'contractor':
             # Get contractor ID for this user
             cur.execute("""
-                SELECT DISTINCT c.id as contractor_id
-                FROM contractors c
-                JOIN users u ON u.organization = c.name
-                WHERE u.id = %s
+                SELECT id as contractor_id
+                FROM contractors
+                WHERE user_id = %s
             """, (user_id,))
             contractor = cur.fetchone()
             contractor_id = contractor['contractor_id'] if contractor else None
