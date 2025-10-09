@@ -23,6 +23,17 @@ const WorkDetail = () => {
   const works = userData?.works?.filter(w => w.object_id === Number(objectId)) || [];
   const work = works.find(w => w.id === Number(workId));
 
+  if (!userData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-slate-600">Загрузка...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!work) {
     return (
       <div className="min-h-screen bg-slate-50 p-4 md:p-8">
