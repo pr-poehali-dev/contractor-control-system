@@ -1,0 +1,21 @@
+{
+  "tests": [
+    {
+      "name": "Load user data without token",
+      "method": "GET",
+      "path": "/",
+      "headers": {},
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "No token provided"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "OPTIONS request for CORS",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}

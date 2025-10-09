@@ -2,6 +2,7 @@ import { createContext, useContext, useState, ReactNode, useEffect } from 'react
 
 const API_BASE = 'https://functions.poehali.dev';
 const AUTH_API = `${API_BASE}/b9d6731e-788e-476b-bad5-047bd3d6adc1`;
+const USER_DATA_API = `${API_BASE}/bdee636b-a6c0-42d0-8f77-23c316751e34`;
 
 type UserRole = 'contractor' | 'client' | 'admin';
 
@@ -73,6 +74,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('user', JSON.stringify(authUser));
   };
 
+  const loadUserData = async (authToken: string) => {
+    try {
+      console.log('Loading user data...');
+      const response = await fetch(USER_DATA_API, {
+        method: 'GET',
+        headers: {
+          'X-Auth-Token': authToken,
+        },
+      });
+
+      if (!response.ok) {
+        console.error('Failed to load user data:', response.status);
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        return;
+      }
+
+      const data = await response.json();
+      console.log('User data loaded:', data);
+      setUserData(data);
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    }
+  };
+
   const clearAuth = () => {
     setToken(null);
     setUser(null);
@@ -99,6 +125,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       saveAuth(data.token, data.user);
+      await loadUserData(data.token);
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : 'Ошибка входа');
     } finally {
@@ -124,6 +151,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       saveAuth(data.token, data.user);
+      await loadUserData(data.token);
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : 'Ошибка регистрации');
     } finally {
@@ -133,13 +161,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const verifyToken = async (): Promise<boolean> => {
     const storedToken = localStorage.getItem('auth_token');
+    console.log('Verifying token...', storedToken ? 'Token exists' : 'No token');
     
     if (!storedToken) {
+      clearAuth();
       setIsLoading(false);
       return false;
     }
-
-    setIsLoading(true);
 
     try {
       const response = await fetch(`${AUTH_API}?action=verify`, {
@@ -150,16 +178,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (!response.ok) {
+        console.log('Token verification failed:', response.status);
         clearAuth();
         setIsLoading(false);
         return false;
       }
 
       const data = await response.json();
+      console.log('Token verified, user:', data.user);
       setUser(data.user);
       setToken(storedToken);
       localStorage.setItem('user', JSON.stringify(data.user));
+      await loadUserData(storedToken);
       setIsLoading(false);
+      console.log('Auth flow complete');
       return true;
     } catch (error) {
       console.error('Token verification failed:', error);
