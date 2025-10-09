@@ -61,46 +61,6 @@ const WorkDetail = () => {
 
   const userRole: UserRole = user?.role || 'contractor';
 
-  // Вспомогательные функции
-  const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      'active': 'В работе',
-      'pending': 'Ожидание',
-      'completed': 'Завершено',
-      'on_hold': 'Приостановлено',
-    };
-    return labels[status] || status;
-  };
-
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      'active': 'bg-blue-100 text-blue-800',
-      'pending': 'bg-yellow-100 text-yellow-800',
-      'completed': 'bg-green-100 text-green-800',
-      'on_hold': 'bg-gray-100 text-gray-800',
-    };
-    return colors[status] || 'bg-gray-100 text-gray-800';
-  };
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
-  };
-
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(word => word[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
   const events: JournalEvent[] = workLogs
     .filter(log => log.work_id === Number(workId))
     .map(log => ({
