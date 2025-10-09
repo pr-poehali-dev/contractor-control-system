@@ -138,6 +138,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             phone = body.get('phone')
             password = body.get('password')
             
+            print(f"DEBUG LOGIN: email={email}, phone={phone}, has_password={bool(password)}")
+            
             if not password or not (email or phone):
                 return {
                     'statusCode': 400,
@@ -156,6 +158,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             )
             user = cur.fetchone()
             
+            print(f"DEBUG: user found={bool(user)}")
+            
             if not user:
                 return {
                     'statusCode': 401,
@@ -165,6 +169,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             user_id, user_email, user_phone, user_name, user_role, user_org, password_hash, is_active = user
             
+            print(f"DEBUG: user_id={user_id}, is_active={is_active}, has_hash={bool(password_hash)}")
+            
             if not is_active:
                 return {
                     'statusCode': 403,
@@ -172,7 +178,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'error': 'Account is inactive'})
                 }
             
-            if not verify_password(password, password_hash):
+            password_match = verify_password(password, password_hash)
+            print(f"DEBUG: password_match={password_match}")
+            
+            if not password_match:
                 return {
                     'statusCode': 401,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
