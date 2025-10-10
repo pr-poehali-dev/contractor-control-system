@@ -28,8 +28,8 @@ const WorkTemplateViewDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            {template.name}
+          <DialogTitle className="flex items-center gap-2 flex-wrap">
+            {template.title}
             {template.code && <Badge variant="outline">{template.code}</Badge>}
           </DialogTitle>
           <DialogDescription>
@@ -37,25 +37,18 @@ const WorkTemplateViewDialog = ({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
-          <div className="flex items-center gap-4">
-            <Badge className="bg-blue-100 text-blue-700">
-              {template.category}
-            </Badge>
-            <Badge className="bg-slate-100 text-slate-700">
-              {template.unit}
-            </Badge>
-          </div>
-
           {template.description && (
             <div>
               <h4 className="font-semibold text-sm text-slate-700 mb-2">
                 Описание
               </h4>
-              <p className="text-slate-600">{template.description}</p>
+              <p className="text-slate-600 whitespace-pre-wrap">
+                {template.description}
+              </p>
             </div>
           )}
 
-          {template.normative_base && (
+          {template.normative_ref && (
             <>
               <Separator />
               <div>
@@ -63,49 +56,21 @@ const WorkTemplateViewDialog = ({
                   Нормативная база
                 </h4>
                 <p className="text-slate-600 whitespace-pre-wrap">
-                  {template.normative_base}
+                  {template.normative_ref}
                 </p>
               </div>
             </>
           )}
 
-          {template.control_points && (
+          {template.material_types && (
             <>
               <Separator />
               <div>
                 <h4 className="font-semibold text-sm text-slate-700 mb-2">
-                  Контрольные точки
+                  Типовые материалы
                 </h4>
                 <p className="text-slate-600 whitespace-pre-wrap">
-                  {template.control_points}
-                </p>
-              </div>
-            </>
-          )}
-
-          {template.typical_defects && (
-            <>
-              <Separator />
-              <div>
-                <h4 className="font-semibold text-sm text-slate-700 mb-2">
-                  Типовые дефекты
-                </h4>
-                <p className="text-slate-600 whitespace-pre-wrap">
-                  {template.typical_defects}
-                </p>
-              </div>
-            </>
-          )}
-
-          {template.acceptance_criteria && (
-            <>
-              <Separator />
-              <div>
-                <h4 className="font-semibold text-sm text-slate-700 mb-2">
-                  Критерии приёмки
-                </h4>
-                <p className="text-slate-600 whitespace-pre-wrap">
-                  {template.acceptance_criteria}
+                  {template.material_types}
                 </p>
               </div>
             </>

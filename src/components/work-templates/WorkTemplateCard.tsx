@@ -27,8 +27,8 @@ const WorkTemplateCard = ({
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-2">
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-semibold text-slate-900">{template.name}</h3>
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <h3 className="font-semibold text-slate-900">{template.title}</h3>
               {template.code && (
                 <Badge variant="outline" className="text-xs">
                   {template.code}
@@ -40,9 +40,11 @@ const WorkTemplateCard = ({
                 {template.description}
               </p>
             )}
-            <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-200">
-              {template.unit}
-            </Badge>
+            {template.normative_ref && (
+              <p className="text-xs text-slate-500 mb-2">
+                📋 {template.normative_ref}
+              </p>
+            )}
           </div>
           {isAdmin && (
             <div
