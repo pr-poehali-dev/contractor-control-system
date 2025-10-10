@@ -36,6 +36,7 @@ const WorkTemplates = () => {
     normative_ref: '',
     material_types: '',
     category: 'Общестроительные работы',
+    control_points: [],
   });
 
   const isAdmin = user?.role === 'admin';
@@ -113,6 +114,7 @@ const WorkTemplates = () => {
         normative_ref: '',
         material_types: '',
         category: 'Общестроительные работы',
+        control_points: [],
       });
       loadTemplates();
     } catch (error) {
@@ -211,6 +213,7 @@ const WorkTemplates = () => {
       normative_ref: template.normative_ref || '',
       material_types: template.material_types || '',
       category: template.category || 'Общестроительные работы',
+      control_points: template.control_points || [],
     });
     setIsEditOpen(true);
   };

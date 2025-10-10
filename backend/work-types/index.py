@@ -76,6 +76,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             normative_ref = body.get('normative_ref', '')
             material_types = body.get('material_types', '')
             category = body.get('category', 'Общестроительные работы')
+            control_points = body.get('control_points', [])
             
             if not title or not code:
                 return {
@@ -88,11 +89,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.execute(
                 """
                 INSERT INTO t_p8942561_contractor_control_s.work_templates 
-                (title, code, description, normative_ref, material_types, category, created_at)
-                VALUES (%s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
-                RETURNING id, title, code, description, normative_ref, material_types, category, created_at
+                (title, code, description, normative_ref, material_types, category, control_points, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s::jsonb, CURRENT_TIMESTAMP)
+                RETURNING id, title, code, description, normative_ref, material_types, category, control_points, created_at
                 """,
-                (title, code, description, normative_ref, material_types, category)
+                (title, code, description, normative_ref, material_types, category, json.dumps(control_points))
             )
             work_type = cur.fetchone()
             conn.commit()
@@ -105,7 +106,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'normative_ref': work_type[4],
                 'material_types': work_type[5],
                 'category': work_type[6],
-                'created_at': work_type[7].isoformat() if work_type[7] else None
+                'control_points': work_type[7] if work_type[7] else [],
+                'created_at': work_type[8].isoformat() if work_type[8] else None
             }
             
             cur.close()
@@ -137,6 +139,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             normative_ref = body.get('normative_ref', '')
             material_types = body.get('material_types', '')
             category = body.get('category', 'Общестроительные работы')
+            control_points = body.get('control_points', [])
             
             if not title or not code:
                 return {
@@ -149,11 +152,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.execute(
                 """
                 UPDATE t_p8942561_contractor_control_s.work_templates 
-                SET title = %s, code = %s, description = %s, normative_ref = %s, material_types = %s, category = %s
+                SET title = %s, code = %s, description = %s, normative_ref = %s, material_types = %s, category = %s, control_points = %s::jsonb
                 WHERE id = %s
-                RETURNING id, title, code, description, normative_ref, material_types, category, created_at
+                RETURNING id, title, code, description, normative_ref, material_types, category, control_points, created_at
                 """,
-                (title, code, description, normative_ref, material_types, category, work_id)
+                (title, code, description, normative_ref, material_types, category, json.dumps(control_points), work_id)
             )
             work_type = cur.fetchone()
             
@@ -175,7 +178,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'normative_ref': work_type[4],
                 'material_types': work_type[5],
                 'category': work_type[6],
-                'created_at': work_type[7].isoformat() if work_type[7] else None
+                'control_points': work_type[7] if work_type[7] else [],
+                'created_at': work_type[8].isoformat() if work_type[8] else None
             }
             
             cur.close()

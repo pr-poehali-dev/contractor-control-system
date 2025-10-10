@@ -1,3 +1,11 @@
+export interface ControlPoint {
+  id: string;
+  description: string;
+  standard: string;
+  standard_clause: string;
+  is_critical: boolean;
+}
+
 export interface WorkTemplate {
   id: number;
   title: string;
@@ -6,6 +14,7 @@ export interface WorkTemplate {
   normative_ref?: string;
   material_types?: string;
   category?: string;
+  control_points?: ControlPoint[];
   created_at: string;
 }
 
@@ -16,4 +25,5 @@ export interface WorkTemplateFormData {
   normative_ref: string;
   material_types: string;
   category: string;
+  control_points: ControlPoint[];
 }
