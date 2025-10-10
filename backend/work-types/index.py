@@ -1,6 +1,6 @@
 '''
 Business: CRUD для справочника типов работ
-Args: event с httpMethod, body (name, description, category, unit для POST/PUT), queryStringParameters (id для PUT/DELETE)
+Args: event с httpMethod, body (title, code, description, normative_ref, material_types для POST/PUT), queryStringParameters (id для PUT/DELETE)
 Returns: Список типов работ, созданный/обновленный тип работы или результат удаления
 '''
 
@@ -37,10 +37,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         if method == 'GET':
             cur.execute(
                 """
-                SELECT id, name, code, description, normative_base, 
-                       category, created_at, updated_at
-                FROM work_types
-                ORDER BY category, name
+                SELECT id, title, code, description, normative_ref, material_types, created_at
+                FROM t_p8942561_contractor_control_s.work_templates
+                ORDER BY title
                 """
             )
             work_types = cur.fetchall()
@@ -54,8 +53,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'description': wt[3],
                     'normative_ref': wt[4],
                     'material_types': wt[5],
-                    'created_at': wt[6].isoformat() if wt[6] else None,
-                    'updated_at': wt[7].isoformat() if wt[7] else None
+                    'created_at': wt[6].isoformat() if wt[6] else None
                 })
             
             cur.close()
@@ -76,21 +74,22 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             normative_ref = body.get('normative_ref', '')
             material_types = body.get('material_types', '')
             
-            if not title:
+            if not title or not code:
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Missing required field: title'}),
+                    'body': json.dumps({'error': 'Missing required fields: title, code'}),
                     'isBase64Encoded': False
                 }
             
             cur.execute(
                 """
-                INSERT INTO work_types (name, code, description, normative_base, category, created_at, updated_at)
-                VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                RETURNING id, name, code, description, normative_base, category, created_at, updated_at
+                INSERT INTO t_p8942561_contractor_control_s.work_templates 
+                (title, code, description, normative_ref, material_types, created_at)
+                VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+                RETURNING id, title, code, description, normative_ref, material_types, created_at
                 """,
-                (title, code or None, description, normative_ref or None, material_types or None)
+                (title, code, description, normative_ref, material_types)
             )
             work_type = cur.fetchone()
             conn.commit()
@@ -102,8 +101,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'description': work_type[3],
                 'normative_ref': work_type[4],
                 'material_types': work_type[5],
-                'created_at': work_type[6].isoformat() if work_type[6] else None,
-                'updated_at': work_type[7].isoformat() if work_type[7] else None
+                'created_at': work_type[6].isoformat() if work_type[6] else None
             }
             
             cur.close()
@@ -135,22 +133,22 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             normative_ref = body.get('normative_ref', '')
             material_types = body.get('material_types', '')
             
-            if not title:
+            if not title or not code:
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Missing required field: title'}),
+                    'body': json.dumps({'error': 'Missing required fields: title, code'}),
                     'isBase64Encoded': False
                 }
             
             cur.execute(
                 """
-                UPDATE work_types 
-                SET name = %s, code = %s, description = %s, normative_base = %s, category = %s, updated_at = CURRENT_TIMESTAMP
+                UPDATE t_p8942561_contractor_control_s.work_templates 
+                SET title = %s, code = %s, description = %s, normative_ref = %s, material_types = %s
                 WHERE id = %s
-                RETURNING id, name, code, description, normative_base, category, created_at, updated_at
+                RETURNING id, title, code, description, normative_ref, material_types, created_at
                 """,
-                (title, code or None, description, normative_ref or None, material_types or None, work_id)
+                (title, code, description, normative_ref, material_types, work_id)
             )
             work_type = cur.fetchone()
             
@@ -171,8 +169,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'description': work_type[3],
                 'normative_ref': work_type[4],
                 'material_types': work_type[5],
-                'created_at': work_type[6].isoformat() if work_type[6] else None,
-                'updated_at': work_type[7].isoformat() if work_type[7] else None
+                'created_at': work_type[6].isoformat() if work_type[6] else None
             }
             
             cur.close()
@@ -197,7 +194,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
-            cur.execute("DELETE FROM work_types WHERE id = %s RETURNING id", (work_id,))
+            cur.execute(
+                "DELETE FROM t_p8942561_contractor_control_s.work_templates WHERE id = %s RETURNING id", 
+                (work_id,)
+            )
             deleted = cur.fetchone()
             
             if not deleted:
