@@ -266,27 +266,27 @@ export default function EventItem({
       <div className={cn('flex-1 max-w-[85%]', isOwnEvent && 'flex flex-col items-end')}>
         <div className={cn('mb-2 flex items-center gap-2', isOwnEvent && 'flex-row-reverse')}>
           <span className="text-lg font-semibold text-slate-900">{event.author_name}</span>
-          {userRole === 'customer' && event.type === 'work_entry' && !isOwnEvent && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 text-sm opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={() => onCreateInspection?.(event.id)}
-            >
-              <Icon name="ClipboardCheck" size={14} className="mr-1" />
-              Проверка
-            </Button>
-          )}
         </div>
 
         <Card className={cn(
-          'border-none shadow-sm',
+          'border-none shadow-sm relative',
           isOwnEvent ? 'bg-blue-50' : 'bg-white',
           event.type === 'work_entry' && !isOwnEvent && 'border-l-4 border-l-green-500',
           event.type === 'inspection' && !isOwnEvent && 'border-l-4 border-l-blue-500',
           event.type === 'defect_added' && 'border-l-4 border-l-amber-500'
         )}>
           <CardContent className="p-5">
+            {userRole === 'customer' && event.type === 'work_entry' && !isOwnEvent && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="absolute top-3 right-3 h-8 text-sm"
+                onClick={() => onCreateInspection?.(event.id)}
+              >
+                <Icon name="ClipboardCheck" size={14} className="mr-1" />
+                Проверка
+              </Button>
+            )}
             {renderEventContent()}
             <p className={cn('mt-4 text-base text-slate-400', isOwnEvent && 'text-right')}>
               {formatTime(event.created_at)}

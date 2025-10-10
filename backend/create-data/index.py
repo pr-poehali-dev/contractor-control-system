@@ -141,8 +141,10 @@ def handler(event, context):
                 work_log_id = data.get('work_log_id')
                 description = data.get('description', '').replace("'", "''")
                 status = data.get('status', 'pending')
-                defects = data.get('defects', '[]').replace("'", "''")
-                photo_urls = data.get('photo_urls', '').replace("'", "''") if data.get('photo_urls') else None
+                defects_raw = data.get('defects', '[]')
+                defects = defects_raw.replace("'", "''") if isinstance(defects_raw, str) else '[]'
+                photo_urls_raw = data.get('photo_urls', '')
+                photo_urls = photo_urls_raw.replace("'", "''") if photo_urls_raw else None
                 
                 if work_log_id and photo_urls:
                     cur.execute(f"""
