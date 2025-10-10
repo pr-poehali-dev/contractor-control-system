@@ -115,8 +115,33 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             ORDER BY wl.created_at DESC
             LIMIT 20
         '''
+    elif user_role == 'admin':
+        # Admin sees ALL events from all projects
+        work_logs_query = '''
+            SELECT 
+                wl.id,
+                wl.work_id,
+                wl.description,
+                wl.volume,
+                wl.materials,
+                wl.photo_urls,
+                wl.created_at,
+                w.title as work_title,
+                w.object_id,
+                o.title as object_title,
+                o.project_id,
+                p.title as project_title,
+                u.name as author_name
+            FROM work_logs wl
+            JOIN works w ON wl.work_id = w.id
+            JOIN objects o ON w.object_id = o.id
+            JOIN projects p ON o.project_id = p.id
+            JOIN users u ON wl.created_by = u.id
+            ORDER BY wl.created_at DESC
+            LIMIT 30
+        '''
     else:
-        # Client/admin sees all events for their projects
+        # Client sees only events for their projects
         work_logs_query = f'''
             SELECT 
                 wl.id,
@@ -198,6 +223,31 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             )
             ORDER BY i.created_at DESC
             LIMIT 10
+        '''
+    elif user_role == 'admin':
+        inspections_query = '''
+            SELECT 
+                i.id,
+                i.work_id,
+                i.inspection_number,
+                i.status,
+                i.description,
+                i.defects,
+                i.photo_urls,
+                i.created_at,
+                w.title as work_title,
+                w.object_id,
+                o.title as object_title,
+                o.project_id,
+                p.title as project_title,
+                u.name as author_name
+            FROM inspections i
+            JOIN works w ON i.work_id = w.id
+            JOIN objects o ON w.object_id = o.id
+            JOIN projects p ON o.project_id = p.id
+            JOIN users u ON i.created_by = u.id
+            ORDER BY i.created_at DESC
+            LIMIT 15
         '''
     else:
         inspections_query = f'''
