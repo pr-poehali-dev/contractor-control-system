@@ -275,10 +275,14 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
         isOpen={handlers.isEditDialogOpen}
         onClose={() => handlers.setIsEditDialogOpen(false)}
         onSubmit={() => handlers.handleEditSubmit(selectedWorkData)}
+        onDelete={() => handlers.handleDeleteWork(selectedWorkData, () => {
+          navigate(`/projects/${projectId}/objects/${objectId}`);
+        })}
         formData={handlers.editFormData}
         setFormData={handlers.setEditFormData}
         contractors={contractors}
         isSubmitting={handlers.isSubmitting}
+        canDelete={user?.role === 'admin' || user?.role === 'client'}
       />
     </div>
   );

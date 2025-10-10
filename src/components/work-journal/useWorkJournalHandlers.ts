@@ -228,6 +228,39 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
     }
   };
 
+  const handleDeleteWork = async (selectedWorkData: any, onSuccess?: () => void) => {
+    if (!user || !selectedWorkData) return;
+    
+    try {
+      setIsSubmitting(true);
+      await api.deleteItem(token!, 'work', selectedWorkData.id);
+
+      if (token) {
+        const refreshedData = await api.getUserData(token);
+        setUserData(refreshedData);
+      }
+
+      toast({
+        title: 'Работа удалена',
+        description: 'Работа успешно удалена из системы',
+      });
+      
+      setIsEditDialogOpen(false);
+      
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: error instanceof Error ? error.message : 'Не удалось удалить работу',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return {
     newMessage,
     setNewMessage,
@@ -254,5 +287,6 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
     handleWorkReportSubmit,
     handleEditClick,
     handleEditSubmit,
+    handleDeleteWork,
   };
 }

@@ -24,20 +24,24 @@ interface WorkEditDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: () => void;
+  onDelete?: () => void;
   formData: EditFormData;
   setFormData: (data: EditFormData) => void;
   contractors: Contractor[];
   isSubmitting: boolean;
+  canDelete?: boolean;
 }
 
 export default function WorkEditDialog({
   isOpen,
   onClose,
   onSubmit,
+  onDelete,
   formData,
   setFormData,
   contractors,
   isSubmitting,
+  canDelete = true,
 }: WorkEditDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -100,20 +104,34 @@ export default function WorkEditDialog({
             </Select>
           </div>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            Отмена
-          </Button>
-          <Button onClick={onSubmit} disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <Icon name="Loader2" size={16} className="mr-2 animate-spin" />
-                Сохранение...
-              </>
-            ) : (
-              'Сохранить'
+        <DialogFooter className="!flex-row !justify-between !items-center">
+          <div className="flex-1">
+            {canDelete && onDelete && (
+              <Button 
+                variant="destructive" 
+                onClick={onDelete}
+                disabled={isSubmitting}
+              >
+                <Icon name="Trash2" size={16} className="mr-2" />
+                Удалить работу
+              </Button>
             )}
-          </Button>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
+              Отмена
+            </Button>
+            <Button onClick={onSubmit} disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Icon name="Loader2" size={16} className="mr-2 animate-spin" />
+                  Сохранение...
+                </>
+              ) : (
+                'Сохранить'
+              )}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

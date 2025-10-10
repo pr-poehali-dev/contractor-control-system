@@ -79,19 +79,19 @@ const CreateWork = () => {
         if (Array.isArray(workTypes)) {
           setTemplates(workTypes.map((t: any) => ({
             id: String(t.id),
-            name: t.name,
-            category: t.category || 'Прочие работы',
-            unit: t.unit,
+            name: t.title || t.name,
+            category: t.category || 'Общестроительные работы',
+            unit: 'м²',
           })));
           
           // Group templates by category
           const grouped = workTypes.reduce((acc: GroupedTemplates, template: any) => {
-            const cat = template.category || 'Прочие работы';
+            const cat = template.category || 'Общестроительные работы';
             const tmpl: WorkTemplate = {
               id: String(template.id),
-              name: template.name,
+              name: template.title || template.name,
               category: cat,
-              unit: template.unit,
+              unit: 'м²',
             };
             if (!acc[cat]) {
               acc[cat] = [];
