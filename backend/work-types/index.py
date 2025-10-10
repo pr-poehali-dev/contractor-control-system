@@ -1,6 +1,6 @@
 '''
 Business: CRUD для справочника типов работ
-Args: event с httpMethod, body (title, code, description, normative_ref, material_types для POST/PUT), queryStringParameters (id для PUT/DELETE)
+Args: event с httpMethod, body (title, code, description, normative_ref, material_types, category для POST/PUT), queryStringParameters (id для PUT/DELETE)
 Returns: Список типов работ, созданный/обновленный тип работы или результат удаления
 '''
 
@@ -37,9 +37,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         if method == 'GET':
             cur.execute(
                 """
-                SELECT id, title, code, description, normative_ref, material_types, created_at
+                SELECT id, title, code, description, normative_ref, material_types, category, created_at
                 FROM t_p8942561_contractor_control_s.work_templates
-                ORDER BY title
+                ORDER BY category, title
                 """
             )
             work_types = cur.fetchall()
@@ -53,7 +53,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'description': wt[3],
                     'normative_ref': wt[4],
                     'material_types': wt[5],
-                    'created_at': wt[6].isoformat() if wt[6] else None
+                    'category': wt[6],
+                    'created_at': wt[7].isoformat() if wt[7] else None
                 })
             
             cur.close()
@@ -73,6 +74,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             description = body.get('description', '')
             normative_ref = body.get('normative_ref', '')
             material_types = body.get('material_types', '')
+            category = body.get('category', 'Общестроительные работы')
             
             if not title or not code:
                 return {
@@ -85,11 +87,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.execute(
                 """
                 INSERT INTO t_p8942561_contractor_control_s.work_templates 
-                (title, code, description, normative_ref, material_types, created_at)
-                VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
-                RETURNING id, title, code, description, normative_ref, material_types, created_at
+                (title, code, description, normative_ref, material_types, category, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+                RETURNING id, title, code, description, normative_ref, material_types, category, created_at
                 """,
-                (title, code, description, normative_ref, material_types)
+                (title, code, description, normative_ref, material_types, category)
             )
             work_type = cur.fetchone()
             conn.commit()
@@ -101,7 +103,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'description': work_type[3],
                 'normative_ref': work_type[4],
                 'material_types': work_type[5],
-                'created_at': work_type[6].isoformat() if work_type[6] else None
+                'category': work_type[6],
+                'created_at': work_type[7].isoformat() if work_type[7] else None
             }
             
             cur.close()
@@ -132,6 +135,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             description = body.get('description', '')
             normative_ref = body.get('normative_ref', '')
             material_types = body.get('material_types', '')
+            category = body.get('category', 'Общестроительные работы')
             
             if not title or not code:
                 return {
@@ -144,11 +148,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.execute(
                 """
                 UPDATE t_p8942561_contractor_control_s.work_templates 
-                SET title = %s, code = %s, description = %s, normative_ref = %s, material_types = %s
+                SET title = %s, code = %s, description = %s, normative_ref = %s, material_types = %s, category = %s
                 WHERE id = %s
-                RETURNING id, title, code, description, normative_ref, material_types, created_at
+                RETURNING id, title, code, description, normative_ref, material_types, category, created_at
                 """,
-                (title, code, description, normative_ref, material_types, work_id)
+                (title, code, description, normative_ref, material_types, category, work_id)
             )
             work_type = cur.fetchone()
             
@@ -169,7 +173,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'description': work_type[3],
                 'normative_ref': work_type[4],
                 'material_types': work_type[5],
-                'created_at': work_type[6].isoformat() if work_type[6] else None
+                'category': work_type[6],
+                'created_at': work_type[7].isoformat() if work_type[7] else None
             }
             
             cur.close()

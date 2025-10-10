@@ -28,12 +28,14 @@ const WorkTemplates = () => {
     null
   );
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [formData, setFormData] = useState<WorkTemplateFormData>({
     title: '',
     code: '',
     description: '',
     normative_ref: '',
     material_types: '',
+    category: 'Общестроительные работы',
   });
 
   const isAdmin = user?.role === 'admin';
@@ -110,6 +112,7 @@ const WorkTemplates = () => {
         description: '',
         normative_ref: '',
         material_types: '',
+        category: 'Общестроительные работы',
       });
       loadTemplates();
     } catch (error) {
@@ -207,6 +210,7 @@ const WorkTemplates = () => {
       description: template.description || '',
       normative_ref: template.normative_ref || '',
       material_types: template.material_types || '',
+      category: template.category || 'Общестроительные работы',
     });
     setIsEditOpen(true);
   };
@@ -221,6 +225,8 @@ const WorkTemplates = () => {
     setIsDeleteOpen(true);
   };
 
+  const categories = ['all', ...Array.from(new Set(templates.map(t => t.category).filter(Boolean)))];
+
   const filteredTemplates = templates.filter((template) => {
     const matchesSearch =
       template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -229,8 +235,18 @@ const WorkTemplates = () => {
       template.normative_ref
         ?.toLowerCase()
         .includes(searchTerm.toLowerCase());
-    return matchesSearch;
+    const matchesCategory = selectedCategory === 'all' || template.category === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
+
+  const groupedTemplates = filteredTemplates.reduce((acc, template) => {
+    const category = template.category || 'Без категории';
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(template);
+    return acc;
+  }, {} as Record<string, WorkTemplate[]>);
 
   return (
     <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-10 bg-slate-50 min-h-screen">
@@ -246,42 +262,63 @@ const WorkTemplates = () => {
 
         <Card className="mb-6">
           <CardContent className="p-4">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Icon
-                    name="Search"
-                    size={18}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                  />
-                  <Input
-                    placeholder="Поиск работ по названию, коду, нормативу..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Icon
+                      name="Search"
+                      size={18}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                    />
+                    <Input
+                      placeholder="Поиск работ по названию, коду, нормативу..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
+                {isAdmin && (
+                  <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+                    <DialogTrigger asChild>
+                      <Button>
+                        <Icon name="Plus" size={18} className="mr-2" />
+                        Добавить работу
+                      </Button>
+                    </DialogTrigger>
+                    <WorkTemplateFormDialog
+                      open={isAddOpen}
+                      onOpenChange={setIsAddOpen}
+                      title="Добавить вид работы"
+                      description="Заполните информацию о новом виде работ"
+                      formData={formData}
+                      onFormDataChange={setFormData}
+                      onSubmit={handleAddTemplate}
+                      submitLabel="Добавить"
+                    />
+                  </Dialog>
+                )}
               </div>
-              {isAdmin && (
-                <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Icon name="Plus" size={18} className="mr-2" />
-                      Добавить работу
-                    </Button>
-                  </DialogTrigger>
-                  <WorkTemplateFormDialog
-                    open={isAddOpen}
-                    onOpenChange={setIsAddOpen}
-                    title="Добавить вид работы"
-                    description="Заполните информацию о новом виде работ"
-                    formData={formData}
-                    onFormDataChange={setFormData}
-                    onSubmit={handleAddTemplate}
-                    submitLabel="Добавить"
-                  />
-                </Dialog>
-              )}
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant={selectedCategory === 'all' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory('all')}
+                >
+                  Все категории
+                </Button>
+                {categories.filter(c => c !== 'all').map((category) => (
+                  <Button
+                    key={category}
+                    variant={selectedCategory === category ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedCategory(category)}
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -300,16 +337,29 @@ const WorkTemplates = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredTemplates.map((template) => (
-              <WorkTemplateCard
-                key={template.id}
-                template={template}
-                isAdmin={isAdmin}
-                onView={openViewDialog}
-                onEdit={openEditDialog}
-                onDelete={openDeleteDialog}
-              />
+          <div className="space-y-6">
+            {Object.entries(groupedTemplates).map(([category, categoryTemplates]) => (
+              <div key={category}>
+                <h2 className="text-lg font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                  <Icon name="FolderOpen" size={20} className="text-blue-600" />
+                  {category}
+                  <span className="text-sm font-normal text-slate-500">
+                    ({categoryTemplates.length})
+                  </span>
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {categoryTemplates.map((template) => (
+                    <WorkTemplateCard
+                      key={template.id}
+                      template={template}
+                      isAdmin={isAdmin}
+                      onView={openViewDialog}
+                      onEdit={openEditDialog}
+                      onDelete={openDeleteDialog}
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         )}

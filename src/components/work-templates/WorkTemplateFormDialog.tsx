@@ -3,6 +3,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -11,6 +18,20 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { WorkTemplateFormData } from './types';
+
+const CATEGORIES = [
+  'Кровельные работы',
+  'Оконные и дверные работы',
+  'Системы отопления',
+  'Вентиляция и кондиционирование',
+  'Фасадные работы',
+  'Электромонтажные работы',
+  'Гидроизоляция и подвалы',
+  'Водоотведение',
+  'Благоустройство территории',
+  'Приборы учета',
+  'Общестроительные работы',
+];
 
 interface WorkTemplateFormDialogProps {
   open: boolean;
@@ -105,6 +126,26 @@ const WorkTemplateFormDialog = ({
               placeholder="металлочерепица, деревянная обрешётка, саморезы с уплотнителем"
               rows={3}
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="category">Категория работ</Label>
+            <Select
+              value={formData.category}
+              onValueChange={(value) =>
+                onFormDataChange({ ...formData, category: value })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Выберите категорию" />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <DialogFooter>

@@ -40,11 +40,13 @@ const WorkTemplateCard = ({
                 {template.description}
               </p>
             )}
-            {template.normative_ref && (
-              <p className="text-xs text-slate-500 mb-2">
-                📋 {template.normative_ref}
-              </p>
-            )}
+            <div className="flex flex-wrap gap-2 items-center">
+              {template.normative_ref && (
+                <p className="text-xs text-slate-500">
+                  📋 {template.normative_ref}
+                </p>
+              )}
+            </div>
           </div>
           {isAdmin && (
             <div

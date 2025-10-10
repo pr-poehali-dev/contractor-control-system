@@ -5,6 +5,7 @@ export interface WorkTemplate {
   description?: string;
   normative_ref?: string;
   material_types?: string;
+  category?: string;
   created_at: string;
 }
 
@@ -14,4 +15,5 @@ export interface WorkTemplateFormData {
   description: string;
   normative_ref: string;
   material_types: string;
+  category: string;
 }
