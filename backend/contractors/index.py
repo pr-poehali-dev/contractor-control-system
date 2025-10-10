@@ -215,18 +215,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     """
                     SELECT 
                         p.id as project_id,
-                        p.name as project_name,
-                        po.id as object_id,
-                        po.name as object_name,
+                        p.title as project_name,
+                        o.id as object_id,
+                        o.title as object_name,
                         w.id as work_id,
-                        w.work_type as work_title,
-                        w.status,
-                        w.assigned_at
+                        w.title as work_title,
+                        COALESCE(w.work_status, w.status) as status,
+                        w.created_at as assigned_at
                     FROM t_p8942561_contractor_control_s.works w
-                    INNER JOIN t_p8942561_contractor_control_s.project_objects po ON w.object_id = po.id
-                    INNER JOIN t_p8942561_contractor_control_s.projects p ON po.project_id = p.id
+                    LEFT JOIN t_p8942561_contractor_control_s.objects o ON w.object_id = o.id
+                    LEFT JOIN t_p8942561_contractor_control_s.projects p ON o.project_id = p.id
                     WHERE w.contractor_id = %s
-                    ORDER BY w.assigned_at DESC
+                    ORDER BY w.created_at DESC
                     """,
                     (contractor_id,)
                 )
@@ -241,7 +241,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'object_name': row[3],
                         'work_id': row[4],
                         'work_title': row[5],
-                        'status': row[6],
+                        'status': row[6] or 'pending',
                         'assigned_at': row[7].isoformat() if row[7] else None
                     })
                 
