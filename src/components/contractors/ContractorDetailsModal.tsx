@@ -82,7 +82,7 @@ const ContractorDetailsModal = ({
   };
 
   const handleNavigateToWork = (projectId: number, objectId: number, workId: number) => {
-    navigate(`/projects/${projectId}/objects/${objectId}/work-journal`);
+    navigate(`/projects/${projectId}/objects/${objectId}/works/${workId}`);
     onOpenChange(false);
   };
 
