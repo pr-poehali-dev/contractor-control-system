@@ -80,16 +80,7 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
       };
     }>;
   }) => {
-    console.log('=== INSPECTION SUBMIT START ===');
-    console.log('User:', user);
-    console.log('Selected work:', selectedWork);
-    console.log('Token:', token ? 'exists' : 'missing');
-    console.log('Data:', data);
-    
-    if (!user || !selectedWork) {
-      console.error('Missing user or selectedWork');
-      return;
-    }
+    if (!user || !selectedWork) return;
     
     setIsSubmitting(true);
 
@@ -118,15 +109,6 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
         descriptionParts.push(`Не соответствует: ${nonCompliantCount}`);
       }
 
-      console.log('Creating inspection with:', {
-        work_id: selectedWork,
-        work_log_id: data.journal_entry_id || selectedEntryForInspection || null,
-        description: descriptionParts.join(', '),
-        status: overallStatus,
-        defects: defects,
-        photo_urls: allPhotos.length > 0 ? allPhotos.join(',') : null,
-      });
-
       await api.createItem(token!, 'inspection', {
         work_id: selectedWork,
         work_log_id: data.journal_entry_id || selectedEntryForInspection || null,
@@ -154,7 +136,6 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
         description: error instanceof Error ? error.message : 'Не удалось создать проверку',
         variant: 'destructive',
       });
-      console.error('Inspection creation error:', error);
     } finally {
       setIsSubmitting(false);
     }

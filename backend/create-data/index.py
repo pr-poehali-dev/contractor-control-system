@@ -164,29 +164,38 @@ def handler(event, context):
                 photo_urls_raw = data.get('photo_urls', '')
                 photo_urls = photo_urls_raw.replace("'", "''") if photo_urls_raw else None
                 
+                # Generate inspection number
+                cur.execute(f"""
+                    SELECT COALESCE(MAX(CAST(SUBSTRING(inspection_number FROM '[0-9]+') AS INTEGER)), 0) + 1 as next_num
+                    FROM inspections
+                    WHERE work_id = {work_id}
+                """)
+                next_num = cur.fetchone()['next_num']
+                inspection_number = f'INS-{work_id}-{next_num}'
+                
                 if work_log_id and photo_urls:
                     cur.execute(f"""
-                        INSERT INTO inspections (work_id, work_log_id, description, status, defects, photo_urls, created_by, created_at)
-                        VALUES ({work_id}, {int(work_log_id)}, '{description}', '{status}', '{defects}', '{photo_urls}', {user_id_int}, NOW())
-                        RETURNING id, work_id, work_log_id, description, status, defects, photo_urls, created_by, created_at
+                        INSERT INTO inspections (work_id, work_log_id, inspection_number, description, status, defects, photo_urls, created_by, created_at, updated_at)
+                        VALUES ({work_id}, {int(work_log_id)}, '{inspection_number}', '{description}', '{status}', '{defects}', '{photo_urls}', {user_id_int}, NOW(), NOW())
+                        RETURNING id, work_id, work_log_id, inspection_number, description, status, defects, photo_urls, created_by, created_at
                     """)
                 elif work_log_id:
                     cur.execute(f"""
-                        INSERT INTO inspections (work_id, work_log_id, description, status, defects, created_by, created_at)
-                        VALUES ({work_id}, {int(work_log_id)}, '{description}', '{status}', '{defects}', {user_id_int}, NOW())
-                        RETURNING id, work_id, work_log_id, description, status, defects, photo_urls, created_by, created_at
+                        INSERT INTO inspections (work_id, work_log_id, inspection_number, description, status, defects, created_by, created_at, updated_at)
+                        VALUES ({work_id}, {int(work_log_id)}, '{inspection_number}', '{description}', '{status}', '{defects}', {user_id_int}, NOW(), NOW())
+                        RETURNING id, work_id, work_log_id, inspection_number, description, status, defects, photo_urls, created_by, created_at
                     """)
                 elif photo_urls:
                     cur.execute(f"""
-                        INSERT INTO inspections (work_id, description, status, defects, photo_urls, created_by, created_at)
-                        VALUES ({work_id}, '{description}', '{status}', '{defects}', '{photo_urls}', {user_id_int}, NOW())
-                        RETURNING id, work_id, work_log_id, description, status, defects, photo_urls, created_by, created_at
+                        INSERT INTO inspections (work_id, inspection_number, description, status, defects, photo_urls, created_by, created_at, updated_at)
+                        VALUES ({work_id}, '{inspection_number}', '{description}', '{status}', '{defects}', '{photo_urls}', {user_id_int}, NOW(), NOW())
+                        RETURNING id, work_id, work_log_id, inspection_number, description, status, defects, photo_urls, created_by, created_at
                     """)
                 else:
                     cur.execute(f"""
-                        INSERT INTO inspections (work_id, description, status, defects, created_by, created_at)
-                        VALUES ({work_id}, '{description}', '{status}', '{defects}', {user_id_int}, NOW())
-                        RETURNING id, work_id, work_log_id, description, status, defects, photo_urls, created_by, created_at
+                        INSERT INTO inspections (work_id, inspection_number, description, status, defects, created_by, created_at, updated_at)
+                        VALUES ({work_id}, '{inspection_number}', '{description}', '{status}', '{defects}', {user_id_int}, NOW(), NOW())
+                        RETURNING id, work_id, work_log_id, inspection_number, description, status, defects, photo_urls, created_by, created_at
                     """)
                 result = cur.fetchone()
                 conn.commit()
