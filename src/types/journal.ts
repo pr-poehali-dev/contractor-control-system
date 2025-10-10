@@ -9,7 +9,7 @@ export type EventType =
   | 'material_added'
   | 'photo_added';
 
-export type UserRole = 'contractor' | 'customer' | 'supervisor';
+export type UserRole = 'contractor' | 'client' | 'customer' | 'supervisor' | 'admin';
 
 export interface JournalEvent {
   id: number;

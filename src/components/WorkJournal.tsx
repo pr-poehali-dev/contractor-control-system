@@ -98,23 +98,26 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
       .toUpperCase();
   };
 
-  const workEntryEvents: JournalEvent[] = workEntries.map(log => ({
-    id: log.id,
-    type: 'work_entry' as const,
-    work_id: log.work_id,
-    created_by: log.created_by,
-    author_name: log.author_name,
-    author_role: (log.author_role || 'contractor') as UserRole,
-    created_at: log.created_at,
-    content: log.description,
-    work_data: {
-      volume: log.volume,
-      unit: log.unit,
-      materials: log.materials ? log.materials.split(',').map(m => m.trim()) : [],
-      photos: log.photo_urls ? log.photo_urls.split(',') : [],
-      progress: log.progress,
-    },
-  }));
+  const workEntryEvents: JournalEvent[] = workEntries.map(log => {
+    const hasWorkData = log.volume || log.materials || log.photo_urls;
+    return {
+      id: log.id,
+      type: hasWorkData ? ('work_entry' as const) : ('chat_message' as const),
+      work_id: log.work_id,
+      created_by: log.created_by,
+      author_name: log.author_name,
+      author_role: (log.author_role || 'contractor') as UserRole,
+      created_at: log.created_at,
+      content: log.description,
+      work_data: hasWorkData ? {
+        volume: log.volume,
+        unit: log.unit,
+        materials: log.materials ? log.materials.split(',').map(m => m.trim()) : [],
+        photos: log.photo_urls ? log.photo_urls.split(',') : [],
+        progress: log.progress,
+      } : undefined,
+    };
+  });
 
   const inspectionEvents: JournalEvent[] = inspections
     .filter(insp => insp.work_id === selectedWork)

@@ -276,11 +276,11 @@ export default function EventItem({
           event.type === 'defect_added' && 'border-l-4 border-l-amber-500'
         )}>
           <CardContent className="p-5">
-            {userRole === 'customer' && event.type === 'work_entry' && !isOwnEvent && (
+            {(userRole === 'customer' || userRole === 'client') && event.type === 'work_entry' && !isOwnEvent && (
               <Button
                 variant="outline"
                 size="sm"
-                className="absolute top-3 right-3 h-8 text-sm"
+                className="absolute top-3 right-3 h-8 text-sm z-10"
                 onClick={() => onCreateInspection?.(event.id)}
               >
                 <Icon name="ClipboardCheck" size={14} className="mr-1" />
