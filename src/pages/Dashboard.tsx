@@ -2,16 +2,40 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Icon from '@/components/ui/icon';
 import OnboardingBanner from '@/components/OnboardingBanner';
+import { Skeleton } from '@/components/ui/skeleton';
+
+interface FeedEvent {
+  id: string;
+  type: 'work_log' | 'inspection' | 'remark' | 'work_start' | 'work_complete';
+  title: string;
+  description: string;
+  timestamp: string;
+  status?: string;
+  workId?: number;
+  objectId?: number;
+  projectId?: number;
+  objectTitle?: string;
+  projectTitle?: string;
+  author?: string;
+  photoUrls?: string[];
+  materials?: string;
+  volume?: string;
+  defects?: string;
+}
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, userData } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [feed, setFeed] = useState<FeedEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<'all' | 'work_logs' | 'inspections' | 'remarks'>('all');
 
   const projects = userData?.projects || [];
 
@@ -47,6 +71,28 @@ const Dashboard = () => {
     checkContractorRedirect();
   }, [user, projects.length, navigate]);
 
+  useEffect(() => {
+    loadFeed();
+  }, [user]);
+
+  const loadFeed = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`https://functions.poehali.dev/f38edb91-216d-4887-b091-ef224db01905?user_id=${user.id}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setFeed(data.events);
+      }
+    } catch (error) {
+      console.error('Failed to load feed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (showOnboarding && user?.id === 3) {
     return <OnboardingBanner onClose={() => setShowOnboarding(false)} />;
   }
@@ -63,304 +109,335 @@ const Dashboard = () => {
       value: String(activeProjects), 
       icon: 'Building2', 
       color: 'bg-blue-100 text-[#2563EB]',
-      trend: '+12%',
-      trendUp: true
     },
     { 
       label: 'Объектов в работе', 
       value: String(sites.filter(s => s.status === 'active').length), 
       icon: 'MapPin', 
       color: 'bg-green-100 text-green-600',
-      total: sites.length,
-      trend: '+8%',
-      trendUp: true
     },
     { 
       label: 'Работ выполняется', 
       value: String(works.filter(w => w.status === 'in_progress').length), 
       icon: 'Wrench', 
       color: 'bg-purple-100 text-purple-600',
-      total: works.length,
-      trend: '+5%',
-      trendUp: true
     },
     { 
       label: 'Открытых замечаний', 
       value: String(openRemarks), 
       icon: 'AlertCircle', 
       color: 'bg-red-100 text-red-600',
-      total: remarks.length,
-      trend: '-15%',
-      trendUp: false
     },
   ];
 
-  const recentActivity = [
-    { id: 1, type: 'work', title: 'Бетонирование фундамента', object: 'ЖК Солнечный', time: '2 часа назад', status: 'completed' },
-    { id: 2, type: 'inspection', title: 'Проверка качества кирпичной кладки', object: 'ТЦ Европейский', time: '4 часа назад', status: 'pending' },
-    { id: 3, type: 'remark', title: 'Обнаружены отклонения в штукатурке', object: 'ЖК Солнечный', time: '1 день назад', status: 'open' },
-    { id: 4, type: 'work', title: 'Установка окон', object: 'Офисное здание А1', time: '2 дня назад', status: 'in_progress' },
-  ];
-
-  const getActivityIcon = (type: string) => {
+  const getEventIcon = (type: string) => {
     switch(type) {
-      case 'work': return 'Wrench';
+      case 'work_log': return 'FileText';
       case 'inspection': return 'ClipboardCheck';
       case 'remark': return 'AlertTriangle';
+      case 'work_start': return 'Play';
+      case 'work_complete': return 'CheckCircle2';
       default: return 'Activity';
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch(status) {
-      case 'completed': return 'bg-green-100 text-green-700';
-      case 'in_progress': return 'bg-blue-100 text-blue-700';
-      case 'pending': return 'bg-yellow-100 text-yellow-700';
-      case 'open': return 'bg-red-100 text-red-700';
-      default: return 'bg-slate-100 text-slate-700';
+  const getEventColor = (type: string) => {
+    switch(type) {
+      case 'work_log': return 'bg-blue-100 text-blue-600';
+      case 'inspection': return 'bg-purple-100 text-purple-600';
+      case 'remark': return 'bg-red-100 text-red-600';
+      case 'work_start': return 'bg-green-100 text-green-600';
+      case 'work_complete': return 'bg-emerald-100 text-emerald-600';
+      default: return 'bg-slate-100 text-slate-600';
     }
   };
 
-  const getStatusLabel = (status: string) => {
-    switch(status) {
-      case 'completed': return 'Завершено';
-      case 'in_progress': return 'В работе';
-      case 'pending': return 'Ожидает';
-      case 'open': return 'Открыто';
-      default: return status;
+  const getEventLabel = (type: string) => {
+    switch(type) {
+      case 'work_log': return 'Запись в журнале';
+      case 'inspection': return 'Проверка';
+      case 'remark': return 'Замечание';
+      case 'work_start': return 'Начало работы';
+      case 'work_complete': return 'Работа завершена';
+      default: return type;
     }
   };
+
+  const formatTimeAgo = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffDays > 7) {
+      return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+    } else if (diffDays > 0) {
+      return `${diffDays} ${diffDays === 1 ? 'день' : diffDays < 5 ? 'дня' : 'дней'} назад`;
+    } else if (diffHours > 0) {
+      return `${diffHours} ${diffHours === 1 ? 'час' : diffHours < 5 ? 'часа' : 'часов'} назад`;
+    } else {
+      return 'Только что';
+    }
+  };
+
+  const handleEventClick = (event: FeedEvent) => {
+    if (event.projectId && event.objectId && event.workId) {
+      navigate(`/projects/${event.projectId}/objects/${event.objectId}`, {
+        state: { scrollToWork: event.workId }
+      });
+    }
+  };
+
+  const filteredFeed = filter === 'all' 
+    ? feed 
+    : feed.filter(event => {
+        if (filter === 'work_logs') return event.type === 'work_log' || event.type === 'work_start' || event.type === 'work_complete';
+        if (filter === 'inspections') return event.type === 'inspection';
+        if (filter === 'remarks') return event.type === 'remark';
+        return true;
+      });
 
   return (
-    <div className="p-6 md:p-8 lg:p-10 pb-24 md:pb-10 bg-slate-50 min-h-screen">
-      <div className="max-w-[1600px] mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-            Добро пожаловать, {user?.name || 'Пользователь'}
+    <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-10 bg-slate-50 min-h-screen">
+      <div className="max-w-[1400px] mx-auto">
+        <div className="mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">
+            {user?.name || 'Пользователь'}
           </h1>
-          <p className="text-lg text-slate-600">Обзор активности и статистика проектов</p>
+          <p className="text-slate-600">Лента событий по вашим проектам</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {stats.map((stat, index) => (
-            <Card key={stat.label} className="animate-fade-in hover:shadow-lg transition-shadow" style={{ animationDelay: `${index * 0.1}s` }}>
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`w-14 h-14 ${stat.color} rounded-xl flex items-center justify-center`}>
-                    <Icon name={stat.icon as any} size={28} />
+            <Card key={stat.label} className="animate-fade-in" style={{ animationDelay: `${index * 0.05}s` }}>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className={`w-10 h-10 ${stat.color} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                    <Icon name={stat.icon as any} size={20} />
                   </div>
-                  {stat.trend && (
-                    <Badge variant="outline" className={`${stat.trendUp ? 'text-green-600 border-green-200' : 'text-red-600 border-red-200'}`}>
-                      {stat.trend}
-                    </Badge>
-                  )}
+                  <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
                 </div>
-                <div className="flex items-baseline gap-2 mb-1">
-                  <p className="text-4xl font-bold text-slate-900">{stat.value}</p>
-                  {stat.total && <p className="text-lg text-slate-400">/ {stat.total}</p>}
-                </div>
-                <p className="text-sm text-slate-600 font-medium">{stat.label}</p>
+                <p className="text-xs text-slate-600 font-medium">{stat.label}</p>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="lg:col-span-2">
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xl font-bold">Последняя активность</CardTitle>
-                <Button variant="ghost" size="sm" onClick={() => navigate('/activity')}>
-                  Все события
-                  <Icon name="ArrowRight" size={16} className="ml-1" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentActivity.map((activity) => (
-                  <div key={activity.id} className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
-                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
-                      <Icon name={getActivityIcon(activity.type) as any} size={20} className="text-slate-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-slate-900 mb-1">{activity.title}</p>
-                      <div className="flex items-center gap-2 text-sm text-slate-500">
-                        <Icon name="MapPin" size={14} />
-                        <span>{activity.object}</span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <Badge className={getStatusColor(activity.status)}>
-                        {getStatusLabel(activity.status)}
-                      </Badge>
-                      <span className="text-xs text-slate-400">{activity.time}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-4">
-              <CardTitle className="text-xl font-bold">Быстрые действия</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <Button 
-                  className="w-full justify-start h-auto py-4" 
-                  variant="outline"
-                  onClick={() => navigate('/projects')}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 text-[#2563EB] rounded-lg flex items-center justify-center">
-                      <Icon name="FolderPlus" size={20} />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-semibold text-slate-900">Создать проект</p>
-                      <p className="text-xs text-slate-500">Новый строительный проект</p>
-                    </div>
-                  </div>
-                </Button>
-
-                <Button 
-                  className="w-full justify-start h-auto py-4" 
-                  variant="outline"
-                  onClick={() => navigate('/create-inspection')}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
-                      <Icon name="ClipboardCheck" size={20} />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-semibold text-slate-900">Создать проверку</p>
-                      <p className="text-xs text-slate-500">Инспекция объекта</p>
-                    </div>
-                  </div>
-                </Button>
-
-                <Button 
-                  className="w-full justify-start h-auto py-4" 
-                  variant="outline"
-                  onClick={() => navigate('/analytics')}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center">
-                      <Icon name="BarChart3" size={20} />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-semibold text-slate-900">Аналитика смет</p>
-                      <p className="text-xs text-slate-500">План vs Факт</p>
-                    </div>
-                  </div>
-                </Button>
-
-                <Button 
-                  className="w-full justify-start h-auto py-4" 
-                  variant="outline"
-                  onClick={() => navigate('/work-templates')}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center">
-                      <Icon name="FileText" size={20} />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-semibold text-slate-900">Шаблоны документов</p>
-                      <p className="text-xs text-slate-500">Акты и отчёты</p>
-                    </div>
-                  </div>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card>
-          <CardHeader className="pb-4">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl font-bold">Активные проекты</CardTitle>
-              <Button onClick={() => navigate('/projects')} size="sm">
-                <Icon name="Plus" size={16} className="mr-1" />
-                Создать проект
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {projects.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Icon name="Folder" size={40} className="text-slate-300" />
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex-1">
+            <Card className="mb-4">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                  <Button
+                    variant={filter === 'all' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setFilter('all')}
+                    className="flex-shrink-0"
+                  >
+                    <Icon name="Sparkles" size={16} className="mr-2" />
+                    Все события
+                  </Button>
+                  <Button
+                    variant={filter === 'work_logs' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setFilter('work_logs')}
+                    className="flex-shrink-0"
+                  >
+                    <Icon name="FileText" size={16} className="mr-2" />
+                    Журнал работ
+                  </Button>
+                  <Button
+                    variant={filter === 'inspections' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setFilter('inspections')}
+                    className="flex-shrink-0"
+                  >
+                    <Icon name="ClipboardCheck" size={16} className="mr-2" />
+                    Проверки
+                  </Button>
+                  <Button
+                    variant={filter === 'remarks' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setFilter('remarks')}
+                    className="flex-shrink-0"
+                  >
+                    <Icon name="AlertTriangle" size={16} className="mr-2" />
+                    Замечания
+                  </Button>
                 </div>
-                <p className="text-lg text-slate-500 mb-4">Нет проектов</p>
-                <Button onClick={() => navigate('/projects')}>
-                  <Icon name="Plus" size={16} className="mr-2" />
-                  Создать первый проект
-                </Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {projects.slice(0, 6).map((project, index) => {
-                  const projectSites = sites.filter(s => s.project_id === project.id);
-                  const projectWorks = works.filter(w => 
-                    projectSites.some(s => s.id === w.object_id)
-                  );
-                  const completedWorks = projectWorks.filter(w => w.status === 'completed').length;
-                  const progress = projectWorks.length > 0 
-                    ? Math.round((completedWorks / projectWorks.length) * 100)
-                    : 0;
+              </CardContent>
+            </Card>
 
-                  return (
-                    <Card 
-                      key={project.id}
-                      className="cursor-pointer hover:shadow-lg transition-all animate-fade-in group border-2 border-transparent hover:border-blue-200"
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                      onClick={() => navigate(`/projects/${project.id}`)}
-                    >
-                      <CardContent className="p-6">
-                        <div className="flex items-start justify-between mb-4">
-                          <h3 className="font-bold text-lg text-slate-900 group-hover:text-blue-600 transition-colors">
-                            {project.title}
-                          </h3>
-                          <div className={`
-                            w-3 h-3 rounded-full
-                            ${project.status === 'active' ? 'bg-green-500' : ''}
-                            ${project.status === 'pending' ? 'bg-yellow-500' : ''}
-                            ${project.status === 'completed' ? 'bg-slate-400' : ''}
-                          `} />
+            <div className="space-y-4">
+              {loading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <Card key={i}>
+                    <CardContent className="p-6">
+                      <div className="flex gap-4">
+                        <Skeleton className="w-12 h-12 rounded-full flex-shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-3/4" />
+                          <Skeleton className="h-3 w-1/2" />
+                          <Skeleton className="h-3 w-full" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : filteredFeed.length === 0 ? (
+                <Card>
+                  <CardContent className="p-12 text-center">
+                    <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Icon name="Inbox" size={32} className="text-slate-400" />
+                    </div>
+                    <p className="text-slate-600 mb-2">Пока нет событий</p>
+                    <p className="text-sm text-slate-500">События появятся, когда начнется работа над проектами</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                filteredFeed.map((event, index) => (
+                  <Card 
+                    key={event.id}
+                    className="hover:shadow-md transition-shadow cursor-pointer animate-fade-in"
+                    style={{ animationDelay: `${index * 0.05}s` }}
+                    onClick={() => handleEventClick(event)}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex gap-4">
+                        <div className="flex-shrink-0">
+                          <Avatar className={`w-12 h-12 ${getEventColor(event.type)}`}>
+                            <AvatarFallback className="bg-transparent">
+                              <Icon name={getEventIcon(event.type) as any} size={24} />
+                            </AvatarFallback>
+                          </Avatar>
                         </div>
                         
-                        <div className="space-y-3 mb-4">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-slate-600">Прогресс</span>
-                            <span className="font-bold text-blue-600">{progress}%</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between mb-2 gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                <Badge variant="outline" className="text-xs">
+                                  {getEventLabel(event.type)}
+                                </Badge>
+                                <span className="text-xs text-slate-500">
+                                  {formatTimeAgo(event.timestamp)}
+                                </span>
+                              </div>
+                              <h3 className="font-semibold text-slate-900 mb-1">
+                                {event.title}
+                              </h3>
+                            </div>
                           </div>
-                          <div className="w-full bg-slate-100 rounded-full h-2">
-                            <div 
-                              className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                              style={{ width: `${progress}%` }}
-                            />
-                          </div>
-                        </div>
 
-                        <div className="flex items-center gap-4 text-sm text-slate-600">
-                          <span className="flex items-center gap-1.5">
-                            <Icon name="MapPin" size={16} />
-                            {projectSites.length} объектов
-                          </span>
-                          <span className="flex items-center gap-1.5">
-                            <Icon name="Wrench" size={16} />
-                            {projectWorks.length} работ
-                          </span>
+                          <p className="text-sm text-slate-600 mb-3 line-clamp-2">
+                            {event.description}
+                          </p>
+
+                          {(event.volume || event.materials) && (
+                            <div className="flex flex-wrap gap-4 mb-3 text-xs">
+                              {event.volume && (
+                                <div className="flex items-center gap-1.5 text-slate-600">
+                                  <Icon name="Package" size={14} />
+                                  <span>Объём: {event.volume}</span>
+                                </div>
+                              )}
+                              {event.materials && (
+                                <div className="flex items-center gap-1.5 text-slate-600">
+                                  <Icon name="Boxes" size={14} />
+                                  <span>Материалы: {event.materials}</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {event.photoUrls && event.photoUrls.length > 0 && (
+                            <div className="flex gap-2 mb-3 overflow-x-auto scrollbar-hide">
+                              {event.photoUrls.slice(0, 4).map((url, i) => (
+                                <div key={i} className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-slate-100">
+                                  <img 
+                                    src={url} 
+                                    alt={`Фото ${i + 1}`}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              ))}
+                              {event.photoUrls.length > 4 && (
+                                <div className="w-20 h-20 flex-shrink-0 rounded-lg bg-slate-100 flex items-center justify-center text-sm text-slate-600 font-medium">
+                                  +{event.photoUrls.length - 4}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          <div className="flex items-center gap-2 text-xs text-slate-500">
+                            <Icon name="FolderOpen" size={14} />
+                            <span className="truncate">{event.projectTitle}</span>
+                            <Icon name="ChevronRight" size={12} />
+                            <Icon name="MapPin" size={14} />
+                            <span className="truncate">{event.objectTitle}</span>
+                          </div>
+
+                          {event.author && (
+                            <div className="flex items-center gap-2 text-xs text-slate-500 mt-2 pt-2 border-t border-slate-100">
+                              <Icon name="User" size={14} />
+                              <span>{event.author}</span>
+                            </div>
+                          )}
                         </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </div>
+
+          <div className="lg:w-80 flex-shrink-0">
+            <Card className="sticky top-4">
+              <CardContent className="p-6">
+                <h3 className="font-bold text-lg mb-4 text-slate-900">Быстрые действия</h3>
+                <div className="space-y-2">
+                  <Button 
+                    className="w-full justify-start" 
+                    variant="outline"
+                    onClick={() => navigate('/projects')}
+                  >
+                    <Icon name="FolderPlus" size={18} className="mr-3" />
+                    Создать проект
+                  </Button>
+
+                  <Button 
+                    className="w-full justify-start" 
+                    variant="outline"
+                    onClick={() => navigate('/create-inspection')}
+                  >
+                    <Icon name="ClipboardCheck" size={18} className="mr-3" />
+                    Создать проверку
+                  </Button>
+
+                  <Button 
+                    className="w-full justify-start" 
+                    variant="outline"
+                    onClick={() => navigate('/analytics')}
+                  >
+                    <Icon name="BarChart3" size={18} className="mr-3" />
+                    Аналитика
+                  </Button>
+
+                  <Button 
+                    className="w-full justify-start" 
+                    variant="outline"
+                    onClick={() => navigate('/work-templates')}
+                  >
+                    <Icon name="FileText" size={18} className="mr-3" />
+                    Шаблоны
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

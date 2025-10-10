@@ -1,0 +1,22 @@
+{
+  "tests": [
+    {
+      "name": "Get feed for user",
+      "method": "GET",
+      "path": "/?user_id=11",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      }
+    },
+    {
+      "name": "Missing user_id parameter",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "user_id is required"
+      }
+    }
+  ]
+}

@@ -1,0 +1,276 @@
+import json
+import os
+from typing import Dict, Any, List
+from datetime import datetime
+import psycopg2
+from psycopg2.extras import RealDictCursor
+
+def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
+    '''
+    Business: Get activity feed for user dashboard
+    Args: event with httpMethod, queryStringParameters (user_id)
+    Returns: HTTP response with list of events
+    '''
+    method: str = event.get('httpMethod', 'GET')
+    
+    if method == 'OPTIONS':
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, X-User-Id',
+                'Access-Control-Max-Age': '86400'
+            },
+            'body': '',
+            'isBase64Encoded': False
+        }
+    
+    if method != 'GET':
+        return {
+            'statusCode': 405,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({'error': 'Method not allowed'}),
+            'isBase64Encoded': False
+        }
+    
+    params = event.get('queryStringParameters', {}) or {}
+    user_id = params.get('user_id')
+    
+    if not user_id:
+        return {
+            'statusCode': 400,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({'error': 'user_id is required'}),
+            'isBase64Encoded': False
+        }
+    
+    dsn = os.environ.get('DATABASE_URL')
+    if not dsn:
+        return {
+            'statusCode': 500,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({'error': 'Database connection not configured'}),
+            'isBase64Encoded': False
+        }
+    
+    conn = psycopg2.connect(dsn)
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    
+    # Get user role
+    cur.execute(f"SELECT role FROM users WHERE id = {user_id}")
+    user_row = cur.fetchone()
+    
+    if not user_row:
+        cur.close()
+        conn.close()
+        return {
+            'statusCode': 404,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({'error': 'User not found'}),
+            'isBase64Encoded': False
+        }
+    
+    user_role = user_row['role']
+    events: List[Dict[str, Any]] = []
+    
+    # Build query based on user role
+    if user_role == 'contractor':
+        # Contractor sees only events related to their works
+        work_logs_query = f'''
+            SELECT 
+                wl.id,
+                wl.work_id,
+                wl.description,
+                wl.volume,
+                wl.materials,
+                wl.photo_urls,
+                wl.created_at,
+                w.title as work_title,
+                w.object_id,
+                o.title as object_title,
+                o.project_id,
+                p.title as project_title,
+                u.name as author_name
+            FROM work_logs wl
+            JOIN works w ON wl.work_id = w.id
+            JOIN objects o ON w.object_id = o.id
+            JOIN projects p ON o.project_id = p.id
+            JOIN users u ON wl.created_by = u.id
+            WHERE w.contractor_id = (
+                SELECT contractor_id FROM users WHERE id = {user_id}
+            )
+            ORDER BY wl.created_at DESC
+            LIMIT 20
+        '''
+    else:
+        # Client/admin sees all events for their projects
+        work_logs_query = f'''
+            SELECT 
+                wl.id,
+                wl.work_id,
+                wl.description,
+                wl.volume,
+                wl.materials,
+                wl.photo_urls,
+                wl.created_at,
+                w.title as work_title,
+                w.object_id,
+                o.title as object_title,
+                o.project_id,
+                p.title as project_title,
+                u.name as author_name
+            FROM work_logs wl
+            JOIN works w ON wl.work_id = w.id
+            JOIN objects o ON w.object_id = o.id
+            JOIN projects p ON o.project_id = p.id
+            JOIN users u ON wl.created_by = u.id
+            WHERE p.client_id = {user_id}
+            ORDER BY wl.created_at DESC
+            LIMIT 20
+        '''
+    
+    cur.execute(work_logs_query)
+    work_logs = cur.fetchall()
+    
+    for log in work_logs:
+        photo_urls = []
+        if log['photo_urls']:
+            try:
+                photo_urls = json.loads(log['photo_urls'])
+            except:
+                pass
+        
+        events.append({
+            'id': f"work_log_{log['id']}",
+            'type': 'work_log',
+            'title': log['work_title'],
+            'description': log['description'],
+            'timestamp': log['created_at'].isoformat() if hasattr(log['created_at'], 'isoformat') else str(log['created_at']),
+            'workId': log['work_id'],
+            'objectId': log['object_id'],
+            'projectId': log['project_id'],
+            'objectTitle': log['object_title'],
+            'projectTitle': log['project_title'],
+            'author': log['author_name'],
+            'volume': log['volume'],
+            'materials': log['materials'],
+            'photoUrls': photo_urls
+        })
+    
+    # Get inspections
+    if user_role == 'contractor':
+        inspections_query = f'''
+            SELECT 
+                i.id,
+                i.work_id,
+                i.inspection_number,
+                i.status,
+                i.description,
+                i.defects,
+                i.photo_urls,
+                i.created_at,
+                w.title as work_title,
+                w.object_id,
+                o.title as object_title,
+                o.project_id,
+                p.title as project_title,
+                u.name as author_name
+            FROM inspections i
+            JOIN works w ON i.work_id = w.id
+            JOIN objects o ON w.object_id = o.id
+            JOIN projects p ON o.project_id = p.id
+            JOIN users u ON i.created_by = u.id
+            WHERE w.contractor_id = (
+                SELECT contractor_id FROM users WHERE id = {user_id}
+            )
+            ORDER BY i.created_at DESC
+            LIMIT 10
+        '''
+    else:
+        inspections_query = f'''
+            SELECT 
+                i.id,
+                i.work_id,
+                i.inspection_number,
+                i.status,
+                i.description,
+                i.defects,
+                i.photo_urls,
+                i.created_at,
+                w.title as work_title,
+                w.object_id,
+                o.title as object_title,
+                o.project_id,
+                p.title as project_title,
+                u.name as author_name
+            FROM inspections i
+            JOIN works w ON i.work_id = w.id
+            JOIN objects o ON w.object_id = o.id
+            JOIN projects p ON o.project_id = p.id
+            JOIN users u ON i.created_by = u.id
+            WHERE p.client_id = {user_id}
+            ORDER BY i.created_at DESC
+            LIMIT 10
+        '''
+    
+    cur.execute(inspections_query)
+    inspections = cur.fetchall()
+    
+    for insp in inspections:
+        photo_urls = []
+        if insp['photo_urls']:
+            try:
+                photo_urls = json.loads(insp['photo_urls'])
+            except:
+                pass
+        
+        status_label = 'Проверка завершена' if insp['status'] == 'completed' else 'Обнаружены замечания' if insp['status'] == 'on_rework' else 'Проверка'
+        
+        events.append({
+            'id': f"inspection_{insp['id']}",
+            'type': 'inspection',
+            'title': f"Проверка №{insp['inspection_number']}",
+            'description': insp['description'] or f"{status_label}: {insp['work_title']}",
+            'timestamp': insp['created_at'].isoformat() if hasattr(insp['created_at'], 'isoformat') else str(insp['created_at']),
+            'status': insp['status'],
+            'workId': insp['work_id'],
+            'objectId': insp['object_id'],
+            'projectId': insp['project_id'],
+            'objectTitle': insp['object_title'],
+            'projectTitle': insp['project_title'],
+            'author': insp['author_name'],
+            'photoUrls': photo_urls,
+            'defects': insp['defects']
+        })
+    
+    cur.close()
+    conn.close()
+    
+    # Sort all events by timestamp
+    events.sort(key=lambda x: x['timestamp'], reverse=True)
+    
+    return {
+        'statusCode': 200,
+        'headers': {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        },
+        'body': json.dumps({
+            'success': True,
+            'events': events[:30]
+        }),
+        'isBase64Encoded': False
+    }
