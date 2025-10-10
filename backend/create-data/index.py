@@ -223,13 +223,19 @@ def handler(event, context):
             }
             
         except Exception as e:
+            import traceback
+            error_details = {
+                'error': str(e),
+                'traceback': traceback.format_exc(),
+                'item_type': item_type
+            }
             conn.rollback()
             cur.close()
             conn.close()
             return {
                 'statusCode': 500,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                'body': json.dumps({'error': str(e)})
+                'body': json.dumps(error_details)
             }
     
     return {

@@ -96,7 +96,7 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
       const allPhotos = defects.flatMap(d => d.photos).filter(Boolean);
       
       const hasDefects = defects.length > 0;
-      const overallStatus = hasDefects ? 'non_compliant' : 'compliant';
+      const overallStatus = hasDefects ? 'on_rework' : 'completed';
       
       const descriptionParts: string[] = [];
       
