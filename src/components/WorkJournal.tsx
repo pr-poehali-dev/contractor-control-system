@@ -34,6 +34,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
 
   const works = (userData?.works || []).filter(w => w.object_id === objectId);
   const workLogs = userData?.workLogs || [];
+  const inspections = userData?.inspections || [];
   const sites = userData?.sites || [];
   const projects = userData?.projects || [];
   
@@ -97,7 +98,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
       .toUpperCase();
   };
 
-  const mockEvents: JournalEvent[] = workEntries.map(log => ({
+  const workEntryEvents: JournalEvent[] = workEntries.map(log => ({
     id: log.id,
     type: 'work_entry' as const,
     work_id: log.work_id,
@@ -114,6 +115,28 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
       progress: log.progress,
     },
   }));
+
+  const inspectionEvents: JournalEvent[] = inspections
+    .filter(insp => insp.work_id === selectedWork)
+    .map(insp => ({
+      id: insp.id,
+      type: 'inspection' as const,
+      work_id: insp.work_id,
+      created_by: insp.created_by,
+      author_name: insp.author_name,
+      author_role: (insp.author_role || 'client') as UserRole,
+      created_at: insp.created_at,
+      content: insp.description,
+      inspection_data: {
+        status: insp.status,
+        defects: insp.defects ? JSON.parse(insp.defects) : [],
+        photos: insp.photo_urls ? insp.photo_urls.split(',') : [],
+        work_log_id: insp.work_log_id,
+      },
+    }));
+
+  const mockEvents: JournalEvent[] = [...workEntryEvents, ...inspectionEvents]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   return (
     <div className="flex flex-col h-[calc(100vh-140px)] bg-white overflow-hidden border-t border-slate-200">

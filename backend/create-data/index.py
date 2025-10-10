@@ -136,6 +136,41 @@ def handler(event, context):
                 result = cur.fetchone()
                 conn.commit()
                 
+            elif item_type == 'inspection':
+                work_id = int(data.get('work_id', 0))
+                work_log_id = data.get('work_log_id')
+                description = data.get('description', '').replace("'", "''")
+                status = data.get('status', 'pending')
+                defects = data.get('defects', '[]').replace("'", "''")
+                photo_urls = data.get('photo_urls', '').replace("'", "''") if data.get('photo_urls') else None
+                
+                if work_log_id and photo_urls:
+                    cur.execute(f"""
+                        INSERT INTO inspections (work_id, work_log_id, description, status, defects, photo_urls, created_by, created_at)
+                        VALUES ({work_id}, {int(work_log_id)}, '{description}', '{status}', '{defects}', '{photo_urls}', {user_id_int}, NOW())
+                        RETURNING id, work_id, work_log_id, description, status, defects, photo_urls, created_by, created_at
+                    """)
+                elif work_log_id:
+                    cur.execute(f"""
+                        INSERT INTO inspections (work_id, work_log_id, description, status, defects, created_by, created_at)
+                        VALUES ({work_id}, {int(work_log_id)}, '{description}', '{status}', '{defects}', {user_id_int}, NOW())
+                        RETURNING id, work_id, work_log_id, description, status, defects, photo_urls, created_by, created_at
+                    """)
+                elif photo_urls:
+                    cur.execute(f"""
+                        INSERT INTO inspections (work_id, description, status, defects, photo_urls, created_by, created_at)
+                        VALUES ({work_id}, '{description}', '{status}', '{defects}', '{photo_urls}', {user_id_int}, NOW())
+                        RETURNING id, work_id, work_log_id, description, status, defects, photo_urls, created_by, created_at
+                    """)
+                else:
+                    cur.execute(f"""
+                        INSERT INTO inspections (work_id, description, status, defects, created_by, created_at)
+                        VALUES ({work_id}, '{description}', '{status}', '{defects}', {user_id_int}, NOW())
+                        RETURNING id, work_id, work_log_id, description, status, defects, photo_urls, created_by, created_at
+                    """)
+                result = cur.fetchone()
+                conn.commit()
+                
             else:
                 cur.close()
                 conn.close()

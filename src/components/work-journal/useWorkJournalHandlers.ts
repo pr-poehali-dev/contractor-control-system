@@ -67,14 +67,47 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
     setIsInspectionModalOpen(true);
   };
 
-  const handleInspectionSubmit = (data: any) => {
-    console.log('Создание проверки:', data);
-    toast({
-      title: 'Проверка создана',
-      description: 'Проверка успешно добавлена в журнал',
-    });
-    setIsInspectionModalOpen(false);
-    setSelectedEntryForInspection(undefined);
+  const handleInspectionSubmit = async (data: {
+    text_content: string;
+    status: string;
+    defects: Array<{ description: string; severity: string }>;
+    photo_urls: string[];
+  }) => {
+    if (!user || !selectedWork) return;
+    
+    setIsSubmitting(true);
+
+    try {
+      await api.createItem(token!, 'inspection', {
+        work_id: selectedWork,
+        work_log_id: selectedEntryForInspection || null,
+        description: data.text_content,
+        status: data.status,
+        defects: JSON.stringify(data.defects),
+        photo_urls: data.photo_urls.join(',') || null,
+      });
+
+      if (token) {
+        const refreshedData = await api.getUserData(token);
+        setUserData(refreshedData);
+      }
+
+      toast({
+        title: 'Проверка создана',
+        description: 'Проверка успешно добавлена в журнал',
+      });
+
+      setIsInspectionModalOpen(false);
+      setSelectedEntryForInspection(undefined);
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось создать проверку',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleWorkReportSubmit = async (data: {

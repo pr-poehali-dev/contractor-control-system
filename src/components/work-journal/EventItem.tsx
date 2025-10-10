@@ -73,6 +73,62 @@ export default function EventItem({
           </>
         );
         
+      case 'inspection':
+        return (
+          <>
+            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-slate-200">
+              <Icon name="ClipboardCheck" size={20} className="text-blue-600" />
+              <span className="text-base font-semibold text-blue-600">Проверка</span>
+              {event.inspection_data?.status && (
+                <Badge 
+                  variant={
+                    event.inspection_data.status === 'approved' ? 'default' : 
+                    event.inspection_data.status === 'rejected' ? 'destructive' : 
+                    'outline'
+                  }
+                  className="text-sm"
+                >
+                  {event.inspection_data.status === 'approved' ? 'Одобрено' : 
+                   event.inspection_data.status === 'rejected' ? 'Не одобрено' : 
+                   'На проверке'}
+                </Badge>
+              )}
+            </div>
+            <p className="text-lg leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
+            
+            {event.inspection_data?.defects && event.inspection_data.defects.length > 0 && (
+              <div className="mt-4">
+                <p className="text-base text-slate-600 mb-3">Замечания:</p>
+                <div className="space-y-2">
+                  {event.inspection_data.defects.map((defect, idx) => (
+                    <div key={idx} className="p-3 bg-amber-50 border-l-4 border-l-amber-500 rounded">
+                      <div className="flex items-start gap-2">
+                        <Badge variant="outline" className="text-xs">
+                          {defect.severity === 'critical' ? 'Критично' : defect.severity === 'major' ? 'Важно' : 'Незначит.'}
+                        </Badge>
+                        <p className="text-sm flex-1">{defect.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {event.inspection_data?.photos && event.inspection_data.photos.length > 0 && (
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {event.inspection_data.photos.map((photo, idx) => (
+                  <img 
+                    key={idx}
+                    src={photo} 
+                    alt={`Проверка ${idx + 1}`}
+                    className="w-full h-32 object-cover rounded"
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        );
+
       case 'inspection_created':
         return (
           <div className="flex items-start gap-3">
@@ -227,6 +283,7 @@ export default function EventItem({
           'border-none shadow-sm',
           isOwnEvent ? 'bg-blue-50' : 'bg-white',
           event.type === 'work_entry' && !isOwnEvent && 'border-l-4 border-l-green-500',
+          event.type === 'inspection' && !isOwnEvent && 'border-l-4 border-l-blue-500',
           event.type === 'defect_added' && 'border-l-4 border-l-amber-500'
         )}>
           <CardContent className="p-5">

@@ -1,5 +1,6 @@
 export type EventType = 
-  | 'work_entry' 
+  | 'work_entry'
+  | 'inspection'
   | 'inspection_created' 
   | 'inspection_completed'
   | 'defect_added' 
@@ -29,10 +30,13 @@ export interface JournalEvent {
   };
   
   inspection_data?: {
-    inspection_id: number;
-    inspection_number: string;
-    status?: 'pending' | 'in_progress' | 'completed';
+    inspection_id?: number;
+    inspection_number?: string;
+    status?: 'approved' | 'rejected' | 'pending';
     defects_count?: number;
+    defects?: Array<{ description: string; severity: string }>;
+    photos?: string[];
+    work_log_id?: number;
   };
   
   defect_data?: {

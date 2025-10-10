@@ -212,9 +212,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         if work_ids:
             cur.execute("""
-                SELECT i.id, i.work_id, i.inspection_number, i.created_by, i.status,
-                       i.notes, i.created_at, i.completed_at,
-                       u.name as inspector_name
+                SELECT i.id, i.work_id, i.work_log_id, i.inspection_number, i.created_by, i.status,
+                       i.notes, i.description, i.defects, i.photo_urls, i.created_at, i.completed_at,
+                       u.name as author_name, u.role as author_role
                 FROM inspections i
                 LEFT JOIN users u ON i.created_by = u.id
                 WHERE i.work_id = ANY(%s)
