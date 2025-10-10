@@ -80,7 +80,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            Описание
+            Нормативная документация
             {activeTab === 'description' && (
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
             )}
