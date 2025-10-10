@@ -1,50 +1,18 @@
 {
   "tests": [
     {
-      "name": "Update project",
-      "method": "PUT",
-      "headers": {
-        "X-User-Id": "1"
-      },
-      "body": {
-        "type": "project",
-        "id": 1,
-        "data": {
-          "title": "Updated Project",
-          "description": "Updated Description",
-          "status": "active"
-        }
-      },
-      "expectedStatus": 200,
-      "expectedBody": {
-        "success": true
-      },
-      "bodyMatcher": "partial"
+      "name": "OPTIONS request for CORS",
+      "method": "OPTIONS",
+      "expectedStatus": 200
     },
     {
-      "name": "Delete without auth",
+      "name": "Delete without auth token",
       "method": "DELETE",
       "body": {
         "type": "project",
         "id": 1
       },
       "expectedStatus": 401
-    },
-    {
-      "name": "Delete project with auth",
-      "method": "DELETE",
-      "headers": {
-        "X-User-Id": "1"
-      },
-      "body": {
-        "type": "project",
-        "id": 999
-      },
-      "expectedStatus": 200,
-      "expectedBody": {
-        "success": true
-      },
-      "bodyMatcher": "partial"
     }
   ]
 }

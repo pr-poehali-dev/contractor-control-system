@@ -1,12 +1,23 @@
 """
 Business: Create projects, objects, works and log entries
-Args: event with httpMethod, headers (X-User-Id), body (type, data)
+Args: event with httpMethod, headers (X-Auth-Token), body (type, data)
 Returns: HTTP response with created item or error
 """
 import json
 import os
 import psycopg2
+import jwt
 from psycopg2.extras import RealDictCursor
+
+JWT_SECRET = os.environ.get('JWT_SECRET', 'default-secret-change-in-production')
+
+def verify_jwt_token(token):
+    try:
+        return jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+    except jwt.ExpiredSignatureError:
+        raise ValueError('Token expired')
+    except jwt.InvalidTokenError:
+        raise ValueError('Invalid token')
 
 def handler(event, context):
     method = event.get('httpMethod', 'POST')
@@ -17,7 +28,7 @@ def handler(event, context):
             'headers': {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, X-User-Id',
+                'Access-Control-Allow-Headers': 'Content-Type, X-Auth-Token',
                 'Access-Control-Max-Age': '86400'
             },
             'body': ''
@@ -25,22 +36,29 @@ def handler(event, context):
     
     if method == 'POST':
         headers = event.get('headers', {})
-        user_id = headers.get('X-User-Id') or headers.get('x-user-id')
+        auth_token = headers.get('X-Auth-Token') or headers.get('x-auth-token')
         
-        if not user_id:
+        if not auth_token:
             return {
                 'statusCode': 401,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                'body': json.dumps({'error': 'User ID required'})
+                'body': json.dumps({'error': 'Auth token required'})
             }
         
         try:
-            user_id_int = int(user_id)
-        except (ValueError, TypeError):
+            payload = verify_jwt_token(auth_token)
+            user_id_int = payload['user_id']
+        except ValueError as e:
             return {
-                'statusCode': 400,
+                'statusCode': 401,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                'body': json.dumps({'error': 'Invalid user ID'})
+                'body': json.dumps({'error': str(e)})
+            }
+        except Exception as e:
+            return {
+                'statusCode': 401,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({'error': 'Invalid token'})
             }
         
         body = json.loads(event.get('body', '{}'))
