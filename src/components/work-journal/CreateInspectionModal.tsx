@@ -123,7 +123,9 @@ export default function CreateInspectionModal({
   };
 
   const handleSubmit = () => {
+    console.log('=== MODAL SUBMIT START ===');
     const validCheckpoints = checkpoints.filter(cp => cp.status !== 'not_checked');
+    console.log('Valid checkpoints:', validCheckpoints);
     
     if (validCheckpoints.length === 0) {
       alert('Необходимо проверить хотя бы один пункт');
@@ -138,6 +140,11 @@ export default function CreateInspectionModal({
       alert('Заполните описание и ссылку на норматив для всех замечаний');
       return;
     }
+
+    console.log('Submitting inspection data:', {
+      journal_entry_id: journalEntryId,
+      checkpoints: validCheckpoints,
+    });
 
     onSubmit({
       journal_entry_id: journalEntryId,

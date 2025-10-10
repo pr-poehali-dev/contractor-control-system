@@ -68,23 +68,72 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
   };
 
   const handleInspectionSubmit = async (data: {
-    text_content: string;
-    status: string;
-    defects: Array<{ description: string; severity: string }>;
-    photo_urls: string[];
+    journal_entry_id?: number;
+    checkpoints: Array<{
+      control_point_id: number;
+      status: 'compliant' | 'non_compliant' | 'not_checked';
+      notes?: string;
+      defect?: {
+        description: string;
+        standard_reference: string;
+        photos: string[];
+      };
+    }>;
   }) => {
-    if (!user || !selectedWork) return;
+    console.log('=== INSPECTION SUBMIT START ===');
+    console.log('User:', user);
+    console.log('Selected work:', selectedWork);
+    console.log('Token:', token ? 'exists' : 'missing');
+    console.log('Data:', data);
+    
+    if (!user || !selectedWork) {
+      console.error('Missing user or selectedWork');
+      return;
+    }
     
     setIsSubmitting(true);
 
     try {
+      const defects = data.checkpoints
+        .filter(cp => cp.status === 'non_compliant' && cp.defect)
+        .map(cp => ({
+          description: cp.defect!.description,
+          standard_reference: cp.defect!.standard_reference,
+          photos: cp.defect!.photos,
+        }));
+
+      const allPhotos = defects.flatMap(d => d.photos).filter(Boolean);
+      
+      const hasDefects = defects.length > 0;
+      const overallStatus = hasDefects ? 'non_compliant' : 'compliant';
+      
+      const descriptionParts: string[] = [];
+      
+      const compliantCount = data.checkpoints.filter(cp => cp.status === 'compliant').length;
+      const nonCompliantCount = data.checkpoints.filter(cp => cp.status === 'non_compliant').length;
+      
+      descriptionParts.push(`Проверено пунктов: ${data.checkpoints.length}`);
+      descriptionParts.push(`Соответствует: ${compliantCount}`);
+      if (nonCompliantCount > 0) {
+        descriptionParts.push(`Не соответствует: ${nonCompliantCount}`);
+      }
+
+      console.log('Creating inspection with:', {
+        work_id: selectedWork,
+        work_log_id: data.journal_entry_id || selectedEntryForInspection || null,
+        description: descriptionParts.join(', '),
+        status: overallStatus,
+        defects: defects,
+        photo_urls: allPhotos.length > 0 ? allPhotos.join(',') : null,
+      });
+
       await api.createItem(token!, 'inspection', {
         work_id: selectedWork,
-        work_log_id: selectedEntryForInspection || null,
-        description: data.text_content,
-        status: data.status,
-        defects: JSON.stringify(data.defects),
-        photo_urls: data.photo_urls.join(',') || null,
+        work_log_id: data.journal_entry_id || selectedEntryForInspection || null,
+        description: descriptionParts.join(', '),
+        status: overallStatus,
+        defects: JSON.stringify(defects),
+        photo_urls: allPhotos.length > 0 ? allPhotos.join(',') : null,
       });
 
       if (token) {
@@ -102,9 +151,10 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
     } catch (error) {
       toast({
         title: 'Ошибка',
-        description: 'Не удалось создать проверку',
+        description: error instanceof Error ? error.message : 'Не удалось создать проверку',
         variant: 'destructive',
       });
+      console.error('Inspection creation error:', error);
     } finally {
       setIsSubmitting(false);
     }
