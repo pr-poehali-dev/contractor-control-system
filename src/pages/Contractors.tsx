@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import ContractorDetailsModal from '@/components/contractors/ContractorDetailsModal';
 
 const Contractors = () => {
   const { user, userData } = useAuth();
@@ -20,6 +21,8 @@ const Contractors = () => {
   const [existingContractor, setExistingContractor] = useState<any>(null);
   const [contractors, setContractors] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedContractor, setSelectedContractor] = useState<any>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   useEffect(() => {
     loadContractors();
@@ -285,8 +288,12 @@ const Contractors = () => {
           {contractors.map((contractor, index) => (
             <Card 
               key={contractor.id}
-              className="hover:shadow-lg transition-shadow animate-fade-in"
+              className="hover:shadow-lg transition-shadow animate-fade-in cursor-pointer"
               style={{ animationDelay: `${index * 0.05}s` }}
+              onClick={() => {
+                setSelectedContractor(contractor);
+                setDetailsOpen(true);
+              }}
             >
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
@@ -342,6 +349,12 @@ const Contractors = () => {
           ))}
         </div>
       )}
+
+      <ContractorDetailsModal
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+        contractor={selectedContractor}
+      />
     </div>
   );
 };

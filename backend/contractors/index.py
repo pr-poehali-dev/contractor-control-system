@@ -57,8 +57,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     """
                     SELECT c.id, c.name, c.inn, c.contact_info, c.user_id,
                            u.email, u.phone, u.name as user_name
-                    FROM contractors c
-                    LEFT JOIN users u ON c.user_id = u.id
+                    FROM t_p8942561_contractor_control_s.contractors c
+                    LEFT JOIN t_p8942561_contractor_control_s.users u ON c.user_id = u.id
                     WHERE c.inn = %s
                     """,
                     (inn,)
@@ -110,7 +110,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'body': json.dumps({'error': 'client_id, inn, and name are required'})
                     }
                 
-                cur.execute("SELECT id, user_id FROM contractors WHERE inn = %s", (inn,))
+                cur.execute("SELECT id, user_id FROM t_p8942561_contractor_control_s.contractors WHERE inn = %s", (inn,))
                 existing_contractor = cur.fetchone()
                 
                 if existing_contractor:
@@ -118,7 +118,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     
                     cur.execute(
                         """
-                        INSERT INTO client_contractors (client_id, contractor_id, added_at)
+                        INSERT INTO t_p8942561_contractor_control_s.client_contractors (client_id, contractor_id, added_at)
                         VALUES (%s, %s, CURRENT_TIMESTAMP)
                         ON CONFLICT (client_id, contractor_id) DO NOTHING
                         RETURNING id
@@ -149,7 +149,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     
                     cur.execute(
                         """
-                        INSERT INTO users (email, phone, password_hash, name, role, organization, is_active, created_at, updated_at)
+                        INSERT INTO t_p8942561_contractor_control_s.users (email, phone, password_hash, name, role, organization, is_active, created_at, updated_at)
                         VALUES (%s, %s, %s, %s, 'contractor', %s, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                         RETURNING id
                         """,
@@ -159,7 +159,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     
                     cur.execute(
                         """
-                        INSERT INTO contractors (name, inn, contact_info, user_id, created_at, updated_at)
+                        INSERT INTO t_p8942561_contractor_control_s.contractors (name, inn, contact_info, user_id, created_at, updated_at)
                         VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                         RETURNING id
                         """,
@@ -169,7 +169,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     
                     cur.execute(
                         """
-                        INSERT INTO client_contractors (client_id, contractor_id, added_at)
+                        INSERT INTO t_p8942561_contractor_control_s.client_contractors (client_id, contractor_id, added_at)
                         VALUES (%s, %s, CURRENT_TIMESTAMP)
                         """,
                         (client_id, contractor_id)
@@ -177,7 +177,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     
                     cur.execute(
                         """
-                        INSERT INTO contractor_invites (client_id, contractor_id, status, created_at)
+                        INSERT INTO t_p8942561_contractor_control_s.contractor_invites (client_id, contractor_id, status, created_at)
                         VALUES (%s, %s, 'sent', CURRENT_TIMESTAMP)
                         RETURNING id
                         """,
@@ -205,7 +205,54 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     }
         
         elif method == 'GET':
-            client_id = event.get('queryStringParameters', {}).get('client_id')
+            params = event.get('queryStringParameters', {}) or {}
+            client_id = params.get('client_id')
+            contractor_id = params.get('contractor_id')
+            with_assignments = params.get('with_assignments') == 'true'
+            
+            if contractor_id and with_assignments:
+                cur.execute(
+                    """
+                    SELECT 
+                        p.id as project_id,
+                        p.name as project_name,
+                        po.id as object_id,
+                        po.name as object_name,
+                        w.id as work_id,
+                        w.work_type as work_title,
+                        w.status,
+                        w.assigned_at
+                    FROM t_p8942561_contractor_control_s.works w
+                    INNER JOIN t_p8942561_contractor_control_s.project_objects po ON w.object_id = po.id
+                    INNER JOIN t_p8942561_contractor_control_s.projects p ON po.project_id = p.id
+                    WHERE w.contractor_id = %s
+                    ORDER BY w.assigned_at DESC
+                    """,
+                    (contractor_id,)
+                )
+                assignments_data = cur.fetchall()
+                
+                assignments = []
+                for row in assignments_data:
+                    assignments.append({
+                        'project_id': row[0],
+                        'project_name': row[1],
+                        'object_id': row[2],
+                        'object_name': row[3],
+                        'work_id': row[4],
+                        'work_title': row[5],
+                        'status': row[6],
+                        'assigned_at': row[7].isoformat() if row[7] else None
+                    })
+                
+                cur.close()
+                conn.close()
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'assignments': assignments})
+                }
             
             if not client_id:
                 return {
@@ -218,9 +265,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 """
                 SELECT c.id, c.name, c.inn, c.contact_info, cc.added_at,
                        u.email, u.phone, u.name as user_name
-                FROM contractors c
-                INNER JOIN client_contractors cc ON c.id = cc.contractor_id
-                LEFT JOIN users u ON c.user_id = u.id
+                FROM t_p8942561_contractor_control_s.contractors c
+                INNER JOIN t_p8942561_contractor_control_s.client_contractors cc ON c.id = cc.contractor_id
+                LEFT JOIN t_p8942561_contractor_control_s.users u ON c.user_id = u.id
                 WHERE cc.client_id = %s
                 ORDER BY cc.added_at DESC
                 """,
