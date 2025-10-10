@@ -37,9 +37,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         if method == 'GET':
             cur.execute(
                 """
-                SELECT id, name, code, description, category, unit, 
-                       normative_base, control_points, typical_defects, 
-                       acceptance_criteria, created_at, updated_at
+                SELECT id, name, code, description, normative_base, 
+                       category, created_at, updated_at
                 FROM work_types
                 ORDER BY category, name
                 """
@@ -50,17 +49,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             for wt in work_types:
                 work_types_list.append({
                     'id': wt[0],
-                    'name': wt[1],
+                    'title': wt[1],
                     'code': wt[2],
                     'description': wt[3],
-                    'category': wt[4],
-                    'unit': wt[5],
-                    'normative_base': wt[6],
-                    'control_points': wt[7],
-                    'typical_defects': wt[8],
-                    'acceptance_criteria': wt[9],
-                    'created_at': wt[10].isoformat() if wt[10] else None,
-                    'updated_at': wt[11].isoformat() if wt[11] else None
+                    'normative_ref': wt[4],
+                    'material_types': wt[5],
+                    'created_at': wt[6].isoformat() if wt[6] else None,
+                    'updated_at': wt[7].isoformat() if wt[7] else None
                 })
             
             cur.close()
@@ -75,54 +70,40 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         elif method == 'POST':
             body = json.loads(event.get('body', '{}'))
-            name = body.get('name')
+            title = body.get('title')
             code = body.get('code', '')
             description = body.get('description', '')
-            category = body.get('category')
-            unit = body.get('unit')
-            normative_base = body.get('normative_base', '')
-            control_points = body.get('control_points', '')
-            typical_defects = body.get('typical_defects', '')
-            acceptance_criteria = body.get('acceptance_criteria', '')
+            normative_ref = body.get('normative_ref', '')
+            material_types = body.get('material_types', '')
             
-            if not name or not category or not unit:
+            if not title:
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Missing required fields: name, category, unit'}),
+                    'body': json.dumps({'error': 'Missing required field: title'}),
                     'isBase64Encoded': False
                 }
             
             cur.execute(
                 """
-                INSERT INTO work_types (name, code, description, category, unit, 
-                                       normative_base, control_points, typical_defects, 
-                                       acceptance_criteria, created_at, updated_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                RETURNING id, name, code, description, category, unit, 
-                          normative_base, control_points, typical_defects, 
-                          acceptance_criteria, created_at, updated_at
+                INSERT INTO work_types (name, code, description, normative_base, category, created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                RETURNING id, name, code, description, normative_base, category, created_at, updated_at
                 """,
-                (name, code or None, description, category, unit, 
-                 normative_base or None, control_points or None, 
-                 typical_defects or None, acceptance_criteria or None)
+                (title, code or None, description, normative_ref or None, material_types or None)
             )
             work_type = cur.fetchone()
             conn.commit()
             
             work_type_data = {
                 'id': work_type[0],
-                'name': work_type[1],
+                'title': work_type[1],
                 'code': work_type[2],
                 'description': work_type[3],
-                'category': work_type[4],
-                'unit': work_type[5],
-                'normative_base': work_type[6],
-                'control_points': work_type[7],
-                'typical_defects': work_type[8],
-                'acceptance_criteria': work_type[9],
-                'created_at': work_type[10].isoformat() if work_type[10] else None,
-                'updated_at': work_type[11].isoformat() if work_type[11] else None
+                'normative_ref': work_type[4],
+                'material_types': work_type[5],
+                'created_at': work_type[6].isoformat() if work_type[6] else None,
+                'updated_at': work_type[7].isoformat() if work_type[7] else None
             }
             
             cur.close()
@@ -148,38 +129,28 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             body = json.loads(event.get('body', '{}'))
-            name = body.get('name')
+            title = body.get('title')
             code = body.get('code', '')
             description = body.get('description', '')
-            category = body.get('category')
-            unit = body.get('unit')
-            normative_base = body.get('normative_base', '')
-            control_points = body.get('control_points', '')
-            typical_defects = body.get('typical_defects', '')
-            acceptance_criteria = body.get('acceptance_criteria', '')
+            normative_ref = body.get('normative_ref', '')
+            material_types = body.get('material_types', '')
             
-            if not name or not category or not unit:
+            if not title:
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Missing required fields: name, category, unit'}),
+                    'body': json.dumps({'error': 'Missing required field: title'}),
                     'isBase64Encoded': False
                 }
             
             cur.execute(
                 """
                 UPDATE work_types 
-                SET name = %s, code = %s, description = %s, category = %s, unit = %s,
-                    normative_base = %s, control_points = %s, typical_defects = %s,
-                    acceptance_criteria = %s, updated_at = CURRENT_TIMESTAMP
+                SET name = %s, code = %s, description = %s, normative_base = %s, category = %s, updated_at = CURRENT_TIMESTAMP
                 WHERE id = %s
-                RETURNING id, name, code, description, category, unit,
-                          normative_base, control_points, typical_defects,
-                          acceptance_criteria, created_at, updated_at
+                RETURNING id, name, code, description, normative_base, category, created_at, updated_at
                 """,
-                (name, code or None, description, category, unit,
-                 normative_base or None, control_points or None,
-                 typical_defects or None, acceptance_criteria or None, work_id)
+                (title, code or None, description, normative_ref or None, material_types or None, work_id)
             )
             work_type = cur.fetchone()
             
@@ -195,17 +166,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             work_type_data = {
                 'id': work_type[0],
-                'name': work_type[1],
+                'title': work_type[1],
                 'code': work_type[2],
                 'description': work_type[3],
-                'category': work_type[4],
-                'unit': work_type[5],
-                'normative_base': work_type[6],
-                'control_points': work_type[7],
-                'typical_defects': work_type[8],
-                'acceptance_criteria': work_type[9],
-                'created_at': work_type[10].isoformat() if work_type[10] else None,
-                'updated_at': work_type[11].isoformat() if work_type[11] else None
+                'normative_ref': work_type[4],
+                'material_types': work_type[5],
+                'created_at': work_type[6].isoformat() if work_type[6] else None,
+                'updated_at': work_type[7].isoformat() if work_type[7] else None
             }
             
             cur.close()
