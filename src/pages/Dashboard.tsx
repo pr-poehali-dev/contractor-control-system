@@ -379,44 +379,15 @@ const Dashboard = () => {
           <div className="lg:w-80 flex-shrink-0">
             <Card className="sticky top-4">
               <CardContent className="p-6">
-                <h3 className="font-bold text-lg mb-4 text-slate-900">Быстрые действия</h3>
-                <div className="space-y-2">
-                  <Button 
-                    className="w-full justify-start" 
-                    variant="outline"
-                    onClick={() => navigate('/projects')}
-                  >
-                    <Icon name="FolderPlus" size={18} className="mr-3" />
-                    Создать проект
-                  </Button>
-
-                  <Button 
-                    className="w-full justify-start" 
-                    variant="outline"
-                    onClick={() => navigate('/create-inspection')}
-                  >
-                    <Icon name="ClipboardCheck" size={18} className="mr-3" />
-                    Создать проверку
-                  </Button>
-
-                  <Button 
-                    className="w-full justify-start" 
-                    variant="outline"
-                    onClick={() => navigate('/analytics')}
-                  >
-                    <Icon name="BarChart3" size={18} className="mr-3" />
-                    Аналитика
-                  </Button>
-
-                  <Button 
-                    className="w-full justify-start" 
-                    variant="outline"
-                    onClick={() => navigate('/work-templates')}
-                  >
-                    <Icon name="FileText" size={18} className="mr-3" />
-                    Шаблоны
-                  </Button>
-                </div>
+                <h3 className="font-bold text-lg mb-4 text-slate-900">Быстрое действие</h3>
+                <Button 
+                  className="w-full justify-start" 
+                  variant="outline"
+                  onClick={() => navigate('/projects')}
+                >
+                  <Icon name="FolderPlus" size={18} className="mr-3" />
+                  Создать проект
+                </Button>
               </CardContent>
             </Card>
           </div>

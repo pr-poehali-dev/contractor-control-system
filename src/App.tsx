@@ -18,7 +18,6 @@ import Activity from "./pages/Activity";
 import Settings from "./pages/Settings";
 import MyWorks from "./pages/MyWorks";
 import WorkLog from "./pages/WorkLog";
-import CreateInspection from "./pages/CreateInspection";
 import Defects from "./pages/Defects";
 import Analytics from "./pages/Analytics";
 import Contractors from "./pages/Contractors";
@@ -75,7 +74,6 @@ const App = () => (
             <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
             <Route path="/my-works" element={<ProtectedRoute><MyWorks /></ProtectedRoute>} />
             <Route path="/work-log" element={<ProtectedRoute><WorkLog /></ProtectedRoute>} />
-            <Route path="/create-inspection" element={<ProtectedRoute><CreateInspection /></ProtectedRoute>} />
             <Route path="/inspection/:inspectionId" element={<ProtectedRoute><InspectionDetail /></ProtectedRoute>} />
             <Route path="/journal-entry/:entryId" element={<ProtectedRoute><JournalEntryDetail /></ProtectedRoute>} />
             <Route path="/defects" element={<ProtectedRoute><Defects /></ProtectedRoute>} />
