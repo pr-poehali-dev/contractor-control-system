@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,6 +16,7 @@ interface CreateInspectionModalProps {
   onSubmit: (data: InspectionFormData) => void;
   journalEntryId?: number;
   workType?: string;
+  controlPoints?: ControlPoint[];
 }
 
 export interface CheckpointResult {
@@ -82,16 +83,25 @@ export default function CreateInspectionModal({
   onClose,
   onSubmit,
   journalEntryId,
-  workType = 'Кирпичная кладка'
+  workType = 'Работа',
+  controlPoints = mockControlPoints
 }: CreateInspectionModalProps) {
-  const [checkpoints, setCheckpoints] = useState<CheckpointResult[]>(
-    mockControlPoints.map(cp => ({
-      control_point_id: cp.id,
-      status: 'not_checked' as const,
-      notes: '',
-    }))
-  );
+  const [checkpoints, setCheckpoints] = useState<CheckpointResult[]>([]);
   const [activeDefectId, setActiveDefectId] = useState<number | null>(null);
+
+  // Reset checkpoints when controlPoints or modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setCheckpoints(
+        controlPoints.map(cp => ({
+          control_point_id: cp.id,
+          status: 'not_checked' as const,
+          notes: '',
+        }))
+      );
+      setActiveDefectId(null);
+    }
+  }, [isOpen, controlPoints]);
 
   const handleCheckpointStatusChange = (cpId: number, status: 'compliant' | 'non_compliant') => {
     setCheckpoints(prev => prev.map(cp => {
@@ -168,30 +178,42 @@ export default function CreateInspectionModal({
             </p>
           </div>
 
-          {mockControlPoints.map((cp) => {
-            const checkpoint = checkpoints.find(c => c.control_point_id === cp.id);
-            const isNonCompliant = checkpoint?.status === 'non_compliant';
-            
-            return (
-              <Card key={cp.id} className={cn(
-                'border-2',
-                checkpoint?.status === 'compliant' && 'border-green-200 bg-green-50',
-                checkpoint?.status === 'non_compliant' && 'border-amber-200 bg-amber-50'
-              )}>
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-start gap-2 mb-2">
-                        {cp.is_critical && (
-                          <Badge variant="destructive" className="text-xs">Критично</Badge>
-                        )}
-                        <Badge variant="outline" className="text-xs">{cp.category}</Badge>
+          {controlPoints.length === 0 ? (
+            <Card className="border-2 border-amber-200 bg-amber-50">
+              <CardContent className="p-6 text-center">
+                <Icon name="AlertCircle" size={32} className="mx-auto text-amber-600 mb-3" />
+                <p className="text-amber-900 font-medium mb-2">
+                  Контрольные точки не найдены
+                </p>
+                <p className="text-sm text-amber-700">
+                  Для этого вида работ контрольные точки не настроены в справочнике
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            controlPoints.map((cp) => {
+              const checkpoint = checkpoints.find(c => c.control_point_id === cp.id);
+              const isNonCompliant = checkpoint?.status === 'non_compliant';
+              
+              return (
+                <Card key={cp.id} className={cn(
+                  'border-2',
+                  checkpoint?.status === 'compliant' && 'border-green-200 bg-green-50',
+                  checkpoint?.status === 'non_compliant' && 'border-amber-200 bg-amber-50'
+                )}>
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-start gap-2 mb-2">
+                          {cp.is_critical && (
+                            <Badge variant="destructive" className="text-xs">Критично</Badge>
+                          )}
+                        </div>
+                        <p className="text-sm font-medium text-slate-800 mb-1">{cp.description}</p>
+                        <p className="text-xs text-blue-600">
+                          📋 {cp.standard} • {cp.standard_clause}
+                        </p>
                       </div>
-                      <p className="text-sm font-medium text-slate-800 mb-1">{cp.description}</p>
-                      <p className="text-xs text-blue-600">
-                        📋 {cp.standard} • {cp.standard_clause}
-                      </p>
-                    </div>
                     
                     <div className="flex gap-2 flex-shrink-0">
                       <Button
@@ -261,8 +283,9 @@ export default function CreateInspectionModal({
                   )}
                 </CardContent>
               </Card>
-            );
-          })}
+              );
+            })
+          )}
         </div>
 
         <DialogFooter>

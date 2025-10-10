@@ -37,7 +37,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         if method == 'GET':
             cur.execute(
                 """
-                SELECT id, title, code, description, normative_ref, material_types, category, created_at
+                SELECT id, title, code, description, normative_ref, material_types, category, control_points, created_at
                 FROM t_p8942561_contractor_control_s.work_templates
                 ORDER BY category, title
                 """
@@ -54,7 +54,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'normative_ref': wt[4],
                     'material_types': wt[5],
                     'category': wt[6],
-                    'created_at': wt[7].isoformat() if wt[7] else None
+                    'control_points': wt[7] if wt[7] else [],
+                    'created_at': wt[8].isoformat() if wt[8] else None
                 })
             
             cur.close()

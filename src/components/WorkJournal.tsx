@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -47,6 +47,20 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
 
   const [showWorksList, setShowWorksList] = useState(false);
   const [activeTab, setActiveTab] = useState('journal');
+  const [workTemplates, setWorkTemplates] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadWorkTemplates = async () => {
+      try {
+        const response = await fetch('https://functions.poehali.dev/f7c65aa6-e261-44c6-a6cb-65fd7bac3fdf');
+        const data = await response.json();
+        setWorkTemplates(data.work_types || []);
+      } catch (error) {
+        console.error('Failed to load work templates:', error);
+      }
+    };
+    loadWorkTemplates();
+  }, []);
 
   const handleWorkSelect = (workId: number) => {
     if (projectId) {
@@ -251,6 +265,9 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                 onSubmit={handlers.handleInspectionSubmit}
                 journalEntryId={handlers.selectedEntryForInspection}
                 workType={selectedWorkData?.title}
+                controlPoints={
+                  workTemplates.find(t => t.title === selectedWorkData?.title)?.control_points || []
+                }
               />
             </>
           ) : (
