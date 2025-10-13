@@ -30,6 +30,8 @@ interface FeedEventCardProps {
   event: FeedEvent;
   index: number;
   onClick: (event: FeedEvent) => void;
+  onStartInspection?: (event: FeedEvent) => void;
+  userRole?: 'client' | 'contractor' | 'admin';
 }
 
 const getEventIcon = (type: string) => {
@@ -70,7 +72,7 @@ const formatTimeAgo = (timestamp: string) => {
   }
 };
 
-const FeedEventCard = ({ event, index }: FeedEventCardProps) => {
+const FeedEventCard = ({ event, index, onStartInspection, userRole }: FeedEventCardProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const photos = event.photoUrls || [];
 
@@ -134,42 +136,26 @@ const FeedEventCard = ({ event, index }: FeedEventCardProps) => {
           </div>
         </div>
 
-        {event.type !== 'info_post' && event.objectTitle && (
-          <div className="mb-3 pl-14">
-            <Badge variant="outline" className="text-xs px-2.5 py-1 font-normal">
-              {event.objectTitle}
-            </Badge>
+        {event.type !== 'info_post' && (event.objectTitle || event.projectTitle) && (
+          <div className="mb-3 flex gap-2 flex-wrap">
+            {event.projectTitle && (
+              <Badge variant="outline" className="text-xs px-2.5 py-1 font-normal bg-blue-50 text-blue-700 border-blue-200">
+                {event.projectTitle}
+              </Badge>
+            )}
+            {event.objectTitle && (
+              <Badge variant="outline" className="text-xs px-2.5 py-1 font-normal">
+                {event.objectTitle}
+              </Badge>
+            )}
           </div>
         )}
 
         <div className="mb-3">
-          <h4 className="font-medium text-slate-900 mb-2 text-[15px] leading-snug">{event.title}</h4>
-          <p className="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed">
-            {event.description}
-          </p>
+          <h4 className="font-medium text-slate-900 mb-2 text-sm leading-snug">{event.title}</h4>
         </div>
 
-        {(event.volume || event.materials) && (
-          <div className="flex flex-wrap gap-3 mb-3 p-3 bg-slate-50 rounded-lg">
-            {event.volume && (
-              <div className="flex items-center gap-2 text-xs text-slate-700">
-                <Icon name="Package" size={14} className="text-slate-500" />
-                <span className="font-medium">Объём:</span>
-                <span>{event.volume}</span>
-              </div>
-            )}
-            {event.materials && (
-              <div className="flex items-center gap-2 text-xs text-slate-700">
-                <Icon name="Boxes" size={14} className="text-slate-500" />
-                <span className="font-medium">Материалы:</span>
-                <span>{event.materials}</span>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {photos.length > 0 && (
+        {photos.length > 0 && (
         <div className="relative bg-black group">
           <div className="relative aspect-[4/3] md:aspect-video">
             <img 
@@ -224,7 +210,47 @@ const FeedEventCard = ({ event, index }: FeedEventCardProps) => {
         </div>
       )}
 
+        <div className="mt-3">
+          <p className="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed">
+            {event.description}
+          </p>
+        </div>
 
+        {(event.volume || event.materials) && (
+          <div className="flex flex-wrap gap-3 mt-3 p-3 bg-slate-50 rounded-lg">
+            {event.volume && (
+              <div className="flex items-center gap-2 text-xs text-slate-700">
+                <Icon name="Package" size={14} className="text-slate-500" />
+                <span className="font-medium">Объём:</span>
+                <span>{event.volume}</span>
+              </div>
+            )}
+            {event.materials && (
+              <div className="flex items-center gap-2 text-xs text-slate-700">
+                <Icon name="Boxes" size={14} className="text-slate-500" />
+                <span className="font-medium">Материалы:</span>
+                <span>{event.materials}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {event.type === 'planned_inspection' && event.status === 'draft' && userRole === 'client' && (
+          <div className="mt-3 pt-3 border-t border-slate-100">
+            <Button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onStartInspection?.(event);
+              }}
+              className="w-full"
+              variant="default"
+            >
+              <Icon name="ClipboardCheck" size={16} className="mr-2" />
+              Начать проверку
+            </Button>
+          </div>
+        )}
+      </div>
     </Card>
   );
 };

@@ -222,6 +222,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             WHERE w.contractor_id = (
                 SELECT contractor_id FROM users WHERE id = {user_id}
             )
+            AND i.status != 'draft'
             ORDER BY i.created_at DESC
             LIMIT 10
         '''
@@ -247,6 +248,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             JOIN objects o ON w.object_id = o.id
             JOIN projects p ON o.project_id = p.id
             JOIN users u ON i.created_by = u.id
+            WHERE i.status != 'draft'
             ORDER BY i.created_at DESC
             LIMIT 15
         '''
@@ -273,6 +275,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             JOIN projects p ON o.project_id = p.id
             JOIN users u ON i.created_by = u.id
             WHERE p.client_id = {user_id}
+            AND i.status != 'draft'
             ORDER BY i.created_at DESC
             LIMIT 10
         '''
@@ -393,6 +396,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'description': planned['notes'] or '\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0437\u0430\u043f\u043b\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u043d\u0430',
             'timestamp': planned['scheduled_date'].isoformat() if hasattr(planned['scheduled_date'], 'isoformat') else str(planned['scheduled_date']),
             'scheduledDate': planned['scheduled_date'].isoformat() if hasattr(planned['scheduled_date'], 'isoformat') else str(planned['scheduled_date']),
+            'status': 'draft',
             'workId': planned['work_id'],
             'objectId': planned['object_id'],
             'projectId': planned['project_id'],

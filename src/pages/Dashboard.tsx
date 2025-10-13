@@ -315,6 +315,14 @@ const Dashboard = () => {
                     event={event}
                     index={index}
                     onClick={handleEventClick}
+                    userRole={user?.role}
+                    onStartInspection={(event) => {
+                      if (event.workId && event.objectId && event.projectId) {
+                        navigate(`/projects/${event.projectId}/objects/${event.objectId}`, {
+                          state: { scrollToWork: event.workId, startInspection: true }
+                        });
+                      }
+                    }}
                   />
                 ))
               )}
