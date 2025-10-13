@@ -38,20 +38,20 @@ const PublicProject = () => {
               </Badge>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 md:gap-8">
+            <div className="grid grid-cols-3 gap-3 md:gap-8">
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">{projectSites.length}</div>
-                <p className="text-xs md:text-sm text-slate-600">объектов</p>
+                <div className="text-2xl md:text-4xl font-bold text-slate-900 mb-1">{projectSites.length}</div>
+                <p className="text-[10px] md:text-sm text-slate-600 leading-tight">объектов</p>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">{projectWorks.length}</div>
-                <p className="text-xs md:text-sm text-slate-600">работ</p>
+                <div className="text-2xl md:text-4xl font-bold text-slate-900 mb-1">{projectWorks.length}</div>
+                <p className="text-[10px] md:text-sm text-slate-600 leading-tight">работ</p>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
+                <div className="text-base md:text-4xl font-bold text-slate-900 mb-1 leading-tight">
                   {new Date(project.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
                 </div>
-                <p className="text-xs md:text-sm text-slate-600">дата создания</p>
+                <p className="text-[10px] md:text-sm text-slate-600 leading-tight">дата создания</p>
               </div>
             </div>
           </CardContent>

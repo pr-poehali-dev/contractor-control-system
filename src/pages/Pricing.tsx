@@ -262,64 +262,66 @@ const Pricing = () => {
         </div>
 
         <div className="lg:col-span-1">
-          <Card className="lg:sticky lg:top-20">
-            <CardHeader>
-              <CardTitle>Ваш тариф</CardTitle>
-              <CardDescription>Итоговая стоимость</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">Базовый тариф</span>
-                  <span className="font-medium">{basePrice} ₽</span>
-                </div>
-                {enabledAddons.length > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Дополнительно</span>
-                    <span className="font-medium">{addonsPrice} ₽</span>
+          <div className="sticky bottom-0 left-0 right-0 lg:static bg-white border-t lg:border-t-0 p-4 lg:p-0 -mx-4 md:mx-0">
+            <Card className="border-0 lg:border shadow-none lg:shadow-sm">
+              <CardHeader className="pb-3 lg:pb-6">
+                <CardTitle className="text-lg">Ваш тариф</CardTitle>
+                <CardDescription className="text-xs md:text-sm">Итоговая стоимость</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 lg:space-y-4">
+                <div className="space-y-1.5 lg:space-y-2">
+                  <div className="flex justify-between text-xs md:text-sm">
+                    <span className="text-slate-600">Базовый тариф</span>
+                    <span className="font-medium">{basePrice} ₽</span>
                   </div>
-                )}
-                {discount > 0 && (
-                  <div className="flex justify-between text-sm text-green-600">
-                    <span>Скидка 15%</span>
-                    <span className="font-medium">-{discount} ₽</span>
+                  {enabledAddons.length > 0 && (
+                    <div className="flex justify-between text-xs md:text-sm">
+                      <span className="text-slate-600">Дополнительно</span>
+                      <span className="font-medium">{addonsPrice} ₽</span>
+                    </div>
+                  )}
+                  {discount > 0 && (
+                    <div className="flex justify-between text-xs md:text-sm text-green-600">
+                      <span>Скидка 15%</span>
+                      <span className="font-medium">-{discount} ₽</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-3 lg:pt-4 border-t">
+                  <div className="flex justify-between items-baseline mb-1">
+                    <span className="text-sm text-slate-600">Итого в месяц</span>
+                    <div className="text-2xl lg:text-3xl font-bold text-slate-900">
+                      {finalPrice} ₽
+                    </div>
                   </div>
-                )}
-              </div>
+                  <p className="text-xs text-slate-500 text-right">
+                    {finalPrice * 12} ₽ в год
+                  </p>
+                </div>
 
-              <div className="pt-4 border-t">
-                <div className="flex justify-between items-baseline mb-1">
-                  <span className="text-slate-600">Итого в месяц</span>
-                  <div className="text-3xl font-bold text-slate-900">
-                    {finalPrice} ₽
+                <Button className="w-full" size="lg">
+                  <Icon name="CreditCard" size={18} className="mr-2" />
+                  <span className="text-sm md:text-base">Оформить подписку</span>
+                </Button>
+
+                <div className="space-y-1.5 lg:space-y-2 pt-3 lg:pt-4 border-t">
+                  <div className="flex items-center gap-2 text-xs md:text-sm text-slate-600">
+                    <Icon name="Check" size={14} className="text-green-600 flex-shrink-0" />
+                    <span>Первые 14 дней бесплатно</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs md:text-sm text-slate-600">
+                    <Icon name="Check" size={14} className="text-green-600 flex-shrink-0" />
+                    <span>Отмена в любое время</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs md:text-sm text-slate-600">
+                    <Icon name="Check" size={14} className="text-green-600 flex-shrink-0" />
+                    <span>Безопасная оплата</span>
                   </div>
                 </div>
-                <p className="text-xs text-slate-500 text-right">
-                  {finalPrice * 12} ₽ в год
-                </p>
-              </div>
-
-              <Button className="w-full" size="lg">
-                <Icon name="CreditCard" size={20} className="mr-2" />
-                Оформить подписку
-              </Button>
-
-              <div className="space-y-2 pt-4 border-t">
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <Icon name="Check" size={16} className="text-green-600" />
-                  <span>Первые 14 дней бесплатно</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <Icon name="Check" size={16} className="text-green-600" />
-                  <span>Отмена в любое время</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <Icon name="Check" size={16} className="text-green-600" />
-                  <span>Безопасная оплата</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
       </div>

@@ -39,34 +39,36 @@ const PublicObject = () => {
               </Badge>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 md:gap-8">
+            <div className="grid grid-cols-3 gap-3 md:gap-8">
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">{objectWorks.length}</div>
-                <p className="text-xs md:text-sm text-slate-600">работ</p>
+                <div className="text-2xl md:text-4xl font-bold text-slate-900 mb-1">{objectWorks.length}</div>
+                <p className="text-[10px] md:text-sm text-slate-600 leading-tight">работ</p>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">{inspections.length}</div>
-                <p className="text-xs md:text-sm text-slate-600">проверок</p>
+                <div className="text-2xl md:text-4xl font-bold text-slate-900 mb-1">{inspections.length}</div>
+                <p className="text-[10px] md:text-sm text-slate-600 leading-tight">проверок</p>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
+                <div className="text-base md:text-4xl font-bold text-slate-900 mb-1 leading-tight">
                   {new Date(site.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
                 </div>
-                <p className="text-xs md:text-sm text-slate-600">дата создания</p>
+                <p className="text-[10px] md:text-sm text-slate-600 leading-tight">дата создания</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Tabs defaultValue="journal" className="space-y-6">
-          <div className="overflow-x-auto">
-            <TabsList className="inline-flex w-auto min-w-full">
-              <TabsTrigger value="journal" className="text-xs md:text-sm whitespace-nowrap">Журнал работ</TabsTrigger>
-              <TabsTrigger value="schedule" className="text-xs md:text-sm whitespace-nowrap">График</TabsTrigger>
-              <TabsTrigger value="analytics" className="text-xs md:text-sm whitespace-nowrap">Аналитика</TabsTrigger>
-              <TabsTrigger value="inspections" className="text-xs md:text-sm whitespace-nowrap">Проверки</TabsTrigger>
-              <TabsTrigger value="general" className="text-xs md:text-sm whitespace-nowrap">Общая информация</TabsTrigger>
-            </TabsList>
+          <div className="relative -mx-4 px-4 md:mx-0 md:px-0">
+            <div className="overflow-x-auto scrollbar-hide">
+              <TabsList className="inline-flex w-auto">
+                <TabsTrigger value="journal" className="text-xs md:text-sm whitespace-nowrap px-3 md:px-4">Журнал работ</TabsTrigger>
+                <TabsTrigger value="schedule" className="text-xs md:text-sm whitespace-nowrap px-3 md:px-4">График</TabsTrigger>
+                <TabsTrigger value="analytics" className="text-xs md:text-sm whitespace-nowrap px-3 md:px-4">Аналитика</TabsTrigger>
+                <TabsTrigger value="inspections" className="text-xs md:text-sm whitespace-nowrap px-3 md:px-4">Проверки</TabsTrigger>
+                <TabsTrigger value="general" className="text-xs md:text-sm whitespace-nowrap px-2 md:px-4">Общее</TabsTrigger>
+              </TabsList>
+            </div>
           </div>
 
           <TabsContent value="journal" className="space-y-4">
