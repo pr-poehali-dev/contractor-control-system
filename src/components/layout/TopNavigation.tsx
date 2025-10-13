@@ -105,10 +105,10 @@ export default function TopNavigation() {
           <Button
             variant="ghost"
             onClick={() => navigate('/profile')}
-            className="relative h-10 w-10 rounded-full"
+            className="relative h-10 w-10 rounded-full p-0"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold">
-              {user ? getInitials(user.name) : 'U'}
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+              <Icon name="User" size={20} />
             </div>
           </Button>
         </div>
