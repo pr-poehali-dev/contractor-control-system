@@ -4,6 +4,11 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 interface FeedEvent {
   id: string;
@@ -74,6 +79,7 @@ const formatTimeAgo = (timestamp: string) => {
 
 const FeedEventCard = ({ event, index, onStartInspection, userRole }: FeedEventCardProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
   const photos = event.photoUrls || [];
 
   const handlePrevImage = (e: React.MouseEvent) => {
@@ -86,6 +92,11 @@ const FeedEventCard = ({ event, index, onStartInspection, userRole }: FeedEventC
     setCurrentImageIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
   };
 
+  const handleImageClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsImageDialogOpen(true);
+  };
+
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -96,6 +107,7 @@ const FeedEventCard = ({ event, index, onStartInspection, userRole }: FeedEventC
   };
 
   return (
+    <>
     <Card 
       className="overflow-hidden hover:shadow-md transition-shadow animate-fade-in"
       style={{ animationDelay: `${index * 0.05}s` }}
@@ -157,7 +169,7 @@ const FeedEventCard = ({ event, index, onStartInspection, userRole }: FeedEventC
 
         {photos.length > 0 && (
         <div className="relative bg-black group">
-          <div className="relative aspect-[4/3] md:aspect-video">
+          <div className="relative aspect-[4/3] md:aspect-video cursor-pointer" onClick={handleImageClick}>
             <img 
               src={photos[currentImageIndex]} 
               alt={`Фото ${currentImageIndex + 1}`}
@@ -252,6 +264,62 @@ const FeedEventCard = ({ event, index, onStartInspection, userRole }: FeedEventC
         )}
       </div>
     </Card>
+
+    <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
+      <DialogContent className="max-w-[95vw] max-h-[95vh] w-auto h-auto p-0 bg-black/95 border-0">
+        <div className="relative w-full h-full flex items-center justify-center">
+          <img 
+            src={photos[currentImageIndex]} 
+            alt={`Фото ${currentImageIndex + 1}`}
+            className="max-w-full max-h-[95vh] object-contain"
+          />
+          
+          {photos.length > 1 && (
+            <>
+              <div className="absolute top-4 right-4 bg-black/60 text-white text-sm px-3 py-1.5 rounded-full font-medium">
+                {currentImageIndex + 1}/{photos.length}
+              </div>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute left-4 top-1/2 -translate-y-1/2 h-12 w-12 bg-white/90 hover:bg-white rounded-full shadow-lg"
+                onClick={handlePrevImage}
+              >
+                <Icon name="ChevronLeft" size={24} />
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-4 top-1/2 -translate-y-1/2 h-12 w-12 bg-white/90 hover:bg-white rounded-full shadow-lg"
+                onClick={handleNextImage}
+              >
+                <Icon name="ChevronRight" size={24} />
+              </Button>
+
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                {photos.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentImageIndex(idx);
+                    }}
+                    className={`w-2 h-2 rounded-full transition-all ${
+                      idx === currentImageIndex 
+                        ? 'bg-white w-6' 
+                        : 'bg-white/50 hover:bg-white/75'
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 };
 
