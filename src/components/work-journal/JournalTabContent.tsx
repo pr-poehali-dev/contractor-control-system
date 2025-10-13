@@ -37,12 +37,12 @@ export default function JournalTabContent({
   getInitials,
 }: JournalTabContentProps) {
   return (
-    <>
-      <div className="flex-1 overflow-y-auto p-3 md:p-8 lg:p-12 bg-slate-50 pb-40 md:pb-8">
+    <div className="flex flex-col flex-1 min-h-0">
+      <div className="flex-1 overflow-y-auto p-3 md:p-8 lg:p-12 bg-slate-50">
         {mockEvents.length === 0 ? (
           <NoJournalEntriesEmptyState />
         ) : (
-          <div className="max-w-7xl mx-auto space-y-10">
+          <div className="max-w-7xl mx-auto space-y-10 pb-4">
             {mockEvents.map((event, index) => {
               const showDateSeparator = index === 0 || 
                 formatDate(mockEvents[index - 1].created_at) !== formatDate(event.created_at);
@@ -72,14 +72,14 @@ export default function JournalTabContent({
         )}
       </div>
 
-      <div className="bg-white border-t border-slate-200 p-2 md:p-4 flex-shrink-0 fixed md:relative bottom-16 md:bottom-0 left-0 right-0 z-10 md:z-auto safe-area-inset-bottom">
+      <div className="bg-white border-t border-slate-200 p-3 md:p-4 flex-shrink-0">
         <div className="max-w-4xl mx-auto">
           <div className="flex gap-1.5 md:gap-2 items-end">
             <Textarea
               placeholder="Написать сообщение..."
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              className="resize-none flex-1 text-sm md:text-base"
+              className="resize-none flex-1 text-base"
               rows={2}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -147,6 +147,6 @@ export default function JournalTabContent({
           </p>
         </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -35,11 +35,11 @@ export default function EventItem({
                 <span className="text-xs md:text-base font-semibold text-green-600">Отчёт о работе</span>
               </div>
             )}
-            <p className="text-sm md:text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
+            <p className="text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
             
             {event.work_data?.volume && (
               <div className="mt-2 md:mt-3 p-2 md:p-3 bg-slate-50 rounded-md">
-                <p className="text-sm md:text-sm text-slate-600">
+                <p className="text-sm text-slate-600">
                   Объём: <span className="font-semibold">{event.work_data.volume} {event.work_data.unit}</span>
                 </p>
               </div>
@@ -94,7 +94,7 @@ export default function EventItem({
                 </Badge>
               )}
             </div>
-            <p className="text-sm md:text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
+            <p className="text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
             
             {event.inspection_data?.defects && event.inspection_data.defects.length > 0 && (
               <div className="mt-2 md:mt-3">
@@ -225,12 +225,12 @@ export default function EventItem({
         
       case 'chat_message':
         return (
-          <p className="text-sm md:text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
+          <p className="text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
         );
         
       default:
         return (
-          <p className="text-sm md:text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
+          <p className="text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
         );
     }
   };
@@ -241,9 +241,9 @@ export default function EventItem({
     return (
       <div className="flex justify-center">
         <Card className="max-w-[95%] md:max-w-lg border-slate-200 bg-slate-50">
-          <CardContent className="p-2.5 md:p-4">
+          <CardContent className="p-3 md:p-4">
             {renderEventContent()}
-            <p className="text-[10px] md:text-sm text-slate-400 mt-2 md:mt-3 text-right">
+            <p className="text-xs text-slate-400 mt-2.5 md:mt-3 text-right">
               {formatTime(event.created_at)}
             </p>
           </CardContent>
@@ -253,10 +253,10 @@ export default function EventItem({
   }
 
   return (
-    <div className="flex gap-2 md:gap-4 group">
-      <Avatar className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0">
+    <div className="flex gap-2.5 md:gap-4 group">
+      <Avatar className="w-9 h-9 md:w-10 md:h-10 flex-shrink-0">
         <AvatarFallback className={cn(
-          'text-xs md:text-sm font-semibold',
+          'text-sm font-semibold',
           isOwnEvent ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-700'
         )}>
           {getInitials(event.author_name)}
@@ -264,8 +264,8 @@ export default function EventItem({
       </Avatar>
 
       <div className="flex-1 min-w-0">
-        <div className="mb-1 md:mb-1.5 flex items-center gap-1.5 md:gap-2">
-          <span className="text-sm md:text-base font-semibold text-slate-900">{event.author_name}</span>
+        <div className="mb-1.5 flex items-center gap-2">
+          <span className="text-base font-semibold text-slate-900">{event.author_name}</span>
         </div>
 
         <Card className={cn(
@@ -275,20 +275,20 @@ export default function EventItem({
           event.type === 'inspection' && !isOwnEvent && 'border-l-3 border-l-blue-500',
           event.type === 'defect_added' && 'border-l-3 border-l-amber-500'
         )}>
-          <CardContent className="p-2.5 md:p-4">
+          <CardContent className="p-3 md:p-4">
             {(userRole === 'customer' || userRole === 'client') && event.type === 'work_entry' && !isOwnEvent && (
               <Button
                 variant="outline"
                 size="sm"
-                className="absolute top-2 right-2 h-7 text-xs z-10 px-2"
+                className="absolute top-2 right-2 h-8 text-xs z-10 px-3"
                 onClick={() => onCreateInspection?.(event.id)}
               >
-                <Icon name="ClipboardCheck" size={12} className="md:mr-1" />
+                <Icon name="ClipboardCheck" size={14} className="md:mr-1" />
                 <span className="hidden md:inline">Проверка</span>
               </Button>
             )}
             {renderEventContent()}
-            <p className="mt-2 md:mt-3 text-xs text-slate-400">
+            <p className="mt-2.5 md:mt-3 text-xs text-slate-400">
               {formatTime(event.created_at)}
             </p>
           </CardContent>

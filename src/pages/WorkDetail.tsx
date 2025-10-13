@@ -49,12 +49,10 @@ const WorkDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <WorkJournal 
-        objectId={Number(objectId)} 
-        selectedWorkId={Number(workId)}
-      />
-    </div>
+    <WorkJournal 
+      objectId={Number(objectId)} 
+      selectedWorkId={Number(workId)}
+    />
   );
 };
 

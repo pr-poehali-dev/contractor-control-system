@@ -156,10 +156,10 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   return (
-    <div className="flex flex-col h-screen md:h-[calc(100vh-140px)] bg-white overflow-hidden">
+    <div className="flex flex-col h-full bg-white">
 
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0">
         <WorksList
           works={works}
           workLogs={workLogs}
@@ -182,7 +182,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                 onEdit={() => handlers.handleEditClick(selectedWorkData)}
               />
 
-              <div className="flex-1 flex flex-col overflow-hidden">
+              <div className="flex-1 flex flex-col min-h-0">
                 {activeTab === 'journal' && (
                   <JournalTabContent
                     mockEvents={mockEvents}
