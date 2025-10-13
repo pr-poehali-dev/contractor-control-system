@@ -84,6 +84,20 @@ export default function TopNavigation() {
               </Button>
             );
           })}
+          
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/pricing')}
+            className={cn(
+              'relative h-12 px-3 md:px-4 gap-2 ml-auto',
+              location.pathname === '/pricing' && 'text-blue-600 bg-blue-50'
+            )}
+          >
+            <div className="flex items-center gap-2 px-2 py-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold">
+              <Icon name="Gem" size={16} />
+              <span>Pro</span>
+            </div>
+          </Button>
         </nav>
 
         <div className="flex-1 md:hidden" />
