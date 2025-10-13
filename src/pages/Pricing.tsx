@@ -118,15 +118,16 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="container max-w-5xl mx-auto p-4 md:p-8 pb-24 md:pb-10">
+      <div className="w-full max-w-5xl mx-auto px-4 py-4 md:px-8 md:py-8 pb-24 md:pb-10">
         <div className="mb-6 md:mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600">
-              <Icon name="Gem" size={24} className="text-white" />
+            <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex-shrink-0">
+              <Icon name="Gem" size={20} className="text-white md:hidden" />
+              <Icon name="Gem" size={24} className="text-white hidden md:block" />
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Тарифы</h1>
-              <p className="text-sm md:text-base text-slate-600">Настройте план под ваши потребности</p>
+              <h1 className="text-xl md:text-3xl font-bold text-slate-900">Тарифы</h1>
+              <p className="text-xs md:text-base text-slate-600">Настройте план под ваши потребности</p>
             </div>
           </div>
         </div>
@@ -262,8 +263,8 @@ const Pricing = () => {
         </div>
 
         <div className="lg:col-span-1">
-          <div className="sticky bottom-0 left-0 right-0 lg:static bg-white border-t lg:border-t-0 p-4 lg:p-0 -mx-4 md:mx-0">
-            <Card className="border-0 lg:border shadow-none lg:shadow-sm">
+          <div className="lg:static">
+            <Card className="shadow-sm">
               <CardHeader className="pb-3 lg:pb-6">
                 <CardTitle className="text-lg">Ваш тариф</CardTitle>
                 <CardDescription className="text-xs md:text-sm">Итоговая стоимость</CardDescription>
