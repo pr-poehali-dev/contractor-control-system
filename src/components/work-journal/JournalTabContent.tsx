@@ -38,7 +38,7 @@ export default function JournalTabContent({
 }: JournalTabContentProps) {
   return (
     <>
-      <div className="flex-1 overflow-y-auto p-3 md:p-8 lg:p-12 bg-slate-50">
+      <div className="flex-1 overflow-y-auto p-3 md:p-8 lg:p-12 bg-slate-50 pb-32 md:pb-8">
         {mockEvents.length === 0 ? (
           <NoJournalEntriesEmptyState />
         ) : (
@@ -72,7 +72,7 @@ export default function JournalTabContent({
         )}
       </div>
 
-      <div className="bg-white border-t border-slate-200 p-2 md:p-4 flex-shrink-0 safe-area-bottom">
+      <div className="bg-white border-t border-slate-200 p-2 md:p-4 flex-shrink-0 fixed md:relative bottom-0 left-0 right-0 z-10 md:z-auto">
         <div className="max-w-4xl mx-auto">
           <div className="flex gap-1.5 md:gap-2 items-end">
             <Textarea

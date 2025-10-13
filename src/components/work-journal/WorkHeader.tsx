@@ -47,6 +47,65 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
             <Icon name="Settings" size={20} />
           </Button>
         </div>
+
+        {/* Mobile tabs */}
+        <div className="flex gap-1 overflow-x-auto pb-2 -mx-4 px-4">
+          <button
+            onClick={() => setActiveTab('journal')}
+            className={`pb-2 px-3 text-xs font-medium transition-colors relative whitespace-nowrap flex items-center gap-1.5 rounded-lg ${
+              activeTab === 'journal'
+                ? 'text-blue-600 bg-blue-50'
+                : 'text-slate-600'
+            }`}
+          >
+            <Icon name="MessageSquare" size={14} />
+            Журнал
+          </button>
+          <button
+            onClick={() => setActiveTab('info')}
+            className={`pb-2 px-3 text-xs font-medium transition-colors relative whitespace-nowrap flex items-center gap-1.5 rounded-lg ${
+              activeTab === 'info'
+                ? 'text-blue-600 bg-blue-50'
+                : 'text-slate-600'
+            }`}
+          >
+            <Icon name="Info" size={14} />
+            Инфо
+          </button>
+          <button
+            onClick={() => setActiveTab('description')}
+            className={`pb-2 px-3 text-xs font-medium transition-colors relative whitespace-nowrap flex items-center gap-1.5 rounded-lg ${
+              activeTab === 'description'
+                ? 'text-blue-600 bg-blue-50'
+                : 'text-slate-600'
+            }`}
+          >
+            <Icon name="FileText" size={14} />
+            Документы
+          </button>
+          <button
+            onClick={() => setActiveTab('estimate')}
+            className={`pb-2 px-3 text-xs font-medium transition-colors relative whitespace-nowrap flex items-center gap-1.5 rounded-lg ${
+              activeTab === 'estimate'
+                ? 'text-blue-600 bg-blue-50'
+                : 'text-slate-600'
+            }`}
+          >
+            <Icon name="Calculator" size={14} />
+            Смета
+          </button>
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`pb-2 px-3 text-xs font-medium transition-colors relative whitespace-nowrap flex items-center gap-1.5 rounded-lg ${
+              activeTab === 'analytics'
+                ? 'text-blue-600 bg-blue-50'
+                : 'text-slate-600'
+            }`}
+          >
+            <Icon name="BarChart" size={14} />
+            Аналитика
+          </button>
+        </div>
       </div>
 
       {/* DESKTOP: Original header */}
