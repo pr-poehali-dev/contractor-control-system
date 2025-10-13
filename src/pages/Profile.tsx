@@ -39,7 +39,6 @@ const Profile = () => {
     ? sites.filter(s => works.some(w => w.object_id === s.id))
     : sites;
 
-  const userWorks = works;
   const userInspections = user?.role === 'client' ? inspections : [];
 
   const daysInSystem = 345;
@@ -107,13 +106,12 @@ const Profile = () => {
         </Card>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 md:grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="projects" className="text-xs md:text-sm">Мои проекты</TabsTrigger>
             <TabsTrigger value="objects" className="text-xs md:text-sm">Мои объекты</TabsTrigger>
-            <TabsTrigger value="works" className="text-xs md:text-sm">Мои работы</TabsTrigger>
             {user?.role === 'client' && (
               <TabsTrigger value="inspections" className="text-xs md:text-sm">Мои проверки</TabsTrigger>
             )}
-            <TabsTrigger value="projects" className="text-xs md:text-sm">Проекты</TabsTrigger>
           </TabsList>
 
           <TabsContent value="objects" className="space-y-4">
@@ -121,7 +119,7 @@ const Profile = () => {
               {userSites.map((site) => (
                 <Card key={site.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
                   const project = projects.find(p => p.id === site.project_id);
-                  if (project) navigate(`/projects/${project.id}/objects/${site.id}`);
+                  if (project) navigate(`/public/project/${project.id}/object/${site.id}`);
                 }}>
                   <CardContent className="p-4">
                     <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg mb-3 flex items-center justify-center">
@@ -144,36 +142,7 @@ const Profile = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="works" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {userWorks.map((work) => {
-                const site = sites.find(s => s.id === work.object_id);
-                const project = site ? projects.find(p => p.id === site.project_id) : null;
-                return (
-                  <Card key={work.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
-                    if (project && site) navigate(`/projects/${project.id}/objects/${site.id}`, { state: { scrollToWork: work.id } });
-                  }}>
-                    <CardContent className="p-4">
-                      <div className="aspect-video bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg mb-3 flex items-center justify-center">
-                        <Icon name="Wrench" size={48} className="text-blue-600" />
-                      </div>
-                      <h3 className="font-semibold text-slate-900 mb-1">{work.title}</h3>
-                      <p className="text-sm text-slate-600 mb-2 line-clamp-2">{work.description}</p>
-                      <Badge variant={work.status === 'active' ? 'default' : 'secondary'}>
-                        {work.status === 'active' ? 'В работе' : work.status === 'completed' ? 'Завершено' : 'Ожидание'}
-                      </Badge>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-            {userWorks.length === 0 && (
-              <div className="text-center py-12">
-                <Icon name="Wrench" size={48} className="text-slate-300 mx-auto mb-4" />
-                <p className="text-slate-600">Нет работ</p>
-              </div>
-            )}
-          </TabsContent>
+
 
           {user?.role === 'client' && (
             <TabsContent value="inspections" className="space-y-4">
@@ -207,7 +176,7 @@ const Profile = () => {
               {userProjects.map((project) => {
                 const projectSites = sites.filter(s => s.project_id === project.id);
                 return (
-                  <Card key={project.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate(`/projects/${project.id}`)}>
+                  <Card key={project.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate(`/public/project/${project.id}`)}>
                     <CardContent className="p-6">
                       <div className="flex items-start gap-4">
                         <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 flex-shrink-0">

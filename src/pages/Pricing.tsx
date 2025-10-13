@@ -117,21 +117,22 @@ const Pricing = () => {
   const finalPrice = totalPrice - discount;
 
   return (
-    <div className="container max-w-5xl mx-auto p-4 md:p-8 pb-24 md:pb-10">
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600">
-            <Icon name="Gem" size={24} className="text-white" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">Тарифы</h1>
-            <p className="text-slate-600">Настройте план под ваши потребности</p>
+    <div className="min-h-screen bg-slate-50">
+      <div className="container max-w-5xl mx-auto p-4 md:p-8 pb-24 md:pb-10">
+        <div className="mb-6 md:mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600">
+              <Icon name="Gem" size={24} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Тарифы</h1>
+              <p className="text-sm md:text-base text-slate-600">Настройте план под ваши потребности</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+        <div className="grid lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base md:text-lg">
@@ -143,13 +144,13 @@ const Pricing = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex overflow-x-auto gap-2 pb-2 md:grid md:grid-cols-3 md:gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                 {userTiers.map((tier, index) => (
                   <button
                     key={tier.users}
                     onClick={() => setSelectedUserTier(index)}
                     className={cn(
-                      'p-3 md:p-4 rounded-xl border-2 transition-all text-left flex-shrink-0 w-32 md:w-auto',
+                      'p-3 md:p-4 rounded-xl border-2 transition-all text-left',
                       selectedUserTier === index
                         ? 'border-blue-600 bg-blue-50'
                         : 'border-slate-200 hover:border-slate-300'
@@ -158,9 +159,9 @@ const Pricing = () => {
                     <div className="text-xl md:text-2xl font-bold text-slate-900 mb-1">
                       {tier.users === -1 ? '∞' : tier.users}
                     </div>
-                    <div className="text-[10px] md:text-xs text-slate-600 mb-1 md:mb-2 leading-tight">{tier.label}</div>
+                    <div className="text-[10px] md:text-xs text-slate-600 mb-1 md:mb-2 leading-tight line-clamp-1">{tier.label}</div>
                     <div className="text-xs md:text-sm font-semibold text-blue-600">
-                      {tier.price === 0 ? 'Бесплатно' : `+${tier.price} ₽/мес`}
+                      {tier.price === 0 ? 'Бесплатно' : `+${tier.price} ₽`}
                     </div>
                   </button>
                 ))}
@@ -179,13 +180,13 @@ const Pricing = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex overflow-x-auto gap-2 pb-2 md:grid md:grid-cols-3 md:gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                 {areaTiers.map((tier, index) => (
                   <button
                     key={tier.area}
                     onClick={() => setSelectedAreaTier(index)}
                     className={cn(
-                      'p-3 md:p-4 rounded-xl border-2 transition-all text-left flex-shrink-0 w-32 md:w-auto',
+                      'p-3 md:p-4 rounded-xl border-2 transition-all text-left',
                       selectedAreaTier === index
                         ? 'border-blue-600 bg-blue-50'
                         : 'border-slate-200 hover:border-slate-300'
@@ -194,9 +195,9 @@ const Pricing = () => {
                     <div className="text-xl md:text-2xl font-bold text-slate-900 mb-1">
                       {tier.area === -1 ? '∞' : tier.area / 1000}
                     </div>
-                    <div className="text-[10px] md:text-xs text-slate-600 mb-1 md:mb-2 leading-tight">{tier.label}</div>
+                    <div className="text-[10px] md:text-xs text-slate-600 mb-1 md:mb-2 leading-tight line-clamp-1">{tier.label}</div>
                     <div className="text-xs md:text-sm font-semibold text-blue-600">
-                      {tier.price === 0 ? 'Бесплатно' : `+${tier.price} ₽/мес`}
+                      {tier.price === 0 ? 'Бесплатно' : `+${tier.price} ₽`}
                     </div>
                   </button>
                 ))}
@@ -219,33 +220,33 @@ const Pricing = () => {
                 <div
                   key={addon.id}
                   className={cn(
-                    'flex items-center gap-4 p-4 rounded-xl border-2 transition-all',
+                    'flex items-start gap-3 md:gap-4 p-3 md:p-4 rounded-xl border-2 transition-all',
                     enabledAddons.includes(addon.id)
                       ? 'border-blue-600 bg-blue-50'
                       : 'border-slate-200'
                   )}
                 >
                   <div className={cn(
-                    'flex items-center justify-center w-12 h-12 rounded-xl flex-shrink-0',
+                    'flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl flex-shrink-0',
                     enabledAddons.includes(addon.id)
                       ? 'bg-blue-600 text-white'
                       : 'bg-slate-100 text-slate-600'
                   )}>
-                    <Icon name={addon.icon as any} size={20} />
+                    <Icon name={addon.icon as any} size={18} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-semibold text-slate-900">{addon.title}</h4>
+                      <h4 className="text-sm md:text-base font-semibold text-slate-900">{addon.title}</h4>
                       {addon.badge && (
                         <Badge variant="secondary" className="text-xs">
                           {addon.badge}
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-slate-600">{addon.description}</p>
+                    <p className="text-xs md:text-sm text-slate-600">{addon.description}</p>
                   </div>
-                  <div className="flex items-center gap-3 flex-shrink-0">
-                    <span className="text-sm font-semibold text-blue-600 whitespace-nowrap">
+                  <div className="flex flex-col md:flex-row items-end md:items-center gap-2 md:gap-3 flex-shrink-0">
+                    <span className="text-xs md:text-sm font-semibold text-blue-600 whitespace-nowrap">
                       +{addon.price} ₽/мес
                     </span>
                     <Switch
@@ -320,6 +321,7 @@ const Pricing = () => {
             </CardContent>
           </Card>
         </div>
+      </div>
       </div>
     </div>
   );
