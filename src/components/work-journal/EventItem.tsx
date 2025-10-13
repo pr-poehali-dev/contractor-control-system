@@ -263,19 +263,19 @@ export default function EventItem({
         </AvatarFallback>
       </Avatar>
 
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 max-w-full">
         <div className="mb-1.5 flex items-center gap-2">
-          <span className="text-base font-semibold text-slate-900">{event.author_name}</span>
+          <span className="text-base font-semibold text-slate-900 truncate">{event.author_name}</span>
         </div>
 
         <Card className={cn(
-          'border-none shadow-sm relative',
+          'border-none shadow-sm relative w-full',
           isOwnEvent ? 'bg-blue-50' : 'bg-white',
           event.type === 'work_entry' && !isOwnEvent && 'border-l-3 border-l-green-500',
           event.type === 'inspection' && !isOwnEvent && 'border-l-3 border-l-blue-500',
           event.type === 'defect_added' && 'border-l-3 border-l-amber-500'
         )}>
-          <CardContent className="p-3 md:p-4">
+          <CardContent className="p-3 md:p-4 w-full overflow-hidden">
             {(userRole === 'customer' || userRole === 'client') && event.type === 'work_entry' && !isOwnEvent && (
               <Button
                 variant="outline"

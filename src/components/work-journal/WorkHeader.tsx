@@ -18,7 +18,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
   return (
     <>
       {/* MOBILE: Compact header with back button */}
-      <div className="md:hidden bg-white border-b border-slate-200 px-3 py-2.5">
+      <div className="md:hidden bg-white border-b border-slate-200 px-3 py-2.5 overflow-x-hidden">
         <div className="flex items-center gap-2 mb-2">
           <Button 
             variant="ghost" 
@@ -147,8 +147,8 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
           </div>
         </div>
 
-        <div className="border-b border-slate-200 overflow-x-auto">
-          <div className="flex gap-3 md:gap-6 min-w-max">
+        <div className="border-b border-slate-200 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-3 md:gap-6">
             <button
               onClick={() => setActiveTab('journal')}
               className={`pb-2 md:pb-3 px-1 text-xs md:text-sm font-medium transition-colors relative whitespace-nowrap ${

@@ -37,12 +37,12 @@ export default function JournalTabContent({
   getInitials,
 }: JournalTabContentProps) {
   return (
-    <div className="flex flex-col flex-1 min-h-0">
-      <div className="flex-1 overflow-y-auto p-3 md:p-8 lg:p-12 bg-slate-50">
+    <div className="flex flex-col flex-1 min-h-0 w-full overflow-x-hidden">
+      <div className="flex-1 overflow-y-auto p-3 md:p-8 lg:p-12 bg-slate-50 w-full">
         {mockEvents.length === 0 ? (
           <NoJournalEntriesEmptyState />
         ) : (
-          <div className="max-w-7xl mx-auto space-y-10 pb-4">
+          <div className="max-w-7xl mx-auto space-y-10 pb-4 w-full">
             {mockEvents.map((event, index) => {
               const showDateSeparator = index === 0 || 
                 formatDate(mockEvents[index - 1].created_at) !== formatDate(event.created_at);
@@ -72,9 +72,9 @@ export default function JournalTabContent({
         )}
       </div>
 
-      <div className="bg-white border-t border-slate-200 p-3 md:p-4 flex-shrink-0">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex gap-1.5 md:gap-2 items-end">
+      <div className="bg-white border-t border-slate-200 p-3 md:p-4 flex-shrink-0 w-full">
+        <div className="max-w-4xl mx-auto w-full">
+          <div className="flex gap-1.5 md:gap-2 items-end w-full">
             <Textarea
               placeholder="Написать сообщение..."
               value={newMessage}

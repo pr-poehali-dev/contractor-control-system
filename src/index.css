@@ -95,6 +95,7 @@
 @layer base {
   * {
     @apply border-border;
+    box-sizing: border-box;
   }
 
   body {
@@ -105,6 +106,7 @@
       BlinkMacSystemFont,
       "Segoe UI",
       sans-serif;
+    overflow-x: hidden;
   }
 }
 

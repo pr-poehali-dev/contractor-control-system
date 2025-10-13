@@ -78,8 +78,8 @@ export default function AnalyticsTab({ workId }: AnalyticsTabProps) {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-slate-50">
-      <div className="px-3 py-4 md:p-8 lg:p-12 max-w-7xl mx-auto">
+    <div className="flex-1 overflow-y-auto bg-slate-50 w-full overflow-x-hidden">
+      <div className="px-3 py-4 md:p-8 lg:p-12 max-w-7xl mx-auto w-full">
         <div className="flex items-center justify-between mb-10">
           <h3 className="text-2xl md:text-3xl font-bold">Аналитика: План vs Факт</h3>
           <Button variant="outline">
