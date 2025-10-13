@@ -189,6 +189,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'projectId': log['project_id'],
             'objectTitle': log['object_title'],
             'projectTitle': log['project_title'],
+            'workTitle': log['work_title'],
             'author': log['author_name'],
             'volume': log['volume'],
             'materials': log['materials'],
@@ -304,6 +305,101 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'author': insp['author_name'],
             'photoUrls': photo_urls,
             'defects': insp['defects']
+        })
+    
+    # Get planned inspections (draft status with scheduled_date)
+    if user_role == 'contractor':
+        planned_query = f'''
+            SELECT 
+                i.id,
+                i.work_id,
+                i.scheduled_date,
+                i.notes,
+                w.title as work_title,
+                w.object_id,
+                o.title as object_title,
+                o.project_id,
+                p.title as project_title,
+                u.name as author_name
+            FROM inspections i
+            JOIN works w ON i.work_id = w.id
+            JOIN objects o ON w.object_id = o.id
+            JOIN projects p ON o.project_id = p.id
+            JOIN users u ON i.created_by = u.id
+            WHERE w.contractor_id = (
+                SELECT contractor_id FROM users WHERE id = {user_id}
+            )
+            AND i.status = 'draft'
+            AND i.scheduled_date IS NOT NULL
+            ORDER BY i.scheduled_date ASC
+            LIMIT 10
+        '''
+    elif user_role == 'admin':
+        planned_query = '''
+            SELECT 
+                i.id,
+                i.work_id,
+                i.scheduled_date,
+                i.notes,
+                w.title as work_title,
+                w.object_id,
+                o.title as object_title,
+                o.project_id,
+                p.title as project_title,
+                u.name as author_name
+            FROM inspections i
+            JOIN works w ON i.work_id = w.id
+            JOIN objects o ON w.object_id = o.id
+            JOIN projects p ON o.project_id = p.id
+            JOIN users u ON i.created_by = u.id
+            WHERE i.status = 'draft'
+            AND i.scheduled_date IS NOT NULL
+            ORDER BY i.scheduled_date ASC
+            LIMIT 10
+        '''
+    else:
+        planned_query = f'''
+            SELECT 
+                i.id,
+                i.work_id,
+                i.scheduled_date,
+                i.notes,
+                w.title as work_title,
+                w.object_id,
+                o.title as object_title,
+                o.project_id,
+                p.title as project_title,
+                u.name as author_name
+            FROM inspections i
+            JOIN works w ON i.work_id = w.id
+            JOIN objects o ON w.object_id = o.id
+            JOIN projects p ON o.project_id = p.id
+            JOIN users u ON i.created_by = u.id
+            WHERE p.client_id = {user_id}
+            AND i.status = 'draft'
+            AND i.scheduled_date IS NOT NULL
+            ORDER BY i.scheduled_date ASC
+            LIMIT 10
+        '''
+    
+    cur.execute(planned_query)
+    planned_inspections = cur.fetchall()
+    
+    for planned in planned_inspections:
+        events.append({
+            'id': f"planned_inspection_{planned['id']}",
+            'type': 'planned_inspection',
+            'title': f"\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 {planned['work_title']}",
+            'description': planned['notes'] or '\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0437\u0430\u043f\u043b\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u043d\u0430',
+            'timestamp': planned['scheduled_date'].isoformat() if hasattr(planned['scheduled_date'], 'isoformat') else str(planned['scheduled_date']),
+            'scheduledDate': planned['scheduled_date'].isoformat() if hasattr(planned['scheduled_date'], 'isoformat') else str(planned['scheduled_date']),
+            'workId': planned['work_id'],
+            'objectId': planned['object_id'],
+            'projectId': planned['project_id'],
+            'objectTitle': planned['object_title'],
+            'projectTitle': planned['project_title'],
+            'workTitle': planned['work_title'],
+            'author': planned['author_name']
         })
     
     cur.close()

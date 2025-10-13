@@ -48,7 +48,15 @@ const JournalEntryModal = ({ open, onOpenChange, form, onFormChange, projects, s
           method: 'POST',
           body: formData,
         });
+        
+        if (!response.ok) {
+          console.error('Upload failed:', response.status, response.statusText);
+          continue;
+        }
+        
         const data = await response.json();
+        console.log('Upload response:', data);
+        
         if (data.url) {
           newUrls.push(data.url);
         }
@@ -57,11 +65,15 @@ const JournalEntryModal = ({ open, onOpenChange, form, onFormChange, projects, s
       }
     }
 
-    onFormChange({
-      ...form,
-      photoUrls: [...(form.photoUrls || []), ...newUrls]
-    });
+    if (newUrls.length > 0) {
+      onFormChange({
+        ...form,
+        photoUrls: [...(form.photoUrls || []), ...newUrls]
+      });
+    }
+    
     setUploading(false);
+    e.target.value = '';
   };
 
   const removeImage = (index: number) => {

@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { api } from '@/lib/api';
 import Icon from '@/components/ui/icon';
 import OnboardingBanner from '@/components/OnboardingBanner';
 import FeedFilters from '@/components/dashboard/FeedFilters';
@@ -36,8 +37,9 @@ interface FeedEvent {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user, userData } = useAuth();
+  const { user, userData, loadUserData } = useAuth();
   const { toast } = useToast();
+  const token = localStorage.getItem('token');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [feed, setFeed] = useState<FeedEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -147,23 +149,42 @@ const Dashboard = () => {
       return;
     }
 
-    toast({
-      title: 'Запись создана',
-      description: 'Отчет добавлен в журнал работ'
-    });
+    try {
+      await api.createItem(token!, 'work_log', {
+        work_id: Number(journalForm.workId),
+        description: journalForm.description,
+        volume: journalForm.volume || null,
+        materials: journalForm.materials || null,
+        photo_urls: journalForm.photoUrls && journalForm.photoUrls.length > 0 
+          ? JSON.stringify(journalForm.photoUrls) 
+          : null
+      });
 
-    setShowJournalModal(false);
-    setJournalForm({
-      projectId: '',
-      objectId: '',
-      workId: '',
-      description: '',
-      volume: '',
-      materials: '',
-      photoUrls: []
-    });
-    
-    loadFeed();
+      toast({
+        title: 'Запись создана',
+        description: 'Отчет добавлен в журнал работ'
+      });
+
+      setShowJournalModal(false);
+      setJournalForm({
+        projectId: '',
+        objectId: '',
+        workId: '',
+        description: '',
+        volume: '',
+        materials: '',
+        photoUrls: []
+      });
+      
+      await loadUserData();
+      loadFeed();
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось создать запись',
+        variant: 'destructive'
+      });
+    }
   };
 
   const handleScheduleInspection = async () => {
@@ -176,21 +197,37 @@ const Dashboard = () => {
       return;
     }
 
-    toast({
-      title: 'Проверка запланирована',
-      description: `Проверка назначена на ${new Date(inspectionForm.scheduledDate).toLocaleDateString('ru-RU')}`
-    });
+    try {
+      await api.createItem(token!, 'inspection', {
+        work_id: Number(inspectionForm.workId),
+        scheduled_date: inspectionForm.scheduledDate,
+        notes: inspectionForm.notes || null,
+        status: 'draft'
+      });
 
-    setShowInspectionModal(false);
-    setInspectionForm({
-      projectId: '',
-      objectId: '',
-      workId: '',
-      scheduledDate: '',
-      notes: ''
-    });
-    
-    loadFeed();
+      toast({
+        title: 'Проверка запланирована',
+        description: `Проверка назначена на ${new Date(inspectionForm.scheduledDate).toLocaleDateString('ru-RU')}`
+      });
+
+      setShowInspectionModal(false);
+      setInspectionForm({
+        projectId: '',
+        objectId: '',
+        workId: '',
+        scheduledDate: '',
+        notes: ''
+      });
+      
+      await loadUserData();
+      loadFeed();
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось запланировать проверку',
+        variant: 'destructive'
+      });
+    }
   };
 
   const handleCreateInfoPost = async () => {
