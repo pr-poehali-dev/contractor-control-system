@@ -41,7 +41,8 @@ const ObjectDetail = () => {
   }
 
   useEffect(() => {
-    if (siteWorks.length > 0) {
+    // На десктопе автоматически открываем первую работу
+    if (siteWorks.length > 0 && window.innerWidth >= 768) {
       navigate(`/projects/${projectId}/objects/${objectId}/works/${siteWorks[0].id}`, { replace: true });
     }
   }, [siteWorks.length, projectId, objectId, navigate]);
@@ -203,7 +204,7 @@ const ObjectDetail = () => {
       </div>
 
       {/* MOBILE: Work list cards */}
-      <div className="md:hidden pb-20">
+      <div className="md:hidden pb-24">
         {siteWorks.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-96 px-4">
             <Icon name="Briefcase" size={48} className="text-slate-300 mb-4" />
@@ -219,52 +220,65 @@ const ObjectDetail = () => {
             </Button>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100 bg-white">
-            {siteWorks.map((work) => (
-              <div
-                key={work.id}
-                className="p-4 active:bg-slate-50 transition-colors"
-                onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/${work.id}`)}
-              >
-                <div className="flex gap-3">
-                  <div className="flex-shrink-0 w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center">
-                    <Icon name="Wrench" size={20} className="text-slate-600" />
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2 mb-1">
-                      <h3 className="font-semibold text-base text-slate-900">{work.title}</h3>
+          <>
+            <div className="divide-y divide-slate-100">
+              {siteWorks.map((work) => (
+                <div
+                  key={work.id}
+                  className="bg-white p-4 active:bg-slate-50 transition-colors cursor-pointer"
+                  onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/${work.id}`)}
+                >
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                      <Icon name="Wrench" size={18} className="text-blue-600" />
                     </div>
                     
-                    <p className="text-sm text-slate-500 mb-2">
-                      Работа окончена. Пробил Иванов А.С. запросил примерку.
-                    </p>
-                    
-                    <div className="flex items-center justify-between">
-                      <Badge className={
-                        work.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                        work.status === 'active' ? 'bg-blue-100 text-blue-700' :
-                        work.status === 'completed' ? 'bg-green-100 text-green-700' :
-                        'bg-slate-100 text-slate-700'
-                      }>
-                        {work.status === 'pending' && 'Требуется проверка'}
-                        {work.status === 'active' && 'В работе'}
-                        {work.status === 'completed' && 'Завершено'}
-                        {work.status === 'on_hold' && 'Приостановлено'}
-                      </Badge>
-                      <span className="text-xs text-slate-400">2 часа назад</span>
-                    </div>
-                  </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-base text-slate-900 mb-1 line-clamp-2">{work.title}</h3>
+                      
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge 
+                          variant="outline"
+                          className={
+                            work.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                            work.status === 'active' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                            work.status === 'completed' ? 'bg-green-50 text-green-700 border-green-200' :
+                            'bg-slate-50 text-slate-700 border-slate-200'
+                          }
+                        >
+                          {work.status === 'pending' && '⏳ Ожидание'}
+                          {work.status === 'active' && '🟢 В работе'}
+                          {work.status === 'completed' && '✅ Готово'}
+                          {work.status === 'on_hold' && '⏸️ Пауза'}
+                        </Badge>
+                      </div>
 
-                  <div className="flex-shrink-0 flex items-center">
-                    <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center">
-                      <span className="text-xs font-semibold text-slate-600">5</span>
+                      {work.contractor_name && (
+                        <p className="text-sm text-slate-500">
+                          {work.contractor_name}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex-shrink-0 flex items-center">
+                      <Icon name="ChevronRight" size={20} className="text-slate-400" />
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+
+            {/* FAB button */}
+            {(user?.role === 'client' || user?.role === 'admin') && (
+              <Button
+                size="lg"
+                className="fixed bottom-20 right-4 h-14 w-14 rounded-full shadow-lg z-20"
+                onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}
+              >
+                <Icon name="Plus" size={24} />
+              </Button>
+            )}
+          </>
         )}
       </div>
 
