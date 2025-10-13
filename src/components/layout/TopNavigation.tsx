@@ -97,7 +97,7 @@ export default function TopNavigation() {
             >
               <div className="flex items-center gap-2 px-2 py-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold text-sm">
                 <Icon name="Gem" size={14} />
-                <span className="hidden sm:inline">Pro</span>
+                <span>Pro</span>
               </div>
             </Button>
           )}
