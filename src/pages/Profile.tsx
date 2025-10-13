@@ -50,13 +50,21 @@ const Profile = () => {
     <div className="min-h-screen bg-slate-50">
       <div className="container max-w-6xl mx-auto p-4 md:p-8 pb-24 md:pb-10">
         <div className="flex justify-end gap-2 mb-6">
-          <Button variant="outline" size="sm" onClick={() => navigate('/settings')}>
-            <Icon name="Settings" size={16} className="mr-2" />
-            <span className="hidden sm:inline">Настройки</span>
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={() => navigate('/settings')}
+            className="h-10 w-10 rounded-full"
+          >
+            <Icon name="Settings" size={20} />
           </Button>
-          <Button variant="outline" size="sm" onClick={handleLogout} className="text-red-600 hover:bg-red-50">
-            <Icon name="LogOut" size={16} className="mr-2" />
-            <span className="hidden sm:inline">Выйти</span>
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={handleLogout}
+            className="h-10 w-10 rounded-full text-red-600 hover:bg-red-50"
+          >
+            <Icon name="LogOut" size={20} />
           </Button>
         </div>
 

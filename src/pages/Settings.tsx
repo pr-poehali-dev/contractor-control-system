@@ -1,39 +1,78 @@
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
+import { Badge } from '@/components/ui/badge';
 
 const Settings = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Настройки</h1>
-        <p className="text-slate-600">Управление параметрами системы</p>
+    <div className="container max-w-4xl mx-auto p-4 md:p-8 pb-24 md:pb-10">
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Настройки</h1>
+          <p className="text-slate-600">Управление профилем и настройками</p>
+        </div>
+        <Button variant="ghost" size="icon" onClick={() => navigate('/profile')} className="h-10 w-10 rounded-full">
+          <Icon name="X" size={20} />
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2">
+      <div className="space-y-6">
+        <Card>
           <CardHeader>
-            <CardTitle>Профиль</CardTitle>
-            <CardDescription>Персональная информация</CardDescription>
+            <CardTitle>Персональная информация</CardTitle>
+            <CardDescription>Ваши основные данные в системе</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Имя</Label>
-              <Input id="name" defaultValue="Инспектор Петров" />
+          <CardContent>
+            <div className="flex items-center gap-6 mb-6">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold text-2xl">
+                {user ? getInitials(user.name) : 'U'}
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-slate-900">{user?.name}</h3>
+                <p className="text-slate-600">{user?.email}</p>
+                <Badge className="mt-2" variant="outline">
+                  {user?.role === 'admin' ? 'Администратор' : user?.role === 'client' ? 'Заказчик' : 'Подрядчик'}
+                </Badge>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" defaultValue="inspector@example.com" />
+
+            <div className="space-y-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Имя</Label>
+                <Input id="name" defaultValue={user?.name} />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" defaultValue={user?.email} />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="phone">Телефон</Label>
+                <Input id="phone" defaultValue={user?.phone || '+7 (900) 123-45-67'} />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="organization">Организация</Label>
+                <Input id="organization" defaultValue={user?.organization || 'ООО "Строительная компания"'} />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">Телефон</Label>
-              <Input id="phone" type="tel" defaultValue="+7 (900) 123-45-67" />
-            </div>
-            <Button>
+
+            <Button className="w-full mt-6">
               <Icon name="Save" size={18} className="mr-2" />
               Сохранить изменения
             </Button>
@@ -43,88 +82,109 @@ const Settings = () => {
         <Card>
           <CardHeader>
             <CardTitle>Уведомления</CardTitle>
-            <CardDescription>Настройка оповещений</CardDescription>
+            <CardDescription>Управление уведомлениями</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-sm">Email-уведомления</p>
-                <p className="text-xs text-slate-500">Получать письма о событиях</p>
+              <div className="space-y-0.5">
+                <Label>Email уведомления</Label>
+                <p className="text-sm text-slate-600">Получать уведомления на почту</p>
               </div>
               <Switch defaultChecked />
             </div>
-            <Separator />
             <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-sm">Push-уведомления</p>
-                <p className="text-xs text-slate-500">Браузерные оповещения</p>
+              <div className="space-y-0.5">
+                <Label>Push уведомления</Label>
+                <p className="text-sm text-slate-600">Уведомления в браузере</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Новые замечания</Label>
+                <p className="text-sm text-slate-600">Уведомлять о новых замечаниях</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Обновления проектов</Label>
+                <p className="text-sm text-slate-600">Уведомлять об изменениях</p>
               </div>
               <Switch />
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-sm">SMS-уведомления</p>
-                <p className="text-xs text-slate-500">Важные события по SMS</p>
-              </div>
-              <Switch defaultChecked />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-3">
+        <Card>
           <CardHeader>
             <CardTitle>Безопасность</CardTitle>
-            <CardDescription>Управление доступом и паролем</CardDescription>
+            <CardDescription>Управление безопасностью аккаунта</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="current-password">Текущий пароль</Label>
-                <Input id="current-password" type="password" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="new-password">Новый пароль</Label>
-                <Input id="new-password" type="password" />
-              </div>
-            </div>
-            <Button variant="outline">
+          <CardContent className="space-y-3">
+            <Button variant="outline" className="w-full justify-start">
               <Icon name="Lock" size={18} className="mr-2" />
-              Изменить пароль
+              Сменить пароль
+            </Button>
+            <Button variant="outline" className="w-full justify-start">
+              <Icon name="Shield" size={18} className="mr-2" />
+              Двухфакторная аутентификация
+            </Button>
+            <Button variant="outline" className="w-full justify-start">
+              <Icon name="Smartphone" size={18} className="mr-2" />
+              Активные сеансы
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-3">
+        <Card>
           <CardHeader>
-            <CardTitle>Интеграции</CardTitle>
-            <CardDescription>Подключенные сервисы</CardDescription>
+            <CardTitle>Дополнительно</CardTitle>
+            <CardDescription>Дополнительные возможности</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white border border-slate-200 rounded-lg flex items-center justify-center">
-                  <Icon name="Mail" className="text-slate-600" size={20} />
-                </div>
-                <div>
-                  <p className="font-medium">Электронная почта</p>
-                  <p className="text-sm text-slate-500">Подключено</p>
-                </div>
-              </div>
-              <Button variant="outline" size="sm">Настроить</Button>
-            </div>
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white border border-slate-200 rounded-lg flex items-center justify-center">
-                  <Icon name="FileText" className="text-slate-600" size={20} />
-                </div>
-                <div>
-                  <p className="font-medium">1С:Предприятие</p>
-                  <p className="text-sm text-slate-500">Не подключено</p>
-                </div>
-              </div>
-              <Button variant="outline" size="sm">Подключить</Button>
-            </div>
+          <CardContent className="space-y-3">
+            {user?.role === 'client' && (
+              <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/pricing')}>
+                <Icon name="Gem" size={18} className="mr-2" />
+                Тарифы и подписка
+              </Button>
+            )}
+            <Button variant="outline" className="w-full justify-start">
+              <Icon name="FileDown" size={18} className="mr-2" />
+              Экспорт данных
+            </Button>
+            <Button variant="outline" className="w-full justify-start">
+              <Icon name="Download" size={18} className="mr-2" />
+              Скачать отчёт
+            </Button>
+            <Button variant="outline" className="w-full justify-start">
+              <Icon name="HelpCircle" size={18} className="mr-2" />
+              Помощь и поддержка
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="border-red-200 bg-red-50/50">
+          <CardHeader>
+            <CardTitle className="text-red-900">Опасная зона</CardTitle>
+            <CardDescription className="text-red-700">Действия, требующие подтверждения</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start border-red-200 text-red-700 hover:bg-red-100 hover:text-red-900"
+              onClick={handleLogout}
+            >
+              <Icon name="LogOut" size={18} className="mr-2" />
+              Выйти из системы
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-full justify-start border-red-200 text-red-700 hover:bg-red-100 hover:text-red-900"
+            >
+              <Icon name="Trash2" size={18} className="mr-2" />
+              Удалить аккаунт
+            </Button>
           </CardContent>
         </Card>
       </div>
