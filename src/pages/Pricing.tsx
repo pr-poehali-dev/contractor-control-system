@@ -118,50 +118,51 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="w-full max-w-5xl mx-auto px-4 py-4 md:px-8 md:py-8 pb-24 md:pb-10">
-        <div className="mb-6 md:mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex-shrink-0">
-              <Icon name="Gem" size={20} className="text-white md:hidden" />
+      <div className="w-full max-w-5xl mx-auto px-3 py-3 md:px-8 md:py-8 pb-24 md:pb-10">
+        <div className="mb-4 md:mb-8">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex-shrink-0">
+              <Icon name="Gem" size={18} className="text-white md:hidden" />
               <Icon name="Gem" size={24} className="text-white hidden md:block" />
             </div>
             <div>
-              <h1 className="text-xl md:text-3xl font-bold text-slate-900">Тарифы</h1>
-              <p className="text-xs md:text-base text-slate-600">Настройте план под ваши потребности</p>
+              <h1 className="text-lg md:text-3xl font-bold text-slate-900">Тарифы</h1>
+              <p className="text-[10px] md:text-base text-slate-600">Настройте план</p>
             </div>
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid lg:grid-cols-3 gap-3 md:gap-6">
+          <div className="lg:col-span-2 space-y-3 md:space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base md:text-lg">
-                <Icon name="Users" size={20} />
-                Количество пользователей
+            <CardHeader className="pb-3 md:pb-6">
+              <CardTitle className="flex items-center gap-2 text-sm md:text-lg">
+                <Icon name="Users" size={16} className="md:hidden" />
+                <Icon name="Users" size={20} className="hidden md:block" />
+                <span className="text-sm md:text-base">Пользователей</span>
               </CardTitle>
-              <CardDescription className="text-sm">
-                Сколько человек будет работать в системе
+              <CardDescription className="text-[10px] md:text-sm">
+                Сколько человек будет работать
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
+            <CardContent className="px-3 md:px-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5 md:gap-3">
                 {userTiers.map((tier, index) => (
                   <button
                     key={tier.users}
                     onClick={() => setSelectedUserTier(index)}
                     className={cn(
-                      'p-3 md:p-4 rounded-xl border-2 transition-all text-left',
+                      'p-2 md:p-4 rounded-lg md:rounded-xl border-2 transition-all text-left',
                       selectedUserTier === index
                         ? 'border-blue-600 bg-blue-50'
                         : 'border-slate-200 hover:border-slate-300'
                     )}
                   >
-                    <div className="text-xl md:text-2xl font-bold text-slate-900 mb-1">
+                    <div className="text-lg md:text-2xl font-bold text-slate-900 mb-0.5 md:mb-1">
                       {tier.users === -1 ? '∞' : tier.users}
                     </div>
-                    <div className="text-[10px] md:text-xs text-slate-600 mb-1 md:mb-2 leading-tight line-clamp-1">{tier.label}</div>
-                    <div className="text-xs md:text-sm font-semibold text-blue-600">
+                    <div className="text-[9px] md:text-xs text-slate-600 mb-1 leading-tight line-clamp-1">{tier.label}</div>
+                    <div className="text-[10px] md:text-sm font-semibold text-blue-600">
                       {tier.price === 0 ? 'Бесплатно' : `+${tier.price} ₽`}
                     </div>
                   </button>
@@ -171,33 +172,34 @@ const Pricing = () => {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base md:text-lg">
-                <Icon name="Maximize2" size={20} />
-                Площадь проектов
+            <CardHeader className="pb-3 md:pb-6">
+              <CardTitle className="flex items-center gap-2 text-sm md:text-lg">
+                <Icon name="Maximize2" size={16} className="md:hidden" />
+                <Icon name="Maximize2" size={20} className="hidden md:block" />
+                <span className="text-sm md:text-base">Площадь проектов</span>
               </CardTitle>
-              <CardDescription className="text-sm">
-                Суммарная площадь всех объектов в проектах
+              <CardDescription className="text-[10px] md:text-sm">
+                Суммарная площадь объектов
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
+            <CardContent className="px-3 md:px-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5 md:gap-3">
                 {areaTiers.map((tier, index) => (
                   <button
                     key={tier.area}
                     onClick={() => setSelectedAreaTier(index)}
                     className={cn(
-                      'p-3 md:p-4 rounded-xl border-2 transition-all text-left',
+                      'p-2 md:p-4 rounded-lg md:rounded-xl border-2 transition-all text-left',
                       selectedAreaTier === index
                         ? 'border-blue-600 bg-blue-50'
                         : 'border-slate-200 hover:border-slate-300'
                     )}
                   >
-                    <div className="text-xl md:text-2xl font-bold text-slate-900 mb-1">
+                    <div className="text-lg md:text-2xl font-bold text-slate-900 mb-0.5 md:mb-1">
                       {tier.area === -1 ? '∞' : tier.area / 1000}
                     </div>
-                    <div className="text-[10px] md:text-xs text-slate-600 mb-1 md:mb-2 leading-tight line-clamp-1">{tier.label}</div>
-                    <div className="text-xs md:text-sm font-semibold text-blue-600">
+                    <div className="text-[9px] md:text-xs text-slate-600 mb-1 leading-tight line-clamp-1">{tier.label}</div>
+                    <div className="text-[10px] md:text-sm font-semibold text-blue-600">
                       {tier.price === 0 ? 'Бесплатно' : `+${tier.price} ₽`}
                     </div>
                   </button>
@@ -207,53 +209,56 @@ const Pricing = () => {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base md:text-lg">
-                <Icon name="Zap" size={20} />
-                Дополнительные возможности
+            <CardHeader className="pb-3 md:pb-6">
+              <CardTitle className="flex items-center gap-2 text-sm md:text-lg">
+                <Icon name="Zap" size={16} className="md:hidden" />
+                <Icon name="Zap" size={20} className="hidden md:block" />
+                <span className="text-sm md:text-base">Дополнительно</span>
               </CardTitle>
-              <CardDescription className="text-sm">
-                Расширьте функциональность системы
+              <CardDescription className="text-[10px] md:text-sm">
+                Расширьте функциональность
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-2 md:space-y-3 px-3 md:px-6">
               {addonFeatures.map(addon => (
                 <div
                   key={addon.id}
                   className={cn(
-                    'flex items-start gap-3 md:gap-4 p-3 md:p-4 rounded-xl border-2 transition-all',
+                    'flex items-start gap-2 md:gap-4 p-2 md:p-4 rounded-lg md:rounded-xl border-2 transition-all',
                     enabledAddons.includes(addon.id)
                       ? 'border-blue-600 bg-blue-50'
                       : 'border-slate-200'
                   )}
                 >
                   <div className={cn(
-                    'flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl flex-shrink-0',
+                    'flex items-center justify-center w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl flex-shrink-0',
                     enabledAddons.includes(addon.id)
                       ? 'bg-blue-600 text-white'
                       : 'bg-slate-100 text-slate-600'
                   )}>
-                    <Icon name={addon.icon as any} size={18} />
+                    <Icon name={addon.icon as any} size={14} className="md:hidden" />
+                    <Icon name={addon.icon as any} size={18} className="hidden md:block" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="text-sm md:text-base font-semibold text-slate-900">{addon.title}</h4>
+                    <div className="flex items-center gap-1 md:gap-2 mb-0.5 md:mb-1">
+                      <h4 className="text-xs md:text-base font-semibold text-slate-900 leading-tight">{addon.title}</h4>
                       {addon.badge && (
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary" className="text-[9px] md:text-xs px-1 py-0">
                           {addon.badge}
                         </Badge>
                       )}
                     </div>
-                    <p className="text-xs md:text-sm text-slate-600">{addon.description}</p>
+                    <p className="text-[10px] md:text-sm text-slate-600 leading-tight">{addon.description}</p>
                   </div>
-                  <div className="flex flex-col md:flex-row items-end md:items-center gap-2 md:gap-3 flex-shrink-0">
-                    <span className="text-xs md:text-sm font-semibold text-blue-600 whitespace-nowrap">
-                      +{addon.price} ₽/мес
+                  <div className="flex flex-col items-end gap-1 md:gap-2 flex-shrink-0">
+                    <span className="text-[10px] md:text-sm font-semibold text-blue-600 whitespace-nowrap">
+                      +{addon.price} ₽
                     </span>
                     <Switch
                       checked={enabledAddons.includes(addon.id)}
                       onCheckedChange={() => toggleAddon(addon.id)}
                       disabled={addon.badge === 'Скоро'}
+                      className="scale-75 md:scale-100"
                     />
                   </div>
                 </div>
@@ -265,58 +270,61 @@ const Pricing = () => {
         <div className="lg:col-span-1">
           <div className="lg:static">
             <Card className="shadow-sm">
-              <CardHeader className="pb-3 lg:pb-6">
-                <CardTitle className="text-lg">Ваш тариф</CardTitle>
-                <CardDescription className="text-xs md:text-sm">Итоговая стоимость</CardDescription>
+              <CardHeader className="pb-2 md:pb-6 px-3 md:px-6">
+                <CardTitle className="text-base md:text-lg">Ваш тариф</CardTitle>
+                <CardDescription className="text-[10px] md:text-sm">Итоговая стоимость</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3 lg:space-y-4">
-                <div className="space-y-1.5 lg:space-y-2">
-                  <div className="flex justify-between text-xs md:text-sm">
+              <CardContent className="space-y-2 md:space-y-4 px-3 md:px-6">
+                <div className="space-y-1 md:space-y-2">
+                  <div className="flex justify-between text-[10px] md:text-sm">
                     <span className="text-slate-600">Базовый тариф</span>
                     <span className="font-medium">{basePrice} ₽</span>
                   </div>
                   {enabledAddons.length > 0 && (
-                    <div className="flex justify-between text-xs md:text-sm">
+                    <div className="flex justify-between text-[10px] md:text-sm">
                       <span className="text-slate-600">Дополнительно</span>
                       <span className="font-medium">{addonsPrice} ₽</span>
                     </div>
                   )}
                   {discount > 0 && (
-                    <div className="flex justify-between text-xs md:text-sm text-green-600">
+                    <div className="flex justify-between text-[10px] md:text-sm text-green-600">
                       <span>Скидка 15%</span>
                       <span className="font-medium">-{discount} ₽</span>
                     </div>
                   )}
                 </div>
 
-                <div className="pt-3 lg:pt-4 border-t">
-                  <div className="flex justify-between items-baseline mb-1">
-                    <span className="text-sm text-slate-600">Итого в месяц</span>
-                    <div className="text-2xl lg:text-3xl font-bold text-slate-900">
+                <div className="pt-2 md:pt-4 border-t">
+                  <div className="flex justify-between items-baseline mb-0.5 md:mb-1">
+                    <span className="text-xs md:text-sm text-slate-600">Итого в месяц</span>
+                    <div className="text-xl md:text-3xl font-bold text-slate-900">
                       {finalPrice} ₽
                     </div>
                   </div>
-                  <p className="text-xs text-slate-500 text-right">
+                  <p className="text-[9px] md:text-xs text-slate-500 text-right">
                     {finalPrice * 12} ₽ в год
                   </p>
                 </div>
 
-                <Button className="w-full" size="lg">
-                  <Icon name="CreditCard" size={18} className="mr-2" />
-                  <span className="text-sm md:text-base">Оформить подписку</span>
+                <Button className="w-full h-9 md:h-10" size="default">
+                  <Icon name="CreditCard" size={14} className="mr-1.5 md:mr-2" />
+                  <span className="text-xs md:text-base">Оформить подписку</span>
                 </Button>
 
-                <div className="space-y-1.5 lg:space-y-2 pt-3 lg:pt-4 border-t">
-                  <div className="flex items-center gap-2 text-xs md:text-sm text-slate-600">
-                    <Icon name="Check" size={14} className="text-green-600 flex-shrink-0" />
+                <div className="space-y-1 md:space-y-2 pt-2 md:pt-4 border-t">
+                  <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-sm text-slate-600">
+                    <Icon name="Check" size={12} className="text-green-600 flex-shrink-0 md:hidden" />
+                    <Icon name="Check" size={14} className="text-green-600 flex-shrink-0 hidden md:block" />
                     <span>Первые 14 дней бесплатно</span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs md:text-sm text-slate-600">
-                    <Icon name="Check" size={14} className="text-green-600 flex-shrink-0" />
+                  <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-sm text-slate-600">
+                    <Icon name="Check" size={12} className="text-green-600 flex-shrink-0 md:hidden" />
+                    <Icon name="Check" size={14} className="text-green-600 flex-shrink-0 hidden md:block" />
                     <span>Отмена в любое время</span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs md:text-sm text-slate-600">
-                    <Icon name="Check" size={14} className="text-green-600 flex-shrink-0" />
+                  <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-sm text-slate-600">
+                    <Icon name="Check" size={12} className="text-green-600 flex-shrink-0 md:hidden" />
+                    <Icon name="Check" size={14} className="text-green-600 flex-shrink-0 hidden md:block" />
                     <span>Безопасная оплата</span>
                   </div>
                 </div>

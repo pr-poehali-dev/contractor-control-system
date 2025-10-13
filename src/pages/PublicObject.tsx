@@ -25,57 +25,57 @@ const PublicObject = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="w-full max-w-4xl mx-auto px-4 py-4 md:px-8 md:py-8 pb-24 md:pb-10">
-        <Card className="mb-6 md:mb-8">
-          <CardContent className="pt-4 md:pt-6 px-3 md:px-6">
-            <div className="flex flex-col items-center text-center mb-4 md:mb-6">
-              <div className="flex h-16 w-16 md:h-24 md:w-24 items-center justify-center rounded-full bg-gradient-to-br from-slate-100 to-slate-200 mb-3 md:mb-4">
-                <Icon name="Building2" size={32} className="text-slate-600 md:hidden" />
+      <div className="w-full max-w-4xl mx-auto px-3 py-3 md:px-8 md:py-8 pb-24 md:pb-10">
+        <Card className="mb-4 md:mb-8">
+          <CardContent className="pt-3 md:pt-6 px-3 md:px-6 pb-3 md:pb-6">
+            <div className="flex flex-col items-center text-center mb-3 md:mb-6">
+              <div className="flex h-14 w-14 md:h-24 md:w-24 items-center justify-center rounded-full bg-gradient-to-br from-slate-100 to-slate-200 mb-2 md:mb-4">
+                <Icon name="Building2" size={28} className="text-slate-600 md:hidden" />
                 <Icon name="Building2" size={48} className="text-slate-600 hidden md:block" />
               </div>
-              <h1 className="text-xl md:text-3xl font-bold text-slate-900 mb-2">{site.title}</h1>
-              <p className="text-sm md:text-base text-slate-600 mb-3">{site.address}</p>
-              <Badge variant={site.status === 'active' ? 'default' : 'secondary'}>
+              <h1 className="text-base md:text-3xl font-bold text-slate-900 mb-1 md:mb-2 px-2">{site.title}</h1>
+              <p className="text-xs md:text-base text-slate-600 mb-2 md:mb-3 px-2">{site.address}</p>
+              <Badge variant={site.status === 'active' ? 'default' : 'secondary'} className="text-[10px] md:text-sm px-2 py-0.5">
                 {site.status === 'active' ? 'Активный' : 'Завершён'}
               </Badge>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 md:gap-8">
-              <div className="text-center">
-                <div className="text-xl md:text-4xl font-bold text-slate-900 mb-1">{objectWorks.length}</div>
-                <p className="text-[10px] md:text-sm text-slate-600 leading-tight">работ</p>
+            <div className="grid grid-cols-3 gap-1 md:gap-8">
+              <div className="text-center px-1">
+                <div className="text-lg md:text-4xl font-bold text-slate-900 mb-0.5 md:mb-1">{objectWorks.length}</div>
+                <p className="text-[9px] md:text-sm text-slate-600 leading-tight">работ</p>
               </div>
-              <div className="text-center">
-                <div className="text-xl md:text-4xl font-bold text-slate-900 mb-1">{inspections.length}</div>
-                <p className="text-[10px] md:text-sm text-slate-600 leading-tight">проверок</p>
+              <div className="text-center px-1">
+                <div className="text-lg md:text-4xl font-bold text-slate-900 mb-0.5 md:mb-1">{inspections.length}</div>
+                <p className="text-[9px] md:text-sm text-slate-600 leading-tight">проверок</p>
               </div>
-              <div className="text-center">
-                <div className="text-sm md:text-4xl font-bold text-slate-900 mb-1 leading-tight">
+              <div className="text-center px-1">
+                <div className="text-xs md:text-4xl font-bold text-slate-900 mb-0.5 md:mb-1 leading-tight">
                   {new Date(site.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
                 </div>
-                <p className="text-[10px] md:text-sm text-slate-600 leading-tight">дата создания</p>
+                <p className="text-[9px] md:text-sm text-slate-600 leading-tight">дата создания</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="journal" className="space-y-4 md:space-y-6">
-          <div className="relative -mx-4 md:mx-0">
-            <div className="overflow-x-auto scrollbar-hide px-4 md:px-0">
-              <TabsList className="inline-flex w-auto">
-                <TabsTrigger value="journal" className="text-[11px] md:text-sm whitespace-nowrap px-2 md:px-4">Журнал работ</TabsTrigger>
-                <TabsTrigger value="schedule" className="text-[11px] md:text-sm whitespace-nowrap px-2 md:px-4">График</TabsTrigger>
-                <TabsTrigger value="analytics" className="text-[11px] md:text-sm whitespace-nowrap px-2 md:px-4">Аналитика</TabsTrigger>
-                <TabsTrigger value="inspections" className="text-[11px] md:text-sm whitespace-nowrap px-2 md:px-4">Проверки</TabsTrigger>
-                <TabsTrigger value="general" className="text-[11px] md:text-sm whitespace-nowrap px-2 md:px-4">Общее</TabsTrigger>
+        <Tabs defaultValue="journal" className="space-y-3 md:space-y-6">
+          <div className="relative -mx-3 md:mx-0">
+            <div className="overflow-x-auto scrollbar-hide px-3 md:px-0">
+              <TabsList className="inline-flex w-auto h-8 md:h-10">
+                <TabsTrigger value="journal" className="text-[10px] md:text-sm whitespace-nowrap px-2 md:px-4 h-7 md:h-9">Журнал</TabsTrigger>
+                <TabsTrigger value="schedule" className="text-[10px] md:text-sm whitespace-nowrap px-2 md:px-4 h-7 md:h-9">График</TabsTrigger>
+                <TabsTrigger value="analytics" className="text-[10px] md:text-sm whitespace-nowrap px-2 md:px-4 h-7 md:h-9">Аналитика</TabsTrigger>
+                <TabsTrigger value="inspections" className="text-[10px] md:text-sm whitespace-nowrap px-2 md:px-4 h-7 md:h-9">Проверки</TabsTrigger>
+                <TabsTrigger value="general" className="text-[10px] md:text-sm whitespace-nowrap px-2 md:px-4 h-7 md:h-9">Общее</TabsTrigger>
               </TabsList>
             </div>
           </div>
 
-          <TabsContent value="journal" className="space-y-3 md:space-y-4">
+          <TabsContent value="journal" className="space-y-2 md:space-y-4">
             <Card>
-              <CardContent className="p-4 md:p-6">
-                <h3 className="text-sm md:text-base font-semibold text-slate-900 mb-3 md:mb-4">Журнал работ</h3>
+              <CardContent className="p-3 md:p-6">
+                <h3 className="text-xs md:text-base font-semibold text-slate-900 mb-2 md:mb-4">Журнал работ</h3>
                 <div className="space-y-3">
                   {objectWorks.map(work => (
                     <div key={work.id} className="p-4 bg-slate-50 rounded-lg">
