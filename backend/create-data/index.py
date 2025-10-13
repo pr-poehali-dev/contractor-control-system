@@ -131,26 +131,31 @@ def handler(event, context):
                 description = data.get('description', '').replace("'", "''")
                 volume = data.get('volume', '').replace("'", "''") if data.get('volume') else None
                 materials = data.get('materials', '').replace("'", "''") if data.get('materials') else None
-                progress = int(data.get('progress', 0))
+                photo_urls_raw = data.get('photo_urls', '')
+                photo_urls = photo_urls_raw.replace("'", "''") if photo_urls_raw else None
                 
-                if volume and materials:
-                    cur.execute(f"""
-                        INSERT INTO work_logs (work_id, description, volume, materials, created_by, created_at)
-                        VALUES ({work_id}, '{description}', '{volume}', '{materials}', {user_id_int}, NOW())
-                        RETURNING id, work_id, description, volume, materials, created_by, created_at
-                    """)
-                elif volume:
-                    cur.execute(f"""
-                        INSERT INTO work_logs (work_id, description, volume, created_by, created_at)
-                        VALUES ({work_id}, '{description}', '{volume}', {user_id_int}, NOW())
-                        RETURNING id, work_id, description, volume, materials, created_by, created_at
-                    """)
-                else:
-                    cur.execute(f"""
-                        INSERT INTO work_logs (work_id, description, created_by, created_at)
-                        VALUES ({work_id}, '{description}', {user_id_int}, NOW())
-                        RETURNING id, work_id, description, volume, materials, created_by, created_at
-                    """)
+                # Build SQL dynamically based on available fields
+                fields = ['work_id', 'description', 'created_by', 'created_at']
+                values = [str(work_id), f"'{description}'", str(user_id_int), 'NOW()']
+                
+                if volume:
+                    fields.append('volume')
+                    values.append(f"'{volume}'")
+                if materials:
+                    fields.append('materials')
+                    values.append(f"'{materials}'")
+                if photo_urls:
+                    fields.append('photo_urls')
+                    values.append(f"'{photo_urls}'")
+                
+                fields_str = ', '.join(fields)
+                values_str = ', '.join(values)
+                
+                cur.execute(f"""
+                    INSERT INTO work_logs ({fields_str})
+                    VALUES ({values_str})
+                    RETURNING id, work_id, description, volume, materials, photo_urls, created_by, created_at
+                """)
                 result = cur.fetchone()
                 conn.commit()
                 

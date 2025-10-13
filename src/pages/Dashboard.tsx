@@ -150,14 +150,20 @@ const Dashboard = () => {
     }
 
     try {
+      // Добавляем placeholder фотографии если их нет
+      const photoUrls = journalForm.photoUrls && journalForm.photoUrls.length > 0 
+        ? journalForm.photoUrls 
+        : [
+            'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800',
+            'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800'
+          ];
+      
       await api.createItem(token!, 'work_log', {
         work_id: Number(journalForm.workId),
         description: journalForm.description,
         volume: journalForm.volume || null,
         materials: journalForm.materials || null,
-        photo_urls: journalForm.photoUrls && journalForm.photoUrls.length > 0 
-          ? JSON.stringify(journalForm.photoUrls) 
-          : null
+        photo_urls: JSON.stringify(photoUrls)
       });
 
       toast({
@@ -178,10 +184,11 @@ const Dashboard = () => {
       
       await loadUserData();
       loadFeed();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Failed to create work log:', error);
       toast({
         title: 'Ошибка',
-        description: 'Не удалось создать запись',
+        description: error?.message || 'Не удалось создать запись',
         variant: 'destructive'
       });
     }
