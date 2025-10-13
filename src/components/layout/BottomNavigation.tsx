@@ -13,7 +13,7 @@ interface NavItem {
 }
 
 const mobileNavItems: NavItem[] = [
-  { id: 'dashboard', label: 'Главная', icon: 'Home', path: '/dashboard', roles: ['client', 'admin'] },
+  { id: 'dashboard', label: 'Лента событий', icon: 'Home', path: '/dashboard', roles: ['client', 'contractor', 'admin'] },
   { id: 'projects', label: 'Проекты', icon: 'Folder', path: '/projects', roles: ['client', 'admin'] },
   { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects', roles: ['contractor'] },
   { id: 'defects', label: 'Задачи', icon: 'ListTodo', path: '/defects' },

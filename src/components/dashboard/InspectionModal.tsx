@@ -17,13 +17,14 @@ interface InspectionModalProps {
   };
   onFormChange: (form: any) => void;
   projects: any[];
+  sites: any[];
+  works: any[];
   onSubmit: () => void;
 }
 
-const InspectionModal = ({ open, onOpenChange, form, onFormChange, projects, onSubmit }: InspectionModalProps) => {
-  const selectedProject = projects.find(p => p.id === Number(form.projectId));
-  const selectedObject = selectedProject?.objects?.find((o: any) => o.id === Number(form.objectId));
-  const availableWorks = selectedObject?.works || [];
+const InspectionModal = ({ open, onOpenChange, form, onFormChange, projects, sites, works, onSubmit }: InspectionModalProps) => {
+  const projectSites = sites.filter(s => s.project_id === Number(form.projectId));
+  const availableWorks = works.filter(w => w.object_id === Number(form.objectId));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -66,8 +67,8 @@ const InspectionModal = ({ open, onOpenChange, form, onFormChange, projects, onS
                   <SelectValue placeholder="Выберите объект" />
                 </SelectTrigger>
                 <SelectContent>
-                  {selectedProject?.objects?.map((o: any) => (
-                    <SelectItem key={o.id} value={String(o.id)}>{o.title}</SelectItem>
+                  {projectSites.map((site: any) => (
+                    <SelectItem key={site.id} value={String(site.id)}>{site.title}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

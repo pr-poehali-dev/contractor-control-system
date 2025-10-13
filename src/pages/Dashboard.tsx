@@ -72,6 +72,8 @@ const Dashboard = () => {
   });
 
   const projects = userData?.projects || [];
+  const sites = userData?.sites || [];
+  const works = userData?.works || [];
 
   useEffect(() => {
     if (!user) return;
@@ -218,7 +220,7 @@ const Dashboard = () => {
 
   return (
     <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-10 bg-slate-50 min-h-screen">
-      <div className="max-w-[680px] mx-auto">
+      <div className="max-w-[680px] lg:max-w-[900px] mx-auto">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
@@ -283,6 +285,8 @@ const Dashboard = () => {
         form={journalForm}
         onFormChange={setJournalForm}
         projects={projects}
+        sites={sites}
+        works={works}
         onSubmit={handleCreateJournalEntry}
       />
 
@@ -292,6 +296,8 @@ const Dashboard = () => {
         form={inspectionForm}
         onFormChange={setInspectionForm}
         projects={projects}
+        sites={sites}
+        works={works}
         onSubmit={handleScheduleInspection}
       />
 

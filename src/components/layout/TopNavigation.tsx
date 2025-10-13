@@ -20,7 +20,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { id: 'dashboard', label: 'Главная', icon: 'LayoutDashboard', path: '/dashboard', roles: ['client', 'admin'] },
+  { id: 'dashboard', label: 'Лента событий', icon: 'LayoutDashboard', path: '/dashboard', roles: ['client', 'contractor', 'admin'] },
   { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects', roles: ['contractor', 'admin'] },
   { id: 'projects', label: 'Проекты', icon: 'FolderKanban', path: '/projects', roles: ['client', 'admin'] },
   { id: 'admin', label: 'Админ-панель', icon: 'Shield', path: '/admin', roles: ['admin'] },

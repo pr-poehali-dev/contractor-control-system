@@ -21,14 +21,16 @@ interface JournalEntryModalProps {
   };
   onFormChange: (form: any) => void;
   projects: any[];
+  sites: any[];
+  works: any[];
   onSubmit: () => void;
 }
 
-const JournalEntryModal = ({ open, onOpenChange, form, onFormChange, projects, onSubmit }: JournalEntryModalProps) => {
+const JournalEntryModal = ({ open, onOpenChange, form, onFormChange, projects, sites, works, onSubmit }: JournalEntryModalProps) => {
   const [uploading, setUploading] = useState(false);
-  const selectedProject = projects.find(p => p.id === Number(form.projectId));
-  const selectedObject = selectedProject?.objects?.find((o: any) => o.id === Number(form.objectId));
-  const availableWorks = selectedObject?.works || [];
+  
+  const projectSites = sites.filter(s => s.project_id === Number(form.projectId));
+  const availableWorks = works.filter(w => w.object_id === Number(form.objectId));
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -99,8 +101,8 @@ const JournalEntryModal = ({ open, onOpenChange, form, onFormChange, projects, o
                   <SelectValue placeholder="Выберите объект" />
                 </SelectTrigger>
                 <SelectContent>
-                  {selectedProject?.objects?.map((o: any) => (
-                    <SelectItem key={o.id} value={String(o.id)}>{o.title}</SelectItem>
+                  {projectSites.map((site: any) => (
+                    <SelectItem key={site.id} value={String(site.id)}>{site.title}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

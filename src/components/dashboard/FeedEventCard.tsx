@@ -99,47 +99,45 @@ const FeedEventCard = ({ event, index }: FeedEventCardProps) => {
       style={{ animationDelay: `${index * 0.05}s` }}
     >
       <div className="p-4 sm:p-5">
-        <div className="flex items-center gap-3 mb-3">
-          <Avatar className="w-10 h-10 bg-slate-200">
+        <div className="flex items-start gap-3 mb-3">
+          <Avatar className="w-11 h-11 bg-slate-200 flex-shrink-0">
             <AvatarFallback className="bg-slate-200 text-slate-700 text-sm font-medium">
               {event.author ? getInitials(event.author) : <Icon name={getEventIcon(event.type) as any} size={18} />}
             </AvatarFallback>
           </Avatar>
           
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-slate-900 text-sm">
+            <div className="flex items-center justify-between gap-3 mb-0.5">
+              <h3 className="font-semibold text-slate-900 text-base truncate">
                 {event.author || event.projectTitle}
               </h3>
-              {event.type !== 'info_post' && event.projectTitle && (
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full flex-shrink-0">
+                <Icon name="MoreHorizontal" size={18} />
+              </Button>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-xs text-slate-500">
+                {event.scheduledDate 
+                  ? new Date(event.scheduledDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
+                  : formatTimeAgo(event.timestamp)
+                }
+              </p>
+              {event.type !== 'info_post' && (
                 <>
-                  <span className="text-slate-400">·</span>
-                  <Badge variant="secondary" className="text-xs font-normal">
+                  <span className="text-slate-300">·</span>
+                  <Badge variant="secondary" className="text-[10px] font-normal px-1.5 py-0">
                     {getEventLabel(event.type)}
                   </Badge>
                 </>
               )}
             </div>
-            <p className="text-xs text-slate-500">
-              {event.scheduledDate 
-                ? new Date(event.scheduledDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
-                : formatTimeAgo(event.timestamp)
-              }
-            </p>
           </div>
-
-          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-            <Icon name="MoreHorizontal" size={18} />
-          </Button>
         </div>
 
-        {event.type !== 'info_post' && (
-          <div className="flex items-center gap-2 mb-3 text-xs text-slate-600">
-            <Badge variant="outline" className="text-[11px] px-2 py-0.5">
+        {event.type !== 'info_post' && event.objectTitle && (
+          <div className="mb-3 pl-14">
+            <Badge variant="outline" className="text-xs px-2.5 py-1 font-normal">
               {event.objectTitle}
-            </Badge>
-            <Badge variant="outline" className="text-[11px] px-2 py-0.5">
-              {event.workTitle}
             </Badge>
           </div>
         )}
