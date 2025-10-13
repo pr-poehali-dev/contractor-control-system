@@ -63,7 +63,7 @@ export default function TopNavigation() {
           <span className="font-bold text-lg hidden md:inline">Подряд-ПРО</span>
         </div>
 
-        <nav className="flex items-center gap-1 flex-1">
+        <nav className="hidden md:flex items-center gap-1 flex-1">
           {visibleNavItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
@@ -85,6 +85,8 @@ export default function TopNavigation() {
             );
           })}
         </nav>
+
+        <div className="flex-1 md:hidden" />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

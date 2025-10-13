@@ -156,55 +156,8 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] md:h-[calc(100vh-140px)] bg-white overflow-hidden border-t border-slate-200">
-      <div className="md:hidden border-b border-slate-200 p-2">
-        <Button 
-          variant="outline" 
-          className="w-full justify-between h-auto py-2.5"
-          onClick={() => setShowWorksList(!showWorksList)}
-        >
-          <div className="flex items-center gap-2 truncate">
-            <Icon name="Briefcase" size={16} className="flex-shrink-0" />
-            <span className="truncate font-medium">{selectedWorkData?.title || 'Выберите работу'}</span>
-          </div>
-          <Icon name={showWorksList ? 'ChevronUp' : 'ChevronDown'} size={16} className="flex-shrink-0" />
-        </Button>
+    <div className="flex flex-col h-screen md:h-[calc(100vh-140px)] bg-white overflow-hidden">
 
-        {showWorksList && (
-          <div className="absolute left-0 right-0 top-[52px] z-50 bg-white border-b shadow-lg max-h-[60vh] overflow-y-auto">
-            {works.map((work) => {
-              const logs = workLogs.filter(log => log.work_id === work.id);
-              return (
-                <button
-                  key={work.id}
-                  onClick={() => {
-                    handleWorkSelect(work.id);
-                    setShowWorksList(false);
-                  }}
-                  className={cn(
-                    'w-full text-left p-3 border-b last:border-b-0',
-                    selectedWork === work.id ? 'bg-blue-50' : 'hover:bg-slate-50 active:bg-slate-100'
-                  )}
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className="font-medium text-sm">{work.title}</div>
-                    <Badge variant="outline" className="text-xs">
-                      {work.status === 'active' ? '🟢' : work.status === 'completed' ? '✅' : '🟡'}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center gap-3 text-xs text-slate-500">
-                    <span className="flex items-center gap-1">
-                      <Icon name="MessageSquare" size={12} />
-                      {logs.length}
-                    </span>
-                    <span>{work.assigned_to_name || 'Не назначено'}</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </div>
 
       <div className="flex flex-1 overflow-hidden">
         <WorksList
