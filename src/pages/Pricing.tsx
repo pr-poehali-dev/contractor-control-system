@@ -145,30 +145,28 @@ const Pricing = () => {
                 Сколько человек будет работать
               </CardDescription>
             </CardHeader>
-            <CardContent className="px-3 md:px-6 -mx-3 md:mx-0">
-              <div className="overflow-x-auto scrollbar-hide px-3 md:px-0 -mx-3 md:mx-0">
-                <div className="flex gap-2 md:grid md:grid-cols-3 md:gap-3 pb-2 md:pb-0">
-                  {userTiers.map((tier, index) => (
-                    <button
-                      key={tier.users}
-                      onClick={() => setSelectedUserTier(index)}
-                      className={cn(
-                        'flex-shrink-0 w-[120px] md:w-auto p-2 md:p-4 rounded-lg md:rounded-xl border-2 transition-all text-left',
-                        selectedUserTier === index
-                          ? 'border-blue-600 bg-blue-50'
-                          : 'border-slate-200 hover:border-slate-300'
-                      )}
-                    >
-                      <div className="text-lg md:text-2xl font-bold text-slate-900 mb-0.5 md:mb-1">
-                        {tier.users === -1 ? '∞' : tier.users}
-                      </div>
-                      <div className="text-[9px] md:text-xs text-slate-600 mb-1 leading-tight line-clamp-1">{tier.label}</div>
-                      <div className="text-[10px] md:text-sm font-semibold text-blue-600">
-                        {tier.price === 0 ? 'Бесплатно' : `+${tier.price} ₽`}
-                      </div>
-                    </button>
-                  ))}
-                </div>
+            <CardContent className="px-3 md:px-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5 md:gap-3">
+                {userTiers.map((tier, index) => (
+                  <button
+                    key={tier.users}
+                    onClick={() => setSelectedUserTier(index)}
+                    className={cn(
+                      'p-2 md:p-4 rounded-lg md:rounded-xl border-2 transition-all text-left',
+                      selectedUserTier === index
+                        ? 'border-blue-600 bg-blue-50'
+                        : 'border-slate-200 hover:border-slate-300'
+                    )}
+                  >
+                    <div className="text-lg md:text-2xl font-bold text-slate-900 mb-0.5 md:mb-1">
+                      {tier.users === -1 ? '∞' : tier.users}
+                    </div>
+                    <div className="text-[9px] md:text-xs text-slate-600 mb-1 leading-tight line-clamp-1">{tier.label}</div>
+                    <div className="text-[10px] md:text-sm font-semibold text-blue-600">
+                      {tier.price === 0 ? 'Бесплатно' : `+${tier.price} ₽`}
+                    </div>
+                  </button>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -184,30 +182,28 @@ const Pricing = () => {
                 Суммарная площадь объектов
               </CardDescription>
             </CardHeader>
-            <CardContent className="px-3 md:px-6 -mx-3 md:mx-0">
-              <div className="overflow-x-auto scrollbar-hide px-3 md:px-0 -mx-3 md:mx-0">
-                <div className="flex gap-2 md:grid md:grid-cols-3 md:gap-3 pb-2 md:pb-0">
-                  {areaTiers.map((tier, index) => (
-                    <button
-                      key={tier.area}
-                      onClick={() => setSelectedAreaTier(index)}
-                      className={cn(
-                        'flex-shrink-0 w-[120px] md:w-auto p-2 md:p-4 rounded-lg md:rounded-xl border-2 transition-all text-left',
-                        selectedAreaTier === index
-                          ? 'border-blue-600 bg-blue-50'
-                          : 'border-slate-200 hover:border-slate-300'
-                      )}
-                    >
-                      <div className="text-lg md:text-2xl font-bold text-slate-900 mb-0.5 md:mb-1">
-                        {tier.area === -1 ? '∞' : tier.area / 1000}
-                      </div>
-                      <div className="text-[9px] md:text-xs text-slate-600 mb-1 leading-tight line-clamp-1">{tier.label}</div>
-                      <div className="text-[10px] md:text-sm font-semibold text-blue-600">
-                        {tier.price === 0 ? 'Бесплатно' : `+${tier.price} ₽`}
-                      </div>
-                    </button>
-                  ))}
-                </div>
+            <CardContent className="px-3 md:px-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5 md:gap-3">
+                {areaTiers.map((tier, index) => (
+                  <button
+                    key={tier.area}
+                    onClick={() => setSelectedAreaTier(index)}
+                    className={cn(
+                      'p-2 md:p-4 rounded-lg md:rounded-xl border-2 transition-all text-left',
+                      selectedAreaTier === index
+                        ? 'border-blue-600 bg-blue-50'
+                        : 'border-slate-200 hover:border-slate-300'
+                    )}
+                  >
+                    <div className="text-lg md:text-2xl font-bold text-slate-900 mb-0.5 md:mb-1">
+                      {tier.area === -1 ? '∞' : tier.area / 1000}
+                    </div>
+                    <div className="text-[9px] md:text-xs text-slate-600 mb-1 leading-tight line-clamp-1">{tier.label}</div>
+                    <div className="text-[10px] md:text-sm font-semibold text-blue-600">
+                      {tier.price === 0 ? 'Бесплатно' : `+${tier.price} ₽`}
+                    </div>
+                  </button>
+                ))}
               </div>
             </CardContent>
           </Card>
