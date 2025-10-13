@@ -6,7 +6,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/ui/icon';
 import OnboardingBanner from '@/components/OnboardingBanner';
-import DashboardStats from '@/components/dashboard/DashboardStats';
 import FeedFilters from '@/components/dashboard/FeedFilters';
 import FeedEventCard from '@/components/dashboard/FeedEventCard';
 import CreateActionButton from '@/components/dashboard/CreateActionButton';
@@ -115,38 +114,7 @@ const Dashboard = () => {
     return <OnboardingBanner onClose={() => setShowOnboarding(false)} />;
   }
 
-  const activeProjects = projects.filter(p => p.status === 'active').length;
-  const sites = userData?.sites || [];
-  const works = userData?.works || [];
-  const remarks = userData?.remarks || [];
-  const openRemarks = remarks.filter(r => r.status === 'open').length;
 
-  const stats = [
-    { 
-      label: 'Активных проектов', 
-      value: String(activeProjects), 
-      icon: 'Building2', 
-      color: 'bg-blue-100 text-[#2563EB]',
-    },
-    { 
-      label: 'Объектов в работе', 
-      value: String(sites.filter(s => s.status === 'active').length), 
-      icon: 'MapPin', 
-      color: 'bg-green-100 text-green-600',
-    },
-    { 
-      label: 'Работ выполняется', 
-      value: String(works.filter(w => w.status === 'in_progress').length), 
-      icon: 'Wrench', 
-      color: 'bg-purple-100 text-purple-600',
-    },
-    { 
-      label: 'Открытых замечаний', 
-      value: String(openRemarks), 
-      icon: 'AlertCircle', 
-      color: 'bg-red-100 text-red-600',
-    },
-  ];
 
   const handleEventClick = (event: FeedEvent) => {
     if (event.type === 'info_post') return;
@@ -250,17 +218,12 @@ const Dashboard = () => {
 
   return (
     <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-10 bg-slate-50 min-h-screen">
-      <div className="max-w-[1400px] mx-auto">
-        <div className="mb-4 md:mb-6">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-3">
-              <div className="hidden md:flex w-12 h-12 bg-blue-100 rounded-full items-center justify-center flex-shrink-0">
-                <Icon name="Building2" size={24} className="text-blue-600" />
-              </div>
-              <h1 className="text-xl md:text-3xl font-bold text-slate-900">
-                Лента событий
-              </h1>
-            </div>
+      <div className="max-w-[680px] mx-auto">
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+              Лента событий
+            </h1>
 
             <CreateActionButton
               userRole={user?.role}
@@ -269,13 +232,9 @@ const Dashboard = () => {
               onCreateInfoPost={() => setShowInfoPostModal(true)}
             />
           </div>
-          <p className="text-sm md:text-base text-slate-600">События по вашим проектам</p>
         </div>
 
-        <DashboardStats stats={stats} />
-
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="flex-1">
+        <div className="space-y-4">
             <FeedFilters filter={filter} onFilterChange={setFilter} />
 
             <div className="space-y-4">
@@ -314,8 +273,6 @@ const Dashboard = () => {
                   />
                 ))
               )}
-            </div>
-          </div>
         </div>
       </div>
 

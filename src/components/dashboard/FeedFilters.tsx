@@ -1,4 +1,3 @@
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 
@@ -9,48 +8,58 @@ interface FeedFiltersProps {
 
 const FeedFilters = ({ filter, onFilterChange }: FeedFiltersProps) => {
   return (
-    <Card className="mb-4">
-      <CardContent className="p-4">
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          <Button
-            variant={filter === 'all' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => onFilterChange('all')}
-            className="flex-shrink-0"
-          >
-            <Icon name="Sparkles" size={16} className="mr-2" />
-            Все события
-          </Button>
-          <Button
-            variant={filter === 'work_logs' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => onFilterChange('work_logs')}
-            className="flex-shrink-0"
-          >
-            <Icon name="FileText" size={16} className="mr-2" />
-            Журнал работ
-          </Button>
-          <Button
-            variant={filter === 'inspections' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => onFilterChange('inspections')}
-            className="flex-shrink-0"
-          >
-            <Icon name="ClipboardCheck" size={16} className="mr-2" />
-            Проверки
-          </Button>
-          <Button
-            variant={filter === 'info_posts' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => onFilterChange('info_posts')}
-            className="flex-shrink-0"
-          >
-            <Icon name="Bell" size={16} className="mr-2" />
-            Инфо-посты
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="bg-white rounded-lg shadow-sm mb-4 overflow-x-auto">
+      <div className="flex border-b border-slate-200">
+        <Button
+          variant="ghost"
+          className={`flex-1 min-w-[100px] rounded-none border-b-2 transition-colors ${
+            filter === 'all'
+              ? 'border-blue-500 text-blue-600 hover:text-blue-600 hover:bg-blue-50'
+              : 'border-transparent text-slate-600 hover:bg-slate-50'
+          }`}
+          onClick={() => onFilterChange('all')}
+        >
+          <Icon name="Sparkles" size={18} className="mr-2" />
+          <span className="font-medium">Все</span>
+        </Button>
+        <Button
+          variant="ghost"
+          className={`flex-1 min-w-[140px] rounded-none border-b-2 transition-colors ${
+            filter === 'work_logs'
+              ? 'border-blue-500 text-blue-600 hover:text-blue-600 hover:bg-blue-50'
+              : 'border-transparent text-slate-600 hover:bg-slate-50'
+          }`}
+          onClick={() => onFilterChange('work_logs')}
+        >
+          <Icon name="FileText" size={18} className="mr-2" />
+          <span className="font-medium">Журнал</span>
+        </Button>
+        <Button
+          variant="ghost"
+          className={`flex-1 min-w-[120px] rounded-none border-b-2 transition-colors ${
+            filter === 'inspections'
+              ? 'border-blue-500 text-blue-600 hover:text-blue-600 hover:bg-blue-50'
+              : 'border-transparent text-slate-600 hover:bg-slate-50'
+          }`}
+          onClick={() => onFilterChange('inspections')}
+        >
+          <Icon name="ClipboardCheck" size={18} className="mr-2" />
+          <span className="font-medium">Проверки</span>
+        </Button>
+        <Button
+          variant="ghost"
+          className={`flex-1 min-w-[120px] rounded-none border-b-2 transition-colors ${
+            filter === 'info_posts'
+              ? 'border-blue-500 text-blue-600 hover:text-blue-600 hover:bg-blue-50'
+              : 'border-transparent text-slate-600 hover:bg-slate-50'
+          }`}
+          onClick={() => onFilterChange('info_posts')}
+        >
+          <Icon name="Bell" size={18} className="mr-2" />
+          <span className="font-medium">Инфо</span>
+        </Button>
+      </div>
+    </div>
   );
 };
 

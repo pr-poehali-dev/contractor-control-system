@@ -1,6 +1,8 @@
-import { Card, CardContent } from '@/components/ui/card';
+import { useState } from 'react';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 
 interface FeedEvent {
@@ -40,16 +42,6 @@ const getEventIcon = (type: string) => {
   }
 };
 
-const getEventColor = (type: string) => {
-  switch(type) {
-    case 'work_log': return 'bg-blue-100 text-blue-600';
-    case 'inspection': return 'bg-purple-100 text-purple-600';
-    case 'info_post': return 'bg-amber-100 text-amber-600';
-    case 'planned_inspection': return 'bg-slate-100 text-slate-600';
-    default: return 'bg-slate-100 text-slate-600';
-  }
-};
-
 const getEventLabel = (type: string) => {
   switch(type) {
     case 'work_log': return 'Запись в журнале';
@@ -78,113 +70,177 @@ const formatTimeAgo = (timestamp: string) => {
   }
 };
 
-const FeedEventCard = ({ event, index, onClick }: FeedEventCardProps) => {
+const FeedEventCard = ({ event, index }: FeedEventCardProps) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const photos = event.photoUrls || [];
+
+  const handlePrevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === 0 ? photos.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
     <Card 
-      className={`hover:shadow-md transition-shadow animate-fade-in ${event.type === 'info_post' ? '' : 'cursor-pointer'}`}
+      className="overflow-hidden hover:shadow-md transition-shadow animate-fade-in"
       style={{ animationDelay: `${index * 0.05}s` }}
-      onClick={() => onClick(event)}
     >
-      <CardContent className="p-6">
-        <div className="flex gap-4">
-          <div className="flex-shrink-0">
-            <Avatar className={`w-12 h-12 ${getEventColor(event.type)}`}>
-              <AvatarFallback className="bg-transparent">
-                <Icon name={getEventIcon(event.type) as any} size={24} />
-              </AvatarFallback>
-            </Avatar>
-          </div>
+      <div className="p-4">
+        <div className="flex items-center gap-3 mb-3">
+          <Avatar className="w-10 h-10 bg-slate-200">
+            <AvatarFallback className="bg-slate-200 text-slate-700 text-sm font-medium">
+              {event.author ? getInitials(event.author) : <Icon name={getEventIcon(event.type) as any} size={18} />}
+            </AvatarFallback>
+          </Avatar>
           
           <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between mb-2 gap-4">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1 flex-wrap">
-                  <Badge variant="outline" className="text-xs">
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-slate-900 text-sm">
+                {event.author || event.projectTitle}
+              </h3>
+              {event.type !== 'info_post' && event.projectTitle && (
+                <>
+                  <span className="text-slate-400">·</span>
+                  <Badge variant="secondary" className="text-xs font-normal">
                     {getEventLabel(event.type)}
                   </Badge>
-                  <span className="text-xs text-slate-500">
-                    {event.scheduledDate 
-                      ? new Date(event.scheduledDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
-                      : formatTimeAgo(event.timestamp)
-                    }
-                  </span>
-                </div>
-                <h3 className="font-semibold text-slate-900 mb-1">
-                  {event.title}
-                </h3>
-              </div>
+                </>
+              )}
             </div>
-
-            <p className="text-sm text-slate-600 mb-3 line-clamp-2">
-              {event.description}
+            <p className="text-xs text-slate-500">
+              {event.scheduledDate 
+                ? new Date(event.scheduledDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
+                : formatTimeAgo(event.timestamp)
+              }
             </p>
+          </div>
 
-            {(event.volume || event.materials) && (
-              <div className="flex flex-wrap gap-4 mb-3 text-xs">
-                {event.volume && (
-                  <div className="flex items-center gap-1.5 text-slate-600">
-                    <Icon name="Package" size={14} />
-                    <span>Объём: {event.volume}</span>
-                  </div>
-                )}
-                {event.materials && (
-                  <div className="flex items-center gap-1.5 text-slate-600">
-                    <Icon name="Boxes" size={14} />
-                    <span>Материалы: {event.materials}</span>
-                  </div>
-                )}
+          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+            <Icon name="MoreHorizontal" size={18} />
+          </Button>
+        </div>
+
+        {event.type !== 'info_post' && (
+          <div className="flex items-center gap-2 mb-3 text-xs text-slate-600">
+            <Badge variant="outline" className="text-[11px] px-2 py-0.5">
+              {event.objectTitle}
+            </Badge>
+            <Badge variant="outline" className="text-[11px] px-2 py-0.5">
+              {event.workTitle}
+            </Badge>
+          </div>
+        )}
+
+        <div className="mb-3">
+          <h4 className="font-medium text-slate-900 mb-1">{event.title}</h4>
+          <p className="text-sm text-slate-600 whitespace-pre-wrap">
+            {event.description}
+          </p>
+        </div>
+
+        {(event.volume || event.materials) && (
+          <div className="flex flex-wrap gap-3 mb-3 p-3 bg-slate-50 rounded-lg">
+            {event.volume && (
+              <div className="flex items-center gap-2 text-xs text-slate-700">
+                <Icon name="Package" size={14} className="text-slate-500" />
+                <span className="font-medium">Объём:</span>
+                <span>{event.volume}</span>
               </div>
             )}
+            {event.materials && (
+              <div className="flex items-center gap-2 text-xs text-slate-700">
+                <Icon name="Boxes" size={14} className="text-slate-500" />
+                <span className="font-medium">Материалы:</span>
+                <span>{event.materials}</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
-            {event.photoUrls && event.photoUrls.length > 0 && (
-              <div className="flex gap-2 mb-3 overflow-x-auto scrollbar-hide">
-                {event.photoUrls.slice(0, 4).map((url, i) => (
-                  <div key={i} className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-slate-100">
-                    <img 
-                      src={url} 
-                      alt={`Фото ${i + 1}`}
-                      className="w-full h-full object-cover"
+      {photos.length > 0 && (
+        <div className="relative bg-black group">
+          <div className="relative aspect-[4/3] md:aspect-video">
+            <img 
+              src={photos[currentImageIndex]} 
+              alt={`Фото ${currentImageIndex + 1}`}
+              className="w-full h-full object-contain"
+            />
+            
+            {photos.length > 1 && (
+              <>
+                <div className="absolute top-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded-full font-medium">
+                  {currentImageIndex + 1}/{photos.length}
+                </div>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-white/90 hover:bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={handlePrevImage}
+                >
+                  <Icon name="ChevronLeft" size={20} />
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-white/90 hover:bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={handleNextImage}
+                >
+                  <Icon name="ChevronRight" size={20} />
+                </Button>
+
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                  {photos.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentImageIndex(idx);
+                      }}
+                      className={`w-1.5 h-1.5 rounded-full transition-all ${
+                        idx === currentImageIndex 
+                          ? 'bg-white w-4' 
+                          : 'bg-white/50 hover:bg-white/75'
+                      }`}
                     />
-                  </div>
-                ))}
-                {event.photoUrls.length > 4 && (
-                  <div className="w-20 h-20 flex-shrink-0 rounded-lg bg-slate-100 flex items-center justify-center text-sm text-slate-600 font-medium">
-                    +{event.photoUrls.length - 4}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {event.type !== 'info_post' && event.projectTitle && (
-              <div className="flex items-center gap-2 text-xs text-slate-500">
-                <Icon name="FolderOpen" size={14} />
-                <span className="truncate">{event.projectTitle}</span>
-                {event.objectTitle && (
-                  <>
-                    <Icon name="ChevronRight" size={12} />
-                    <Icon name="MapPin" size={14} />
-                    <span className="truncate">{event.objectTitle}</span>
-                  </>
-                )}
-                {event.workTitle && (
-                  <>
-                    <Icon name="ChevronRight" size={12} />
-                    <Icon name="Wrench" size={14} />
-                    <span className="truncate">{event.workTitle}</span>
-                  </>
-                )}
-              </div>
-            )}
-
-            {event.author && (
-              <div className="flex items-center gap-2 text-xs text-slate-500 mt-2 pt-2 border-t border-slate-100">
-                <Icon name="User" size={14} />
-                <span>{event.author}</span>
-              </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>
-      </CardContent>
+      )}
+
+      <div className="px-4 py-3 border-t border-slate-100">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="sm" className="h-9 gap-2 text-slate-600 hover:text-blue-600">
+            <Icon name="ThumbsUp" size={16} />
+            <span className="text-xs">Отлично</span>
+          </Button>
+          <Button variant="ghost" size="sm" className="h-9 gap-2 text-slate-600 hover:text-blue-600">
+            <Icon name="MessageCircle" size={16} />
+            <span className="text-xs">Комментарий</span>
+          </Button>
+          <Button variant="ghost" size="sm" className="h-9 gap-2 text-slate-600 hover:text-blue-600 ml-auto">
+            <Icon name="Share2" size={16} />
+          </Button>
+        </div>
+      </div>
     </Card>
   );
 };
