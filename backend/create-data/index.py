@@ -38,6 +38,9 @@ def handler(event, context):
         headers = event.get('headers', {})
         auth_token = headers.get('X-Auth-Token') or headers.get('x-auth-token')
         
+        print(f"DEBUG: Headers received: {headers}")
+        print(f"DEBUG: Auth token: {auth_token[:20] if auth_token else 'None'}...")
+        
         if not auth_token:
             return {
                 'statusCode': 401,
@@ -48,17 +51,20 @@ def handler(event, context):
         try:
             payload = verify_jwt_token(auth_token)
             user_id_int = payload['user_id']
+            print(f"DEBUG: Token verified, user_id: {user_id_int}")
         except ValueError as e:
+            print(f"DEBUG: ValueError: {str(e)}")
             return {
                 'statusCode': 401,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
                 'body': json.dumps({'error': str(e)})
             }
         except Exception as e:
+            print(f"DEBUG: Exception: {str(e)}, Type: {type(e)}")
             return {
                 'statusCode': 401,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                'body': json.dumps({'error': 'Invalid token'})
+                'body': json.dumps({'error': f'Invalid token: {str(e)}'})
             }
         
         body = json.loads(event.get('body', '{}'))
