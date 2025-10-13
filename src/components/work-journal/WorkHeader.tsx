@@ -18,24 +18,24 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
   return (
     <>
       {/* MOBILE: Compact header with back button */}
-      <div className="md:hidden bg-white border-b border-slate-200 px-4 py-3">
-        <div className="flex items-center gap-3 mb-3">
+      <div className="md:hidden bg-white border-b border-slate-200 px-3 py-2.5">
+        <div className="flex items-center gap-2 mb-2">
           <Button 
             variant="ghost" 
             size="icon"
             className="flex-shrink-0"
             onClick={() => navigate(`/projects/${projectId}/objects/${objectId}`)}
           >
-            <Icon name="ChevronLeft" size={24} />
+            <Icon name="ChevronLeft" size={20} />
           </Button>
           
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex-shrink-0 flex items-center justify-center">
-              <Icon name="Wrench" size={20} className="text-blue-600" />
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex-shrink-0 flex items-center justify-center">
+              <Icon name="Wrench" size={16} className="text-blue-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-xs text-slate-500">Секция А, корпус 2</div>
-              <h1 className="text-base font-bold text-slate-900 truncate">{selectedWorkData.title}</h1>
+              <div className="text-[10px] text-slate-500">Секция А, корпус 2</div>
+              <h1 className="text-sm font-bold text-slate-900 truncate leading-tight">{selectedWorkData.title}</h1>
             </div>
           </div>
 
@@ -43,66 +43,67 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
             variant="ghost" 
             size="icon"
             onClick={onEdit}
+            className="h-8 w-8"
           >
-            <Icon name="Settings" size={20} />
+            <Icon name="Settings" size={16} />
           </Button>
         </div>
 
         {/* Mobile tabs */}
-        <div className="flex gap-1 overflow-x-auto pb-2 -mx-4 px-4">
+        <div className="flex gap-1 overflow-x-auto pb-1 -mx-3 px-3">
           <button
             onClick={() => setActiveTab('journal')}
-            className={`pb-2 px-3 text-xs font-medium transition-colors relative whitespace-nowrap flex items-center gap-1.5 rounded-lg ${
+            className={`py-1.5 px-2.5 text-[11px] font-medium transition-colors relative whitespace-nowrap flex items-center gap-1 rounded-lg ${
               activeTab === 'journal'
                 ? 'text-blue-600 bg-blue-50'
                 : 'text-slate-600'
             }`}
           >
-            <Icon name="MessageSquare" size={14} />
+            <Icon name="MessageSquare" size={12} />
             Журнал
           </button>
           <button
             onClick={() => setActiveTab('info')}
-            className={`pb-2 px-3 text-xs font-medium transition-colors relative whitespace-nowrap flex items-center gap-1.5 rounded-lg ${
+            className={`py-1.5 px-2.5 text-[11px] font-medium transition-colors relative whitespace-nowrap flex items-center gap-1 rounded-lg ${
               activeTab === 'info'
                 ? 'text-blue-600 bg-blue-50'
                 : 'text-slate-600'
             }`}
           >
-            <Icon name="Info" size={14} />
+            <Icon name="Info" size={12} />
             Инфо
           </button>
           <button
             onClick={() => setActiveTab('description')}
-            className={`pb-2 px-3 text-xs font-medium transition-colors relative whitespace-nowrap flex items-center gap-1.5 rounded-lg ${
+            className={`py-1.5 px-2.5 text-[11px] font-medium transition-colors relative whitespace-nowrap flex items-center gap-1 rounded-lg ${
               activeTab === 'description'
                 ? 'text-blue-600 bg-blue-50'
                 : 'text-slate-600'
             }`}
           >
-            <Icon name="FileText" size={14} />
+            <Icon name="FileText" size={12} />
             Документы
           </button>
           <button
             onClick={() => setActiveTab('estimate')}
-            className={`pb-2 px-3 text-xs font-medium transition-colors relative whitespace-nowrap flex items-center gap-1.5 rounded-lg ${
+            className={`py-1.5 px-2.5 text-[11px] font-medium transition-colors relative whitespace-nowrap flex items-center gap-1 rounded-lg ${
               activeTab === 'estimate'
                 ? 'text-blue-600 bg-blue-50'
                 : 'text-slate-600'
             }`}
           >
-            <Icon name="Calculator" size={14} />
+            <Icon name="Calculator" size={12} />
             Смета
           </button>
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`pb-2 px-3 text-xs font-medium transition-colors relative whitespace-nowrap flex items-center gap-1.5 rounded-lg ${
+            className={`py-1.5 px-2.5 text-[11px] font-medium transition-colors relative whitespace-nowrap flex items-center gap-1 rounded-lg ${
               activeTab === 'analytics'
                 ? 'text-blue-600 bg-blue-50'
                 : 'text-slate-600'
             }`}
           >
-            <Icon name="BarChart" size={14} />
+            <Icon name="BarChart" size={12} />
             Аналитика
           </button>
         </div>
