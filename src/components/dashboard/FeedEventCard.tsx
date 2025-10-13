@@ -98,7 +98,7 @@ const FeedEventCard = ({ event, index }: FeedEventCardProps) => {
       className="overflow-hidden hover:shadow-md transition-shadow animate-fade-in"
       style={{ animationDelay: `${index * 0.05}s` }}
     >
-      <div className="p-4">
+      <div className="p-4 sm:p-5">
         <div className="flex items-center gap-3 mb-3">
           <Avatar className="w-10 h-10 bg-slate-200">
             <AvatarFallback className="bg-slate-200 text-slate-700 text-sm font-medium">
@@ -145,8 +145,8 @@ const FeedEventCard = ({ event, index }: FeedEventCardProps) => {
         )}
 
         <div className="mb-3">
-          <h4 className="font-medium text-slate-900 mb-1">{event.title}</h4>
-          <p className="text-sm text-slate-600 whitespace-pre-wrap">
+          <h4 className="font-medium text-slate-900 mb-2 text-[15px] leading-snug">{event.title}</h4>
+          <p className="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed">
             {event.description}
           </p>
         </div>
@@ -226,21 +226,7 @@ const FeedEventCard = ({ event, index }: FeedEventCardProps) => {
         </div>
       )}
 
-      <div className="px-4 py-3 border-t border-slate-100">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" className="h-9 gap-2 text-slate-600 hover:text-blue-600">
-            <Icon name="ThumbsUp" size={16} />
-            <span className="text-xs">Отлично</span>
-          </Button>
-          <Button variant="ghost" size="sm" className="h-9 gap-2 text-slate-600 hover:text-blue-600">
-            <Icon name="MessageCircle" size={16} />
-            <span className="text-xs">Комментарий</span>
-          </Button>
-          <Button variant="ghost" size="sm" className="h-9 gap-2 text-slate-600 hover:text-blue-600 ml-auto">
-            <Icon name="Share2" size={16} />
-          </Button>
-        </div>
-      </div>
+
     </Card>
   );
 };

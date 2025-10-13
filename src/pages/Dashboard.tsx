@@ -54,7 +54,7 @@ const Dashboard = () => {
     description: '',
     volume: '',
     materials: '',
-    photos: [] as File[]
+    photoUrls: [] as string[]
   });
 
   const [inspectionForm, setInspectionForm] = useState({
@@ -158,7 +158,7 @@ const Dashboard = () => {
       description: '',
       volume: '',
       materials: '',
-      photos: []
+      photoUrls: []
     });
     
     loadFeed();

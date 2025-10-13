@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import Icon from '@/components/ui/icon';
 
 interface JournalEntryModalProps {
   open: boolean;
@@ -15,6 +17,7 @@ interface JournalEntryModalProps {
     description: string;
     volume: string;
     materials: string;
+    photoUrls?: string[];
   };
   onFormChange: (form: any) => void;
   projects: any[];
@@ -22,9 +25,48 @@ interface JournalEntryModalProps {
 }
 
 const JournalEntryModal = ({ open, onOpenChange, form, onFormChange, projects, onSubmit }: JournalEntryModalProps) => {
+  const [uploading, setUploading] = useState(false);
   const selectedProject = projects.find(p => p.id === Number(form.projectId));
   const selectedObject = selectedProject?.objects?.find((o: any) => o.id === Number(form.objectId));
   const availableWorks = selectedObject?.works || [];
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    const newUrls: string[] = [];
+
+    for (const file of Array.from(files)) {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const response = await fetch('https://cdn.poehali.dev/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await response.json();
+        if (data.url) {
+          newUrls.push(data.url);
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+      }
+    }
+
+    onFormChange({
+      ...form,
+      photoUrls: [...(form.photoUrls || []), ...newUrls]
+    });
+    setUploading(false);
+  };
+
+  const removeImage = (index: number) => {
+    const newPhotoUrls = [...(form.photoUrls || [])];
+    newPhotoUrls.splice(index, 1);
+    onFormChange({ ...form, photoUrls: newPhotoUrls });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -107,6 +149,50 @@ const JournalEntryModal = ({ open, onOpenChange, form, onFormChange, projects, o
                 value={form.materials}
                 onChange={(e) => onFormChange({...form, materials: e.target.value})}
               />
+            </div>
+          </div>
+
+          <div>
+            <Label>Фотографии</Label>
+            <div className="mt-2">
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+                className="hidden"
+                id="image-upload"
+                disabled={uploading}
+              />
+              <label
+                htmlFor="image-upload"
+                className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors"
+              >
+                <Icon name="Upload" size={20} className="text-slate-500" />
+                <span className="text-sm text-slate-600">
+                  {uploading ? 'Загрузка...' : 'Загрузить фотографии'}
+                </span>
+              </label>
+
+              {form.photoUrls && form.photoUrls.length > 0 && (
+                <div className="grid grid-cols-3 gap-2 mt-3">
+                  {form.photoUrls.map((url, idx) => (
+                    <div key={idx} className="relative group aspect-square">
+                      <img
+                        src={url}
+                        alt={`Фото ${idx + 1}`}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                      <button
+                        onClick={() => removeImage(idx)}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Icon name="X" size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
