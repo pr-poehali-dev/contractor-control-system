@@ -151,28 +151,29 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
         {activeVersion?.data ? (
           <>
             <Card className="mb-6">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h4 className="text-lg font-semibold">
+              <CardContent className="p-4 md:p-6">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-4 mb-4">
+                  <div className="min-w-0 flex-1">
+                    <h4 className="text-sm md:text-lg font-semibold break-words">
                       Актуальная версия: {activeVersion.version}
                     </h4>
-                    <p className="text-sm text-slate-600">
+                    <p className="text-xs md:text-sm text-slate-600 break-words">
                       Загружена {new Date(activeVersion.createdAt).toLocaleDateString('ru-RU')} • {activeVersion.createdBy}
                     </p>
                   </div>
-                  <Badge className="bg-green-100 text-green-700">Актуальная</Badge>
+                  <Badge className="bg-green-100 text-green-700 flex-shrink-0 text-[10px] md:text-xs">Актуальная</Badge>
                 </div>
 
-                <div className="flex gap-3 mt-4">
+                <div className="flex flex-col md:flex-row gap-2 md:gap-3 mt-4">
                   {activeVersion.xmlFile && (
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleDownloadFile(activeVersion.xmlFile!)}
+                      className="w-full md:w-auto text-xs md:text-sm justify-start"
                     >
-                      <Icon name="FileText" size={16} className="mr-2" />
-                      {activeVersion.xmlFile}
+                      <Icon name="FileText" size={14} className="mr-2 flex-shrink-0" />
+                      <span className="truncate">{activeVersion.xmlFile}</span>
                     </Button>
                   )}
                   {activeVersion.xlsxFile && (
@@ -180,9 +181,10 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
                       variant="outline"
                       size="sm"
                       onClick={() => handleDownloadFile(activeVersion.xlsxFile!)}
+                      className="w-full md:w-auto text-xs md:text-sm justify-start"
                     >
-                      <Icon name="Sheet" size={16} className="mr-2" />
-                      {activeVersion.xlsxFile}
+                      <Icon name="Sheet" size={14} className="mr-2 flex-shrink-0" />
+                      <span className="truncate">{activeVersion.xlsxFile}</span>
                     </Button>
                   )}
                 </div>
@@ -195,16 +197,13 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
                   <table className="w-full">
                     <thead className="bg-slate-50 border-b border-slate-200">
                       <tr>
-                        <th className="text-left p-5 text-lg font-semibold text-slate-700">
+                        <th className="text-left p-2 md:p-5 text-xs md:text-lg font-semibold text-slate-700">
                           Наименование
                         </th>
-                        <th className="text-left p-5 text-lg font-semibold text-slate-700">
+                        <th className="text-left p-2 md:p-5 text-xs md:text-lg font-semibold text-slate-700">
                           Количество
                         </th>
-                        <th className="text-left p-5 text-lg font-semibold text-slate-700">
-                          Цена
-                        </th>
-                        <th className="text-right p-5 text-lg font-semibold text-slate-700">
+                        <th className="text-right p-2 md:p-5 text-xs md:text-lg font-semibold text-slate-700">
                           Итого
                         </th>
                       </tr>
@@ -212,19 +211,18 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
                     <tbody>
                       {activeVersion.data.items.map((item, index) => (
                         <tr key={index} className="border-b border-slate-100 hover:bg-slate-50">
-                          <td className="p-5 text-lg">{item.name}</td>
-                          <td className="p-5 text-lg text-slate-600">{item.quantity}</td>
-                          <td className="p-5 text-lg text-slate-600">{item.price}</td>
-                          <td className="p-5 text-lg font-semibold text-right">{item.total}</td>
+                          <td className="p-2 md:p-5 text-xs md:text-lg break-words">{item.name}</td>
+                          <td className="p-2 md:p-5 text-xs md:text-lg text-slate-600 whitespace-nowrap">{item.quantity}</td>
+                          <td className="p-2 md:p-5 text-xs md:text-lg font-semibold text-right whitespace-nowrap">{item.total}</td>
                         </tr>
                       ))}
                     </tbody>
                     <tfoot className="bg-slate-50 border-t-2 border-slate-300">
                       <tr>
-                        <td colSpan={3} className="p-5 text-lg font-semibold">
+                        <td colSpan={2} className="p-2 md:p-5 text-sm md:text-lg font-semibold">
                           Итого:
                         </td>
-                        <td className="p-5 text-xl font-bold text-right">
+                        <td className="p-2 md:p-5 text-base md:text-xl font-bold text-right whitespace-nowrap">
                           {activeVersion.data.total.toLocaleString('ru-RU')} ₽
                         </td>
                       </tr>
@@ -234,16 +232,16 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 mb-8">
               <Card>
-                <CardContent className="p-5">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Icon name="Calculator" size={26} className="text-blue-600" />
+                <CardContent className="p-3 md:p-5">
+                  <div className="flex items-center gap-2 md:gap-4">
+                    <div className="w-10 h-10 md:w-14 md:h-14 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Icon name="Calculator" size={20} className="text-blue-600 md:w-6 md:h-6" />
                     </div>
-                    <div>
-                      <p className="text-sm text-slate-600">Бюджет</p>
-                      <p className="text-xl font-bold">
+                    <div className="min-w-0">
+                      <p className="text-xs md:text-sm text-slate-600">Бюджет</p>
+                      <p className="text-sm md:text-xl font-bold break-words">
                         {activeVersion.data.budget.toLocaleString('ru-RU')} ₽
                       </p>
                     </div>
@@ -252,14 +250,14 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
               </Card>
 
               <Card>
-                <CardContent className="p-5">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-green-100 rounded-lg flex items-center justify-center">
-                      <Icon name="TrendingDown" size={26} className="text-green-600" />
+                <CardContent className="p-3 md:p-5">
+                  <div className="flex items-center gap-2 md:gap-4">
+                    <div className="w-10 h-10 md:w-14 md:h-14 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Icon name="TrendingDown" size={20} className="text-green-600 md:w-6 md:h-6" />
                     </div>
-                    <div>
-                      <p className="text-sm text-slate-600">Потрачено</p>
-                      <p className="text-xl font-bold">
+                    <div className="min-w-0">
+                      <p className="text-xs md:text-sm text-slate-600">Потрачено</p>
+                      <p className="text-sm md:text-xl font-bold break-words">
                         {activeVersion.data.spent.toLocaleString('ru-RU')} ₽
                       </p>
                     </div>
@@ -268,14 +266,14 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
               </Card>
 
               <Card>
-                <CardContent className="p-5">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-purple-100 rounded-lg flex items-center justify-center">
-                      <Icon name="Wallet" size={26} className="text-purple-600" />
+                <CardContent className="p-3 md:p-5">
+                  <div className="flex items-center gap-2 md:gap-4">
+                    <div className="w-10 h-10 md:w-14 md:h-14 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Icon name="Wallet" size={20} className="text-purple-600 md:w-6 md:h-6" />
                     </div>
-                    <div>
-                      <p className="text-sm text-slate-600">Остаток</p>
-                      <p className="text-xl font-bold">
+                    <div className="min-w-0">
+                      <p className="text-xs md:text-sm text-slate-600">Остаток</p>
+                      <p className="text-sm md:text-xl font-bold break-words">
                         {(activeVersion.data.budget - activeVersion.data.spent).toLocaleString('ru-RU')} ₽
                       </p>
                     </div>

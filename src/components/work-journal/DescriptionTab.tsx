@@ -61,7 +61,7 @@ export default function DescriptionTab({ selectedWorkData }: DescriptionTabProps
                 <Icon name="FileText" size={18} className="text-blue-600 md:w-6 md:h-6" />
               </div>
               <div className="min-w-0 flex-1">
-                <h4 className="text-base md:text-xl font-semibold mb-1 md:mb-2 truncate">{selectedWorkData.title}</h4>
+                <h4 className="text-sm md:text-xl font-semibold mb-1 md:mb-2 break-words">{selectedWorkData.title}</h4>
                 <p className="text-xs md:text-base text-slate-600">
                   Применимые стандарты, нормы и правила
                 </p>
@@ -76,19 +76,19 @@ export default function DescriptionTab({ selectedWorkData }: DescriptionTabProps
               <CardContent className="p-3 md:p-6">
                 <div className="flex items-start gap-2 md:gap-4">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 md:gap-3 mb-1.5 md:mb-2 flex-wrap">
-                      <span className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-semibold flex-shrink-0 ${
+                    <div className="flex items-center gap-2 mb-1.5 md:mb-2 flex-wrap">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] md:text-xs font-semibold flex-shrink-0 ${
                         doc.type === 'ГОСТ' 
                           ? 'bg-blue-100 text-blue-700' 
                           : 'bg-green-100 text-green-700'
                       }`}>
                         {doc.type}
                       </span>
-                      <span className="font-mono text-xs md:text-sm font-semibold text-slate-700 truncate">
+                      <span className="font-mono text-[10px] md:text-sm font-semibold text-slate-700 break-all">
                         {doc.number}
                       </span>
                     </div>
-                    <p className="text-xs md:text-base text-slate-900 font-medium line-clamp-2">
+                    <p className="text-xs md:text-base text-slate-900 font-medium break-words">
                       {doc.title}
                     </p>
                   </div>
@@ -98,7 +98,7 @@ export default function DescriptionTab({ selectedWorkData }: DescriptionTabProps
                     onClick={() => window.open(doc.url, '_blank')}
                     className="flex-shrink-0 h-8 w-8 md:h-9 md:w-9"
                   >
-                    <Icon name="ExternalLink" size={16} />
+                    <Icon name="ExternalLink" size={14} className="md:w-4 md:h-4" />
                   </Button>
                 </div>
               </CardContent>
@@ -109,10 +109,10 @@ export default function DescriptionTab({ selectedWorkData }: DescriptionTabProps
         <Card className="mt-4 md:mt-6 bg-amber-50 border-amber-200">
           <CardContent className="p-3 md:p-6">
             <div className="flex items-start gap-2 md:gap-3">
-              <Icon name="Info" size={18} className="text-amber-600 mt-0.5 flex-shrink-0 md:w-5 md:h-5" />
+              <Icon name="Info" size={16} className="text-amber-600 mt-0.5 flex-shrink-0 md:w-5 md:h-5" />
               <div className="min-w-0 flex-1">
                 <h5 className="font-semibold text-amber-900 mb-0.5 md:mb-1 text-sm md:text-base">Важно</h5>
-                <p className="text-xs md:text-sm text-amber-800">
+                <p className="text-xs md:text-sm text-amber-800 break-words">
                   Все работы должны выполняться в строгом соответствии с указанными нормативными документами. 
                   При обнаружении несоответствий необходимо немедленно сообщить в проектный офис.
                 </p>
