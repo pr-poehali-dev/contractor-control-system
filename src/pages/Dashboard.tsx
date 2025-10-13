@@ -184,24 +184,29 @@ const Dashboard = () => {
   return (
     <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-10 bg-slate-50 min-h-screen">
       <div className="max-w-[1400px] mx-auto">
-        <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">
-            {user?.name || 'Пользователь'}
-          </h1>
-          <p className="text-slate-600">Лента событий по вашим проектам</p>
+        <div className="mb-4 md:mb-6">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="hidden md:flex w-12 h-12 bg-blue-100 rounded-full items-center justify-center flex-shrink-0">
+              <Icon name="Building2" size={24} className="text-blue-600" />
+            </div>
+            <h1 className="text-xl md:text-3xl font-bold text-slate-900">
+              {user?.name || 'Пользователь'}
+            </h1>
+          </div>
+          <p className="text-sm md:text-base text-slate-600">Лента событий по вашим проектам</p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
           {stats.map((stat, index) => (
             <Card key={stat.label} className="animate-fade-in" style={{ animationDelay: `${index * 0.05}s` }}>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className={`w-10 h-10 ${stat.color} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                    <Icon name={stat.icon as any} size={20} />
+              <CardContent className="p-3 md:p-4">
+                <div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
+                  <div className={`w-8 h-8 md:w-10 md:h-10 ${stat.color} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                    <Icon name={stat.icon as any} size={16} className="md:w-5 md:h-5" />
                   </div>
-                  <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+                  <p className="text-xl md:text-2xl font-bold text-slate-900">{stat.value}</p>
                 </div>
-                <p className="text-xs text-slate-600 font-medium">{stat.label}</p>
+                <p className="text-[11px] md:text-xs text-slate-600 font-medium leading-tight">{stat.label}</p>
               </CardContent>
             </Card>
           ))}
