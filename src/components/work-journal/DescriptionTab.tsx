@@ -84,7 +84,7 @@ export default function DescriptionTab({ selectedWorkData }: DescriptionTabProps
                       }`}>
                         {doc.type}
                       </span>
-                      <span className="font-mono text-[10px] md:text-sm font-semibold text-slate-700 break-all">
+                      <span className="font-mono text-[10px] md:text-sm font-semibold text-slate-700">
                         {doc.number}
                       </span>
                     </div>

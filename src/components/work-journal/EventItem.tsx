@@ -253,7 +253,7 @@ export default function EventItem({
   }
 
   return (
-    <div className={cn('flex gap-1.5 md:gap-4 group', isOwnEvent && 'flex-row-reverse')}>
+    <div className="flex gap-1.5 md:gap-4 group">
       <Avatar className="w-7 h-7 md:w-10 md:h-10 flex-shrink-0">
         <AvatarFallback className={cn(
           'text-[10px] md:text-sm font-semibold',
@@ -263,8 +263,8 @@ export default function EventItem({
         </AvatarFallback>
       </Avatar>
 
-      <div className={cn('flex-1 max-w-[85%] md:max-w-[80%]', isOwnEvent && 'flex flex-col items-end')}>
-        <div className={cn('mb-1 md:mb-1.5 flex items-center gap-1.5 md:gap-2', isOwnEvent && 'flex-row-reverse')}>
+      <div className="flex-1 max-w-[85%] md:max-w-[80%]">
+        <div className="mb-1 md:mb-1.5 flex items-center gap-1.5 md:gap-2">
           <span className="text-xs md:text-base font-semibold text-slate-900">{event.author_name}</span>
         </div>
 
@@ -288,7 +288,7 @@ export default function EventItem({
               </Button>
             )}
             {renderEventContent()}
-            <p className={cn('mt-1.5 md:mt-3 text-[9px] md:text-xs text-slate-400', isOwnEvent && 'text-right')}>
+            <p className="mt-1.5 md:mt-3 text-[9px] md:text-xs text-slate-400">
               {formatTime(event.created_at)}
             </p>
           </CardContent>

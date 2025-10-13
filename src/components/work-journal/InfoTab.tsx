@@ -40,13 +40,13 @@ export default function InfoTab({
                     {selectedWorkData.status === 'active' ? '🟢 В работе' : selectedWorkData.status === 'completed' ? '✅ Готово' : '🟡 Ожидание'}
                   </Badge>
                 </div>
-                <div className="flex justify-between gap-2">
+                <div className="flex flex-col md:flex-row md:justify-between gap-1 md:gap-2">
                   <span className="text-slate-600 flex-shrink-0">Подрядчик:</span>
-                  <span className="font-medium text-right break-words min-w-0">{selectedWorkData.contractor_name || 'Не назначен'}</span>
+                  <span className="font-medium md:text-right">{selectedWorkData.contractor_name || 'Не назначен'}</span>
                 </div>
-                <div className="flex justify-between gap-2">
+                <div className="flex flex-col md:flex-row md:justify-between gap-1 md:gap-2">
                   <span className="text-slate-600 flex-shrink-0">Создано:</span>
-                  <span className="font-medium text-right break-words">{formatDate(selectedWorkData.created_at)}</span>
+                  <span className="font-medium md:text-right">{formatDate(selectedWorkData.created_at)}</span>
                 </div>
                 <div className="flex justify-between gap-2">
                   <span className="text-slate-600 flex-shrink-0">Записей:</span>

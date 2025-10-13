@@ -35,7 +35,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-[10px] text-slate-500">Секция А, корпус 2</div>
-              <h1 className="text-sm font-bold text-slate-900 truncate leading-tight">{selectedWorkData.title}</h1>
+              <h1 className="text-sm font-bold text-slate-900 leading-tight line-clamp-2">{selectedWorkData.title}</h1>
             </div>
           </div>
 
@@ -50,7 +50,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
         </div>
 
         {/* Mobile tabs */}
-        <div className="flex gap-1 overflow-x-auto pb-1 -mx-3 px-3">
+        <div className="flex gap-1 overflow-x-auto pb-1 -mx-3 px-3 scrollbar-hide">
           <button
             onClick={() => setActiveTab('journal')}
             className={`py-1.5 px-2.5 text-[11px] font-medium transition-colors relative whitespace-nowrap flex items-center gap-1 rounded-lg ${
