@@ -84,62 +84,34 @@ export default function TopNavigation() {
               </Button>
             );
           })}
-          
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/pricing')}
-            className={cn(
-              'relative h-12 px-3 md:px-4 gap-2 ml-auto',
-              location.pathname === '/pricing' && 'text-blue-600 bg-blue-50'
-            )}
-          >
-            <div className="flex items-center gap-2 px-2 py-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold">
-              <Icon name="Gem" size={16} />
-              <span>Pro</span>
-            </div>
-          </Button>
         </nav>
 
-        <div className="flex-1 md:hidden" />
+        <div className="flex-1" />
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold">
-                {user ? getInitials(user.name) : 'U'}
+        <div className="flex items-center gap-2">
+          {user?.role === 'client' && (
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/pricing')}
+              className="h-10 px-3 gap-2"
+            >
+              <div className="flex items-center gap-2 px-2 py-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold text-sm">
+                <Icon name="Gem" size={14} />
+                <span className="hidden sm:inline">Pro</span>
               </div>
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <div className="flex items-center gap-3 p-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold">
-                {user ? getInitials(user.name) : 'U'}
-              </div>
-              <div className="flex flex-col">
-                <p className="text-sm font-medium">{user?.name}</p>
-                <p className="text-xs text-slate-500">{user?.email}</p>
-              </div>
+          )}
+
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/profile')}
+            className="relative h-10 w-10 rounded-full"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold">
+              {user ? getInitials(user.name) : 'U'}
             </div>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/profile')}>
-              <Icon name="User" size={16} className="mr-2" />
-              Профиль
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/settings')}>
-              <Icon name="Settings" size={16} className="mr-2" />
-              Настройки
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/tariffs')}>
-              <Icon name="CreditCard" size={16} className="mr-2" />
-              Тарифы
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-              <Icon name="LogOut" size={16} className="mr-2" />
-              Выйти
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </Button>
+        </div>
       </div>
     </header>
   );
