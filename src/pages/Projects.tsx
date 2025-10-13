@@ -107,7 +107,46 @@ const Projects = () => {
 
   return (
     <div className="h-full flex flex-col bg-slate-50">
-      <div className="bg-white border-b border-slate-200 p-6 md:p-8">
+      {/* MOBILE: Simplified header */}
+      <div className="md:hidden bg-white border-b border-slate-200 p-4">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-slate-900">Проекты</h1>
+          </div>
+          <Button variant="ghost" size="icon" onClick={() => navigate('/profile')}>
+            <Icon name="User" size={24} />
+          </Button>
+        </div>
+        
+        {/* Mobile filters */}
+        <div className="space-y-2">
+          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <SelectTrigger className="w-full h-11">
+              <SelectValue placeholder="Все проекты" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Все проекты</SelectItem>
+              <SelectItem value="active">Активные</SelectItem>
+              <SelectItem value="pending">В планировании</SelectItem>
+              <SelectItem value="completed">Завершённые</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-full h-11">
+              <SelectValue placeholder="По дате" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="date">По дате</SelectItem>
+              <SelectItem value="name">По названию</SelectItem>
+              <SelectItem value="progress">По прогрессу</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* DESKTOP: Original header */}
+      <div className="hidden md:block bg-white border-b border-slate-200 p-6 md:p-8">
         <div className="max-w-[1600px] mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -215,7 +254,52 @@ const Projects = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 md:p-8 pb-24 md:pb-8">
+      {/* MOBILE: List view */}
+      <div className="md:hidden flex-1 overflow-y-auto pb-20 bg-white">
+        {filteredProjects.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-96 text-center px-4">
+            <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+              <Icon name="Folder" size={48} className="text-slate-300" />
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 mb-2">Проекты не найдены</h3>
+            <p className="text-slate-600 mb-6">Попробуйте изменить параметры поиска</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {filteredProjects.map((project) => (
+              <div
+                key={project.id}
+                className="p-4 active:bg-slate-50 transition-colors"
+                onClick={() => navigate(`/projects/${project.id}`)}
+              >
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0 w-16 h-16 bg-blue-100 rounded-lg overflow-hidden flex items-center justify-center">
+                    <Icon name="Folder" size={28} className="text-blue-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-base text-slate-900 mb-1">{project.title}</h3>
+                    <p className="text-sm text-slate-500 mb-2">
+                      {project.objectsCount} {project.objectsCount === 1 ? 'объект' : 'объекта'}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs">
+                      <Badge className={getStatusColor(project.status)}>
+                        {getStatusLabel(project.status)}
+                      </Badge>
+                      <span className="text-slate-400">{project.completedWorks}/{project.totalWorks}</span>
+                    </div>
+                  </div>
+                  <div className="flex-shrink-0 text-right">
+                    <div className="text-xs text-slate-400 mb-1">2 дня назад</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* DESKTOP: Original grid/table view */}
+      <div className="hidden md:block flex-1 overflow-y-auto p-6 md:p-8 pb-24 md:pb-8">
         <div className="max-w-[1600px] mx-auto">
           {filteredProjects.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-96 text-center">

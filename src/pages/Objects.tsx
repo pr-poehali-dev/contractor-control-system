@@ -119,7 +119,48 @@ export default function Objects() {
 
   return (
     <div className="h-full flex flex-col bg-slate-50">
-      <div className="bg-white border-b border-slate-200 p-6 md:p-8">
+      {/* MOBILE: Simplified header */}
+      <div className="md:hidden bg-white border-b border-slate-200 p-4">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-slate-900">Главная</h1>
+          </div>
+          <Button variant="ghost" size="icon" onClick={() => navigate('/profile')}>
+            <Icon name="User" size={24} />
+          </Button>
+        </div>
+        
+        {/* Mobile filters */}
+        <div className="space-y-2">
+          <Select value={selectedProject} onValueChange={setSelectedProject}>
+            <SelectTrigger className="w-full h-11">
+              <SelectValue placeholder="Все объекты" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Все объекты</SelectItem>
+              {projects.map(project => (
+                <SelectItem key={project.id} value={String(project.id)}>
+                  {project.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-full h-11">
+              <SelectValue placeholder="По дате" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="date">По дате</SelectItem>
+              <SelectItem value="name">По названию</SelectItem>
+              <SelectItem value="progress">По приоритету</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* DESKTOP: Original header */}
+      <div className="hidden md:block bg-white border-b border-slate-200 p-6 md:p-8">
         <div className="max-w-[1600px] mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -241,7 +282,58 @@ export default function Objects() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 md:p-8 pb-24 md:pb-8">
+      {/* MOBILE: List view */}
+      <div className="md:hidden flex-1 overflow-y-auto pb-20 bg-white">
+        {filteredSites.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-96 text-center px-4">
+            <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+              <Icon name="Building2" size={48} className="text-slate-300" />
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 mb-2">Объекты не найдены</h3>
+            <p className="text-slate-600 mb-6">Попробуйте изменить параметры поиска</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {filteredSites.map((site) => (
+              <div
+                key={site.id}
+                className="p-4 active:bg-slate-50 transition-colors"
+                onClick={() => handleSiteClick(site)}
+              >
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0 w-16 h-16 bg-slate-100 rounded-lg overflow-hidden flex items-center justify-center">
+                    <Icon name="Building2" size={28} className="text-slate-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-base text-slate-900 mb-1">{site.title}</h3>
+                    <p className="text-sm text-slate-500 mb-2">
+                      {site.projectName}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs">
+                      <Badge className={
+                        site.status === 'active' ? 'bg-yellow-100 text-yellow-700' :
+                        site.status === 'pending' ? 'bg-blue-100 text-blue-700' :
+                        'bg-green-100 text-green-700'
+                      }>
+                        {site.status === 'active' ? 'Запланировано' : 
+                         site.status === 'pending' ? 'Требуется проверка' : 
+                         'Завершено'}
+                      </Badge>
+                      <span className="text-slate-400">{site.completedWorks}/{site.worksCount}</span>
+                    </div>
+                  </div>
+                  <div className="flex-shrink-0 text-right">
+                    <div className="text-xs text-slate-400 mb-1">2 часа назад</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* DESKTOP: Original grid/table view */}
+      <div className="hidden md:block flex-1 overflow-y-auto p-6 md:p-8 pb-24 md:pb-8">
         <div className="max-w-[1600px] mx-auto">
           {filteredSites.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-96 text-center">
