@@ -30,27 +30,27 @@ export default function EventItem({
         return (
           <>
             {event.work_data && (
-              <div className="flex items-center gap-2 mb-2 md:mb-3 pb-1.5 md:pb-2 border-b border-slate-200">
-                <Icon name="Wrench" size={14} className="text-green-600 md:w-5 md:h-5" />
+              <div className="flex items-center gap-1.5 mb-2 md:mb-3 pb-1.5 md:pb-2 border-b border-slate-200">
+                <Icon name="Wrench" size={15} className="text-green-600 md:w-5 md:h-5" />
                 <span className="text-xs md:text-base font-semibold text-green-600">Отчёт о работе</span>
               </div>
             )}
-            <p className="text-xs md:text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
+            <p className="text-sm md:text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
             
             {event.work_data?.volume && (
-              <div className="mt-2 md:mt-4 p-2 md:p-3 bg-slate-50 rounded-lg">
-                <p className="text-xs md:text-sm text-slate-600">
-                  Объём: <span className="font-semibold text-xs md:text-base">{event.work_data.volume} {event.work_data.unit}</span>
+              <div className="mt-2 md:mt-3 p-2 md:p-3 bg-slate-50 rounded-md">
+                <p className="text-sm md:text-sm text-slate-600">
+                  Объём: <span className="font-semibold">{event.work_data.volume} {event.work_data.unit}</span>
                 </p>
               </div>
             )}
             
             {event.work_data?.materials && event.work_data.materials.length > 0 && (
-              <div className="mt-2 md:mt-3">
-                <p className="text-xs md:text-sm text-slate-600 mb-1 md:mb-2">Материалы:</p>
-                <div className="flex flex-wrap gap-1 md:gap-1.5">
+              <div className="mt-2">
+                <p className="text-sm text-slate-600 mb-1.5">Материалы:</p>
+                <div className="flex flex-wrap gap-1">
                   {event.work_data.materials.map((material, idx) => (
-                    <Badge key={idx} variant="outline" className="text-[10px] md:text-xs py-0.5 md:py-1 px-1.5 md:px-2">
+                    <Badge key={idx} variant="outline" className="text-xs py-0.5 px-2">
                       {material}
                     </Badge>
                   ))}
@@ -59,13 +59,13 @@ export default function EventItem({
             )}
             
             {event.work_data?.photos && event.work_data.photos.length > 0 && (
-              <div className="mt-2 grid grid-cols-2 gap-1 md:gap-2">
+              <div className="mt-2 grid grid-cols-2 gap-1.5 md:gap-2">
                 {event.work_data.photos.map((photo, idx) => (
                   <img 
                     key={idx}
                     src={photo} 
                     alt={`Фото ${idx + 1}`}
-                    className="w-full h-20 md:h-32 object-cover rounded cursor-pointer"
+                    className="w-full h-24 md:h-32 object-cover rounded cursor-pointer"
                   />
                 ))}
               </div>
@@ -76,8 +76,8 @@ export default function EventItem({
       case 'inspection':
         return (
           <>
-            <div className="flex items-center gap-2 mb-2 md:mb-3 pb-1.5 md:pb-2 border-b border-slate-200">
-              <Icon name="ClipboardCheck" size={16} className="text-blue-600 md:w-5 md:h-5" />
+            <div className="flex items-center gap-1.5 mb-2 md:mb-3 pb-1.5 md:pb-2 border-b border-slate-200">
+              <Icon name="ClipboardCheck" size={15} className="text-blue-600 md:w-5 md:h-5" />
               <span className="text-xs md:text-base font-semibold text-blue-600">Проверка</span>
               {event.inspection_data?.status && (
                 <Badge 
@@ -94,7 +94,7 @@ export default function EventItem({
                 </Badge>
               )}
             </div>
-            <p className="text-xs md:text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
+            <p className="text-sm md:text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
             
             {event.inspection_data?.defects && event.inspection_data.defects.length > 0 && (
               <div className="mt-2 md:mt-3">
@@ -225,12 +225,12 @@ export default function EventItem({
         
       case 'chat_message':
         return (
-          <p className="text-xs md:text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
+          <p className="text-sm md:text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
         );
         
       default:
         return (
-          <p className="text-xs md:text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
+          <p className="text-sm md:text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
         );
     }
   };
@@ -253,34 +253,34 @@ export default function EventItem({
   }
 
   return (
-    <div className="flex gap-1.5 md:gap-4 group">
-      <Avatar className="w-7 h-7 md:w-10 md:h-10 flex-shrink-0">
+    <div className="flex gap-2 md:gap-4 group">
+      <Avatar className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0">
         <AvatarFallback className={cn(
-          'text-[10px] md:text-sm font-semibold',
+          'text-xs md:text-sm font-semibold',
           isOwnEvent ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-700'
         )}>
           {getInitials(event.author_name)}
         </AvatarFallback>
       </Avatar>
 
-      <div className="flex-1 max-w-[85%] md:max-w-[80%]">
+      <div className="flex-1 min-w-0">
         <div className="mb-1 md:mb-1.5 flex items-center gap-1.5 md:gap-2">
-          <span className="text-xs md:text-base font-semibold text-slate-900">{event.author_name}</span>
+          <span className="text-sm md:text-base font-semibold text-slate-900">{event.author_name}</span>
         </div>
 
         <Card className={cn(
           'border-none shadow-sm relative',
           isOwnEvent ? 'bg-blue-50' : 'bg-white',
-          event.type === 'work_entry' && !isOwnEvent && 'border-l-2 md:border-l-3 border-l-green-500',
-          event.type === 'inspection' && !isOwnEvent && 'border-l-2 md:border-l-3 border-l-blue-500',
-          event.type === 'defect_added' && 'border-l-2 md:border-l-3 border-l-amber-500'
+          event.type === 'work_entry' && !isOwnEvent && 'border-l-3 border-l-green-500',
+          event.type === 'inspection' && !isOwnEvent && 'border-l-3 border-l-blue-500',
+          event.type === 'defect_added' && 'border-l-3 border-l-amber-500'
         )}>
-          <CardContent className="p-2 md:p-4">
+          <CardContent className="p-2.5 md:p-4">
             {(userRole === 'customer' || userRole === 'client') && event.type === 'work_entry' && !isOwnEvent && (
               <Button
                 variant="outline"
                 size="sm"
-                className="absolute top-1.5 right-1.5 md:top-2 md:right-2 h-6 md:h-7 text-[10px] md:text-xs z-10 px-1.5 md:px-2"
+                className="absolute top-2 right-2 h-7 text-xs z-10 px-2"
                 onClick={() => onCreateInspection?.(event.id)}
               >
                 <Icon name="ClipboardCheck" size={12} className="md:mr-1" />
@@ -288,7 +288,7 @@ export default function EventItem({
               </Button>
             )}
             {renderEventContent()}
-            <p className="mt-1.5 md:mt-3 text-[9px] md:text-xs text-slate-400">
+            <p className="mt-2 md:mt-3 text-xs text-slate-400">
               {formatTime(event.created_at)}
             </p>
           </CardContent>

@@ -41,28 +41,21 @@ export default function DescriptionTab({ selectedWorkData }: DescriptionTabProps
   ];
 
   return (
-    <div className="flex-1 overflow-y-auto p-3 md:p-8 lg:p-12 bg-slate-50 pb-32 md:pb-12">
+    <div className="flex-1 overflow-y-auto px-3 py-4 md:p-8 lg:p-12 bg-slate-50">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-4 md:mb-8 gap-2">
-          <h3 className="text-lg md:text-2xl lg:text-3xl font-bold">Документы</h3>
-          <Button variant="outline" size="sm" className="md:h-10 hidden md:flex">
-            <Icon name="Edit" size={16} className="mr-2" />
-            Редактировать
-          </Button>
-          <Button variant="ghost" size="icon" className="md:hidden h-8 w-8">
-            <Icon name="Edit" size={16} />
-          </Button>
+        <div className="flex items-center justify-between mb-5 md:mb-8 gap-2">
+          <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">Документы</h3>
         </div>
 
-        <Card className="mb-4 md:mb-6">
-          <CardContent className="p-4 md:p-8">
-            <div className="flex items-start gap-2 md:gap-3">
-              <div className="p-1.5 md:p-2 bg-blue-50 rounded-lg flex-shrink-0">
-                <Icon name="FileText" size={18} className="text-blue-600 md:w-6 md:h-6" />
+        <Card className="mb-4 md:mb-6 bg-blue-50 border-blue-100">
+          <CardContent className="p-3 md:p-5">
+            <div className="flex items-start gap-2.5">
+              <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
+                <Icon name="FileText" size={18} className="text-blue-600" />
               </div>
               <div className="min-w-0 flex-1">
-                <h4 className="text-sm md:text-xl font-semibold mb-1 md:mb-2 break-words">{selectedWorkData.title}</h4>
-                <p className="text-xs md:text-base text-slate-600">
+                <h4 className="text-sm md:text-lg font-semibold mb-1 leading-snug">{selectedWorkData.title}</h4>
+                <p className="text-xs md:text-sm text-slate-600">
                   Применимые стандарты, нормы и правила
                 </p>
               </div>
@@ -70,51 +63,42 @@ export default function DescriptionTab({ selectedWorkData }: DescriptionTabProps
           </CardContent>
         </Card>
 
-        <div className="space-y-2 md:space-y-4">
+        <div className="space-y-3 md:space-y-4">
           {regulatoryDocs.map((doc, index) => (
-            <Card key={index} className="hover:shadow-md transition-shadow active:shadow-lg">
-              <CardContent className="p-3 md:p-6">
-                <div className="flex items-start gap-2 md:gap-4">
+            <Card key={index} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-3 md:p-5">
+                <div className="flex items-start gap-2">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1.5 md:mb-2 flex-wrap">
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] md:text-xs font-semibold flex-shrink-0 ${
+                    <div className="flex items-center gap-1.5 mb-2 flex-wrap">
+                      <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
                         doc.type === 'ГОСТ' 
                           ? 'bg-blue-100 text-blue-700' 
                           : 'bg-green-100 text-green-700'
                       }`}>
                         {doc.type}
                       </span>
-                      <span className="font-mono text-[10px] md:text-sm font-semibold text-slate-700">
+                      <span className="font-mono text-xs text-slate-700">
                         {doc.number}
                       </span>
                     </div>
-                    <p className="text-xs md:text-base text-slate-900 font-medium break-words">
+                    <p className="text-sm md:text-base text-slate-900 leading-snug">
                       {doc.title}
                     </p>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={() => window.open(doc.url, '_blank')}
-                    className="flex-shrink-0 h-8 w-8 md:h-9 md:w-9"
-                  >
-                    <Icon name="ExternalLink" size={14} className="md:w-4 md:h-4" />
-                  </Button>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        <Card className="mt-4 md:mt-6 bg-amber-50 border-amber-200">
-          <CardContent className="p-3 md:p-6">
-            <div className="flex items-start gap-2 md:gap-3">
-              <Icon name="Info" size={16} className="text-amber-600 mt-0.5 flex-shrink-0 md:w-5 md:h-5" />
+        <Card className="mt-5 md:mt-6 bg-amber-50 border-amber-200">
+          <CardContent className="p-3 md:p-5">
+            <div className="flex items-start gap-2">
+              <Icon name="Info" size={16} className="text-amber-600 mt-0.5 flex-shrink-0" />
               <div className="min-w-0 flex-1">
-                <h5 className="font-semibold text-amber-900 mb-0.5 md:mb-1 text-sm md:text-base">Важно</h5>
-                <p className="text-xs md:text-sm text-amber-800 break-words">
-                  Все работы должны выполняться в строгом соответствии с указанными нормативными документами. 
-                  При обнаружении несоответствий необходимо немедленно сообщить в проектный офис.
+                <h5 className="font-semibold text-amber-900 mb-1 text-sm">Важно</h5>
+                <p className="text-xs md:text-sm text-amber-800 leading-relaxed">
+                  Все работы должны выполняться в строгом соответствии с указанными нормативными документами.
                 </p>
               </div>
             </div>

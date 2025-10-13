@@ -48,7 +48,7 @@ export default function WorkDetailJournal({
 }: WorkDetailJournalProps) {
   return (
     <>
-      <div className="flex-1 overflow-y-auto p-3 md:p-8 lg:p-12 bg-slate-50">
+      <div className="flex-1 overflow-y-auto px-2 py-3 md:p-8 lg:p-12 bg-slate-50">
         {events.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-4">
@@ -58,7 +58,7 @@ export default function WorkDetailJournal({
             <p className="text-slate-400 text-sm">Начните вести журнал работ</p>
           </div>
         ) : (
-          <div className="max-w-7xl mx-auto space-y-4 md:space-y-10">
+          <div className="max-w-7xl mx-auto space-y-3 md:space-y-10">
             {events.map((event, index) => {
               const showDateSeparator = index === 0 || 
                 formatDate(events[index - 1].created_at) !== formatDate(event.created_at);
@@ -66,8 +66,8 @@ export default function WorkDetailJournal({
               return (
                 <div key={event.id}>
                   {showDateSeparator && (
-                    <div className="flex justify-center my-2 md:my-4">
-                      <div className="bg-slate-200 text-slate-600 text-[10px] md:text-xs px-2 md:px-3 py-0.5 md:py-1 rounded-full font-medium">
+                    <div className="flex justify-center my-3 md:my-4">
+                      <div className="bg-slate-200 text-slate-600 text-[11px] md:text-xs px-2.5 md:px-3 py-1 rounded-full font-medium">
                         {formatDate(event.created_at)}
                       </div>
                     </div>
@@ -88,22 +88,22 @@ export default function WorkDetailJournal({
         )}
       </div>
 
-      <div className="bg-white border-t border-slate-200 p-2 md:p-5 lg:p-6 flex-shrink-0">
+      <div className="bg-white border-t border-slate-200 px-2 py-2.5 md:p-5 lg:p-6 flex-shrink-0">
         <div className="max-w-6xl mx-auto space-y-2 md:space-y-4">
           {userRole === 'contractor' && (
             <>
-              <div className="grid grid-cols-2 gap-2 md:gap-3">
+              <div className="grid grid-cols-2 gap-1.5 md:gap-3">
                 <div>
                   <Input
                     placeholder="Объём (м², шт, кг...)"
                     value={volume}
                     onChange={(e) => setVolume(e.target.value)}
-                    className="text-xs md:text-base h-9 md:h-11"
+                    className="text-xs md:text-base h-10 md:h-11"
                   />
                 </div>
                 <div>
                   <Select value={progress} onValueChange={setProgress}>
-                    <SelectTrigger className="text-xs md:text-base h-9 md:h-11">
+                    <SelectTrigger className="text-xs md:text-base h-10 md:h-11">
                       <SelectValue placeholder="Прогресс" />
                     </SelectTrigger>
                     <SelectContent>
@@ -121,7 +121,7 @@ export default function WorkDetailJournal({
                   placeholder="Материалы (через запятую)"
                   value={materials}
                   onChange={(e) => setMaterials(e.target.value)}
-                  className="text-xs md:text-base h-9 md:h-11"
+                  className="text-xs md:text-base h-10 md:h-11"
                 />
               </div>
             </>
@@ -132,7 +132,7 @@ export default function WorkDetailJournal({
               placeholder="Сообщение..."
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              className="flex-1 min-h-[50px] md:min-h-[60px] text-xs md:text-base resize-none"
+              className="flex-1 min-h-[44px] md:min-h-[60px] text-sm md:text-base resize-none"
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
@@ -140,12 +140,9 @@ export default function WorkDetailJournal({
                 }
               }}
             />
-            <div className="flex flex-col gap-1 md:gap-2">
-              <Button variant="ghost" size="icon" className="h-8 w-8 md:h-10 md:w-10">
-                <Icon name="Paperclip" size={16} className="md:w-5 md:h-5" />
-              </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8 md:h-10 md:w-10">
-                <Icon name="Camera" size={16} className="md:w-5 md:h-5" />
+            <div className="flex gap-1 md:flex-col md:gap-2">
+              <Button variant="ghost" size="icon" className="h-11 w-11 md:h-10 md:w-10">
+                <Icon name="Paperclip" size={18} className="md:w-5 md:h-5" />
               </Button>
             </div>
           </div>
@@ -154,10 +151,10 @@ export default function WorkDetailJournal({
             <Button
               onClick={onSendMessage}
               disabled={isSubmitting || !newMessage.trim()}
-              className="flex-1 h-9 md:h-10 text-xs md:text-sm"
+              className="h-11 w-11 md:flex-1 md:h-10 p-0 md:px-4"
             >
-              <Icon name="Send" size={14} className="mr-1 md:mr-2 md:w-4 md:h-4" />
-              Отправить
+              <Icon name="Send" size={18} className="md:mr-2 md:w-4 md:h-4" />
+              <span className="hidden md:inline">Отправить</span>
             </Button>
           </div>
         </div>
