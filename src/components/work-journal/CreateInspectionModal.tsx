@@ -244,50 +244,49 @@ export default function CreateInspectionModal({
                       </Button>
                     </div>
                     </div>
-                  </CardContent>
-
-                  {isNonCompliant && checkpoint.defect && (
-                    <div className="mt-3 md:mt-4 pt-3 md:pt-4 border-t border-amber-300 space-y-3 px-3 md:px-0">
-                      <div className="flex items-center gap-2 text-amber-700">
-                        <Icon name="AlertTriangle" size={14} className="md:w-4 md:h-4" />
-                        <span className="text-xs md:text-sm font-semibold">Добавить замечание</span>
-                      </div>
-                      
-                      <div>
-                        <Label className="text-xs md:text-sm">Описание замечания *</Label>
-                        <Textarea
-                          placeholder="Опишите выявленное несоответствие..."
-                          value={checkpoint.defect.description}
-                          onChange={(e) => handleDefectChange(cp.id, 'description', e.target.value)}
-                          rows={3}
-                          className="mt-1 text-sm"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label className="text-xs md:text-sm">Ссылка на норматив *</Label>
-                        <Input
-                          placeholder="СНиП 3.03.01-87, п. 4.5"
-                          value={checkpoint.defect.standard_reference}
-                          onChange={(e) => handleDefectChange(cp.id, 'standard_reference', e.target.value)}
-                          className="mt-1 text-sm"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label className="text-xs md:text-sm">Фотофиксация</Label>
-                        <div className="mt-1 border-2 border-dashed border-amber-300 rounded-lg p-3 md:p-4 text-center">
-                          <Icon name="Camera" size={24} className="mx-auto text-amber-400 mb-2 md:w-8 md:h-8" />
-                          <p className="text-[11px] md:text-xs text-slate-600">Прикрепите фото</p>
-                          <Button variant="outline" size="sm" className="mt-2 h-8 text-xs">
-                            Выбрать файлы
-                          </Button>
+                    
+                    {isNonCompliant && checkpoint.defect && (
+                      <div className="mt-3 pt-3 border-t border-amber-300 space-y-3">
+                        <div className="flex items-center gap-2 text-amber-700">
+                          <Icon name="AlertTriangle" size={14} className="md:w-4 md:h-4" />
+                          <span className="text-xs md:text-sm font-semibold">Добавить замечание</span>
+                        </div>
+                        
+                        <div>
+                          <Label className="text-xs md:text-sm">Описание замечания *</Label>
+                          <Textarea
+                            placeholder="Опишите выявленное несоответствие..."
+                            value={checkpoint.defect.description}
+                            onChange={(e) => handleDefectChange(cp.id, 'description', e.target.value)}
+                            rows={3}
+                            className="mt-1 text-sm"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label className="text-xs md:text-sm">Ссылка на норматив *</Label>
+                          <Input
+                            placeholder="СНиП 3.03.01-87, п. 4.5"
+                            value={checkpoint.defect.standard_reference}
+                            onChange={(e) => handleDefectChange(cp.id, 'standard_reference', e.target.value)}
+                            className="mt-1 text-sm"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label className="text-xs md:text-sm">Фотофиксация</Label>
+                          <div className="mt-1 border-2 border-dashed border-amber-300 rounded-lg p-3 md:p-4 text-center">
+                            <Icon name="Camera" size={24} className="mx-auto text-amber-400 mb-2 md:w-8 md:h-8" />
+                            <p className="text-[11px] md:text-xs text-slate-600">Прикрепите фото</p>
+                            <Button variant="outline" size="sm" className="mt-2 h-8 text-xs">
+                              Выбрать файлы
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                    )}
+                  </CardContent>
+                </Card>
               );
             })
           )}
