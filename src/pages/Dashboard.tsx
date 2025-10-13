@@ -37,9 +37,8 @@ interface FeedEvent {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user, userData, loadUserData } = useAuth();
+  const { user, userData, loadUserData, token } = useAuth();
   const { toast } = useToast();
-  const token = localStorage.getItem('token');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [feed, setFeed] = useState<FeedEvent[]>([]);
   const [loading, setLoading] = useState(true);

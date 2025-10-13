@@ -31,6 +31,7 @@ interface AuthContextType {
   token: string | null;
   userData: UserData | null;
   setUserData: (data: UserData) => void;
+  loadUserData: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
@@ -79,7 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('user', JSON.stringify(authUser));
   };
 
-  const loadUserData = async (authToken: string) => {
+  const loadUserDataInternal = async (authToken: string) => {
     try {
       console.log('Loading user data...');
       const response = await fetch(USER_DATA_API, {
@@ -102,6 +103,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error('Error loading user data:', error);
     }
+  };
+
+  const loadUserData = async () => {
+    if (!token) {
+      console.error('Cannot load user data: no token');
+      return;
+    }
+    await loadUserDataInternal(token);
   };
 
   const clearAuth = () => {
@@ -135,7 +144,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.log('Saving auth, token:', data.token?.substring(0, 20) + '...');
       saveAuth(data.token, data.user);
       console.log('Token saved to localStorage:', localStorage.getItem('auth_token')?.substring(0, 20) + '...');
-      await loadUserData(data.token);
+      await loadUserDataInternal(data.token);
     } catch (error) {
       console.error('Login error:', error);
       throw new Error(error instanceof Error ? error.message : 'Ошибка входа');
@@ -162,7 +171,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       saveAuth(data.token, data.user);
-      await loadUserData(data.token);
+      await loadUserDataInternal(data.token);
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : 'Ошибка регистрации');
     } finally {
@@ -200,7 +209,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(data.user);
       setToken(storedToken);
       localStorage.setItem('user', JSON.stringify(data.user));
-      await loadUserData(storedToken);
+      await loadUserDataInternal(storedToken);
       setIsLoading(false);
       console.log('Auth flow complete');
       return true;
@@ -226,6 +235,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       token,
       userData,
       setUserData,
+      loadUserData,
       login, 
       register,
       logout, 
