@@ -157,8 +157,10 @@ def handler(event, context):
             elif item_type == 'inspection':
                 work_id = int(data.get('work_id', 0))
                 work_log_id = data.get('work_log_id')
-                description = data.get('description', '').replace("'", "''")
+                description = data.get('description', '').replace("'", "''") if data.get('description') else ''
                 status = data.get('status', 'pending')
+                notes = data.get('notes', '').replace("'", "''") if data.get('notes') else None
+                scheduled_date = data.get('scheduled_date')
                 defects_raw = data.get('defects', '[]')
                 defects = defects_raw.replace("'", "''") if isinstance(defects_raw, str) else '[]'
                 photo_urls_raw = data.get('photo_urls', '')
@@ -173,30 +175,34 @@ def handler(event, context):
                 next_num = cur.fetchone()['next_num']
                 inspection_number = f'INS-{work_id}-{next_num}'
                 
-                if work_log_id and photo_urls:
-                    cur.execute(f"""
-                        INSERT INTO inspections (work_id, work_log_id, inspection_number, description, status, defects, photo_urls, created_by, created_at, updated_at)
-                        VALUES ({work_id}, {int(work_log_id)}, '{inspection_number}', '{description}', '{status}', '{defects}', '{photo_urls}', {user_id_int}, NOW(), NOW())
-                        RETURNING id, work_id, work_log_id, inspection_number, description, status, defects, photo_urls, created_by, created_at
-                    """)
-                elif work_log_id:
-                    cur.execute(f"""
-                        INSERT INTO inspections (work_id, work_log_id, inspection_number, description, status, defects, created_by, created_at, updated_at)
-                        VALUES ({work_id}, {int(work_log_id)}, '{inspection_number}', '{description}', '{status}', '{defects}', {user_id_int}, NOW(), NOW())
-                        RETURNING id, work_id, work_log_id, inspection_number, description, status, defects, photo_urls, created_by, created_at
-                    """)
-                elif photo_urls:
-                    cur.execute(f"""
-                        INSERT INTO inspections (work_id, inspection_number, description, status, defects, photo_urls, created_by, created_at, updated_at)
-                        VALUES ({work_id}, '{inspection_number}', '{description}', '{status}', '{defects}', '{photo_urls}', {user_id_int}, NOW(), NOW())
-                        RETURNING id, work_id, work_log_id, inspection_number, description, status, defects, photo_urls, created_by, created_at
-                    """)
-                else:
-                    cur.execute(f"""
-                        INSERT INTO inspections (work_id, inspection_number, description, status, defects, created_by, created_at, updated_at)
-                        VALUES ({work_id}, '{inspection_number}', '{description}', '{status}', '{defects}', {user_id_int}, NOW(), NOW())
-                        RETURNING id, work_id, work_log_id, inspection_number, description, status, defects, photo_urls, created_by, created_at
-                    """)
+                # Build SQL dynamically based on available fields
+                fields = ['work_id', 'inspection_number', 'status', 'defects', 'created_by', 'created_at', 'updated_at']
+                values = [str(work_id), f"'{inspection_number}'", f"'{status}'", f"'{defects}'", str(user_id_int), 'NOW()', 'NOW()']
+                
+                if work_log_id:
+                    fields.append('work_log_id')
+                    values.append(str(int(work_log_id)))
+                if description:
+                    fields.append('description')
+                    values.append(f"'{description}'")
+                if notes:
+                    fields.append('notes')
+                    values.append(f"'{notes}'")
+                if scheduled_date:
+                    fields.append('scheduled_date')
+                    values.append(f"'{scheduled_date}'")
+                if photo_urls:
+                    fields.append('photo_urls')
+                    values.append(f"'{photo_urls}'")
+                
+                fields_str = ', '.join(fields)
+                values_str = ', '.join(values)
+                
+                cur.execute(f"""
+                    INSERT INTO inspections ({fields_str})
+                    VALUES ({values_str})
+                    RETURNING id, work_id, work_log_id, inspection_number, description, status, notes, scheduled_date, defects, photo_urls, created_by, created_at
+                """)
                 result = cur.fetchone()
                 conn.commit()
                 
