@@ -6,13 +6,20 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import Icon from '@/components/ui/icon';
 import OnboardingBanner from '@/components/OnboardingBanner';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from '@/hooks/use-toast';
 
 interface FeedEvent {
   id: string;
-  type: 'work_log' | 'inspection' | 'remark' | 'work_start' | 'work_complete';
+  type: 'work_log' | 'inspection' | 'info_post' | 'planned_inspection';
   title: string;
   description: string;
   timestamp: string;
@@ -22,20 +29,51 @@ interface FeedEvent {
   projectId?: number;
   objectTitle?: string;
   projectTitle?: string;
+  workTitle?: string;
   author?: string;
   photoUrls?: string[];
   materials?: string;
   volume?: string;
   defects?: string;
+  scheduledDate?: string;
 }
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, userData } = useAuth();
+  const { toast } = useToast();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [feed, setFeed] = useState<FeedEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'work_logs' | 'inspections' | 'remarks'>('all');
+  const [filter, setFilter] = useState<'all' | 'work_logs' | 'inspections' | 'info_posts'>('all');
+
+  const [showJournalModal, setShowJournalModal] = useState(false);
+  const [showInspectionModal, setShowInspectionModal] = useState(false);
+  const [showInfoPostModal, setShowInfoPostModal] = useState(false);
+
+  const [journalForm, setJournalForm] = useState({
+    projectId: '',
+    objectId: '',
+    workId: '',
+    description: '',
+    volume: '',
+    materials: '',
+    photos: [] as File[]
+  });
+
+  const [inspectionForm, setInspectionForm] = useState({
+    projectId: '',
+    objectId: '',
+    workId: '',
+    scheduledDate: '',
+    notes: ''
+  });
+
+  const [infoPostForm, setInfoPostForm] = useState({
+    title: '',
+    content: '',
+    link: ''
+  });
 
   const projects = userData?.projects || [];
 
@@ -117,9 +155,8 @@ const Dashboard = () => {
     switch(type) {
       case 'work_log': return 'FileText';
       case 'inspection': return 'ClipboardCheck';
-      case 'remark': return 'AlertTriangle';
-      case 'work_start': return 'Play';
-      case 'work_complete': return 'CheckCircle2';
+      case 'info_post': return 'Bell';
+      case 'planned_inspection': return 'Calendar';
       default: return 'Activity';
     }
   };
@@ -128,9 +165,8 @@ const Dashboard = () => {
     switch(type) {
       case 'work_log': return 'bg-blue-100 text-blue-600';
       case 'inspection': return 'bg-purple-100 text-purple-600';
-      case 'remark': return 'bg-red-100 text-red-600';
-      case 'work_start': return 'bg-green-100 text-green-600';
-      case 'work_complete': return 'bg-emerald-100 text-emerald-600';
+      case 'info_post': return 'bg-amber-100 text-amber-600';
+      case 'planned_inspection': return 'bg-slate-100 text-slate-600';
       default: return 'bg-slate-100 text-slate-600';
     }
   };
@@ -139,9 +175,8 @@ const Dashboard = () => {
     switch(type) {
       case 'work_log': return 'Запись в журнале';
       case 'inspection': return 'Проверка';
-      case 'remark': return 'Замечание';
-      case 'work_start': return 'Начало работы';
-      case 'work_complete': return 'Работа завершена';
+      case 'info_post': return 'Инфо-пост';
+      case 'planned_inspection': return 'Запланирована проверка';
       default: return type;
     }
   };
@@ -165,6 +200,8 @@ const Dashboard = () => {
   };
 
   const handleEventClick = (event: FeedEvent) => {
+    if (event.type === 'info_post') return;
+    
     if (event.projectId && event.objectId && event.workId) {
       navigate(`/projects/${event.projectId}/objects/${event.objectId}`, {
         state: { scrollToWork: event.workId }
@@ -175,25 +212,144 @@ const Dashboard = () => {
   const filteredFeed = filter === 'all' 
     ? feed 
     : feed.filter(event => {
-        if (filter === 'work_logs') return event.type === 'work_log' || event.type === 'work_start' || event.type === 'work_complete';
-        if (filter === 'inspections') return event.type === 'inspection';
-        if (filter === 'remarks') return event.type === 'remark';
+        if (filter === 'work_logs') return event.type === 'work_log';
+        if (filter === 'inspections') return event.type === 'inspection' || event.type === 'planned_inspection';
+        if (filter === 'info_posts') return event.type === 'info_post';
         return true;
       });
+
+  const selectedProject = projects.find(p => p.id === Number(journalForm.projectId));
+  const selectedObject = selectedProject?.objects?.find((o: any) => o.id === Number(journalForm.objectId));
+  const availableWorks = selectedObject?.works || [];
+
+  const inspSelectedProject = projects.find(p => p.id === Number(inspectionForm.projectId));
+  const inspSelectedObject = inspSelectedProject?.objects?.find((o: any) => o.id === Number(inspectionForm.objectId));
+  const inspAvailableWorks = inspSelectedObject?.works || [];
+
+  const handleCreateJournalEntry = async () => {
+    if (!journalForm.projectId || !journalForm.objectId || !journalForm.workId || !journalForm.description) {
+      toast({
+        title: 'Ошибка',
+        description: 'Заполните все обязательные поля',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    toast({
+      title: 'Запись создана',
+      description: 'Отчет добавлен в журнал работ'
+    });
+
+    setShowJournalModal(false);
+    setJournalForm({
+      projectId: '',
+      objectId: '',
+      workId: '',
+      description: '',
+      volume: '',
+      materials: '',
+      photos: []
+    });
+    
+    loadFeed();
+  };
+
+  const handleScheduleInspection = async () => {
+    if (!inspectionForm.projectId || !inspectionForm.objectId || !inspectionForm.workId || !inspectionForm.scheduledDate) {
+      toast({
+        title: 'Ошибка',
+        description: 'Заполните все обязательные поля',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    toast({
+      title: 'Проверка запланирована',
+      description: `Проверка назначена на ${new Date(inspectionForm.scheduledDate).toLocaleDateString('ru-RU')}`
+    });
+
+    setShowInspectionModal(false);
+    setInspectionForm({
+      projectId: '',
+      objectId: '',
+      workId: '',
+      scheduledDate: '',
+      notes: ''
+    });
+    
+    loadFeed();
+  };
+
+  const handleCreateInfoPost = async () => {
+    if (!infoPostForm.title || !infoPostForm.content) {
+      toast({
+        title: 'Ошибка',
+        description: 'Заполните все обязательные поля',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    toast({
+      title: 'Инфо-пост создан',
+      description: 'Уведомление отправлено всем пользователям'
+    });
+
+    setShowInfoPostModal(false);
+    setInfoPostForm({
+      title: '',
+      content: '',
+      link: ''
+    });
+    
+    loadFeed();
+  };
 
   return (
     <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-10 bg-slate-50 min-h-screen">
       <div className="max-w-[1400px] mx-auto">
         <div className="mb-4 md:mb-6">
-          <div className="flex items-center gap-3 mb-1">
-            <div className="hidden md:flex w-12 h-12 bg-blue-100 rounded-full items-center justify-center flex-shrink-0">
-              <Icon name="Building2" size={24} className="text-blue-600" />
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-3">
+              <div className="hidden md:flex w-12 h-12 bg-blue-100 rounded-full items-center justify-center flex-shrink-0">
+                <Icon name="Building2" size={24} className="text-blue-600" />
+              </div>
+              <h1 className="text-xl md:text-3xl font-bold text-slate-900">
+                Лента событий
+              </h1>
             </div>
-            <h1 className="text-xl md:text-3xl font-bold text-slate-900">
-              {user?.name || 'Пользователь'}
-            </h1>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon" className="rounded-full h-12 w-12 shadow-lg">
+                  <Icon name="Plus" size={24} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                {user?.role === 'contractor' && (
+                  <DropdownMenuItem onClick={() => setShowJournalModal(true)}>
+                    <Icon name="FileText" size={18} className="mr-2" />
+                    Запись в журнал
+                  </DropdownMenuItem>
+                )}
+                {user?.role === 'client' && (
+                  <DropdownMenuItem onClick={() => setShowInspectionModal(true)}>
+                    <Icon name="Calendar" size={18} className="mr-2" />
+                    Проверку
+                  </DropdownMenuItem>
+                )}
+                {user?.role === 'admin' && (
+                  <DropdownMenuItem onClick={() => setShowInfoPostModal(true)}>
+                    <Icon name="Bell" size={18} className="mr-2" />
+                    Инфо-пост
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-          <p className="text-sm md:text-base text-slate-600">Лента событий по вашим проектам</p>
+          <p className="text-sm md:text-base text-slate-600">События по вашим проектам</p>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
@@ -245,13 +401,13 @@ const Dashboard = () => {
                     Проверки
                   </Button>
                   <Button
-                    variant={filter === 'remarks' ? 'default' : 'outline'}
+                    variant={filter === 'info_posts' ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => setFilter('remarks')}
+                    onClick={() => setFilter('info_posts')}
                     className="flex-shrink-0"
                   >
-                    <Icon name="AlertTriangle" size={16} className="mr-2" />
-                    Замечания
+                    <Icon name="Bell" size={16} className="mr-2" />
+                    Инфо-посты
                   </Button>
                 </div>
               </CardContent>
@@ -287,7 +443,7 @@ const Dashboard = () => {
                 filteredFeed.map((event, index) => (
                   <Card 
                     key={event.id}
-                    className="hover:shadow-md transition-shadow cursor-pointer animate-fade-in"
+                    className={`hover:shadow-md transition-shadow animate-fade-in ${event.type === 'info_post' ? '' : 'cursor-pointer'}`}
                     style={{ animationDelay: `${index * 0.05}s` }}
                     onClick={() => handleEventClick(event)}
                   >
@@ -309,7 +465,10 @@ const Dashboard = () => {
                                   {getEventLabel(event.type)}
                                 </Badge>
                                 <span className="text-xs text-slate-500">
-                                  {formatTimeAgo(event.timestamp)}
+                                  {event.scheduledDate 
+                                    ? new Date(event.scheduledDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
+                                    : formatTimeAgo(event.timestamp)
+                                  }
                                 </span>
                               </div>
                               <h3 className="font-semibold text-slate-900 mb-1">
@@ -358,13 +517,26 @@ const Dashboard = () => {
                             </div>
                           )}
 
-                          <div className="flex items-center gap-2 text-xs text-slate-500">
-                            <Icon name="FolderOpen" size={14} />
-                            <span className="truncate">{event.projectTitle}</span>
-                            <Icon name="ChevronRight" size={12} />
-                            <Icon name="MapPin" size={14} />
-                            <span className="truncate">{event.objectTitle}</span>
-                          </div>
+                          {event.type !== 'info_post' && event.projectTitle && (
+                            <div className="flex items-center gap-2 text-xs text-slate-500">
+                              <Icon name="FolderOpen" size={14} />
+                              <span className="truncate">{event.projectTitle}</span>
+                              {event.objectTitle && (
+                                <>
+                                  <Icon name="ChevronRight" size={12} />
+                                  <Icon name="MapPin" size={14} />
+                                  <span className="truncate">{event.objectTitle}</span>
+                                </>
+                              )}
+                              {event.workTitle && (
+                                <>
+                                  <Icon name="ChevronRight" size={12} />
+                                  <Icon name="Wrench" size={14} />
+                                  <span className="truncate">{event.workTitle}</span>
+                                </>
+                              )}
+                            </div>
+                          )}
 
                           {event.author && (
                             <div className="flex items-center gap-2 text-xs text-slate-500 mt-2 pt-2 border-t border-slate-100">
@@ -380,24 +552,237 @@ const Dashboard = () => {
               )}
             </div>
           </div>
-
-          <div className="lg:w-80 flex-shrink-0">
-            <Card className="sticky top-4">
-              <CardContent className="p-6">
-                <h3 className="font-bold text-lg mb-4 text-slate-900">Быстрое действие</h3>
-                <Button 
-                  className="w-full justify-start" 
-                  variant="outline"
-                  onClick={() => navigate('/projects')}
-                >
-                  <Icon name="FolderPlus" size={18} className="mr-3" />
-                  Создать проект
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </div>
+
+      <Dialog open={showJournalModal} onOpenChange={setShowJournalModal}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Создать запись в журнал</DialogTitle>
+            <DialogDescription>Добавьте отчет о выполненных работах</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>Проект</Label>
+              <Select value={journalForm.projectId} onValueChange={(val) => setJournalForm({...journalForm, projectId: val, objectId: '', workId: ''})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Выберите проект" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projects.map((p: any) => (
+                    <SelectItem key={p.id} value={String(p.id)}>{p.title}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {journalForm.projectId && (
+              <div>
+                <Label>Объект</Label>
+                <Select value={journalForm.objectId} onValueChange={(val) => setJournalForm({...journalForm, objectId: val, workId: ''})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Выберите объект" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {selectedProject?.objects?.map((o: any) => (
+                      <SelectItem key={o.id} value={String(o.id)}>{o.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {journalForm.objectId && (
+              <div>
+                <Label>Работа</Label>
+                <Select value={journalForm.workId} onValueChange={(val) => setJournalForm({...journalForm, workId: val})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Выберите работу" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableWorks.map((w: any) => (
+                      <SelectItem key={w.id} value={String(w.id)}>{w.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            <div>
+              <Label>Описание работ</Label>
+              <Textarea 
+                placeholder="Опишите выполненные работы..."
+                value={journalForm.description}
+                onChange={(e) => setJournalForm({...journalForm, description: e.target.value})}
+                rows={4}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Объём</Label>
+                <Input 
+                  placeholder="Например: 50 м²"
+                  value={journalForm.volume}
+                  onChange={(e) => setJournalForm({...journalForm, volume: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label>Материалы</Label>
+                <Input 
+                  placeholder="Например: Кирпич"
+                  value={journalForm.materials}
+                  onChange={(e) => setJournalForm({...journalForm, materials: e.target.value})}
+                />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowJournalModal(false)}>
+              Отмена
+            </Button>
+            <Button onClick={handleCreateJournalEntry}>
+              Создать запись
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showInspectionModal} onOpenChange={setShowInspectionModal}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Запланировать проверку</DialogTitle>
+            <DialogDescription>Выберите дату и объект для проверки</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>Дата проверки</Label>
+              <Input 
+                type="date"
+                value={inspectionForm.scheduledDate}
+                onChange={(e) => setInspectionForm({...inspectionForm, scheduledDate: e.target.value})}
+                min={new Date().toISOString().split('T')[0]}
+              />
+            </div>
+
+            <div>
+              <Label>Проект</Label>
+              <Select value={inspectionForm.projectId} onValueChange={(val) => setInspectionForm({...inspectionForm, projectId: val, objectId: '', workId: ''})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Выберите проект" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projects.map((p: any) => (
+                    <SelectItem key={p.id} value={String(p.id)}>{p.title}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {inspectionForm.projectId && (
+              <div>
+                <Label>Объект</Label>
+                <Select value={inspectionForm.objectId} onValueChange={(val) => setInspectionForm({...inspectionForm, objectId: val, workId: ''})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Выберите объект" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {inspSelectedProject?.objects?.map((o: any) => (
+                      <SelectItem key={o.id} value={String(o.id)}>{o.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {inspectionForm.objectId && (
+              <div>
+                <Label>Работа</Label>
+                <Select value={inspectionForm.workId} onValueChange={(val) => setInspectionForm({...inspectionForm, workId: val})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Выберите работу" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {inspAvailableWorks.map((w: any) => (
+                      <SelectItem key={w.id} value={String(w.id)}>{w.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            <div>
+              <Label>Примечания (необязательно)</Label>
+              <Textarea 
+                placeholder="Дополнительная информация..."
+                value={inspectionForm.notes}
+                onChange={(e) => setInspectionForm({...inspectionForm, notes: e.target.value})}
+                rows={3}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowInspectionModal(false)}>
+              Отмена
+            </Button>
+            <Button onClick={handleScheduleInspection}>
+              Запланировать
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showInfoPostModal} onOpenChange={setShowInfoPostModal}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Создать инфо-пост</DialogTitle>
+            <DialogDescription>Уведомление увидят все пользователи системы</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>Заголовок</Label>
+              <Input 
+                placeholder="Новый регламент приемки работ"
+                value={infoPostForm.title}
+                onChange={(e) => setInfoPostForm({...infoPostForm, title: e.target.value})}
+              />
+            </div>
+
+            <div>
+              <Label>Содержание</Label>
+              <Textarea 
+                placeholder="С 2025 года вводится новый регламент..."
+                value={infoPostForm.content}
+                onChange={(e) => setInfoPostForm({...infoPostForm, content: e.target.value})}
+                rows={6}
+              />
+            </div>
+
+            <div>
+              <Label>Ссылка (необязательно)</Label>
+              <Input 
+                placeholder="https://example.com/document.pdf"
+                value={infoPostForm.link}
+                onChange={(e) => setInfoPostForm({...infoPostForm, link: e.target.value})}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowInfoPostModal(false)}>
+              Отмена
+            </Button>
+            <Button onClick={handleCreateInfoPost}>
+              Опубликовать
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
