@@ -1,17 +1,16 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
-import Icon from '@/components/ui/icon';
 import { Badge } from '@/components/ui/badge';
+import Icon from '@/components/ui/icon';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Profile = () => {
-  const { user, logout } = useAuth();
+  const { user, userData, logout } = useAuth();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('objects');
 
   const handleLogout = () => {
     logout();
@@ -27,174 +26,218 @@ const Profile = () => {
       .slice(0, 2);
   };
 
-  return (
-    <div className="container max-w-4xl mx-auto p-4 md:p-8 pb-24 md:pb-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Профиль</h1>
-        <p className="text-slate-600">Управление профилем и настройками</p>
-      </div>
+  const projects = userData?.projects || [];
+  const sites = userData?.sites || [];
+  const works = userData?.works || [];
+  const inspections = userData?.inspections || [];
 
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Персональная информация</CardTitle>
-            <CardDescription>Ваши основные данные в системе</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-6 mb-6">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold text-2xl">
+  const userProjects = user?.role === 'contractor' 
+    ? projects.filter(p => works.some(w => sites.some(s => s.project_id === p.id && w.object_id === s.id)))
+    : projects;
+
+  const userSites = user?.role === 'contractor'
+    ? sites.filter(s => works.some(w => w.object_id === s.id))
+    : sites;
+
+  const userWorks = works;
+  const userInspections = user?.role === 'client' ? inspections : [];
+
+  const daysInSystem = 345;
+  const reliabilityRating = Math.floor((userProjects.filter(p => p.status === 'completed').length / Math.max(userProjects.length, 1)) * 100);
+  const qualityRating = Math.floor((userInspections.filter(i => i.status === 'completed').length / Math.max(userInspections.length, 1)) * 100);
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <div className="container max-w-6xl mx-auto p-4 md:p-8 pb-24 md:pb-10">
+        <div className="flex justify-end gap-2 mb-6">
+          <Button variant="outline" size="sm" onClick={() => navigate('/settings')}>
+            <Icon name="Settings" size={16} className="mr-2" />
+            <span className="hidden sm:inline">Настройки</span>
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleLogout} className="text-red-600 hover:bg-red-50">
+            <Icon name="LogOut" size={16} className="mr-2" />
+            <span className="hidden sm:inline">Выйти</span>
+          </Button>
+        </div>
+
+        <Card className="mb-8">
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold text-3xl mb-4">
                 {user ? getInitials(user.name) : 'U'}
               </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-semibold text-slate-900">{user?.name}</h3>
-                <p className="text-slate-600">{user?.email}</p>
-                <Badge className="mt-2" variant="outline">
-                  {user?.role === 'admin' ? 'Администратор' : user?.role === 'client' ? 'Заказчик' : 'Подрядчик'}
-                </Badge>
-              </div>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">{user?.name}</h1>
+              <p className="text-slate-600 mb-3">укажите информацию о себе</p>
+              <Badge variant="outline" className="mb-4">
+                {user?.role === 'admin' ? 'Администратор' : user?.role === 'client' ? 'Заказчик' : 'Подрядчик'}
+              </Badge>
             </div>
 
+            <div className="grid grid-cols-3 gap-4 md:gap-8">
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
+                  {user?.role === 'client' ? reliabilityRating : qualityRating}%
+                </div>
+                <p className="text-xs md:text-sm text-slate-600">
+                  {user?.role === 'client' ? 'Рейтинг надежности' : 'Качество работ'}
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
+                  {user?.role === 'contractor' ? qualityRating : reliabilityRating}%
+                </div>
+                <p className="text-xs md:text-sm text-slate-600">
+                  {user?.role === 'contractor' ? 'Рейтинг надежности' : 'Качество работ'}
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">{daysInSystem}</div>
+                <p className="text-xs md:text-sm text-slate-600">дней в системе</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-4">
+            <TabsTrigger value="objects" className="text-xs md:text-sm">Мои объекты</TabsTrigger>
+            <TabsTrigger value="works" className="text-xs md:text-sm">Мои работы</TabsTrigger>
+            {user?.role === 'client' && (
+              <TabsTrigger value="inspections" className="text-xs md:text-sm">Мои проверки</TabsTrigger>
+            )}
+            <TabsTrigger value="projects" className="text-xs md:text-sm">Проекты</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="objects" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {userSites.map((site) => (
+                <Card key={site.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
+                  const project = projects.find(p => p.id === site.project_id);
+                  if (project) navigate(`/projects/${project.id}/objects/${site.id}`);
+                }}>
+                  <CardContent className="p-4">
+                    <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg mb-3 flex items-center justify-center">
+                      <Icon name="Building2" size={48} className="text-slate-400" />
+                    </div>
+                    <h3 className="font-semibold text-slate-900 mb-1">{site.title}</h3>
+                    <p className="text-sm text-slate-600 mb-2">{site.address}</p>
+                    <Badge variant={site.status === 'active' ? 'default' : 'secondary'}>
+                      {site.status === 'active' ? 'Активный' : 'Завершён'}
+                    </Badge>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            {userSites.length === 0 && (
+              <div className="text-center py-12">
+                <Icon name="Building2" size={48} className="text-slate-300 mx-auto mb-4" />
+                <p className="text-slate-600">Нет объектов</p>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="works" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {userWorks.map((work) => {
+                const site = sites.find(s => s.id === work.object_id);
+                const project = site ? projects.find(p => p.id === site.project_id) : null;
+                return (
+                  <Card key={work.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
+                    if (project && site) navigate(`/projects/${project.id}/objects/${site.id}`, { state: { scrollToWork: work.id } });
+                  }}>
+                    <CardContent className="p-4">
+                      <div className="aspect-video bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg mb-3 flex items-center justify-center">
+                        <Icon name="Wrench" size={48} className="text-blue-600" />
+                      </div>
+                      <h3 className="font-semibold text-slate-900 mb-1">{work.title}</h3>
+                      <p className="text-sm text-slate-600 mb-2 line-clamp-2">{work.description}</p>
+                      <Badge variant={work.status === 'active' ? 'default' : 'secondary'}>
+                        {work.status === 'active' ? 'В работе' : work.status === 'completed' ? 'Завершено' : 'Ожидание'}
+                      </Badge>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+            {userWorks.length === 0 && (
+              <div className="text-center py-12">
+                <Icon name="Wrench" size={48} className="text-slate-300 mx-auto mb-4" />
+                <p className="text-slate-600">Нет работ</p>
+              </div>
+            )}
+          </TabsContent>
+
+          {user?.role === 'client' && (
+            <TabsContent value="inspections" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {userInspections.map((inspection) => (
+                  <Card key={inspection.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate(`/inspection/${inspection.id}`)}>
+                    <CardContent className="p-4">
+                      <div className="aspect-video bg-gradient-to-br from-green-100 to-green-200 rounded-lg mb-3 flex items-center justify-center">
+                        <Icon name="ClipboardCheck" size={48} className="text-green-600" />
+                      </div>
+                      <h3 className="font-semibold text-slate-900 mb-1">{inspection.inspection_number}</h3>
+                      <p className="text-sm text-slate-600 mb-2">{works.find(w => w.id === inspection.work_id)?.title}</p>
+                      <Badge variant={inspection.status === 'completed' ? 'default' : 'secondary'}>
+                        {inspection.status === 'completed' ? 'Завершена' : inspection.status === 'draft' ? 'Черновик' : 'В процессе'}
+                      </Badge>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              {userInspections.length === 0 && (
+                <div className="text-center py-12">
+                  <Icon name="ClipboardCheck" size={48} className="text-slate-300 mx-auto mb-4" />
+                  <p className="text-slate-600">Нет проверок</p>
+                </div>
+              )}
+            </TabsContent>
+          )}
+
+          <TabsContent value="projects" className="space-y-4">
             <div className="space-y-4">
-              <div className="grid gap-2">
-                <Label htmlFor="name">Имя</Label>
-                <Input id="name" defaultValue={user?.name} />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" defaultValue={user?.email} />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="phone">Телефон</Label>
-                <Input id="phone" defaultValue={user?.phone || '+7 (900) 123-45-67'} />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="organization">Организация</Label>
-                <Input id="organization" defaultValue={user?.organization || 'ООО "Строительная компания"'} />
-              </div>
+              {userProjects.map((project) => {
+                const projectSites = sites.filter(s => s.project_id === project.id);
+                return (
+                  <Card key={project.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate(`/projects/${project.id}`)}>
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 flex-shrink-0">
+                          <Icon name="FolderKanban" size={32} className="text-purple-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className="font-semibold text-lg text-slate-900">{project.title}</h3>
+                            <Badge variant={project.status === 'active' ? 'default' : 'secondary'}>
+                              {project.status === 'active' ? 'Активный' : project.status === 'completed' ? 'Завершён' : 'В ожидании'}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-slate-600 mb-3">{project.description}</p>
+                          <div className="flex items-center gap-4 text-sm text-slate-500">
+                            <span className="flex items-center gap-1">
+                              <Icon name="Building2" size={16} />
+                              {projectSites.length} {projectSites.length === 1 ? 'объект' : 'объекта'}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Icon name="Calendar" size={16} />
+                              {new Date(project.created_at).toLocaleDateString('ru-RU')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
-
-            <Button className="w-full mt-6">
-              <Icon name="Save" size={18} className="mr-2" />
-              Сохранить изменения
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Настройки</CardTitle>
-            <CardDescription>Управление уведомлениями и безопасностью</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div>
-              <h4 className="font-medium text-slate-900 mb-4">Уведомления</h4>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Email уведомления</Label>
-                    <p className="text-sm text-slate-600">Получать уведомления на почту</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Push уведомления</Label>
-                    <p className="text-sm text-slate-600">Уведомления в браузере</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Новые замечания</Label>
-                    <p className="text-sm text-slate-600">Уведомлять о новых замечаниях</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Обновления проектов</Label>
-                    <p className="text-sm text-slate-600">Уведомлять об изменениях</p>
-                  </div>
-                  <Switch />
-                </div>
+            {userProjects.length === 0 && (
+              <div className="text-center py-12">
+                <Icon name="FolderKanban" size={48} className="text-slate-300 mx-auto mb-4" />
+                <p className="text-slate-600">Нет проектов</p>
               </div>
-            </div>
-
-            <Separator />
-
-            <div>
-              <h4 className="font-medium text-slate-900 mb-4">Безопасность</h4>
-              <div className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
-                  <Icon name="Lock" size={18} className="mr-2" />
-                  Сменить пароль
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Icon name="Shield" size={18} className="mr-2" />
-                  Двухфакторная аутентификация
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Icon name="Smartphone" size={18} className="mr-2" />
-                  Активные сеансы
-                </Button>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div>
-              <h4 className="font-medium text-slate-900 mb-4">Дополнительно</h4>
-              <div className="space-y-3">
-                {user?.role === 'client' && (
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={() => navigate('/pricing')}
-                  >
-                    <Icon name="Gem" size={18} className="mr-2" />
-                    Тарифы и подписка
-                  </Button>
-                )}
-                <Button variant="outline" className="w-full justify-start">
-                  <Icon name="FileDown" size={18} className="mr-2" />
-                  Экспорт данных
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Icon name="Download" size={18} className="mr-2" />
-                  Скачать отчёт
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Icon name="HelpCircle" size={18} className="mr-2" />
-                  Помощь и поддержка
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-red-200 bg-red-50/50">
-          <CardHeader>
-            <CardTitle className="text-red-900">Опасная зона</CardTitle>
-            <CardDescription className="text-red-700">Действия, требующие подтверждения</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Button 
-              variant="outline" 
-              className="w-full justify-start border-red-200 text-red-700 hover:bg-red-100 hover:text-red-900"
-              onClick={handleLogout}
-            >
-              <Icon name="LogOut" size={18} className="mr-2" />
-              Выйти из системы
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full justify-start border-red-200 text-red-700 hover:bg-red-100 hover:text-red-900"
-            >
-              <Icon name="Trash2" size={18} className="mr-2" />
-              Удалить аккаунт
-            </Button>
-          </CardContent>
-        </Card>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

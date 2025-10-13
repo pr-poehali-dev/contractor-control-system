@@ -130,36 +130,36 @@ const Pricing = () => {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 space-y-6">
+      <div className="grid lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-base md:text-lg">
                 <Icon name="Users" size={20} />
                 Количество пользователей
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm">
                 Сколько человек будет работать в системе
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-2 md:gap-3">
                 {userTiers.map((tier, index) => (
                   <button
                     key={tier.users}
                     onClick={() => setSelectedUserTier(index)}
                     className={cn(
-                      'p-4 rounded-xl border-2 transition-all text-left',
+                      'p-3 md:p-4 rounded-xl border-2 transition-all text-left',
                       selectedUserTier === index
                         ? 'border-blue-600 bg-blue-50'
                         : 'border-slate-200 hover:border-slate-300'
                     )}
                   >
-                    <div className="text-2xl font-bold text-slate-900 mb-1">
+                    <div className="text-xl md:text-2xl font-bold text-slate-900 mb-1">
                       {tier.users === -1 ? '∞' : tier.users}
                     </div>
-                    <div className="text-xs text-slate-600 mb-2">{tier.label}</div>
-                    <div className="text-sm font-semibold text-blue-600">
+                    <div className="text-[10px] md:text-xs text-slate-600 mb-1 md:mb-2 leading-tight">{tier.label}</div>
+                    <div className="text-xs md:text-sm font-semibold text-blue-600">
                       {tier.price === 0 ? 'Бесплатно' : `+${tier.price} ₽/мес`}
                     </div>
                   </button>
@@ -170,32 +170,32 @@ const Pricing = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-base md:text-lg">
                 <Icon name="Maximize2" size={20} />
                 Площадь проектов
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm">
                 Суммарная площадь всех объектов в проектах
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-2 md:gap-3">
                 {areaTiers.map((tier, index) => (
                   <button
                     key={tier.area}
                     onClick={() => setSelectedAreaTier(index)}
                     className={cn(
-                      'p-4 rounded-xl border-2 transition-all text-left',
+                      'p-3 md:p-4 rounded-xl border-2 transition-all text-left',
                       selectedAreaTier === index
                         ? 'border-blue-600 bg-blue-50'
                         : 'border-slate-200 hover:border-slate-300'
                     )}
                   >
-                    <div className="text-2xl font-bold text-slate-900 mb-1">
+                    <div className="text-xl md:text-2xl font-bold text-slate-900 mb-1">
                       {tier.area === -1 ? '∞' : tier.area / 1000}
                     </div>
-                    <div className="text-xs text-slate-600 mb-2">{tier.label}</div>
-                    <div className="text-sm font-semibold text-blue-600">
+                    <div className="text-[10px] md:text-xs text-slate-600 mb-1 md:mb-2 leading-tight">{tier.label}</div>
+                    <div className="text-xs md:text-sm font-semibold text-blue-600">
                       {tier.price === 0 ? 'Бесплатно' : `+${tier.price} ₽/мес`}
                     </div>
                   </button>
@@ -206,11 +206,11 @@ const Pricing = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-base md:text-lg">
                 <Icon name="Zap" size={20} />
                 Дополнительные возможности
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm">
                 Расширьте функциональность системы
               </CardDescription>
             </CardHeader>
@@ -260,8 +260,8 @@ const Pricing = () => {
           </Card>
         </div>
 
-        <div className="md:col-span-1">
-          <Card className="sticky top-20">
+        <div className="lg:col-span-1">
+          <Card className="lg:sticky lg:top-20">
             <CardHeader>
               <CardTitle>Ваш тариф</CardTitle>
               <CardDescription>Итоговая стоимость</CardDescription>
