@@ -78,7 +78,7 @@ export default function AnalyticsTab({ workId }: AnalyticsTabProps) {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-12 bg-slate-50">
+    <div className="flex-1 overflow-y-auto p-3 md:p-8 lg:p-12 bg-slate-50 pb-32 md:pb-12">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-10">
           <h3 className="text-2xl md:text-3xl font-bold">Аналитика: План vs Факт</h3>
