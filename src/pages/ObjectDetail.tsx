@@ -40,12 +40,27 @@ const ObjectDetail = () => {
     siteWorks = [...siteWorks].sort((a, b) => a.title.localeCompare(b.title));
   }
 
+  // На десктопе автоматически редиректим ДО первого рендера
+  const [hasRedirected, setHasRedirected] = useState(false);
+  
   useEffect(() => {
-    // На десктопе автоматически открываем первую работу
-    if (siteWorks.length > 0 && window.innerWidth >= 768) {
+    if (!hasRedirected && siteWorks.length > 0 && window.innerWidth >= 768) {
+      setHasRedirected(true);
       navigate(`/projects/${projectId}/objects/${objectId}/works/${siteWorks[0].id}`, { replace: true });
     }
-  }, [siteWorks.length, projectId, objectId, navigate]);
+  }, [siteWorks.length, projectId, objectId, navigate, hasRedirected]);
+  
+  // Показываем загрузку на десктопе пока редиректим
+  if (!hasRedirected && siteWorks.length > 0 && window.innerWidth >= 768) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-slate-600">Загрузка...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!site) {
     return (

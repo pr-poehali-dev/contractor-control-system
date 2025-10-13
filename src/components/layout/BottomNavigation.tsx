@@ -9,14 +9,14 @@ interface NavItem {
   label: string;
   icon: string;
   path: string;
-  roles?: ('customer' | 'contractor')[];
+  roles?: ('customer' | 'contractor' | 'client' | 'admin')[];
 }
 
 const mobileNavItems: NavItem[] = [
-  { id: 'projects', label: 'Проекты', icon: 'Folder', path: '/projects', roles: ['customer'] },
-  { id: 'objects', label: 'Главная', icon: 'Home', path: '/objects', roles: ['contractor'] },
-  { id: 'objects-customer', label: 'Главная', icon: 'Home', path: '/objects', roles: ['customer'] },
-  { id: 'defects', label: 'Задачи', icon: 'ListTodo', path: '/defects', roles: ['customer', 'contractor'] },
+  { id: 'dashboard', label: 'Главная', icon: 'Home', path: '/dashboard', roles: ['client', 'admin'] },
+  { id: 'projects', label: 'Проекты', icon: 'Folder', path: '/projects', roles: ['client', 'admin'] },
+  { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects', roles: ['contractor'] },
+  { id: 'defects', label: 'Задачи', icon: 'ListTodo', path: '/defects' },
 ];
 
 export default function BottomNavigation() {
@@ -25,7 +25,7 @@ export default function BottomNavigation() {
   const { user } = useAuth();
 
   const visibleNavItems = mobileNavItems
-    .filter((item) => !item.roles || item.roles.includes(user?.role || 'contractor'))
+    .filter((item) => !item.roles || item.roles.includes(user?.role as any || 'contractor'))
     .slice(0, 3);
 
   return (
