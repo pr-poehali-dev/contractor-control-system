@@ -48,27 +48,16 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="container max-w-6xl mx-auto p-4 md:p-8 pb-24 md:pb-10">
-        <div className="flex justify-end gap-2 mb-6">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => navigate('/settings')}
-            className="h-10 w-10 rounded-full"
-          >
-            <Icon name="Settings" size={20} />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={handleLogout}
-            className="h-10 w-10 rounded-full text-red-600 hover:bg-red-50"
-          >
-            <Icon name="LogOut" size={20} />
-          </Button>
-        </div>
-
         <Card className="mb-8">
-          <CardContent className="pt-6">
+          <CardContent className="pt-6 relative">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => navigate('/settings')}
+              className="absolute top-6 right-6 h-10 w-10 rounded-full"
+            >
+              <Icon name="Settings" size={20} />
+            </Button>
             <div className="flex flex-col items-center text-center mb-6">
               <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold text-3xl mb-4">
                 {user ? getInitials(user.name) : 'U'}
