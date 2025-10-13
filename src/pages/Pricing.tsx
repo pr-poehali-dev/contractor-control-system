@@ -143,13 +143,13 @@ const Pricing = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-2 md:gap-3">
+              <div className="flex overflow-x-auto gap-2 pb-2 md:grid md:grid-cols-3 md:gap-3">
                 {userTiers.map((tier, index) => (
                   <button
                     key={tier.users}
                     onClick={() => setSelectedUserTier(index)}
                     className={cn(
-                      'p-3 md:p-4 rounded-xl border-2 transition-all text-left',
+                      'p-3 md:p-4 rounded-xl border-2 transition-all text-left flex-shrink-0 w-32 md:w-auto',
                       selectedUserTier === index
                         ? 'border-blue-600 bg-blue-50'
                         : 'border-slate-200 hover:border-slate-300'
@@ -179,13 +179,13 @@ const Pricing = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-2 md:gap-3">
+              <div className="flex overflow-x-auto gap-2 pb-2 md:grid md:grid-cols-3 md:gap-3">
                 {areaTiers.map((tier, index) => (
                   <button
                     key={tier.area}
                     onClick={() => setSelectedAreaTier(index)}
                     className={cn(
-                      'p-3 md:p-4 rounded-xl border-2 transition-all text-left',
+                      'p-3 md:p-4 rounded-xl border-2 transition-all text-left flex-shrink-0 w-32 md:w-auto',
                       selectedAreaTier === index
                         ? 'border-blue-600 bg-blue-50'
                         : 'border-slate-200 hover:border-slate-300'
