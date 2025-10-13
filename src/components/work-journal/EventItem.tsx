@@ -30,27 +30,27 @@ export default function EventItem({
         return (
           <>
             {event.work_data && (
-              <div className="flex items-center gap-3 mb-4 pb-3 border-b border-slate-200">
-                <Icon name="Wrench" size={20} className="text-green-600" />
-                <span className="text-base font-semibold text-green-600">Отчёт о работе</span>
+              <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4 pb-2 md:pb-3 border-b border-slate-200">
+                <Icon name="Wrench" size={16} className="text-green-600 md:w-5 md:h-5" />
+                <span className="text-sm md:text-base font-semibold text-green-600">Отчёт о работе</span>
               </div>
             )}
-            <p className="text-lg leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
+            <p className="text-sm md:text-lg leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
             
             {event.work_data?.volume && (
-              <div className="mt-5 p-4 bg-slate-50 rounded-lg">
-                <p className="text-base text-slate-600">
-                  Объём: <span className="font-semibold text-lg">{event.work_data.volume} {event.work_data.unit}</span>
+              <div className="mt-3 md:mt-5 p-3 md:p-4 bg-slate-50 rounded-lg">
+                <p className="text-sm md:text-base text-slate-600">
+                  Объём: <span className="font-semibold text-base md:text-lg">{event.work_data.volume} {event.work_data.unit}</span>
                 </p>
               </div>
             )}
             
             {event.work_data?.materials && event.work_data.materials.length > 0 && (
-              <div className="mt-4">
-                <p className="text-base text-slate-600 mb-3">Материалы:</p>
-                <div className="flex flex-wrap gap-2">
+              <div className="mt-3 md:mt-4">
+                <p className="text-sm md:text-base text-slate-600 mb-2 md:mb-3">Материалы:</p>
+                <div className="flex flex-wrap gap-1.5 md:gap-2">
                   {event.work_data.materials.map((material, idx) => (
-                    <Badge key={idx} variant="outline" className="text-base py-1.5 px-3">
+                    <Badge key={idx} variant="outline" className="text-xs md:text-base py-1 md:py-1.5 px-2 md:px-3">
                       {material}
                     </Badge>
                   ))}
@@ -59,13 +59,13 @@ export default function EventItem({
             )}
             
             {event.work_data?.photos && event.work_data.photos.length > 0 && (
-              <div className="mt-3 grid grid-cols-2 gap-2">
+              <div className="mt-2 md:mt-3 grid grid-cols-2 gap-1.5 md:gap-2">
                 {event.work_data.photos.map((photo, idx) => (
                   <img 
                     key={idx}
                     src={photo} 
                     alt={`Фото ${idx + 1}`}
-                    className="w-full h-32 object-cover rounded"
+                    className="w-full h-24 md:h-32 object-cover rounded cursor-pointer"
                   />
                 ))}
               </div>
@@ -253,42 +253,42 @@ export default function EventItem({
   }
 
   return (
-    <div className={cn('flex gap-5 group', isOwnEvent && 'flex-row-reverse')}>
-      <Avatar className="w-12 h-12 flex-shrink-0">
+    <div className={cn('flex gap-2 md:gap-5 group', isOwnEvent && 'flex-row-reverse')}>
+      <Avatar className="w-8 h-8 md:w-12 md:h-12 flex-shrink-0">
         <AvatarFallback className={cn(
-          'text-base font-semibold',
+          'text-xs md:text-base font-semibold',
           isOwnEvent ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-700'
         )}>
           {getInitials(event.author_name)}
         </AvatarFallback>
       </Avatar>
 
-      <div className={cn('flex-1 max-w-[85%]', isOwnEvent && 'flex flex-col items-end')}>
-        <div className={cn('mb-2 flex items-center gap-2', isOwnEvent && 'flex-row-reverse')}>
-          <span className="text-lg font-semibold text-slate-900">{event.author_name}</span>
+      <div className={cn('flex-1 max-w-[90%] md:max-w-[85%]', isOwnEvent && 'flex flex-col items-end')}>
+        <div className={cn('mb-1.5 md:mb-2 flex items-center gap-2', isOwnEvent && 'flex-row-reverse')}>
+          <span className="text-sm md:text-lg font-semibold text-slate-900">{event.author_name}</span>
         </div>
 
         <Card className={cn(
           'border-none shadow-sm relative',
           isOwnEvent ? 'bg-blue-50' : 'bg-white',
-          event.type === 'work_entry' && !isOwnEvent && 'border-l-4 border-l-green-500',
-          event.type === 'inspection' && !isOwnEvent && 'border-l-4 border-l-blue-500',
-          event.type === 'defect_added' && 'border-l-4 border-l-amber-500'
+          event.type === 'work_entry' && !isOwnEvent && 'border-l-2 md:border-l-4 border-l-green-500',
+          event.type === 'inspection' && !isOwnEvent && 'border-l-2 md:border-l-4 border-l-blue-500',
+          event.type === 'defect_added' && 'border-l-2 md:border-l-4 border-l-amber-500'
         )}>
-          <CardContent className="p-5">
+          <CardContent className="p-3 md:p-5">
             {(userRole === 'customer' || userRole === 'client') && event.type === 'work_entry' && !isOwnEvent && (
               <Button
                 variant="outline"
                 size="sm"
-                className="absolute top-3 right-3 h-8 text-sm z-10"
+                className="absolute top-2 right-2 md:top-3 md:right-3 h-7 md:h-8 text-xs md:text-sm z-10 px-2 md:px-3"
                 onClick={() => onCreateInspection?.(event.id)}
               >
-                <Icon name="ClipboardCheck" size={14} className="mr-1" />
-                Проверка
+                <Icon name="ClipboardCheck" size={12} className="md:mr-1 md:w-3.5 md:h-3.5" />
+                <span className="hidden md:inline">Проверка</span>
               </Button>
             )}
             {renderEventContent()}
-            <p className={cn('mt-4 text-base text-slate-400', isOwnEvent && 'text-right')}>
+            <p className={cn('mt-2 md:mt-4 text-xs md:text-base text-slate-400', isOwnEvent && 'text-right')}>
               {formatTime(event.created_at)}
             </p>
           </CardContent>

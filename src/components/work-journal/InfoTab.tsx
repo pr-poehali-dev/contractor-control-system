@@ -19,37 +19,37 @@ export default function InfoTab({
   handleCreateInspection,
 }: InfoTabProps) {
   return (
-    <div className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-12 bg-slate-50">
+    <div className="flex-1 overflow-y-auto p-3 md:p-8 lg:p-12 bg-slate-50">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <h3 className="text-2xl md:text-3xl font-bold">Информация и история</h3>
-          <Button onClick={handleCreateInspection}>
-            <Icon name="Plus" size={18} className="mr-2" />
-            Создать проверку
+        <div className="flex items-center justify-between mb-4 md:mb-8 gap-2">
+          <h3 className="text-lg md:text-2xl lg:text-3xl font-bold">Информация</h3>
+          <Button onClick={handleCreateInspection} size="sm" className="md:h-10">
+            <Icon name="Plus" size={16} className="md:mr-2 md:w-[18px] md:h-[18px]" />
+            <span className="hidden md:inline">Создать проверку</span>
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 lg:gap-10">
           <Card>
-            <CardContent className="p-6 lg:p-8">
-              <h4 className="text-xl font-semibold mb-5">Детали работы</h4>
-              <div className="space-y-4 text-lg">
-                <div className="flex justify-between">
+            <CardContent className="p-4 md:p-6 lg:p-8">
+              <h4 className="text-base md:text-xl font-semibold mb-3 md:mb-5">Детали работы</h4>
+              <div className="space-y-3 md:space-y-4 text-sm md:text-lg">
+                <div className="flex justify-between items-center gap-2">
                   <span className="text-slate-600">Статус:</span>
-                  <Badge>
+                  <Badge className="text-xs md:text-sm">
                     {selectedWorkData.status === 'active' ? '🟢 В работе' : selectedWorkData.status === 'completed' ? '✅ Готово' : '🟡 Ожидание'}
                   </Badge>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-2">
                   <span className="text-slate-600">Подрядчик:</span>
-                  <span className="font-medium">{selectedWorkData.contractor_name || 'Не назначен'}</span>
+                  <span className="font-medium text-right">{selectedWorkData.contractor_name || 'Не назначен'}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-2">
                   <span className="text-slate-600">Создано:</span>
-                  <span className="font-medium">{formatDate(selectedWorkData.created_at)}</span>
+                  <span className="font-medium text-right">{formatDate(selectedWorkData.created_at)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-600">Записей в журнале:</span>
+                <div className="flex justify-between gap-2">
+                  <span className="text-slate-600">Записей:</span>
                   <span className="font-medium">{workEntries.length}</span>
                 </div>
               </div>
@@ -57,23 +57,23 @@ export default function InfoTab({
           </Card>
 
           <Card className="lg:row-span-2">
-            <CardContent className="p-5 lg:p-7">
-              <h4 className="text-lg font-semibold mb-4">История изменений</h4>
-              <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
-                <div className="flex gap-4 pb-4 border-b border-slate-100 last:border-b-0">
-                  <div className="w-2.5 h-2.5 bg-blue-500 rounded-full mt-2" />
-                  <div className="flex-1">
-                    <p className="text-base font-medium">Работа создана</p>
-                    <p className="text-sm text-slate-500 mt-1">{formatDate(selectedWorkData.created_at)} в {formatTime(selectedWorkData.created_at)}</p>
+            <CardContent className="p-4 md:p-5 lg:p-7">
+              <h4 className="text-base md:text-lg font-semibold mb-3 md:mb-4">История изменений</h4>
+              <div className="space-y-3 md:space-y-4 max-h-[400px] md:max-h-[600px] overflow-y-auto pr-1 md:pr-2">
+                <div className="flex gap-2 md:gap-4 pb-3 md:pb-4 border-b border-slate-100 last:border-b-0">
+                  <div className="w-2 h-2 md:w-2.5 md:h-2.5 bg-blue-500 rounded-full mt-1.5 md:mt-2 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm md:text-base font-medium">Работа создана</p>
+                    <p className="text-xs md:text-sm text-slate-500 mt-0.5 md:mt-1">{formatDate(selectedWorkData.created_at)} в {formatTime(selectedWorkData.created_at)}</p>
                   </div>
                 </div>
                 {workEntries.slice(0, 5).map((entry) => (
-                  <div key={entry.id} className="flex gap-4 pb-4 border-b border-slate-100 last:border-b-0">
-                    <div className="w-2.5 h-2.5 bg-green-500 rounded-full mt-2" />
-                    <div className="flex-1">
-                      <p className="text-base font-medium">{entry.author_name} добавил запись</p>
-                      <p className="text-sm text-slate-600 mt-1">{entry.description.slice(0, 80)}...</p>
-                      <p className="text-sm text-slate-500 mt-1">{formatDate(entry.created_at)} в {formatTime(entry.created_at)}</p>
+                  <div key={entry.id} className="flex gap-2 md:gap-4 pb-3 md:pb-4 border-b border-slate-100 last:border-b-0">
+                    <div className="w-2 h-2 md:w-2.5 md:h-2.5 bg-green-500 rounded-full mt-1.5 md:mt-2 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm md:text-base font-medium truncate">{entry.author_name} добавил запись</p>
+                      <p className="text-xs md:text-sm text-slate-600 mt-0.5 md:mt-1 line-clamp-2">{entry.description}</p>
+                      <p className="text-xs md:text-sm text-slate-500 mt-0.5 md:mt-1">{formatDate(entry.created_at)} в {formatTime(entry.created_at)}</p>
                     </div>
                   </div>
                 ))}

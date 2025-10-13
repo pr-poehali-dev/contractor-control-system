@@ -70,7 +70,7 @@ export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmittin
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] md:w-full">
         <DialogHeader>
           <DialogTitle>Отчёт о работе</DialogTitle>
         </DialogHeader>

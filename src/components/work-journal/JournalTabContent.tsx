@@ -38,7 +38,7 @@ export default function JournalTabContent({
 }: JournalTabContentProps) {
   return (
     <>
-      <div className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-12 bg-slate-50">
+      <div className="flex-1 overflow-y-auto p-3 md:p-8 lg:p-12 bg-slate-50">
         {mockEvents.length === 0 ? (
           <NoJournalEntriesEmptyState />
         ) : (
@@ -72,14 +72,14 @@ export default function JournalTabContent({
         )}
       </div>
 
-      <div className="bg-white border-t border-slate-200 p-4 flex-shrink-0">
+      <div className="bg-white border-t border-slate-200 p-2 md:p-4 flex-shrink-0 safe-area-bottom">
         <div className="max-w-4xl mx-auto">
-          <div className="flex gap-2 items-end">
+          <div className="flex gap-1.5 md:gap-2 items-end">
             <Textarea
               placeholder="Написать сообщение..."
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              className="resize-none flex-1"
+              className="resize-none flex-1 text-sm md:text-base"
               rows={2}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -88,30 +88,51 @@ export default function JournalTabContent({
                 }
               }}
             />
-            <div className="flex gap-2">
+            <div className="flex gap-1.5 md:gap-2">
               {userRole === 'contractor' ? (
-                <Button 
-                  variant="outline"
-                  onClick={() => setIsWorkReportModalOpen(true)}
-                  className="h-10"
-                >
-                  <Icon name="FileText" size={18} className="mr-2" />
-                  Отчёт
-                </Button>
+                <>
+                  <Button 
+                    variant="outline"
+                    onClick={() => setIsWorkReportModalOpen(true)}
+                    className="h-10 hidden md:flex"
+                  >
+                    <Icon name="FileText" size={18} className="mr-2" />
+                    Отчёт
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setIsWorkReportModalOpen(true)}
+                    className="h-10 w-10 md:hidden"
+                  >
+                    <Icon name="FileText" size={18} />
+                  </Button>
+                </>
               ) : (
-                <Button 
-                  variant="outline"
-                  onClick={() => setIsInspectionModalOpen(true)}
-                  className="h-10"
-                >
-                  <Icon name="ClipboardCheck" size={18} className="mr-2" />
-                  Проверка
-                </Button>
+                <>
+                  <Button 
+                    variant="outline"
+                    onClick={() => setIsInspectionModalOpen(true)}
+                    className="h-10 hidden md:flex"
+                  >
+                    <Icon name="ClipboardCheck" size={18} className="mr-2" />
+                    Проверка
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setIsInspectionModalOpen(true)}
+                    className="h-10 w-10 md:hidden"
+                  >
+                    <Icon name="ClipboardCheck" size={18} />
+                  </Button>
+                </>
               )}
               <Button 
                 onClick={handleSendMessage}
                 disabled={!newMessage.trim() || isSubmitting}
-                className="h-10"
+                className="h-10 w-10 md:w-auto md:px-4"
+                size="icon"
               >
                 {isSubmitting ? (
                   <Icon name="Loader2" size={18} className="animate-spin" />
@@ -121,7 +142,7 @@ export default function JournalTabContent({
               </Button>
             </div>
           </div>
-          <p className="text-xs text-slate-400 mt-2">
+          <p className="text-xs text-slate-400 mt-1.5 hidden md:block">
             Enter — отправить, Shift+Enter — новая строка
           </p>
         </div>

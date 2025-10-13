@@ -133,18 +133,18 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-12 bg-slate-50">
+    <div className="flex-1 overflow-y-auto p-3 md:p-8 lg:p-12 bg-slate-50">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h3 className="text-2xl md:text-3xl font-bold">Смета</h3>
-            <p className="text-slate-600 mt-1">
+        <div className="flex items-center justify-between mb-4 md:mb-8 gap-2">
+          <div className="min-w-0 flex-1">
+            <h3 className="text-lg md:text-2xl lg:text-3xl font-bold truncate">Смета</h3>
+            <p className="text-xs md:text-sm text-slate-600 mt-0.5 md:mt-1 hidden md:block">
               Управление версиями сметной документации
             </p>
           </div>
-          <Button onClick={() => setIsUploadDialogOpen(true)}>
-            <Icon name="Upload" size={18} className="mr-2" />
-            Загрузить смету
+          <Button onClick={() => setIsUploadDialogOpen(true)} size="sm" className="md:h-10 flex-shrink-0">
+            <Icon name="Upload" size={16} className="md:mr-2 md:w-[18px] md:h-[18px]" />
+            <span className="hidden md:inline">Загрузить</span>
           </Button>
         </div>
 
