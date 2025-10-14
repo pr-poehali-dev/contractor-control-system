@@ -124,13 +124,14 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
                     objectTags.map((tag) => (
                     <label
                       key={tag.id}
-                      className="flex items-center gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer"
+                      className="flex items-start gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer"
                     >
                       <Checkbox
                         checked={selectedTags.includes(tag.id)}
                         onCheckedChange={() => toggleTag(tag.id)}
+                        className="mt-0.5 flex-shrink-0"
                       />
-                      <span className="text-sm flex-1 truncate">{tag.label}</span>
+                      <span className="text-sm flex-1 break-words leading-snug">{tag.label}</span>
                     </label>
                     ))
                   )}
@@ -172,13 +173,14 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
                     workTags.map((tag) => (
                     <label
                       key={tag.id}
-                      className="flex items-center gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer"
+                      className="flex items-start gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer"
                     >
                       <Checkbox
                         checked={selectedTags.includes(tag.id)}
                         onCheckedChange={() => toggleTag(tag.id)}
+                        className="mt-0.5 flex-shrink-0"
                       />
-                      <span className="text-sm flex-1 truncate">{tag.label}</span>
+                      <span className="text-sm flex-1 break-words leading-snug">{tag.label}</span>
                     </label>
                     ))
                   )}
@@ -220,13 +222,14 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
                     contractorTags.map((tag) => (
                     <label
                       key={tag.id}
-                      className="flex items-center gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer"
+                      className="flex items-start gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer"
                     >
                       <Checkbox
                         checked={selectedTags.includes(tag.id)}
                         onCheckedChange={() => toggleTag(tag.id)}
+                        className="mt-0.5 flex-shrink-0"
                       />
-                      <span className="text-sm flex-1 truncate">{tag.label}</span>
+                      <span className="text-sm flex-1 break-words leading-snug">{tag.label}</span>
                     </label>
                     ))
                   )}
