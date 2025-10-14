@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
+import ProBadgeWithTimer from './ProBadgeWithTimer';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -89,18 +90,7 @@ export default function TopNavigation() {
         <div className="flex-1" />
 
         <div className="flex items-center gap-2">
-          {user?.role === 'client' && (
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/pricing')}
-              className="h-10 px-3 gap-2"
-            >
-              <div className="flex items-center gap-2 px-2 py-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold text-sm">
-                <Icon name="Gem" size={14} />
-                <span>Pro</span>
-              </div>
-            </Button>
-          )}
+          {user?.role === 'client' && <ProBadgeWithTimer />}
 
           <Button
             variant="ghost"

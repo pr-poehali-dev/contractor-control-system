@@ -6,6 +6,8 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import Icon from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
+import DiscountTimer from '@/components/pricing/DiscountTimer';
+import { useDiscountOffer } from '@/hooks/useDiscountOffer';
 
 const userTiers = [
   { users: 5, label: '5 пользователей', price: 0 },
@@ -98,6 +100,7 @@ const Pricing = () => {
   const [selectedUserTier, setSelectedUserTier] = useState(0);
   const [selectedAreaTier, setSelectedAreaTier] = useState(0);
   const [enabledAddons, setEnabledAddons] = useState<string[]>([]);
+  const { isOfferActive, discountPercent } = useDiscountOffer();
 
   const toggleAddon = (addonId: string) => {
     setEnabledAddons(prev =>
@@ -113,8 +116,12 @@ const Pricing = () => {
     return sum + (addon?.price || 0);
   }, 0);
   const totalPrice = basePrice + addonsPrice;
-  const discount = totalPrice > 5000 ? Math.floor(totalPrice * 0.15) : 0;
-  const finalPrice = totalPrice - discount;
+  
+  const volumeDiscount = totalPrice > 5000 ? Math.floor(totalPrice * 0.15) : 0;
+  const newUserDiscount = isOfferActive ? Math.floor(totalPrice * (discountPercent / 100)) : 0;
+  const totalDiscount = volumeDiscount + newUserDiscount;
+  
+  const finalPrice = totalPrice - totalDiscount;
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -267,7 +274,9 @@ const Pricing = () => {
           </Card>
         </div>
 
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 space-y-3 md:space-y-6">
+          <DiscountTimer />
+          
           <div className="lg:static">
             <Card className="shadow-sm">
               <CardHeader className="pb-2 md:pb-6 px-3 md:px-6">
@@ -286,10 +295,20 @@ const Pricing = () => {
                       <span className="font-medium">{addonsPrice} ₽</span>
                     </div>
                   )}
-                  {discount > 0 && (
+                  {volumeDiscount > 0 && (
                     <div className="flex justify-between text-[10px] md:text-sm text-green-600">
                       <span>Скидка 15%</span>
-                      <span className="font-medium">-{discount} ₽</span>
+                      <span className="font-medium">-{volumeDiscount} ₽</span>
+                    </div>
+                  )}
+                  {newUserDiscount > 0 && (
+                    <div className="flex justify-between text-[10px] md:text-sm text-orange-600">
+                      <div className="flex items-center gap-1">
+                        <Icon name="Zap" size={12} className="md:hidden" />
+                        <Icon name="Zap" size={14} className="hidden md:block" />
+                        <span className="font-semibold">Скидка новичка {discountPercent}%</span>
+                      </div>
+                      <span className="font-bold">-{newUserDiscount} ₽</span>
                     </div>
                   )}
                 </div>

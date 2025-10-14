@@ -20,11 +20,20 @@ const OnboardingFlow = ({ userId, userRole, registrationDate }: OnboardingFlowPr
     if (userRole !== 'client') return;
 
     const hasSeenOnboarding = localStorage.getItem(`onboarding_v2_${userId}`);
+    const hasSeenProOffer = localStorage.getItem(`pro_offer_shown_${userId}`);
     
     if (!hasSeenOnboarding) {
       setTimeout(() => setShowWelcome(true), 500);
+    } else if (!hasSeenProOffer && registrationDate) {
+      const regDate = new Date(registrationDate);
+      const now = new Date();
+      const totalSecondsLeft = 48 * 60 * 60 - Math.floor((now.getTime() - regDate.getTime()) / 1000);
+      
+      if (totalSecondsLeft > 0) {
+        setTimeout(() => setShowProUpgrade(true), 1000);
+      }
     }
-  }, [userId, userRole]);
+  }, [userId, userRole, registrationDate]);
 
   const handleStartTour = () => {
     setShowWelcome(false);
