@@ -18,35 +18,39 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
   return (
     <>
       {/* MOBILE: Compact header with back button */}
-      <div className="md:hidden bg-white border-b border-slate-200 px-3 py-2.5 overflow-x-hidden">
-        <div className="flex items-center gap-2 mb-2">
+      <div className="md:hidden bg-gradient-to-b from-white to-slate-50 border-b border-slate-200 px-3 py-3 overflow-x-hidden">
+        <div className="flex items-start gap-2.5 mb-3">
           <Button 
             variant="ghost" 
             size="icon"
-            className="flex-shrink-0"
+            className="flex-shrink-0 h-9 w-9 mt-0.5"
             onClick={() => navigate(`/objects/${objectId}`)}
           >
             <Icon name="ChevronLeft" size={20} />
           </Button>
           
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex-shrink-0 flex items-center justify-center">
-              <Icon name="Wrench" size={16} className="text-blue-600" />
+          <div className="flex items-start gap-2.5 flex-1 min-w-0">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex-shrink-0 flex items-center justify-center shadow-sm">
+              <Icon name="Wrench" size={18} className="text-white" />
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-[10px] text-slate-500">Секция А, корпус 2</div>
-              <h1 className="text-sm font-bold text-slate-900 leading-tight line-clamp-2">{selectedWorkData.title}</h1>
+            <div className="flex-1 min-w-0 pt-0.5">
+              {organizationName && (
+                <div className="text-[11px] text-slate-500 mb-0.5 truncate font-medium">{organizationName}</div>
+              )}
+              <h1 className="text-[15px] font-bold text-slate-900 leading-tight line-clamp-2">{selectedWorkData.title}</h1>
             </div>
           </div>
 
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={onEdit}
-            className="h-8 w-8"
-          >
-            <Icon name="Settings" size={16} />
-          </Button>
+          {(userRole === 'client' || userRole === 'admin') && onEdit && (
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={onEdit}
+              className="h-9 w-9 flex-shrink-0 mt-0.5"
+            >
+              <Icon name="Settings" size={18} />
+            </Button>
+          )}
         </div>
 
         {/* Mobile tabs */}
@@ -110,39 +114,33 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
       </div>
 
       {/* DESKTOP: Original header */}
-      <div className="hidden md:block bg-white border-b border-slate-200 px-2 md:px-6 pt-2 md:pt-4 pb-0">
-        <div className="flex items-center justify-between mb-2 md:mb-3">
-          <div className="flex-1 min-w-0 mr-2">
-            <h2 className="text-sm md:text-xl font-bold truncate leading-tight">{selectedWorkData.title}</h2>
-            {organizationName && (
-              <p className="text-xs text-slate-500 mt-0.5 truncate">
-                {organizationName}
-              </p>
-            )}
+      <div className="hidden md:block bg-gradient-to-b from-white to-slate-50/50 border-b border-slate-200 px-6 pt-5 pb-0">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start gap-4 flex-1 min-w-0 mr-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex-shrink-0 flex items-center justify-center shadow-md">
+              <Icon name="Wrench" size={22} className="text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              {organizationName && (
+                <p className="text-sm text-slate-500 mb-1 truncate font-medium">
+                  {organizationName}
+                </p>
+              )}
+              <h2 className="text-2xl font-bold text-slate-900 leading-tight line-clamp-2">{selectedWorkData.title}</h2>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             {(userRole === 'client' || userRole === 'admin') && onEdit && (
-              <Button variant="outline" size="sm" onClick={onEdit} className="hidden md:flex">
-                <Icon name="Edit" size={16} className="mr-1" />
-                Редактировать
+              <Button variant="outline" size="default" onClick={onEdit} className="shadow-sm">
+                <Icon name="Settings" size={16} className="mr-2" />
+                Настройки
               </Button>
             )}
-            {(userRole === 'client' || userRole === 'admin') && onEdit && (
-              <Button variant="ghost" size="icon" onClick={onEdit} className="md:hidden h-8 w-8">
-                <Icon name="Edit" size={16} />
-              </Button>
-            )}
-            <Button variant="ghost" size="icon" className="hidden md:flex">
-              <Icon name="Search" size={18} />
-            </Button>
-            <Button variant="ghost" size="icon" className="hidden md:flex">
+            <Button variant="ghost" size="icon" className="h-10 w-10">
               <Icon name="Star" size={18} />
             </Button>
-            <Button variant="ghost" size="icon" className="hidden md:flex">
-              <Icon name="Bell" size={18} />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Icon name="MoreVertical" size={16} />
+            <Button variant="ghost" size="icon" className="h-10 w-10">
+              <Icon name="MoreVertical" size={18} />
             </Button>
           </div>
         </div>
