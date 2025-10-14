@@ -97,15 +97,29 @@ def handler(event, context):
                 conn.commit()
                 
             elif item_type == 'object':
-                project_id = int(data.get('project_id', 0))
+                project_id = data.get('project_id')
                 title = data.get('title', '').replace("'", "''")
                 address = data.get('address', '').replace("'", "''")
+                description = data.get('description', '').replace("'", "''") if data.get('description') else None
                 status = data.get('status', 'active')
                 
+                fields = ['title', 'address', 'status', 'client_id', 'created_at', 'updated_at']
+                values = [f"'{title}'", f"'{address}'", f"'{status}'", str(user_id_int), 'NOW()', 'NOW()']
+                
+                if project_id:
+                    fields.append('project_id')
+                    values.append(str(int(project_id)))
+                if description:
+                    fields.append('description')
+                    values.append(f"'{description}'")
+                
+                fields_str = ', '.join(fields)
+                values_str = ', '.join(values)
+                
                 cur.execute(f"""
-                    INSERT INTO objects (title, address, project_id, status)
-                    VALUES ('{title}', '{address}', {project_id}, '{status}')
-                    RETURNING id, title, address, project_id, status
+                    INSERT INTO objects ({fields_str})
+                    VALUES ({values_str})
+                    RETURNING id, title, address, description, project_id, status, client_id, created_at, updated_at
                 """)
                 result = cur.fetchone()
                 conn.commit()
