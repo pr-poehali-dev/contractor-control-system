@@ -12,7 +12,7 @@ const Login = () => {
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [devCode, setDevCode] = useState('');
-  const { loginWithPhone } = useAuth();
+  const { loginWithPhone, login } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -23,6 +23,27 @@ const Login = () => {
         description: 'Введите номер телефона или "admin"',
         variant: 'destructive',
       });
+      return;
+    }
+    
+    if (phone.toLowerCase() === 'admin') {
+      setIsLoading(true);
+      try {
+        await login('admin@example.com', 'admin123');
+        navigate('/dashboard');
+        toast({
+          title: 'Добро пожаловать, Администратор!',
+          description: 'Вы вошли как администратор',
+        });
+      } catch (error) {
+        toast({
+          title: 'Ошибка входа',
+          description: error instanceof Error ? error.message : 'Не удалось войти',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoading(false);
+      }
       return;
     }
     
