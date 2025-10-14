@@ -247,6 +247,29 @@ def handler(event, context):
                 result = cur.fetchone()
                 conn.commit()
                 
+            elif item_type == 'info_post':
+                title = data.get('title', '').replace("'", "''")
+                content = data.get('content', '').replace("'", "''")
+                link = data.get('link', '').replace("'", "''") if data.get('link') else None
+                
+                fields = ['title', 'content', 'created_by', 'created_at', 'updated_at']
+                values = [f"'{title}'", f"'{content}'", str(user_id_int), 'NOW()', 'NOW()']
+                
+                if link:
+                    fields.append('link')
+                    values.append(f"'{link}'")
+                
+                fields_str = ', '.join(fields)
+                values_str = ', '.join(values)
+                
+                cur.execute(f"""
+                    INSERT INTO t_p8942561_contractor_control_s.info_posts ({fields_str})
+                    VALUES ({values_str})
+                    RETURNING id, title, content, link, created_by, created_at, updated_at
+                """)
+                result = cur.fetchone()
+                conn.commit()
+                
             else:
                 cur.close()
                 conn.close()

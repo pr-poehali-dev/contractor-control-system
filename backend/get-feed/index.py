@@ -420,6 +420,35 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'author': planned['author_name']
         })
     
+    # Get info posts (visible to all users, limited to last 5)
+    info_posts_query = '''
+        SELECT 
+            ip.id,
+            ip.title,
+            ip.content,
+            ip.link,
+            ip.created_at,
+            u.name as author_name
+        FROM t_p8942561_contractor_control_s.info_posts ip
+        JOIN users u ON ip.created_by = u.id
+        ORDER BY ip.created_at DESC
+        LIMIT 5
+    '''
+    
+    cur.execute(info_posts_query)
+    info_posts = cur.fetchall()
+    
+    for post in info_posts:
+        events.append({
+            'id': f"info_post_{post['id']}",
+            'type': 'info_post',
+            'title': post['title'],
+            'description': post['content'],
+            'timestamp': post['created_at'].isoformat() if hasattr(post['created_at'], 'isoformat') else str(post['created_at']),
+            'link': post['link'],
+            'author': post['author_name']
+        })
+    
     cur.close()
     conn.close()
     
