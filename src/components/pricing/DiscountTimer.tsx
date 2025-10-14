@@ -15,12 +15,22 @@ export default function DiscountTimer() {
   const [isOfferActive, setIsOfferActive] = useState(false);
 
   useEffect(() => {
-    if (!user?.created_at) return;
+    if (!user?.created_at) {
+      console.log('[DiscountTimer] No user.created_at:', user);
+      return;
+    }
 
     const checkOffer = () => {
       const regDate = new Date(user.created_at);
       const now = new Date();
       const totalSecondsLeft = 48 * 60 * 60 - Math.floor((now.getTime() - regDate.getTime()) / 1000);
+      
+      console.log('[DiscountTimer]', {
+        regDate: regDate.toISOString(),
+        now: now.toISOString(),
+        totalSecondsLeft,
+        isActive: totalSecondsLeft > 0
+      });
       
       if (totalSecondsLeft > 0) {
         setIsOfferActive(true);

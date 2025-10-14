@@ -8,6 +8,7 @@ import Icon from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
 import DiscountTimer from '@/components/pricing/DiscountTimer';
 import { useDiscountOffer } from '@/hooks/useDiscountOffer';
+import TestProModal from '@/components/dev/TestProModal';
 
 const userTiers = [
   { users: 5, label: '5 пользователей', price: 0 },
@@ -353,6 +354,8 @@ const Pricing = () => {
         </div>
       </div>
       </div>
+      
+      <TestProModal />
     </div>
   );
 };
