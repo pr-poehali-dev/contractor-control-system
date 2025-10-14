@@ -29,7 +29,21 @@ const Login = () => {
     if (phone.toLowerCase() === 'admin') {
       setIsLoading(true);
       try {
-        await loginWithPhone('admin', 'admin');
+        const response = await fetch('https://functions.poehali.dev/98a74339-b468-4d33-b7b0-b3c19beb9d75', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: 'admin' }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Ошибка входа');
+        }
+
+        localStorage.setItem('auth_token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
         navigate('/dashboard');
         toast({
           title: 'Добро пожаловать, Администратор!',

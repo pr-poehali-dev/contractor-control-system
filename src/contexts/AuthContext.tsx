@@ -159,20 +159,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       console.log('Phone login attempt:', phone);
       
-      if (phone.toLowerCase() === 'admin' && code === 'admin') {
-        const adminUser: User = {
-          id: 1,
-          name: 'Администратор',
-          role: 'admin',
-          phone: 'admin'
-        };
-        const adminToken = 'admin-token-' + Date.now();
-        console.log('Admin login, creating mock auth');
-        saveAuth(adminToken, adminUser);
-        setIsLoading(false);
-        return;
-      }
-      
       const response = await fetch(VERIFY_CODE_API, {
         method: 'POST',
         headers: {
