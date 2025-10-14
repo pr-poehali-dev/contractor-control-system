@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
 
 interface Work {
@@ -26,15 +27,13 @@ interface BuildingObject {
   updated_at?: string;
 }
 
-type TabType = 'journal' | 'schedule' | 'analytics' | 'inspections' | 'info';
-
 const PublicObject = () => {
   const { objectId } = useParams();
   const navigate = useNavigate();
   const { userData } = useAuth();
   const [object, setObject] = useState<BuildingObject | null>(null);
   const [works, setWorks] = useState<Work[]>([]);
-  const [activeTab, setActiveTab] = useState<TabType>('info');
+  const [activeTab, setActiveTab] = useState('info');
 
   useEffect(() => {
     if (userData?.objects && objectId) {
@@ -52,9 +51,9 @@ const PublicObject = () => {
 
   if (!object) {
     return (
-      <div className="min-h-screen bg-slate-200 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="text-center">
-          <Icon name="Building2" size={64} className="text-slate-400 mx-auto mb-4" />
+          <Icon name="Building2" size={64} className="text-slate-300 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-slate-900 mb-2">Объект не найден</h2>
           <Button onClick={() => navigate('/profile')} variant="outline" className="mt-4">
             Вернуться к профилю
@@ -72,80 +71,93 @@ const PublicObject = () => {
     });
   };
 
-  const tabs = [
-    { id: 'journal' as TabType, label: 'Журнал работ' },
-    { id: 'schedule' as TabType, label: 'График' },
-    { id: 'analytics' as TabType, label: 'Аналитика' },
-    { id: 'inspections' as TabType, label: 'Проверки' },
-    { id: 'info' as TabType, label: 'Общая информация' },
-  ];
-
   return (
-    <div className="min-h-screen bg-slate-200 pb-20">
-      <div className="bg-slate-200 pt-8 pb-6">
-        <div className="container max-w-4xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
+    <div className="min-h-screen bg-slate-50 pb-20">
+      <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div className="container max-w-4xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between mb-4">
             <Button 
               variant="ghost" 
               size="icon"
               onClick={() => navigate('/profile')}
-              className="w-12 h-12 rounded-full bg-white hover:bg-slate-100"
             >
               <Icon name="ArrowLeft" size={20} />
             </Button>
             <Button 
               variant="ghost" 
               size="icon"
-              className="w-12 h-12 rounded-full bg-white hover:bg-slate-100"
             >
               <Icon name="MoreVertical" size={20} />
             </Button>
           </div>
 
-          <div className="flex flex-col items-center text-center mb-8">
-            <div className="w-32 h-32 rounded-full bg-rose-300 mb-6" />
-            <h1 className="text-2xl font-semibold text-slate-900 mb-6">{object.title}</h1>
-            
-            <div className="flex flex-wrap gap-2 justify-center">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === tab.id
-                      ? 'bg-slate-400 text-white'
-                      : 'bg-slate-300 text-slate-700 hover:bg-slate-350'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+          <div className="flex flex-col items-center text-center">
+            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 mb-4 flex items-center justify-center">
+              <Icon name="Building2" size={40} className="text-blue-600" />
             </div>
+            <h1 className="text-xl md:text-2xl font-bold text-slate-900 mb-6">{object.title}</h1>
           </div>
         </div>
       </div>
 
-      <div className="container max-w-4xl mx-auto px-4">
-        {activeTab === 'info' && (
-          <div className="space-y-6">
+      <div className="container max-w-4xl mx-auto px-4 py-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 gap-2 h-auto bg-transparent p-0">
+            <TabsTrigger 
+              value="journal" 
+              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
+            >
+              Журнал работ
+            </TabsTrigger>
+            <TabsTrigger 
+              value="schedule"
+              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
+            >
+              График
+            </TabsTrigger>
+            <TabsTrigger 
+              value="analytics"
+              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
+            >
+              Аналитика
+            </TabsTrigger>
+            <TabsTrigger 
+              value="inspections"
+              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
+            >
+              Проверки
+            </TabsTrigger>
+            <TabsTrigger 
+              value="info"
+              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2 col-span-3 md:col-span-1"
+            >
+              Общая информация
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="info" className="space-y-6 mt-6">
             <div>
               <h2 className="text-lg font-semibold text-slate-900 mb-4">Даты</h2>
               <div className="space-y-3">
-                <Card className="p-4 bg-white">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-700">Дата старта работ</span>
-                    <span className="text-slate-900 font-medium">
-                      {object.created_at ? formatDate(object.created_at) : '—'}
-                    </span>
-                  </div>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                      <span className="text-slate-600 text-sm md:text-base">Дата старта работ</span>
+                      <span className="text-slate-900 font-medium text-sm md:text-base">
+                        {object.created_at ? formatDate(object.created_at) : '—'}
+                      </span>
+                    </div>
+                  </CardContent>
                 </Card>
-                <Card className="p-4 bg-white">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-700">Дата заключения договора</span>
-                    <span className="text-slate-900 font-medium">
-                      {object.updated_at ? formatDate(object.updated_at) : '—'}
-                    </span>
-                  </div>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                      <span className="text-slate-600 text-sm md:text-base">Дата заключения договора</span>
+                      <span className="text-slate-900 font-medium text-sm md:text-base">
+                        {object.updated_at ? formatDate(object.updated_at) : '—'}
+                      </span>
+                    </div>
+                  </CardContent>
                 </Card>
               </div>
             </div>
@@ -154,97 +166,114 @@ const PublicObject = () => {
               <h2 className="text-lg font-semibold text-slate-900 mb-4">Характеристики</h2>
               <div className="space-y-3">
                 {object.address && (
-                  <Card className="p-4 bg-white">
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-700">Адрес</span>
-                      <span className="text-slate-900 font-medium text-right">{object.address}</span>
-                    </div>
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                        <span className="text-slate-600 text-sm md:text-base">Адрес</span>
+                        <span className="text-slate-900 font-medium text-sm md:text-base text-left md:text-right">
+                          {object.address}
+                        </span>
+                      </div>
+                    </CardContent>
                   </Card>
                 )}
                 {object.description && (
-                  <Card className="p-4 bg-white">
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-700">Описание</span>
-                      <span className="text-slate-900 font-medium text-right">{object.description}</span>
-                    </div>
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                        <span className="text-slate-600 text-sm md:text-base">Описание</span>
+                        <span className="text-slate-900 font-medium text-sm md:text-base text-left md:text-right">
+                          {object.description}
+                        </span>
+                      </div>
+                    </CardContent>
                   </Card>
                 )}
-                <Card className="p-4 bg-white">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-700">Проект</span>
-                    <button className="text-blue-600 font-medium hover:underline">
-                      Скачать
-                    </button>
-                  </div>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-600 text-sm md:text-base">Проект</span>
+                      <Button variant="link" className="text-blue-600 p-0 h-auto text-sm md:text-base">
+                        Скачать
+                      </Button>
+                    </div>
+                  </CardContent>
                 </Card>
-                <Card className="p-4 bg-white">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-700">Разрешительная документация</span>
-                    <button className="text-blue-600 font-medium hover:underline">
-                      Скачать
-                    </button>
-                  </div>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-600 text-sm md:text-base">Разрешительная документация</span>
+                      <Button variant="link" className="text-blue-600 p-0 h-auto text-sm md:text-base">
+                        Скачать
+                      </Button>
+                    </div>
+                  </CardContent>
                 </Card>
               </div>
             </div>
-          </div>
-        )}
+          </TabsContent>
 
-        {activeTab === 'journal' && (
-          <div className="space-y-4">
+          <TabsContent value="journal" className="space-y-4 mt-6">
             <h2 className="text-lg font-semibold text-slate-900">Журнал работ</h2>
             {works.length === 0 ? (
-              <Card className="p-8 bg-white text-center">
-                <Icon name="Briefcase" size={48} className="text-slate-300 mx-auto mb-3" />
-                <p className="text-slate-600">Нет работ в журнале</p>
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <Icon name="Briefcase" size={48} className="text-slate-300 mx-auto mb-3" />
+                  <p className="text-slate-600">Нет работ в журнале</p>
+                </CardContent>
               </Card>
             ) : (
               <div className="space-y-3">
                 {works.map((work) => (
-                  <Card key={work.id} className="p-4 bg-white hover:bg-slate-50 transition-colors cursor-pointer">
-                    <h3 className="font-semibold text-slate-900 mb-1">{work.title}</h3>
-                    {work.description && (
-                      <p className="text-sm text-slate-600 mb-2">{work.description}</p>
-                    )}
-                    {work.contractor_name && (
-                      <p className="text-sm text-slate-500">Подрядчик: {work.contractor_name}</p>
-                    )}
+                  <Card key={work.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                    <CardContent className="p-4">
+                      <h3 className="font-semibold text-slate-900 mb-1">{work.title}</h3>
+                      {work.description && (
+                        <p className="text-sm text-slate-600 mb-2">{work.description}</p>
+                      )}
+                      {work.contractor_name && (
+                        <p className="text-sm text-slate-500 flex items-center gap-1">
+                          <Icon name="Users" size={14} />
+                          {work.contractor_name}
+                        </p>
+                      )}
+                    </CardContent>
                   </Card>
                 ))}
               </div>
             )}
-          </div>
-        )}
+          </TabsContent>
 
-        {activeTab === 'schedule' && (
-          <div className="space-y-4">
+          <TabsContent value="schedule" className="space-y-4 mt-6">
             <h2 className="text-lg font-semibold text-slate-900">График работ</h2>
-            <Card className="p-8 bg-white text-center">
-              <Icon name="Calendar" size={48} className="text-slate-300 mx-auto mb-3" />
-              <p className="text-slate-600">Раздел в разработке</p>
+            <Card>
+              <CardContent className="p-8 text-center">
+                <Icon name="Calendar" size={48} className="text-slate-300 mx-auto mb-3" />
+                <p className="text-slate-600">Раздел в разработке</p>
+              </CardContent>
             </Card>
-          </div>
-        )}
+          </TabsContent>
 
-        {activeTab === 'analytics' && (
-          <div className="space-y-4">
+          <TabsContent value="analytics" className="space-y-4 mt-6">
             <h2 className="text-lg font-semibold text-slate-900">Аналитика</h2>
-            <Card className="p-8 bg-white text-center">
-              <Icon name="BarChart3" size={48} className="text-slate-300 mx-auto mb-3" />
-              <p className="text-slate-600">Раздел в разработке</p>
+            <Card>
+              <CardContent className="p-8 text-center">
+                <Icon name="BarChart3" size={48} className="text-slate-300 mx-auto mb-3" />
+                <p className="text-slate-600">Раздел в разработке</p>
+              </CardContent>
             </Card>
-          </div>
-        )}
+          </TabsContent>
 
-        {activeTab === 'inspections' && (
-          <div className="space-y-4">
+          <TabsContent value="inspections" className="space-y-4 mt-6">
             <h2 className="text-lg font-semibold text-slate-900">Проверки</h2>
-            <Card className="p-8 bg-white text-center">
-              <Icon name="ClipboardCheck" size={48} className="text-slate-300 mx-auto mb-3" />
-              <p className="text-slate-600">Раздел в разработке</p>
+            <Card>
+              <CardContent className="p-8 text-center">
+                <Icon name="ClipboardCheck" size={48} className="text-slate-300 mx-auto mb-3" />
+                <p className="text-slate-600">Раздел в разработке</p>
+              </CardContent>
             </Card>
-          </div>
-        )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
