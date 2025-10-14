@@ -21,6 +21,8 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
     description: '',
     contractor_id: '',
     status: 'active',
+    start_date: '',
+    end_date: '',
   });
 
   const handleSendMessage = async () => {
@@ -191,6 +193,8 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
       description: selectedWorkData.description || '',
       contractor_id: selectedWorkData.contractor_id?.toString() || '',
       status: selectedWorkData.status || 'active',
+      start_date: selectedWorkData.start_date || '',
+      end_date: selectedWorkData.end_date || '',
     });
     setIsEditDialogOpen(true);
   };
@@ -205,6 +209,8 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
         description: editFormData.description,
         contractor_id: editFormData.contractor_id ? Number(editFormData.contractor_id) : null,
         status: editFormData.status,
+        start_date: editFormData.start_date || null,
+        end_date: editFormData.end_date || null,
       });
 
       if (token) {

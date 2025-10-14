@@ -165,6 +165,8 @@ const CreateWork = () => {
         description: formData.description,
         contractor_id: formData.contractor_id ? Number(formData.contractor_id) : null,
         status: 'active',
+        start_date: formData.start_date || null,
+        end_date: formData.end_date || null,
       });
 
       const newWorkId = result.data.id;
@@ -409,7 +411,7 @@ const CreateWork = () => {
             type="button" 
             variant="outline" 
             size="lg"
-            onClick={() => navigate(`/projects/${projectId}/objects/${objectId}`)}
+            onClick={() => navigate(`/objects/${objectId}`)}
             disabled={isSubmitting}
           >
             Отмена

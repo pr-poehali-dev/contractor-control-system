@@ -18,6 +18,8 @@ interface EditFormData {
   description: string;
   contractor_id: string;
   status: string;
+  start_date?: string;
+  end_date?: string;
 }
 
 interface WorkEditDialogProps {
@@ -66,6 +68,26 @@ export default function WorkEditDialog({
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
             />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-start-date">Плановое начало</Label>
+              <Input
+                id="edit-start-date"
+                type="date"
+                value={formData.start_date || ''}
+                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-end-date">Плановое окончание</Label>
+              <Input
+                id="edit-end-date"
+                type="date"
+                value={formData.end_date || ''}
+                onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+              />
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="edit-contractor">Подрядчик</Label>
