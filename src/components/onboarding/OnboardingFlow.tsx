@@ -76,39 +76,40 @@ const OnboardingFlow = ({ userId, userRole, registrationDate }: OnboardingFlowPr
   return (
     <>
       <Dialog open={showWelcome} onOpenChange={handleWelcomeClose}>
-        <DialogContent className="max-w-lg">
-          <div className="text-center py-6">
-            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Icon name="Rocket" size={40} className="text-blue-600" />
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="text-center py-4 md:py-6 px-2">
+            <div className="w-16 h-16 md:w-20 md:h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+              <Icon name="Rocket" size={32} className="md:w-10 md:h-10 text-blue-600" />
             </div>
             
-            <h2 className="text-2xl font-bold text-slate-900 mb-3">
+            <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-2 md:mb-3 px-2">
               Добро пожаловать в систему!
             </h2>
             
-            <p className="text-slate-600 mb-8 leading-relaxed">
+            <p className="text-sm md:text-base text-slate-600 mb-6 md:mb-8 leading-relaxed px-2">
               Мы покажем, как создать объект, добавить работы и начать контролировать строительство. 
               Это займёт всего минуту!
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button
-                variant="outline"
-                onClick={handleSkipTour}
-                className="order-2 sm:order-1"
-              >
-                Я разберусь сам
-              </Button>
+            <div className="flex flex-col gap-3 justify-center px-2">
               <Button
                 onClick={handleStartTour}
-                className="bg-blue-600 hover:bg-blue-700 order-1 sm:order-2"
+                className="bg-blue-600 hover:bg-blue-700 w-full"
+                size="lg"
               >
                 <Icon name="Play" size={16} className="mr-2" />
                 Начать обучение
               </Button>
+              <Button
+                variant="outline"
+                onClick={handleSkipTour}
+                className="w-full"
+              >
+                Я разберусь сам
+              </Button>
             </div>
 
-            <p className="text-xs text-slate-500 mt-6">
+            <p className="text-xs text-slate-500 mt-4 md:mt-6 px-2">
               Вы всегда можете вернуться к обучению через меню помощи
             </p>
           </div>
