@@ -173,10 +173,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     for log in work_logs:
         photo_urls = []
         if log['photo_urls']:
-            try:
-                photo_urls = json.loads(log['photo_urls'])
-            except:
-                pass
+            photo_url_str = log['photo_urls']
+            if isinstance(photo_url_str, str):
+                if photo_url_str.startswith('['):
+                    try:
+                        photo_urls = json.loads(photo_url_str)
+                    except:
+                        photo_urls = [photo_url_str]
+                else:
+                    photo_urls = [photo_url_str]
+            elif isinstance(photo_url_str, list):
+                photo_urls = photo_url_str
         
         events.append({
             'id': f"work_log_{log['id']}",
@@ -286,10 +293,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     for insp in inspections:
         photo_urls = []
         if insp['photo_urls']:
-            try:
-                photo_urls = json.loads(insp['photo_urls'])
-            except:
-                pass
+            photo_url_str = insp['photo_urls']
+            if isinstance(photo_url_str, str):
+                if photo_url_str.startswith('['):
+                    try:
+                        photo_urls = json.loads(photo_url_str)
+                    except:
+                        photo_urls = [photo_url_str]
+                else:
+                    photo_urls = [photo_url_str]
+            elif isinstance(photo_url_str, list):
+                photo_urls = photo_url_str
         
         status_label = 'Проверка завершена' if insp['status'] == 'completed' else 'Обнаружены замечания' if insp['status'] == 'on_rework' else 'Проверка'
         
