@@ -276,19 +276,35 @@ const Dashboard = () => {
       return;
     }
 
-    toast({
-      title: 'Инфо-пост создан',
-      description: 'Уведомление отправлено всем пользователям'
-    });
+    try {
+      await api.createItem(token!, 'info_post', {
+        title: infoPostForm.title,
+        content: infoPostForm.content,
+        link: infoPostForm.link || null
+      });
 
-    setShowInfoPostModal(false);
-    setInfoPostForm({
-      title: '',
-      content: '',
-      link: ''
-    });
-    
-    loadFeed();
+      toast({
+        title: 'Инфо-пост создан',
+        description: 'Уведомление отправлено всем пользователям'
+      });
+
+      setShowInfoPostModal(false);
+      setInfoPostForm({
+        title: '',
+        content: '',
+        link: ''
+      });
+      
+      await loadUserData();
+      loadFeed();
+    } catch (error: any) {
+      console.error('Failed to create info post:', error);
+      toast({
+        title: 'Ошибка',
+        description: error?.message || 'Не удалось создать инфо-пост',
+        variant: 'destructive'
+      });
+    }
   };
 
   return (
