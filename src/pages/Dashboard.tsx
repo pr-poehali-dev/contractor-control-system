@@ -154,21 +154,29 @@ const Dashboard = () => {
 
     if (selectedTags.length === 0) return true;
 
-    return selectedTags.some(tag => {
-      if (tag.startsWith('object-')) {
-        const objectId = parseInt(tag.replace('object-', ''));
-        return event.objectId === objectId;
-      }
-      if (tag.startsWith('work-')) {
-        const workId = parseInt(tag.replace('work-', ''));
-        return event.workId === workId;
-      }
-      if (tag.startsWith('contractor-')) {
-        const contractor = tag.replace('contractor-', '');
-        return event.author === contractor;
-      }
-      return false;
+    // Группируем теги по типам
+    const objectTags = selectedTags.filter(tag => tag.startsWith('object-'));
+    const workTags = selectedTags.filter(tag => tag.startsWith('work-'));
+    const contractorTags = selectedTags.filter(tag => tag.startsWith('contractor-'));
+
+    // Проверяем каждую группу отдельно - все должны совпадать (логика И)
+    const objectMatch = objectTags.length === 0 || objectTags.some(tag => {
+      const objectId = parseInt(tag.replace('object-', ''));
+      return event.objectId === objectId;
     });
+
+    const workMatch = workTags.length === 0 || workTags.some(tag => {
+      const workId = parseInt(tag.replace('work-', ''));
+      return event.workId === workId;
+    });
+
+    const contractorMatch = contractorTags.length === 0 || contractorTags.some(tag => {
+      const contractor = tag.replace('contractor-', '');
+      return event.author === contractor;
+    });
+
+    // Все условия должны выполняться одновременно
+    return objectMatch && workMatch && contractorMatch;
   });
 
   const handleCreateJournalEntry = async () => {
