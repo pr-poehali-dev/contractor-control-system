@@ -65,9 +65,16 @@ const OnboardingFlow = ({ userId, userRole, registrationDate }: OnboardingFlowPr
 
   if (userRole !== 'client') return null;
 
+  const handleWelcomeClose = (open: boolean) => {
+    if (!open) {
+      localStorage.setItem(`onboarding_v2_${userId}`, 'closed');
+    }
+    setShowWelcome(open);
+  };
+
   return (
     <>
-      <Dialog open={showWelcome} onOpenChange={setShowWelcome}>
+      <Dialog open={showWelcome} onOpenChange={handleWelcomeClose}>
         <DialogContent className="max-w-lg">
           <div className="text-center py-6">
             <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
