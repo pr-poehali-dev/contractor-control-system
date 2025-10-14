@@ -100,7 +100,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       const data = await response.json();
       console.log('User data loaded:', data);
-      setUserData(data);
+      
+      const normalizedData = {
+        objects: Array.isArray(data.objects) ? data.objects : [],
+        works: Array.isArray(data.works) ? data.works : [],
+        inspections: Array.isArray(data.inspections) ? data.inspections : [],
+        remarks: Array.isArray(data.remarks) ? data.remarks : [],
+        workLogs: Array.isArray(data.workLogs) ? data.workLogs : [],
+        checkpoints: Array.isArray(data.checkpoints) ? data.checkpoints : [],
+        contractors: Array.isArray(data.contractors) ? data.contractors : [],
+      };
+      
+      console.log('Normalized user data:', normalizedData);
+      setUserData(normalizedData);
     } catch (error) {
       console.error('Error loading user data:', error);
     }

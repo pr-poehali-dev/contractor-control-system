@@ -26,10 +26,10 @@ const Profile = () => {
       .slice(0, 2);
   };
 
-  const projects = userData?.projects || [];
-  const sites = userData?.sites || [];
-  const works = userData?.works || [];
-  const inspections = userData?.inspections || [];
+  const projects = (userData?.projects && Array.isArray(userData.projects)) ? userData.projects : [];
+  const sites = (userData?.sites && Array.isArray(userData.sites)) ? userData.sites : [];
+  const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
+  const inspections = (userData?.inspections && Array.isArray(userData.inspections)) ? userData.inspections : [];
 
   const userProjects = user?.role === 'contractor' 
     ? projects.filter(p => works.some(w => sites.some(s => s.project_id === p.id && w.object_id === s.id)))

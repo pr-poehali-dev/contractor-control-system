@@ -9,10 +9,10 @@ const Defects = () => {
   const { userData } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  const remarks = userData?.remarks || [];
-  const inspections = userData?.inspections || [];
-  const works = userData?.works || [];
-  const objects = userData?.objects || [];
+  const remarks = (userData?.remarks && Array.isArray(userData.remarks)) ? userData.remarks : [];
+  const inspections = (userData?.inspections && Array.isArray(userData.inspections)) ? userData.inspections : [];
+  const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
+  const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
 
   const remarksWithContext = remarks.map(remark => {
     const inspection = inspections.find(i => i.id === remark.inspection_id);

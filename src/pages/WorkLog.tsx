@@ -13,7 +13,7 @@ const WorkLog = () => {
   const { toast } = useToast();
   const [newMessage, setNewMessage] = useState('');
 
-  const logEntries = (userData?.workLogs || []).map(log => ({
+  const logEntries = ((userData?.workLogs && Array.isArray(userData.workLogs)) ? userData.workLogs : []).map(log => ({
     id: log.id,
     authorId: log.created_by,
     authorName: log.author_name,

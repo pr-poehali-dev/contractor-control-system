@@ -41,8 +41,8 @@ export default function Objects() {
     }
   };
 
-  const objects = userData?.objects || [];
-  const works = userData?.works || [];
+  const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
+  const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
 
   const objectData = objects.map(obj => {
     const objectWorks = works.filter(w => w.object_id === obj.id);

@@ -32,10 +32,10 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
   const navigate = useNavigate();
   const { projectId } = useParams();
 
-  const works = (userData?.works || []).filter(w => w.object_id === objectId);
-  const workLogs = userData?.workLogs || [];
-  const inspections = userData?.inspections || [];
-  const objects = userData?.objects || [];
+  const works = ((userData?.works && Array.isArray(userData.works)) ? userData.works : []).filter(w => w.object_id === objectId);
+  const workLogs = (userData?.workLogs && Array.isArray(userData.workLogs)) ? userData.workLogs : [];
+  const inspections = (userData?.inspections && Array.isArray(userData.inspections)) ? userData.inspections : [];
+  const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
   
   const currentObject = objects.find(o => o.id === objectId);
 
@@ -79,7 +79,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
   }
 
   const userRole: UserRole = user?.role || 'contractor';
-  const contractors = userData?.contractors || [];
+  const contractors = (userData?.contractors && Array.isArray(userData.contractors)) ? userData.contractors : [];
 
   const selectedWorkData = works.find(w => w.id === selectedWork);
   const workEntries = workLogs

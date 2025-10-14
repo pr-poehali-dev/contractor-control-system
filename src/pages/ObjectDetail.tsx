@@ -23,8 +23,8 @@ const ObjectDetail = () => {
   const [showActions, setShowActions] = useState(false);
   const [sortBy, setSortBy] = useState<string>('priority');
 
-  const objects = userData?.objects || [];
-  const works = userData?.works || [];
+  const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
+  const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
 
   const object = objects.find(s => s.id === Number(objectId));
   let objectWorks = works.filter(w => w.object_id === Number(objectId));

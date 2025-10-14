@@ -119,7 +119,7 @@ const CreateWork = () => {
 
   // Check if user has contractors
   useEffect(() => {
-    if (userData?.contractors && !contractorDialogShown) {
+    if (userData?.contractors && Array.isArray(userData.contractors) && !contractorDialogShown) {
       const contractorsCount = userData.contractors.length;
       setHasContractors(contractorsCount > 0);
       
@@ -362,7 +362,7 @@ const CreateWork = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Без подрядчика</SelectItem>
-                    {userData?.contractors?.map((contractor: any) => (
+                    {((userData?.contractors && Array.isArray(userData.contractors)) ? userData.contractors : []).map((contractor: any) => (
                       <SelectItem key={contractor.id} value={contractor.id.toString()}>
                         {contractor.name}
                       </SelectItem>

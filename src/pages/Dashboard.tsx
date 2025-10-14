@@ -68,8 +68,8 @@ const Dashboard = () => {
     link: ''
   });
 
-  const objects = userData?.objects || [];
-  const works = userData?.works || [];
+  const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
+  const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
 
   useEffect(() => {
     if (!user) return;

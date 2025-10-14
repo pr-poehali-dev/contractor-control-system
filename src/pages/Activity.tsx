@@ -5,11 +5,11 @@ import Icon from '@/components/ui/icon';
 const Activity = () => {
   const { userData } = useAuth();
 
-  const workLogs = userData?.workLogs || [];
-  const inspections = userData?.inspections || [];
-  const remarks = userData?.remarks || [];
-  const works = userData?.works || [];
-  const objects = userData?.objects || [];
+  const workLogs = (userData?.workLogs && Array.isArray(userData.workLogs)) ? userData.workLogs : [];
+  const inspections = (userData?.inspections && Array.isArray(userData.inspections)) ? userData.inspections : [];
+  const remarks = (userData?.remarks && Array.isArray(userData.remarks)) ? userData.remarks : [];
+  const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
+  const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
 
   const allActivity = [
     ...workLogs.map(log => ({

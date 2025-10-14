@@ -20,7 +20,7 @@ const WorkDetail = () => {
     );
   }
 
-  const works = userData?.works?.filter(w => w.object_id === Number(objectId)) || [];
+  const works = (userData?.works && Array.isArray(userData.works)) ? userData.works.filter(w => w.object_id === Number(objectId)) : [];
   const work = works.find(w => w.id === Number(workId));
 
   if (!userData) {
