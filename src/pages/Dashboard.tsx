@@ -13,7 +13,7 @@ import CreateActionButton from '@/components/dashboard/CreateActionButton';
 import JournalEntryModal from '@/components/dashboard/JournalEntryModal';
 import InspectionModal from '@/components/dashboard/InspectionModal';
 import InfoPostModal from '@/components/dashboard/InfoPostModal';
-import TestProModal from '@/components/dev/TestProModal';
+
 
 interface FeedEvent {
   id: string;
@@ -434,7 +434,7 @@ const Dashboard = () => {
         onSubmit={handleCreateInfoPost}
       />
 
-      <TestProModal />
+
       </div>
     </>
   );
