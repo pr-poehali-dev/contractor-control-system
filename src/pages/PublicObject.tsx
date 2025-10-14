@@ -41,16 +41,16 @@ const PublicObject = () => {
             </div>
 
             <div className="grid grid-cols-3 gap-1 md:gap-8">
-              <div className="text-center px-1">
+              <div className="text-center px-1 flex flex-col justify-end">
                 <div className="text-lg md:text-4xl font-bold text-slate-900 mb-0.5 md:mb-1">{objectWorks.length}</div>
                 <p className="text-[9px] md:text-sm text-slate-600 leading-tight">работ</p>
               </div>
-              <div className="text-center px-1">
+              <div className="text-center px-1 flex flex-col justify-end">
                 <div className="text-lg md:text-4xl font-bold text-slate-900 mb-0.5 md:mb-1">{inspections.length}</div>
                 <p className="text-[9px] md:text-sm text-slate-600 leading-tight">проверок</p>
               </div>
-              <div className="text-center px-1">
-                <div className="text-lg md:text-4xl font-bold text-slate-900 mb-0.5 md:mb-1 leading-tight">
+              <div className="text-center px-1 flex flex-col justify-end">
+                <div className="text-[10px] md:text-4xl font-bold text-slate-900 mb-0.5 md:mb-1 leading-tight">
                   {new Date(site.created_at).toLocaleDateString('ru-RU')}
                 </div>
                 <p className="text-[9px] md:text-sm text-slate-600 leading-tight">дата создания</p>
