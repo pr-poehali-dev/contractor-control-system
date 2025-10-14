@@ -13,7 +13,7 @@ interface WorkHeaderProps {
 
 export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, organizationName, userRole, onEdit }: WorkHeaderProps) {
   const navigate = useNavigate();
-  const { projectId, objectId } = useParams();
+  const { objectId } = useParams();
 
   return (
     <>
@@ -24,7 +24,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
             variant="ghost" 
             size="icon"
             className="flex-shrink-0"
-            onClick={() => navigate(`/projects/${projectId}/objects/${objectId}`)}
+            onClick={() => navigate(`/objects/${objectId}`)}
           >
             <Icon name="ChevronLeft" size={20} />
           </Button>
