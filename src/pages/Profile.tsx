@@ -108,15 +108,16 @@ const Profile = () => {
           </CardContent>
         </Card>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className={`grid w-full ${user?.role === 'client' ? 'grid-cols-2' : 'grid-cols-1'}`}>
-            <TabsTrigger value="objects" className="text-xs md:text-sm">Мои объекты</TabsTrigger>
-            {user?.role === 'client' && (
-              <TabsTrigger value="inspections" className="text-xs md:text-sm">Мои проверки</TabsTrigger>
-            )}
-          </TabsList>
+        {user?.role !== 'admin' && (
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList className={`grid w-full ${user?.role === 'client' ? 'grid-cols-2' : 'grid-cols-1'}`}>
+              <TabsTrigger value="objects" className="text-xs md:text-sm">Мои объекты</TabsTrigger>
+              {user?.role === 'client' && (
+                <TabsTrigger value="inspections" className="text-xs md:text-sm">Мои проверки</TabsTrigger>
+              )}
+            </TabsList>
 
-          <TabsContent value="objects" className="space-y-4">
+            <TabsContent value="objects" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {userObjects.map((obj) => (
                 <Card key={obj.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate(`/public/objects/${obj.id}`)}>
@@ -169,9 +170,8 @@ const Profile = () => {
               )}
             </TabsContent>
           )}
-
-
-        </Tabs>
+          </Tabs>
+        )}
       </div>
     </div>
   );

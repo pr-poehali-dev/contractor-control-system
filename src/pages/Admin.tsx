@@ -273,7 +273,7 @@ const Admin = () => {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8 pb-24 md:pb-10">
       <AdminHeader
         isInviteOpen={isInviteOpen}
         onInviteOpenChange={setIsInviteOpen}
