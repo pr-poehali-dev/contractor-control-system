@@ -102,38 +102,42 @@ const PublicObject = () => {
 
       <div className="container max-w-4xl mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 gap-2 h-auto bg-transparent p-0">
-            <TabsTrigger 
-              value="journal" 
-              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
-            >
-              Журнал работ
-            </TabsTrigger>
-            <TabsTrigger 
-              value="schedule"
-              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
-            >
-              График
-            </TabsTrigger>
-            <TabsTrigger 
-              value="analytics"
-              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
-            >
-              Аналитика
-            </TabsTrigger>
-            <TabsTrigger 
-              value="inspections"
-              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
-            >
-              Проверки
-            </TabsTrigger>
-            <TabsTrigger 
-              value="info"
-              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2 col-span-3 md:col-span-1"
-            >
-              Общая информация
-            </TabsTrigger>
-          </TabsList>
+          <div className="space-y-2">
+            <div className="grid grid-cols-3 gap-2">
+              <TabsTrigger 
+                value="journal" 
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
+              >
+                Журнал работ
+              </TabsTrigger>
+              <TabsTrigger 
+                value="schedule"
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
+              >
+                График
+              </TabsTrigger>
+              <TabsTrigger 
+                value="analytics"
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
+              >
+                Аналитика
+              </TabsTrigger>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <TabsTrigger 
+                value="inspections"
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
+              >
+                Проверки
+              </TabsTrigger>
+              <TabsTrigger 
+                value="info"
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
+              >
+                Общая информация
+              </TabsTrigger>
+            </div>
+          </div>
 
           <TabsContent value="info" className="space-y-6 mt-6">
             <div>
