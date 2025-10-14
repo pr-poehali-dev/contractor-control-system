@@ -18,26 +18,26 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
   return (
     <>
       {/* MOBILE: Compact header with back button */}
-      <div className="md:hidden bg-gradient-to-b from-white to-slate-50 border-b border-slate-200 px-3 py-3 overflow-x-hidden">
-        <div className="flex items-start gap-2.5 mb-3">
+      <div className="md:hidden bg-white border-b border-slate-200 px-2.5 py-2 overflow-x-hidden">
+        <div className="flex items-center gap-2 mb-2">
           <Button 
             variant="ghost" 
             size="icon"
-            className="flex-shrink-0 h-9 w-9 mt-0.5"
+            className="flex-shrink-0 h-8 w-8"
             onClick={() => navigate(`/objects/${objectId}`)}
           >
-            <Icon name="ChevronLeft" size={20} />
+            <Icon name="ChevronLeft" size={18} />
           </Button>
           
-          <div className="flex items-start gap-2.5 flex-1 min-w-0">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex-shrink-0 flex items-center justify-center shadow-sm">
-              <Icon name="Wrench" size={18} className="text-white" />
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex-shrink-0 flex items-center justify-center">
+              <Icon name="Wrench" size={15} className="text-white" />
             </div>
-            <div className="flex-1 min-w-0 pt-0.5">
+            <div className="flex-1 min-w-0">
               {organizationName && (
-                <div className="text-[11px] text-slate-500 mb-0.5 truncate font-medium">{organizationName}</div>
+                <div className="text-[10px] text-slate-500 truncate leading-tight">{organizationName}</div>
               )}
-              <h1 className="text-[15px] font-bold text-slate-900 leading-tight line-clamp-2">{selectedWorkData.title}</h1>
+              <h1 className="text-[13px] font-bold text-slate-900 leading-tight truncate">{selectedWorkData.title}</h1>
             </div>
           </div>
 
@@ -46,69 +46,69 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
               variant="ghost" 
               size="icon"
               onClick={onEdit}
-              className="h-9 w-9 flex-shrink-0 mt-0.5"
+              className="h-8 w-8 flex-shrink-0"
             >
-              <Icon name="Settings" size={18} />
+              <Icon name="Settings" size={16} />
             </Button>
           )}
         </div>
 
         {/* Mobile tabs */}
-        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-3 px-3 scrollbar-hide">
+        <div className="flex gap-1 overflow-x-auto pb-0.5 -mx-2.5 px-2.5 scrollbar-hide">
           <button
             onClick={() => setActiveTab('journal')}
-            className={`py-2 px-3.5 text-[12px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-1 rounded-xl min-w-[70px] ${
+            className={`py-1.5 px-3 text-[11px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-0.5 rounded-lg min-w-[60px] ${
               activeTab === 'journal'
-                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100 shadow-sm'
-                : 'text-slate-500 hover:bg-slate-50'
+                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100'
+                : 'text-slate-500'
             }`}
           >
-            <Icon name="MessageSquare" size={18} />
-            <span className="text-[10px]">Журнал</span>
+            <Icon name="MessageSquare" size={16} />
+            <span className="text-[9px]">Журнал</span>
           </button>
           <button
             onClick={() => setActiveTab('info')}
-            className={`py-2 px-3.5 text-[12px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-1 rounded-xl min-w-[70px] ${
+            className={`py-1.5 px-3 text-[11px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-0.5 rounded-lg min-w-[60px] ${
               activeTab === 'info'
-                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100 shadow-sm'
-                : 'text-slate-500 hover:bg-slate-50'
+                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100'
+                : 'text-slate-500'
             }`}
           >
-            <Icon name="Info" size={18} />
-            <span className="text-[10px]">Инфо</span>
+            <Icon name="Info" size={16} />
+            <span className="text-[9px]">Инфо</span>
           </button>
           <button
             onClick={() => setActiveTab('description')}
-            className={`py-2 px-3.5 text-[12px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-1 rounded-xl min-w-[70px] ${
+            className={`py-1.5 px-3 text-[11px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-0.5 rounded-lg min-w-[60px] ${
               activeTab === 'description'
-                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100 shadow-sm'
-                : 'text-slate-500 hover:bg-slate-50'
+                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100'
+                : 'text-slate-500'
             }`}
           >
-            <Icon name="FileText" size={18} />
-            <span className="text-[10px]">Докум.</span>
+            <Icon name="FileText" size={16} />
+            <span className="text-[9px]">Докум.</span>
           </button>
           <button
             onClick={() => setActiveTab('estimate')}
-            className={`py-2 px-3.5 text-[12px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-1 rounded-xl min-w-[70px] ${
+            className={`py-1.5 px-3 text-[11px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-0.5 rounded-lg min-w-[60px] ${
               activeTab === 'estimate'
-                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100 shadow-sm'
-                : 'text-slate-500 hover:bg-slate-50'
+                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100'
+                : 'text-slate-500'
             }`}
           >
-            <Icon name="Calculator" size={18} />
-            <span className="text-[10px]">Смета</span>
+            <Icon name="Calculator" size={16} />
+            <span className="text-[9px]">Смета</span>
           </button>
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`py-2 px-3.5 text-[12px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-1 rounded-xl min-w-[70px] ${
+            className={`py-1.5 px-3 text-[11px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-0.5 rounded-lg min-w-[60px] ${
               activeTab === 'analytics'
-                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100 shadow-sm'
-                : 'text-slate-500 hover:bg-slate-50'
+                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100'
+                : 'text-slate-500'
             }`}
           >
-            <Icon name="BarChart" size={18} />
-            <span className="text-[10px]">Данные</span>
+            <Icon name="BarChart" size={16} />
+            <span className="text-[9px]">Данные</span>
           </button>
         </div>
       </div>
