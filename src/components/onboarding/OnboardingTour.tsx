@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride';
-import { useNavigate } from 'react-router-dom';
+import Joyride, { CallBackProps, STATUS, Step, ACTIONS, EVENTS } from 'react-joyride';
 
 interface OnboardingTourProps {
   onComplete: () => void;
@@ -8,9 +7,15 @@ interface OnboardingTourProps {
 }
 
 const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
-  const navigate = useNavigate();
-  const [run, setRun] = useState(true);
-  const [stepIndex, setStepIndex] = useState(0);
+  const [run, setRun] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setRun(true);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   const steps: Step[] = [
     {
@@ -94,18 +99,20 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
   ];
 
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status, index, action } = data;
+    const { status, type, action } = data;
 
-    if (status === STATUS.FINISHED) {
+    if (([STATUS.FINISHED, STATUS.SKIPPED] as string[]).includes(status)) {
       setRun(false);
-      onComplete();
-    } else if (status === STATUS.SKIPPED) {
+      if (status === STATUS.FINISHED) {
+        onComplete();
+      } else {
+        onSkip();
+      }
+    }
+
+    if (type === EVENTS.STEP_AFTER && action === ACTIONS.CLOSE) {
       setRun(false);
       onSkip();
-    } else if (action === 'next') {
-      setStepIndex(index + 1);
-    } else if (action === 'prev') {
-      setStepIndex(index - 1);
     }
   };
 
@@ -113,10 +120,13 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
     <Joyride
       steps={steps}
       run={run}
-      stepIndex={stepIndex}
       continuous
       showProgress
       showSkipButton
+      scrollToFirstStep
+      disableOverlayClose
+      disableCloseOnEsc
+      spotlightClicks={false}
       callback={handleJoyrideCallback}
       styles={{
         options: {
@@ -149,6 +159,9 @@ const OnboardingTour = ({ onComplete, onSkip }: OnboardingTourProps) => {
         last: 'Завершить',
         next: 'Далее',
         skip: 'Пропустить тур',
+      }}
+      floaterProps={{
+        disableAnimation: false,
       }}
     />
   );
