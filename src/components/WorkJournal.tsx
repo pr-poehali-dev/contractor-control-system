@@ -175,7 +175,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                 selectedWorkData={selectedWorkData}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
-                organizationName={currentProject?.client_name}
+                organizationName={currentObject?.title}
                 userRole={userRole}
                 onEdit={() => handlers.handleEditClick(selectedWorkData)}
               />
