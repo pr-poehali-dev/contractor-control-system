@@ -38,11 +38,11 @@ export default function JournalTabContent({
 }: JournalTabContentProps) {
   return (
     <div className="flex flex-col flex-1 min-h-0 w-full overflow-x-hidden">
-      <div className="flex-1 overflow-y-auto p-3 md:p-8 lg:p-12 bg-slate-50 w-full">
+      <div className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-6 lg:p-8 bg-gradient-to-b from-slate-50 to-white w-full">
         {mockEvents.length === 0 ? (
           <NoJournalEntriesEmptyState />
         ) : (
-          <div className="max-w-7xl mx-auto space-y-10 pb-4 w-full">
+          <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8 pb-4 w-full px-1 sm:px-0">
             {mockEvents.map((event, index) => {
               const showDateSeparator = index === 0 || 
                 formatDate(mockEvents[index - 1].created_at) !== formatDate(event.created_at);
@@ -50,8 +50,8 @@ export default function JournalTabContent({
               return (
                 <div key={event.id}>
                   {showDateSeparator && (
-                    <div className="flex justify-center my-4">
-                      <div className="bg-slate-200 text-slate-600 text-xs px-3 py-1 rounded-full font-medium">
+                    <div className="flex justify-center my-3 sm:my-5">
+                      <div className="bg-gradient-to-r from-slate-100 to-slate-200 text-slate-700 text-[11px] sm:text-xs px-4 py-1.5 rounded-full font-medium shadow-sm">
                         {formatDate(event.created_at)}
                       </div>
                     </div>
