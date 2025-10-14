@@ -50,7 +50,7 @@ export default function ObjectsDesktopHeader({
             <p className="text-lg text-slate-600">Управление строительными объектами</p>
           </div>
           {!isContractor && (
-            <Button size="lg" onClick={onCreateClick}>
+            <Button size="lg" onClick={onCreateClick} data-tour="create-object-btn">
               <Icon name="Plus" size={20} className="mr-2" />
               Добавить объект
             </Button>

@@ -14,6 +14,7 @@ interface User {
   email?: string;
   phone?: string;
   organization?: string;
+  created_at?: string;
 }
 
 interface UserData {

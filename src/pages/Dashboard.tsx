@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { api } from '@/lib/api';
 import Icon from '@/components/ui/icon';
-import OnboardingBanner from '@/components/OnboardingBanner';
+import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
 import FeedFilters from '@/components/dashboard/FeedFilters';
 import FeedEventCard from '@/components/dashboard/FeedEventCard';
 import CreateActionButton from '@/components/dashboard/CreateActionButton';
@@ -37,7 +37,6 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { user, userData, loadUserData, token } = useAuth();
   const { toast } = useToast();
-  const [showOnboarding, setShowOnboarding] = useState(false);
   const [feed, setFeed] = useState<FeedEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'work_logs' | 'inspections' | 'info_posts'>('all');
@@ -72,21 +71,6 @@ const Dashboard = () => {
   const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
 
   useEffect(() => {
-    if (!user) return;
-
-    const checkOnboarding = () => {
-      if (user.id === 3 && objects.length === 0) {
-        const hasSeenOnboarding = localStorage.getItem(`onboarding_${user.id}`);
-        if (!hasSeenOnboarding) {
-          setShowOnboarding(true);
-        }
-      }
-    };
-
-    checkOnboarding();
-  }, [user, objects.length]);
-
-  useEffect(() => {
     loadFeed();
   }, [user]);
 
@@ -117,10 +101,6 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-
-  if (showOnboarding && user?.id === 3) {
-    return <OnboardingBanner onClose={() => setShowOnboarding(false)} />;
-  }
 
   const handleEventClick = (event: FeedEvent) => {
     if (event.type === 'info_post') return;
@@ -262,22 +242,31 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-10 bg-slate-50 min-h-screen">
-      <div className="max-w-[680px] lg:max-w-[900px] mx-auto">
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
-              Лента событий
-            </h1>
+    <>
+      {user && (
+        <OnboardingFlow 
+          userId={user.id} 
+          userRole={user.role}
+          registrationDate={user.created_at}
+        />
+      )}
+      
+      <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-10 bg-slate-50 min-h-screen">
+        <div className="max-w-[680px] lg:max-w-[900px] mx-auto">
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+                Лента событий
+              </h1>
 
-            <CreateActionButton
-              userRole={user?.role}
-              onCreateJournal={() => setShowJournalModal(true)}
-              onCreateInspection={() => setShowInspectionModal(true)}
-              onCreateInfoPost={() => setShowInfoPostModal(true)}
-            />
+              <CreateActionButton
+                userRole={user?.role}
+                onCreateJournal={() => setShowJournalModal(true)}
+                onCreateInspection={() => setShowInspectionModal(true)}
+                onCreateInfoPost={() => setShowInfoPostModal(true)}
+              />
+            </div>
           </div>
-        </div>
 
         <div className="space-y-4">
             <FeedFilters filter={filter} onFilterChange={setFilter} />
@@ -357,7 +346,8 @@ const Dashboard = () => {
         onFormChange={setInfoPostForm}
         onSubmit={handleCreateInfoPost}
       />
-    </div>
+      </div>
+    </>
   );
 };
 

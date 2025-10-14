@@ -70,6 +70,7 @@ export default function TopNavigation() {
                 key={item.id}
                 variant="ghost"
                 onClick={() => navigate(item.path)}
+                data-tour={`${item.id}-tab`}
                 className={cn(
                   'relative h-12 px-3 md:px-4 gap-2',
                   isActive && 'text-blue-600 bg-blue-50'
