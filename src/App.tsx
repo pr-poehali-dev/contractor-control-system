@@ -71,6 +71,8 @@ const App = () => (
             <Route path="/objects/:objectId" element={<ProtectedRoute><ObjectDetail /></ProtectedRoute>} />
             <Route path="/objects/:objectId/works/create" element={<ProtectedRoute><CreateWork /></ProtectedRoute>} />
             <Route path="/objects/:objectId/works/:workId" element={<ProtectedRoute><WorkDetail /></ProtectedRoute>} />
+            <Route path="/projects/:projectId/objects/:objectId/works/:workId" element={<Navigate to="/objects/:objectId/works/:workId" replace />} />
+            <Route path="/projects/:projectId/objects/:objectId" element={<Navigate to="/objects/:objectId" replace />} />
             <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
             <Route path="/my-works" element={<ProtectedRoute><MyWorks /></ProtectedRoute>} />
             <Route path="/work-log" element={<ProtectedRoute><WorkLog /></ProtectedRoute>} />

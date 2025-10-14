@@ -5,7 +5,7 @@ import Icon from '@/components/ui/icon';
 import WorkJournal from '@/components/WorkJournal';
 
 const WorkDetail = () => {
-  const { projectId, objectId, workId } = useParams();
+  const { objectId, workId } = useParams();
   const navigate = useNavigate();
   const { userData, isLoading } = useAuth();
 
@@ -37,7 +37,7 @@ const WorkDetail = () => {
   if (!work) {
     return (
       <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-        <Button variant="ghost" onClick={() => navigate(`/projects/${projectId}/objects/${objectId}`)}>
+        <Button variant="ghost" onClick={() => navigate(`/objects/${objectId}`)}>
           <Icon name="ChevronLeft" size={20} className="mr-2" />
           К объекту
         </Button>

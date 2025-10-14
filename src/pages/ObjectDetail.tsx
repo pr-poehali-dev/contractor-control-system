@@ -16,42 +16,38 @@ import {
 } from "@/components/ui/select";
 
 const ObjectDetail = () => {
-  const { projectId, objectId } = useParams();
+  const { objectId } = useParams();
   const navigate = useNavigate();
   const { user, token, userData, setUserData } = useAuth();
   const { toast } = useToast();
   const [showActions, setShowActions] = useState(false);
   const [sortBy, setSortBy] = useState<string>('priority');
 
-  const sites = userData?.sites || [];
+  const objects = userData?.objects || [];
   const works = userData?.works || [];
-  const projects = userData?.projects || [];
 
-  const site = sites.find(s => s.id === Number(objectId));
-  const project = projects.find(p => p.id === Number(projectId));
-  let siteWorks = works.filter(w => w.object_id === Number(objectId));
+  const object = objects.find(s => s.id === Number(objectId));
+  let objectWorks = works.filter(w => w.object_id === Number(objectId));
 
   if (sortBy === 'priority') {
-    siteWorks = [...siteWorks].sort((a, b) => {
+    objectWorks = [...objectWorks].sort((a, b) => {
       const priorityOrder = { pending: 0, active: 1, completed: 2, on_hold: 3 };
       return (priorityOrder[a.status] || 99) - (priorityOrder[b.status] || 99);
     });
   } else if (sortBy === 'name') {
-    siteWorks = [...siteWorks].sort((a, b) => a.title.localeCompare(b.title));
+    objectWorks = [...objectWorks].sort((a, b) => a.title.localeCompare(b.title));
   }
 
-  // На десктопе автоматически редиректим ДО первого рендера
   const [hasRedirected, setHasRedirected] = useState(false);
   
   useEffect(() => {
-    if (!hasRedirected && siteWorks.length > 0 && window.innerWidth >= 768) {
+    if (!hasRedirected && objectWorks.length > 0 && window.innerWidth >= 768) {
       setHasRedirected(true);
-      navigate(`/projects/${projectId}/objects/${objectId}/works/${siteWorks[0].id}`, { replace: true });
+      navigate(`/objects/${objectId}/works/${objectWorks[0].id}`, { replace: true });
     }
-  }, [siteWorks.length, projectId, objectId, navigate, hasRedirected]);
+  }, [objectWorks.length, objectId, navigate, hasRedirected]);
   
-  // Показываем загрузку на десктопе пока редиректим
-  if (!hasRedirected && siteWorks.length > 0 && window.innerWidth >= 768) {
+  if (!hasRedirected && objectWorks.length > 0 && window.innerWidth >= 768) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
@@ -62,10 +58,10 @@ const ObjectDetail = () => {
     );
   }
 
-  if (!site) {
+  if (!object) {
     return (
       <div className="min-h-screen bg-slate-50 p-4">
-        <Button variant="ghost" size="sm" onClick={() => navigate(`/projects/${projectId}`)}>
+        <Button variant="ghost" size="sm" onClick={() => navigate('/objects')}>
           <Icon name="ChevronLeft" size={20} className="mr-2" />
           Назад
         </Button>
@@ -85,13 +81,13 @@ const ObjectDetail = () => {
     if (!user) return;
     
     try {
-      await api.deleteItem(token!, 'object', site.id);
+      await api.deleteItem(token!, 'object', object.id);
       if (token) {
         const refreshed = await api.getUserData(token);
         setUserData(refreshed);
       }
       toast({ title: 'Объект удалён' });
-      navigate(`/projects/${projectId}`);
+      navigate('/objects');
     } catch (error) {
       toast({ 
         title: 'Ошибка', 
@@ -103,7 +99,6 @@ const ObjectDetail = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* MOBILE: Compact header */}
       <div className="md:hidden sticky top-0 z-10 bg-white border-b border-slate-200 p-4">
         <div className="flex items-center gap-3 mb-3">
           <Button 
@@ -120,7 +115,7 @@ const ObjectDetail = () => {
               <Icon name="Building2" size={24} className="text-blue-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <h1 className="text-lg font-bold text-slate-900 truncate">{site.title}</h1>
+              <h1 className="text-lg font-bold text-slate-900 truncate">{object.title}</h1>
             </div>
           </div>
 
@@ -146,7 +141,6 @@ const ObjectDetail = () => {
           </div>
         )}
 
-        {/* Mobile filters */}
         <div className="mt-3 space-y-2">
           <Select value="all" onValueChange={() => {}}>
             <SelectTrigger className="w-full h-10">
@@ -171,7 +165,6 @@ const ObjectDetail = () => {
         </div>
       </div>
 
-      {/* DESKTOP: Original header */}
       <div className="hidden md:block sticky top-0 z-10 bg-white border-b border-slate-200 px-4 md:px-6 py-3">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3 min-w-0 flex-1">
@@ -179,17 +172,19 @@ const ObjectDetail = () => {
               variant="ghost" 
               size="icon"
               className="flex-shrink-0 mt-0.5"
-              onClick={() => navigate(`/projects/${projectId}`)}
+              onClick={() => navigate('/objects')}
             >
               <Icon name="ChevronLeft" size={24} />
             </Button>
             
             <div className="min-w-0 flex-1">
-              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-slate-900 mb-1">{site.title}</h1>
-              <div className="flex items-center gap-2 text-sm text-slate-600">
-                <Icon name="MapPin" size={16} />
-                <span className="truncate">{site.address}</span>
-              </div>
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-slate-900 mb-1">{object.title}</h1>
+              {object.address && (
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <Icon name="MapPin" size={16} />
+                  <span className="truncate">{object.address}</span>
+                </div>
+              )}
             </div>
           </div>
           
@@ -218,9 +213,8 @@ const ObjectDetail = () => {
         )}
       </div>
 
-      {/* MOBILE: Work list cards */}
       <div className="md:hidden pb-24">
-        {siteWorks.length === 0 ? (
+        {objectWorks.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-96 px-4">
             <Icon name="Briefcase" size={48} className="text-slate-300 mb-4" />
             <h3 className="text-lg font-semibold text-slate-900 mb-2">
@@ -229,7 +223,7 @@ const ObjectDetail = () => {
             <p className="text-sm text-slate-600 mb-6 text-center max-w-md">
               Создайте первую работу для этого объекта
             </p>
-            <Button onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}>
+            <Button onClick={() => navigate(`/objects/${objectId}/works/create`)}>
               <Icon name="Plus" size={18} className="mr-2" />
               Создать работу
             </Button>
@@ -237,11 +231,11 @@ const ObjectDetail = () => {
         ) : (
           <>
             <div className="divide-y divide-slate-100">
-              {siteWorks.map((work) => (
+              {objectWorks.map((work) => (
                 <div
                   key={work.id}
                   className="bg-white p-4 active:bg-slate-50 transition-colors cursor-pointer"
-                  onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/${work.id}`)}
+                  onClick={() => navigate(`/objects/${objectId}/works/${work.id}`)}
                 >
                   <div className="flex gap-3">
                     <div className="flex-shrink-0 w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
@@ -283,12 +277,11 @@ const ObjectDetail = () => {
               ))}
             </div>
 
-            {/* FAB button */}
             {(user?.role === 'client' || user?.role === 'admin') && (
               <Button
                 size="lg"
                 className="fixed bottom-20 right-4 h-14 w-14 rounded-full shadow-lg z-20"
-                onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}
+                onClick={() => navigate(`/objects/${objectId}/works/create`)}
               >
                 <Icon name="Plus" size={24} />
               </Button>
@@ -297,24 +290,23 @@ const ObjectDetail = () => {
         )}
       </div>
 
-      {/* DESKTOP: Original work cards */}
       <div className="hidden md:block p-4 md:p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold text-slate-900">Работы</h2>
             <p className="text-sm text-slate-500 mt-1">
-              {site.title} • {siteWorks.length} {siteWorks.length === 1 ? 'работа' : siteWorks.length < 5 ? 'работы' : 'работ'}
+              {object.title} • {objectWorks.length} {objectWorks.length === 1 ? 'работа' : objectWorks.length < 5 ? 'работы' : 'работ'}
             </p>
           </div>
-          {siteWorks.length > 0 && (
-            <Button onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}>
+          {objectWorks.length > 0 && (
+            <Button onClick={() => navigate(`/objects/${objectId}/works/create`)}>
               <Icon name="Plus" size={18} className="mr-2" />
               Добавить
             </Button>
           )}
         </div>
 
-        {siteWorks.length === 0 ? (
+        {objectWorks.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Icon name="Briefcase" size={48} className="text-slate-300 mb-4" />
@@ -324,7 +316,7 @@ const ObjectDetail = () => {
               <p className="text-sm text-slate-600 mb-6 text-center max-w-md">
                 Создайте первую работу для этого объекта, чтобы начать отслеживать прогресс
               </p>
-              <Button onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}>
+              <Button onClick={() => navigate(`/objects/${objectId}/works/create`)}>
                 <Icon name="Plus" size={18} className="mr-2" />
                 Создать работу
               </Button>
@@ -332,11 +324,11 @@ const ObjectDetail = () => {
           </Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {siteWorks.map((work) => (
+            {objectWorks.map((work) => (
               <Card 
                 key={work.id}
                 className="cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/${work.id}`)}
+                onClick={() => navigate(`/objects/${objectId}/works/${work.id}`)}
               >
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -368,13 +360,12 @@ const ObjectDetail = () => {
         )}
       </div>
 
-      {/* Floating action button for mobile */}
-      {siteWorks.length > 0 && (
+      {objectWorks.length > 0 && (
         <div className="md:hidden fixed bottom-20 right-4 z-20">
           <Button
             size="lg"
             className="h-14 w-14 rounded-full shadow-lg"
-            onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}
+            onClick={() => navigate(`/objects/${objectId}/works/create`)}
           >
             <Icon name="Plus" size={24} />
           </Button>

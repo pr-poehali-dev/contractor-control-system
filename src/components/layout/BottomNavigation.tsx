@@ -13,9 +13,8 @@ interface NavItem {
 }
 
 const mobileNavItems: NavItem[] = [
-  { id: 'dashboard', label: 'Лента событий', icon: 'Home', path: '/dashboard', roles: ['client', 'contractor', 'admin'] },
-  { id: 'projects', label: 'Проекты', icon: 'Folder', path: '/projects', roles: ['client', 'admin'] },
-  { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects', roles: ['contractor'] },
+  { id: 'dashboard', label: 'Главная', icon: 'Home', path: '/dashboard' },
+  { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects' },
   { id: 'defects', label: 'Задачи', icon: 'ListTodo', path: '/defects' },
 ];
 
@@ -33,7 +32,7 @@ export default function BottomNavigation() {
       <div className="grid h-16" style={{ gridTemplateColumns: `repeat(${visibleNavItems.length}, 1fr)` }}>
         {visibleNavItems.map((item) => {
           const isActive = location.pathname === item.path || 
-            (item.path === '/objects' && location.pathname.startsWith('/projects'));
+            (item.path === '/objects' && location.pathname.startsWith('/objects'));
 
           return (
             <Button
