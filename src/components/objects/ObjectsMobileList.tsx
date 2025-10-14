@@ -5,7 +5,7 @@ interface SiteData {
   id: number;
   title: string;
   status: string;
-  projectName: string;
+  address?: string;
   worksCount: number;
   completedWorks: number;
 }
@@ -45,9 +45,11 @@ export default function ObjectsMobileList({
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-base text-slate-900 mb-1">{site.title}</h3>
-              <p className="text-sm text-slate-500 mb-2">
-                {site.projectName}
-              </p>
+              {site.address && (
+                <p className="text-sm text-slate-500 mb-2">
+                  {site.address}
+                </p>
+              )}
               <div className="flex items-center gap-2 text-xs">
                 <Badge className={
                   site.status === 'active' ? 'bg-yellow-100 text-yellow-700' :

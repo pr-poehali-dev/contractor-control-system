@@ -14,20 +14,14 @@ export interface User {
   organization?: string;
 }
 
-export interface Project {
+export interface Object {
   id: number;
   title: string;
-  description: string;
-  status: 'active' | 'completed' | 'pending' | 'archived';
+  address?: string;
+  description?: string;
+  status: 'planning' | 'active' | 'completed' | 'on_hold';
   created_at: string;
-}
-
-export interface Site {
-  id: number;
-  title: string;
-  address: string;
-  project_id: number;
-  status: 'active' | 'completed' | 'pending' | 'archived';
+  owner_id: number;
 }
 
 export interface Work {
@@ -96,8 +90,7 @@ export interface Contractor {
 }
 
 export interface UserData {
-  projects: Project[];
-  sites: Site[];
+  objects: Object[];
   works: Work[];
   inspections: Inspection[];
   checkpoints: InspectionCheckpoint[];

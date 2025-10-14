@@ -9,7 +9,7 @@ const Activity = () => {
   const inspections = userData?.inspections || [];
   const remarks = userData?.remarks || [];
   const works = userData?.works || [];
-  const sites = userData?.sites || [];
+  const objects = userData?.objects || [];
 
   const allActivity = [
     ...workLogs.map(log => ({

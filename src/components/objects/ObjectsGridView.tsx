@@ -24,7 +24,6 @@ interface SiteData {
   title: string;
   status: string;
   address: string;
-  projectName: string;
   worksCount: number;
   completedWorks: number;
   progress: number;
@@ -90,11 +89,6 @@ export default function ObjectsGridView({
             <div className="flex items-center gap-2 text-sm text-slate-600 mb-4">
               <Icon name="MapPin" size={16} />
               <span className="truncate">{site.address}</span>
-            </div>
-
-            <div className="flex items-center gap-2 text-sm text-slate-500 mb-4">
-              <Icon name="Folder" size={16} />
-              <span className="truncate">{site.projectName}</span>
             </div>
 
             {userRole === 'client' && site.works[0]?.contractor_name && (

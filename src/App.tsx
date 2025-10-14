@@ -9,9 +9,7 @@ import Layout from "./components/Layout";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import Projects from "./pages/Projects";
 import Objects from "./pages/Objects";
-import ProjectDetail from "./pages/ProjectDetail";
 import ObjectDetail from "./pages/ObjectDetail";
 import WorkDetail from "./pages/WorkDetail";
 import Activity from "./pages/Activity";
@@ -25,14 +23,11 @@ import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import JournalEntryDetail from "./pages/JournalEntryDetail";
 import InspectionDetail from "./pages/InspectionDetail";
-import CreateProject from "./pages/CreateProject";
 import CreateObject from "./pages/CreateObject";
 import CreateWork from "./pages/CreateWork";
 import WorkTemplates from "./pages/WorkTemplates";
 import Admin from "./pages/Admin";
 import Pricing from "./pages/Pricing";
-import PublicProject from "./pages/PublicProject";
-import PublicObject from "./pages/PublicObject";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -71,8 +66,6 @@ const App = () => (
             <Route path="/objects/:objectId" element={<ProtectedRoute><ObjectDetail /></ProtectedRoute>} />
             <Route path="/objects/:objectId/works/create" element={<ProtectedRoute><CreateWork /></ProtectedRoute>} />
             <Route path="/objects/:objectId/works/:workId" element={<ProtectedRoute><WorkDetail /></ProtectedRoute>} />
-            <Route path="/projects/:projectId/objects/:objectId/works/:workId" element={<Navigate to="/objects/:objectId/works/:workId" replace />} />
-            <Route path="/projects/:projectId/objects/:objectId" element={<Navigate to="/objects/:objectId" replace />} />
             <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
             <Route path="/my-works" element={<ProtectedRoute><MyWorks /></ProtectedRoute>} />
             <Route path="/work-log" element={<ProtectedRoute><WorkLog /></ProtectedRoute>} />
@@ -87,7 +80,6 @@ const App = () => (
             <Route path="/work-templates" element={<ProtectedRoute><WorkTemplates /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="/pricing" element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
-            <Route path="/public/object/:objectId" element={<ProtectedRoute><PublicObject /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

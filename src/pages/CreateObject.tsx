@@ -10,7 +10,6 @@ import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 
 const CreateObject = () => {
-  const { projectId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, token, setUserData } = useAuth();
@@ -38,16 +37,16 @@ const CreateObject = () => {
       return;
     }
 
-    if (!user || !projectId) return;
+    if (!user) return;
 
     setIsSubmitting(true);
 
     try {
       await api.createItem(token!, 'object', {
-        project_id: Number(projectId),
         title: formData.title,
         address: formData.address,
-        status: 'active',
+        status: 'planning',
+        owner_id: user.id,
       });
 
       if (token) {
@@ -61,7 +60,7 @@ const CreateObject = () => {
       });
 
       setTimeout(() => {
-        navigate(`/projects/${projectId}`);
+        navigate('/objects');
       }, 300);
     } catch (error) {
       toast({
@@ -78,10 +77,10 @@ const CreateObject = () => {
       <Button 
         variant="ghost" 
         className="mb-6"
-        onClick={() => navigate(`/projects/${projectId}`)}
+        onClick={() => navigate('/objects')}
       >
         <Icon name="ChevronLeft" size={20} className="mr-2" />
-        К проекту
+        Назад
       </Button>
 
       <div className="mb-8">
@@ -216,7 +215,7 @@ const CreateObject = () => {
             type="button" 
             variant="outline" 
             size="lg"
-            onClick={() => navigate(`/projects/${projectId}`)}
+            onClick={() => navigate('/objects')}
             disabled={isSubmitting}
           >
             Отмена

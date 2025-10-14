@@ -20,7 +20,6 @@ interface SiteData {
   title: string;
   status: string;
   address: string;
-  projectName: string;
   worksCount: number;
   completedWorks: number;
   progress: number;
@@ -48,7 +47,6 @@ export default function ObjectsTableView({
               <tr>
                 <th className="text-left p-4 text-sm font-semibold text-slate-700">Объект</th>
                 <th className="text-left p-4 text-sm font-semibold text-slate-700">Адрес</th>
-                <th className="text-left p-4 text-sm font-semibold text-slate-700">Проект</th>
                 <th className="text-left p-4 text-sm font-semibold text-slate-700">Статус</th>
                 <th className="text-left p-4 text-sm font-semibold text-slate-700">Прогресс</th>
                 <th className="text-right p-4 text-sm font-semibold text-slate-700">Работы</th>
@@ -68,7 +66,6 @@ export default function ObjectsTableView({
                     <p className="font-semibold text-slate-900">{site.title}</p>
                   </td>
                   <td className="p-4 text-sm text-slate-600">{site.address}</td>
-                  <td className="p-4 text-sm text-slate-600">{site.projectName}</td>
                   <td className="p-4">
                     <Badge className={
                       site.status === 'active' ? 'bg-green-100 text-green-700' :

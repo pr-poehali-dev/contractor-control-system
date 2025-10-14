@@ -35,11 +35,9 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
   const works = (userData?.works || []).filter(w => w.object_id === objectId);
   const workLogs = userData?.workLogs || [];
   const inspections = userData?.inspections || [];
-  const sites = userData?.sites || [];
-  const projects = userData?.projects || [];
+  const objects = userData?.objects || [];
   
-  const currentSite = sites.find(s => s.id === objectId);
-  const currentProject = currentSite ? projects.find(p => p.id === currentSite.project_id) : null;
+  const currentObject = objects.find(o => o.id === objectId);
 
   const selectedWork = selectedWorkId || works[0]?.id || null;
   

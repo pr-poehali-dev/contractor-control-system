@@ -12,16 +12,14 @@ const Defects = () => {
   const remarks = userData?.remarks || [];
   const inspections = userData?.inspections || [];
   const works = userData?.works || [];
-  const sites = userData?.sites || [];
-  const projects = userData?.projects || [];
+  const objects = userData?.objects || [];
 
   const remarksWithContext = remarks.map(remark => {
     const inspection = inspections.find(i => i.id === remark.inspection_id);
     const work = works.find(w => w.id === inspection?.work_id);
-    const site = sites.find(s => s.id === work?.object_id);
-    const project = projects.find(p => p.id === site?.project_id);
+    const object = objects.find(o => o.id === work?.object_id);
 
-    return { ...remark, inspection, work, site, project };
+    return { ...remark, inspection, work, object };
   });
 
   const filteredRemarks = remarksWithContext.filter(r => {
@@ -119,10 +117,10 @@ const Defects = () => {
                       <span><strong>Работа:</strong> {remark.work.title}</span>
                     </div>
                   )}
-                  {remark.site && (
+                  {remark.object && (
                     <div className="flex gap-2">
                       <Icon name="MapPin" size={16} />
-                      <span>{remark.site.title}</span>
+                      <span>{remark.object.title}</span>
                     </div>
                   )}
                   <div className="flex gap-2 text-slate-500 text-xs pt-2 border-t">
