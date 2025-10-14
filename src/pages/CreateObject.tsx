@@ -45,8 +45,7 @@ const CreateObject = () => {
       await api.createItem(token!, 'object', {
         title: formData.title,
         address: formData.address,
-        status: 'planning',
-        owner_id: user.id,
+        status: 'active',
       });
 
       if (token) {
