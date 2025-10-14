@@ -1,9 +1,14 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { X } from 'lucide-react';
 
 interface FeedFiltersProps {
   filter: 'all' | 'work_logs' | 'inspections' | 'info_posts';
   onFilterChange: (filter: 'all' | 'work_logs' | 'inspections' | 'info_posts') => void;
+  selectedTags: string[];
+  onTagsChange: (tags: string[]) => void;
+  availableTags: Array<{ id: string; label: string; type: 'object' | 'work' }>;
 }
 
 const filterOptions = [
@@ -13,31 +18,71 @@ const filterOptions = [
   { value: 'info_posts', label: 'Инфо', icon: 'Bell' },
 ];
 
-const FeedFilters = ({ filter, onFilterChange }: FeedFiltersProps) => {
-  const currentFilter = filterOptions.find(f => f.value === filter);
+const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, availableTags }: FeedFiltersProps) => {
+  const toggleTag = (tagId: string) => {
+    if (selectedTags.includes(tagId)) {
+      onTagsChange(selectedTags.filter(t => t !== tagId));
+    } else {
+      onTagsChange([...selectedTags, tagId]);
+    }
+  };
+
+  const clearAllTags = () => {
+    onTagsChange([]);
+  };
 
   return (
-    <div className="mb-4">
-      <Select value={filter} onValueChange={(val) => onFilterChange(val as any)}>
-        <SelectTrigger className="w-full sm:w-[200px] bg-white">
-          <SelectValue>
-            <div className="flex items-center gap-2">
-              <Icon name={currentFilter?.icon as any} size={16} />
-              <span className="font-medium">{currentFilter?.label}</span>
-            </div>
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent>
-          {filterOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              <div className="flex items-center gap-2">
-                <Icon name={option.icon as any} size={16} />
-                <span>{option.label}</span>
-              </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div className="space-y-3">
+      <div className="flex flex-wrap gap-2">
+        {filterOptions.map((option) => (
+          <Button
+            key={option.value}
+            variant={filter === option.value ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => onFilterChange(option.value as any)}
+            className="h-9"
+          >
+            <Icon name={option.icon as any} size={16} className="mr-1.5" />
+            {option.label}
+          </Button>
+        ))}
+      </div>
+
+      {availableTags.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium text-slate-600">Фильтр по тегам:</p>
+            {selectedTags.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearAllTags}
+                className="h-6 px-2 text-xs"
+              >
+                <X size={12} className="mr-1" />
+                Очистить
+              </Button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {availableTags.map((tag) => (
+              <Badge
+                key={tag.id}
+                variant={selectedTags.includes(tag.id) ? 'default' : 'outline'}
+                className="cursor-pointer hover:bg-slate-100 transition-colors"
+                onClick={() => toggleTag(tag.id)}
+              >
+                <Icon 
+                  name={tag.type === 'object' ? 'Building2' : 'Wrench'} 
+                  size={12} 
+                  className="mr-1" 
+                />
+                {tag.label}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

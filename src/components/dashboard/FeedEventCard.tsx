@@ -36,6 +36,7 @@ interface FeedEventCardProps {
   index: number;
   onClick: (event: FeedEvent) => void;
   onStartInspection?: (event: FeedEvent) => void;
+  onTagClick?: (tagId: string, tagType: 'object' | 'work') => void;
   userRole?: 'client' | 'contractor' | 'admin';
 }
 
@@ -77,7 +78,17 @@ const formatTimeAgo = (timestamp: string) => {
   }
 };
 
-const FeedEventCard = ({ event, index, onStartInspection, userRole }: FeedEventCardProps) => {
+const getEventBgColor = (type: string) => {
+  switch(type) {
+    case 'work_log': return 'bg-blue-50/50';
+    case 'inspection': return 'bg-purple-50/50';
+    case 'planned_inspection': return 'bg-purple-50/50';
+    case 'info_post': return 'bg-orange-50/50';
+    default: return 'bg-white';
+  }
+};
+
+const FeedEventCard = ({ event, index, onStartInspection, onTagClick, userRole }: FeedEventCardProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
   const photos = event.photoUrls || [];
@@ -109,7 +120,7 @@ const FeedEventCard = ({ event, index, onStartInspection, userRole }: FeedEventC
   return (
     <>
     <Card 
-      className="overflow-hidden hover:shadow-md transition-shadow animate-fade-in"
+      className={`overflow-hidden hover:shadow-md transition-shadow animate-fade-in ${getEventBgColor(event.type)}`}
       style={{ animationDelay: `${index * 0.05}s` }}
     >
       <div className="p-4 sm:p-5">
@@ -148,16 +159,36 @@ const FeedEventCard = ({ event, index, onStartInspection, userRole }: FeedEventC
           </div>
         </div>
 
-        {event.type !== 'info_post' && (event.objectTitle || event.projectTitle) && (
+        {event.type !== 'info_post' && (event.objectTitle || event.workTitle) && (
           <div className="mb-3 flex gap-2 flex-wrap">
-            {event.projectTitle && (
-              <Badge variant="outline" className="text-xs px-2.5 py-1 font-normal bg-blue-50 text-blue-700 border-blue-200">
-                {event.projectTitle}
+            {event.objectTitle && (
+              <Badge 
+                variant="outline" 
+                className="text-xs px-2.5 py-1 font-normal cursor-pointer hover:bg-slate-100 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (event.objectId && onTagClick) {
+                    onTagClick(`object-${event.objectId}`, 'object');
+                  }
+                }}
+              >
+                <Icon name="Building2" size={12} className="mr-1" />
+                {event.objectTitle}
               </Badge>
             )}
-            {event.objectTitle && (
-              <Badge variant="outline" className="text-xs px-2.5 py-1 font-normal">
-                {event.objectTitle}
+            {event.workTitle && (
+              <Badge 
+                variant="outline" 
+                className="text-xs px-2.5 py-1 font-normal cursor-pointer hover:bg-slate-100 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (event.workId && onTagClick) {
+                    onTagClick(`work-${event.workId}`, 'work');
+                  }
+                }}
+              >
+                <Icon name="Wrench" size={12} className="mr-1" />
+                {event.workTitle}
               </Badge>
             )}
           </div>

@@ -34,6 +34,16 @@ interface FeedEvent {
   scheduledDate?: string;
 }
 
+interface ObjectData {
+  id: number;
+  title: string;
+}
+
+interface WorkData {
+  id: number;
+  title: string;
+}
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, userData, loadUserData, token } = useAuth();
@@ -41,6 +51,7 @@ const Dashboard = () => {
   const [feed, setFeed] = useState<FeedEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'work_logs' | 'inspections' | 'info_posts'>('all');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const [showJournalModal, setShowJournalModal] = useState(false);
   const [showInspectionModal, setShowInspectionModal] = useState(false);
@@ -113,14 +124,41 @@ const Dashboard = () => {
     }
   };
 
-  const filteredFeed = filter === 'all' 
-    ? feed 
-    : feed.filter(event => {
-        if (filter === 'work_logs') return event.type === 'work_log';
-        if (filter === 'inspections') return event.type === 'inspection' || event.type === 'planned_inspection';
-        if (filter === 'info_posts') return event.type === 'info_post';
-        return true;
-      });
+  const availableTags = [
+    ...objects.map(obj => ({ 
+      id: `object-${obj.id}`, 
+      label: obj.title, 
+      type: 'object' as const 
+    })),
+    ...works.map(work => ({ 
+      id: `work-${work.id}`, 
+      label: work.title, 
+      type: 'work' as const 
+    }))
+  ];
+
+  const filteredFeed = feed.filter(event => {
+    const typeMatch = filter === 'all' || 
+      (filter === 'work_logs' && event.type === 'work_log') ||
+      (filter === 'inspections' && (event.type === 'inspection' || event.type === 'planned_inspection')) ||
+      (filter === 'info_posts' && event.type === 'info_post');
+
+    if (!typeMatch) return false;
+
+    if (selectedTags.length === 0) return true;
+
+    return selectedTags.some(tag => {
+      if (tag.startsWith('object-')) {
+        const objectId = parseInt(tag.replace('object-', ''));
+        return event.objectId === objectId;
+      }
+      if (tag.startsWith('work-')) {
+        const workId = parseInt(tag.replace('work-', ''));
+        return event.workId === workId;
+      }
+      return false;
+    });
+  });
 
   const handleCreateJournalEntry = async () => {
     if (!journalForm.objectId || !journalForm.workId || !journalForm.description) {
@@ -270,7 +308,13 @@ const Dashboard = () => {
           </div>
 
         <div className="space-y-4">
-            <FeedFilters filter={filter} onFilterChange={setFilter} />
+            <FeedFilters 
+              filter={filter} 
+              onFilterChange={setFilter}
+              selectedTags={selectedTags}
+              onTagsChange={setSelectedTags}
+              availableTags={availableTags}
+            />
 
             <div className="space-y-4">
               {loading ? (
@@ -306,6 +350,11 @@ const Dashboard = () => {
                     index={index}
                     onClick={handleEventClick}
                     userRole={user?.role}
+                    onTagClick={(tagId, tagType) => {
+                      if (!selectedTags.includes(tagId)) {
+                        setSelectedTags([...selectedTags, tagId]);
+                      }
+                    }}
                     onStartInspection={(event) => {
                       if (event.workId && event.objectId) {
                         navigate(`/objects/${event.objectId}`, {
