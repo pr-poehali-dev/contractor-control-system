@@ -102,7 +102,7 @@ const PublicObject = () => {
 
       <div className="container max-w-4xl mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="h-auto bg-transparent p-0 w-full">
+          <TabsList className="h-auto bg-white p-0 w-full sticky top-0 z-10 pb-3 pt-1 shadow-sm">
             <div className="space-y-2 w-full">
               <div className="grid grid-cols-3 gap-2">
                 <TabsTrigger 
