@@ -36,7 +36,7 @@ interface FeedEventCardProps {
   index: number;
   onClick: (event: FeedEvent) => void;
   onStartInspection?: (event: FeedEvent) => void;
-  onTagClick?: (tagId: string, tagType: 'object' | 'work') => void;
+  onTagClick?: (tagId: string, tagType: 'object' | 'work' | 'contractor') => void;
   userRole?: 'client' | 'contractor' | 'admin';
 }
 
@@ -194,7 +194,13 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, userRole }
             {event.author && (
               <Badge 
                 variant="outline" 
-                className="text-xs px-2.5 py-1 font-normal flex items-center gap-1 max-w-[180px] flex-shrink-0"
+                className="text-xs px-2.5 py-1 font-normal flex items-center gap-1 max-w-[180px] flex-shrink-0 cursor-pointer hover:bg-slate-100 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (event.author && onTagClick) {
+                    onTagClick(`contractor-${event.author}`, 'contractor');
+                  }
+                }}
               >
                 <Icon name="User" size={12} className="flex-shrink-0" />
                 <span className="truncate">{event.author}</span>

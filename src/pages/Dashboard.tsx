@@ -124,6 +124,8 @@ const Dashboard = () => {
     }
   };
 
+  const uniqueContractors = Array.from(new Set(feed.map(e => e.author).filter(Boolean)));
+  
   const availableTags = [
     ...objects.map(obj => ({ 
       id: `object-${obj.id}`, 
@@ -134,6 +136,11 @@ const Dashboard = () => {
       id: `work-${work.id}`, 
       label: work.title, 
       type: 'work' as const 
+    })),
+    ...uniqueContractors.map(contractor => ({
+      id: `contractor-${contractor}`,
+      label: contractor!,
+      type: 'contractor' as const
     }))
   ];
 
@@ -155,6 +162,10 @@ const Dashboard = () => {
       if (tag.startsWith('work-')) {
         const workId = parseInt(tag.replace('work-', ''));
         return event.workId === workId;
+      }
+      if (tag.startsWith('contractor-')) {
+        const contractor = tag.replace('contractor-', '');
+        return event.author === contractor;
       }
       return false;
     });

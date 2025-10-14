@@ -1,14 +1,20 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
-import { X } from 'lucide-react';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ChevronDown, X } from 'lucide-react';
 
 interface FeedFiltersProps {
   filter: 'all' | 'work_logs' | 'inspections' | 'info_posts';
   onFilterChange: (filter: 'all' | 'work_logs' | 'inspections' | 'info_posts') => void;
   selectedTags: string[];
   onTagsChange: (tags: string[]) => void;
-  availableTags: Array<{ id: string; label: string; type: 'object' | 'work' }>;
+  availableTags: Array<{ id: string; label: string; type: 'object' | 'work' | 'contractor' }>;
 }
 
 const filterOptions = [
@@ -31,6 +37,14 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
     onTagsChange([]);
   };
 
+  const objectTags = availableTags.filter(t => t.type === 'object');
+  const workTags = availableTags.filter(t => t.type === 'work');
+  const contractorTags = availableTags.filter(t => t.type === 'contractor');
+
+  const selectedObjectsCount = selectedTags.filter(t => t.startsWith('object-')).length;
+  const selectedWorksCount = selectedTags.filter(t => t.startsWith('work-')).length;
+  const selectedContractorsCount = selectedTags.filter(t => t.startsWith('contractor-')).length;
+
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap gap-2">
@@ -49,38 +63,117 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
       </div>
 
       {availableTags.length > 0 && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-medium text-slate-600">Фильтр по тегам:</p>
-            {selectedTags.length > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearAllTags}
-                className="h-6 px-2 text-xs"
-              >
-                <X size={12} className="mr-1" />
-                Очистить
-              </Button>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {availableTags.map((tag) => (
-              <Badge
-                key={tag.id}
-                variant={selectedTags.includes(tag.id) ? 'default' : 'outline'}
-                className="cursor-pointer hover:bg-slate-100 transition-colors"
-                onClick={() => toggleTag(tag.id)}
-              >
-                <Icon 
-                  name={tag.type === 'object' ? 'Building2' : 'Wrench'} 
-                  size={12} 
-                  className="mr-1" 
-                />
-                {tag.label}
-              </Badge>
-            ))}
-          </div>
+        <div className="flex flex-wrap gap-2 items-center">
+          {objectTags.length > 0 && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9">
+                  <Icon name="Building2" size={14} className="mr-1.5" />
+                  Объекты
+                  {selectedObjectsCount > 0 && (
+                    <Badge variant="secondary" className="ml-1.5 px-1.5 py-0 text-[10px] min-w-[18px] h-[18px] flex items-center justify-center">
+                      {selectedObjectsCount}
+                    </Badge>
+                  )}
+                  <ChevronDown size={14} className="ml-1" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 p-2" align="start">
+                <div className="space-y-1 max-h-64 overflow-y-auto">
+                  {objectTags.map((tag) => (
+                    <label
+                      key={tag.id}
+                      className="flex items-center gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer"
+                    >
+                      <Checkbox
+                        checked={selectedTags.includes(tag.id)}
+                        onCheckedChange={() => toggleTag(tag.id)}
+                      />
+                      <span className="text-sm flex-1 truncate">{tag.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+
+          {workTags.length > 0 && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9">
+                  <Icon name="Wrench" size={14} className="mr-1.5" />
+                  Работы
+                  {selectedWorksCount > 0 && (
+                    <Badge variant="secondary" className="ml-1.5 px-1.5 py-0 text-[10px] min-w-[18px] h-[18px] flex items-center justify-center">
+                      {selectedWorksCount}
+                    </Badge>
+                  )}
+                  <ChevronDown size={14} className="ml-1" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 p-2" align="start">
+                <div className="space-y-1 max-h-64 overflow-y-auto">
+                  {workTags.map((tag) => (
+                    <label
+                      key={tag.id}
+                      className="flex items-center gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer"
+                    >
+                      <Checkbox
+                        checked={selectedTags.includes(tag.id)}
+                        onCheckedChange={() => toggleTag(tag.id)}
+                      />
+                      <span className="text-sm flex-1 truncate">{tag.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+
+          {contractorTags.length > 0 && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9">
+                  <Icon name="Users" size={14} className="mr-1.5" />
+                  Подрядчики
+                  {selectedContractorsCount > 0 && (
+                    <Badge variant="secondary" className="ml-1.5 px-1.5 py-0 text-[10px] min-w-[18px] h-[18px] flex items-center justify-center">
+                      {selectedContractorsCount}
+                    </Badge>
+                  )}
+                  <ChevronDown size={14} className="ml-1" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 p-2" align="start">
+                <div className="space-y-1 max-h-64 overflow-y-auto">
+                  {contractorTags.map((tag) => (
+                    <label
+                      key={tag.id}
+                      className="flex items-center gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer"
+                    >
+                      <Checkbox
+                        checked={selectedTags.includes(tag.id)}
+                        onCheckedChange={() => toggleTag(tag.id)}
+                      />
+                      <span className="text-sm flex-1 truncate">{tag.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+
+          {selectedTags.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearAllTags}
+              className="h-9"
+            >
+              <X size={14} className="mr-1" />
+              Очистить
+            </Button>
+          )}
         </div>
       )}
     </div>
