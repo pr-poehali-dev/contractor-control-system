@@ -71,8 +71,67 @@ const ProUpgradeModal = ({ open, onOpenChange, registrationDate }: ProUpgradeMod
         </div>
 
         <div className="p-8">
+          {isOfferActive && (
+            <div className="mb-6 p-5 bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-300 rounded-xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-orange-200/30 rounded-full -mr-16 -mt-16"></div>
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+                    <Icon name="Zap" size={20} className="text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-900 text-lg">Скидка 25% заканчивается!</h3>
+                    <p className="text-xs text-slate-600">Только для новых пользователей</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div className="bg-white rounded-lg p-3 text-center shadow-sm">
+                    <div className="text-2xl font-bold text-orange-600">{timeLeft.hours.toString().padStart(2, '0')}</div>
+                    <div className="text-xs text-slate-600 uppercase">Часов</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 text-center shadow-sm">
+                    <div className="text-2xl font-bold text-orange-600">{timeLeft.minutes.toString().padStart(2, '0')}</div>
+                    <div className="text-xs text-slate-600 uppercase">Минут</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 text-center shadow-sm">
+                    <div className="text-2xl font-bold text-orange-600">{timeLeft.seconds.toString().padStart(2, '0')}</div>
+                    <div className="text-xs text-slate-600 uppercase">Секунд</div>
+                  </div>
+                </div>
 
-          <div className="space-y-3 mb-8">
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2 bg-white/70 rounded-lg p-2">
+                    <Icon name="Users" size={16} className="text-orange-600 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <span className="font-semibold text-slate-900">∞ пользователей</span>
+                      <span className="text-slate-600"> вместо 3</span>
+                      <span className="ml-2 text-orange-600 font-bold">-25%</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 bg-white/70 rounded-lg p-2">
+                    <Icon name="Building2" size={16} className="text-orange-600 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <span className="font-semibold text-slate-900">∞ метраж объектов</span>
+                      <span className="text-slate-600"> вместо 500м²</span>
+                      <span className="ml-2 text-orange-600 font-bold">-25%</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 bg-white/70 rounded-lg p-2">
+                    <Icon name="Sparkles" size={16} className="text-orange-600 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <span className="font-semibold text-slate-900">Все PRO функции</span>
+                      <span className="text-slate-600"> (экспорт, уведомления, фото)</span>
+                      <span className="ml-2 text-orange-600 font-bold">-25%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-3 mb-6">
+            <h3 className="font-semibold text-slate-900 mb-4">Возможности PRO тарифа:</h3>
             
             <div className="flex gap-3">
               <Icon name="Users" size={20} className="text-slate-600 flex-shrink-0 mt-0.5" />
@@ -119,16 +178,22 @@ const ProUpgradeModal = ({ open, onOpenChange, registrationDate }: ProUpgradeMod
             <Button 
               variant="outline" 
               onClick={() => onOpenChange(false)}
-              className="flex-1 border-slate-300"
+              className="flex-1"
             >
               Позже
             </Button>
             <Button 
               onClick={handleUpgrade}
-              className="flex-1 bg-blue-600 hover:bg-blue-700"
+              className={cn(
+                "flex-1",
+                isOfferActive 
+                  ? "bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg" 
+                  : "bg-blue-600 hover:bg-blue-700"
+              )}
             >
-              <Icon name="Sparkles" size={16} className="mr-2" />
-              Перейти к тарифам
+              {isOfferActive && <Icon name="Zap" size={16} className="mr-2" />}
+              {!isOfferActive && <Icon name="Sparkles" size={16} className="mr-2" />}
+              {isOfferActive ? 'Перейти к тарифам' : 'Перейти к тарифам'}
             </Button>
           </div>
 
