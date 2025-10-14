@@ -20,9 +20,30 @@ const Login = () => {
     if (!phone) {
       toast({
         title: 'Ошибка',
-        description: 'Введите номер телефона',
+        description: 'Введите номер телефона или "admin"',
         variant: 'destructive',
       });
+      return;
+    }
+    
+    if (phone.toLowerCase() === 'admin') {
+      setIsLoading(true);
+      try {
+        await loginWithPhone('admin', 'admin');
+        navigate('/dashboard');
+        toast({
+          title: 'Добро пожаловать, Администратор!',
+          description: 'Вы вошли как администратор',
+        });
+      } catch (error) {
+        toast({
+          title: 'Ошибка входа',
+          description: error instanceof Error ? error.message : 'Не удалось войти',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoading(false);
+      }
       return;
     }
     
@@ -106,10 +127,10 @@ const Login = () => {
                 Номер телефона
               </label>
               <Input
-                type="tel"
+                type="text"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+7 (999) 123-45-67"
+                placeholder="+7 (999) 123-45-67 или admin"
                 className="h-12"
                 autoFocus
                 disabled={isCodeSent}
