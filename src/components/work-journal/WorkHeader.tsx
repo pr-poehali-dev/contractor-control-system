@@ -49,6 +49,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
         </div>
 
         {/* Mobile tabs */}
+        <div className="border-t border-slate-200 pt-2 mt-0.5">
         <div className="grid grid-cols-5 gap-1 pb-0.5">
           <button
             onClick={() => setActiveTab('journal')}
@@ -105,6 +106,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
             <Icon name="BarChart" size={16} />
             <span className="text-[9px]">Данные</span>
           </button>
+        </div>
         </div>
       </div>
 
