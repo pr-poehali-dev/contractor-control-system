@@ -155,7 +155,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, userRole }
         {event.type !== 'info_post' && event.workTitle && (
           <div className="mb-2">
             <h3 
-              className="font-semibold text-slate-900 text-lg leading-snug cursor-pointer hover:text-blue-600 transition-colors"
+              className="font-semibold text-slate-900 text-lg leading-snug cursor-pointer hover:text-blue-600 transition-colors break-words"
               onClick={(e) => {
                 e.stopPropagation();
                 if (event.workId && onTagClick) {
@@ -170,7 +170,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, userRole }
 
         {event.type === 'info_post' && (
           <div className="mb-2">
-            <h3 className="font-semibold text-slate-900 text-lg leading-snug">{event.title}</h3>
+            <h3 className="font-semibold text-slate-900 text-lg leading-snug break-words">{event.title}</h3>
           </div>
         )}
 
