@@ -22,6 +22,7 @@ import Analytics from "./pages/Analytics";
 import Contractors from "./pages/Contractors";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
+import PublicObject from "./pages/PublicObject";
 import JournalEntryDetail from "./pages/JournalEntryDetail";
 import InspectionDetail from "./pages/InspectionDetail";
 import CreateObject from "./pages/CreateObject";
@@ -78,6 +79,7 @@ const App = () => (
               <Route path="/contractors" element={<ProtectedRoute><Contractors /></ProtectedRoute>} />
               <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/public/objects/:objectId" element={<ProtectedRoute><PublicObject /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="/work-templates" element={<ProtectedRoute><WorkTemplates /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />

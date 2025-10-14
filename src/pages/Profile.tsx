@@ -100,7 +100,7 @@ const Profile = () => {
           <TabsContent value="objects" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {userObjects.map((obj) => (
-                <Card key={obj.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate(`/objects/${obj.id}`)}>
+                <Card key={obj.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate(`/public/objects/${obj.id}`)}>
                   <CardContent className="p-4">
                     <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg mb-3 flex items-center justify-center">
                       <Icon name="Building2" size={48} className="text-slate-400" />
