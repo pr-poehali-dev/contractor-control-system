@@ -64,28 +64,47 @@ const Profile = () => {
               </Badge>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 md:gap-8">
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
-                  {user?.role === 'client' ? reliabilityRating : qualityRating}%
+            {user?.role === 'admin' ? (
+              <div className="grid grid-cols-2 gap-3 mt-6">
+                <Button 
+                  onClick={() => navigate('/admin')}
+                  className="h-16 flex flex-col items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  <Icon name="Shield" size={20} />
+                  <span className="text-xs">Админ-панель</span>
+                </Button>
+                <Button 
+                  onClick={() => navigate('/work-types')}
+                  className="h-16 flex flex-col items-center justify-center gap-1 bg-purple-600 hover:bg-purple-700"
+                >
+                  <Icon name="BookOpen" size={20} />
+                  <span className="text-xs">Справочники</span>
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-4 md:gap-8">
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
+                    {user?.role === 'client' ? reliabilityRating : qualityRating}%
+                  </div>
+                  <p className="text-xs md:text-sm text-slate-600">
+                    {user?.role === 'client' ? 'Рейтинг надежности' : 'Качество работ'}
+                  </p>
                 </div>
-                <p className="text-xs md:text-sm text-slate-600">
-                  {user?.role === 'client' ? 'Рейтинг надежности' : 'Качество работ'}
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
-                  {user?.role === 'contractor' ? qualityRating : reliabilityRating}%
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
+                    {user?.role === 'contractor' ? qualityRating : reliabilityRating}%
+                  </div>
+                  <p className="text-xs md:text-sm text-slate-600">
+                    {user?.role === 'contractor' ? 'Рейтинг надежности' : 'Качество работ'}
+                  </p>
                 </div>
-                <p className="text-xs md:text-sm text-slate-600">
-                  {user?.role === 'contractor' ? 'Рейтинг надежности' : 'Качество работ'}
-                </p>
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">{daysInSystem}</div>
+                  <p className="text-xs md:text-sm text-slate-600">дней в системе</p>
+                </div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">{daysInSystem}</div>
-                <p className="text-xs md:text-sm text-slate-600">дней в системе</p>
-              </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 
