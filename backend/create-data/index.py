@@ -71,6 +71,8 @@ def handler(event, context):
         item_type = body.get('type', '').lower()
         data = body.get('data', {})
         
+        print(f"DEBUG: Received type={item_type}, data={data}")
+        
         if not item_type or not data:
             return {
                 'statusCode': 400,
@@ -103,6 +105,8 @@ def handler(event, context):
                 description = data.get('description', '').replace("'", "''") if data.get('description') else None
                 status = data.get('status', 'active')
                 
+                print(f"DEBUG: Creating object with title={title}, address={address}, status={status}")
+                
                 fields = ['title', 'address', 'status', 'client_id', 'created_at', 'updated_at']
                 values = [f"'{title}'", f"'{address}'", f"'{status}'", str(user_id_int), 'NOW()', 'NOW()']
                 
@@ -116,13 +120,18 @@ def handler(event, context):
                 fields_str = ', '.join(fields)
                 values_str = ', '.join(values)
                 
-                cur.execute(f"""
+                sql = f"""
                     INSERT INTO objects ({fields_str})
                     VALUES ({values_str})
                     RETURNING id, title, address, description, project_id, status, client_id, created_at, updated_at
-                """)
+                """
+                print(f"DEBUG: SQL = {sql}")
+                
+                cur.execute(sql)
                 result = cur.fetchone()
                 conn.commit()
+                
+                print(f"DEBUG: Object created successfully, id={result.get('id')}")
                 
             elif item_type == 'work':
                 object_id = int(data.get('object_id', 0))
@@ -255,9 +264,14 @@ def handler(event, context):
             
         except Exception as e:
             import traceback
+            error_msg = str(e)
+            trace = traceback.format_exc()
+            print(f"ERROR: {error_msg}")
+            print(f"TRACEBACK: {trace}")
+            
             error_details = {
-                'error': str(e),
-                'traceback': traceback.format_exc(),
+                'error': error_msg,
+                'traceback': trace,
                 'item_type': item_type
             }
             conn.rollback()
