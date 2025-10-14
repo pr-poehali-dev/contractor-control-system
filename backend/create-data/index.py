@@ -100,19 +100,26 @@ def handler(event, context):
                 
             elif item_type == 'object':
                 project_id = data.get('project_id')
+                if not project_id:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'body': json.dumps({'error': 'project_id is required for object creation'})
+                    }
+                
                 title = data.get('title', '').replace("'", "''")
                 address = data.get('address', '').replace("'", "''")
                 description = data.get('description', '').replace("'", "''") if data.get('description') else None
                 status = data.get('status', 'active')
                 
-                print(f"DEBUG: Creating object with title={title}, address={address}, status={status}")
+                print(f"DEBUG: Creating object with title={title}, address={address}, project_id={project_id}")
                 
-                fields = ['title', 'address', 'status', 'client_id', 'created_at', 'updated_at']
-                values = [f"'{title}'", f"'{address}'", f"'{status}'", str(user_id_int), 'NOW()', 'NOW()']
+                fields = ['title', 'status', 'client_id', 'project_id', 'created_at', 'updated_at']
+                values = [f"'{title}'", f"'{status}'", str(user_id_int), str(int(project_id)), 'NOW()', 'NOW()']
                 
-                if project_id:
-                    fields.append('project_id')
-                    values.append(str(int(project_id)))
+                if address:
+                    fields.append('address')
+                    values.append(f"'{address}'")
                 if description:
                     fields.append('description')
                     values.append(f"'{description}'")
