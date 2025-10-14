@@ -49,10 +49,10 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
         </div>
 
         {/* Mobile tabs */}
-        <div className="flex gap-1 overflow-x-auto pb-0.5 -mx-2.5 px-2.5 scrollbar-hide">
+        <div className="grid grid-cols-5 gap-1 pb-0.5">
           <button
             onClick={() => setActiveTab('journal')}
-            className={`py-1.5 px-3 text-[11px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-0.5 rounded-lg min-w-[60px] ${
+            className={`py-1.5 text-[11px] font-semibold transition-all relative flex flex-col items-center gap-0.5 rounded-lg ${
               activeTab === 'journal'
                 ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100'
                 : 'text-slate-500'
@@ -63,7 +63,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
           </button>
           <button
             onClick={() => setActiveTab('info')}
-            className={`py-1.5 px-3 text-[11px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-0.5 rounded-lg min-w-[60px] ${
+            className={`py-1.5 text-[11px] font-semibold transition-all relative flex flex-col items-center gap-0.5 rounded-lg ${
               activeTab === 'info'
                 ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100'
                 : 'text-slate-500'
@@ -74,7 +74,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
           </button>
           <button
             onClick={() => setActiveTab('description')}
-            className={`py-1.5 px-3 text-[11px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-0.5 rounded-lg min-w-[60px] ${
+            className={`py-1.5 text-[11px] font-semibold transition-all relative flex flex-col items-center gap-0.5 rounded-lg ${
               activeTab === 'description'
                 ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100'
                 : 'text-slate-500'
@@ -85,7 +85,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
           </button>
           <button
             onClick={() => setActiveTab('estimate')}
-            className={`py-1.5 px-3 text-[11px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-0.5 rounded-lg min-w-[60px] ${
+            className={`py-1.5 text-[11px] font-semibold transition-all relative flex flex-col items-center gap-0.5 rounded-lg ${
               activeTab === 'estimate'
                 ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100'
                 : 'text-slate-500'
@@ -96,7 +96,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
           </button>
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`py-1.5 px-3 text-[11px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-0.5 rounded-lg min-w-[60px] ${
+            className={`py-1.5 text-[11px] font-semibold transition-all relative flex flex-col items-center gap-0.5 rounded-lg ${
               activeTab === 'analytics'
                 ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100'
                 : 'text-slate-500'
