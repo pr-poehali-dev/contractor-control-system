@@ -30,7 +30,6 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
   const { user, userData } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { projectId } = useParams();
 
   const works = ((userData?.works && Array.isArray(userData.works)) ? userData.works : []).filter(w => w.object_id === objectId);
   const workLogs = (userData?.workLogs && Array.isArray(userData.workLogs)) ? userData.workLogs : [];
@@ -61,9 +60,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
   }, []);
 
   const handleWorkSelect = (workId: number) => {
-    if (projectId) {
-      navigate(`/projects/${projectId}/objects/${objectId}/works/${workId}`);
-    }
+    navigate(`/objects/${objectId}/works/${workId}`);
   };
 
   const handleCreateEstimate = () => {

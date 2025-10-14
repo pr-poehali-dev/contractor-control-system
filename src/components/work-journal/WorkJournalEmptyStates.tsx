@@ -4,7 +4,6 @@ import Icon from '@/components/ui/icon';
 
 export function NoWorksEmptyState({ objectId }: { objectId: number }) {
   const navigate = useNavigate();
-  const { projectId } = useParams();
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
@@ -12,7 +11,7 @@ export function NoWorksEmptyState({ objectId }: { objectId: number }) {
         <Icon name="Briefcase" size={48} className="mx-auto text-slate-300 mb-4" />
         <h3 className="text-lg font-semibold text-slate-900 mb-2">Пока нет работ</h3>
         <p className="text-slate-600 mb-6">Создайте первую работу для этого объекта</p>
-        <Button onClick={() => projectId && navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}>
+        <Button onClick={() => navigate(`/objects/${objectId}/works/create`)}>
           <Icon name="Plus" size={18} className="mr-2" />
           Создать работу
         </Button>

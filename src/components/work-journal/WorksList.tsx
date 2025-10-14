@@ -25,7 +25,6 @@ export default function WorksList({
   objectId,
 }: WorksListProps) {
   const navigate = useNavigate();
-  const { projectId } = useParams();
   return (
     <div className="hidden md:block w-80 bg-white border-r border-slate-200 flex-col">
       <div className="p-4 border-b border-slate-200">
@@ -33,7 +32,7 @@ export default function WorksList({
           <h3 className="font-bold text-lg">Работы ({works.length})</h3>
           <Button
             size="sm"
-            onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}
+            onClick={() => navigate(`/objects/${objectId}/works/create`)}
           >
             <Icon name="Plus" size={16} className="mr-1" />
             Добавить
@@ -48,7 +47,7 @@ export default function WorksList({
             <p className="text-sm text-slate-600 mb-4">Нет работ на этом объекте</p>
             <Button
               size="sm"
-              onClick={() => navigate(`/projects/${projectId}/objects/${objectId}/works/create`)}
+              onClick={() => navigate(`/objects/${objectId}/works/create`)}
             >
               <Icon name="Plus" size={16} className="mr-2" />
               Добавить первую работу

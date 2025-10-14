@@ -41,7 +41,7 @@ interface GroupedTemplates {
 }
 
 const CreateWork = () => {
-  const { projectId, objectId } = useParams();
+  const { objectId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, token, setUserData, userData } = useAuth();
@@ -180,7 +180,7 @@ const CreateWork = () => {
       });
 
       setTimeout(() => {
-        navigate(`/projects/${projectId}/objects/${objectId}/works/${newWorkId}`);
+        navigate(`/objects/${objectId}/works/${newWorkId}`);
       }, 300);
     } catch (error) {
       toast({
@@ -224,7 +224,7 @@ const CreateWork = () => {
       <Button 
         variant="ghost" 
         className="mb-6"
-        onClick={() => navigate(`/projects/${projectId}/objects/${objectId}`)}
+        onClick={() => navigate(`/objects/${objectId}`)}
       >
         <Icon name="ChevronLeft" size={20} className="mr-2" />
         К объекту
