@@ -19,37 +19,29 @@ const steps: OnboardingStep[] = [
   {
     id: 'welcome',
     title: 'Добро пожаловать в Подряд-ПРО!',
-    description: 'Давайте настроим ваш первый проект за 3 шага. Это займёт всего 2 минуты.',
+    description: 'Давайте настроим вашу первую работу за 3 шага. Это займёт всего 2 минуты.',
     target: 'center',
     position: 'center',
   },
   {
-    id: 'create-project',
-    title: 'Создайте первый проект',
-    description: 'Проект — это контейнер для всех ваших объектов. Например: "Капремонт 2025" или "Ремонт школы №5"',
-    target: '/projects',
-    position: 'center',
-    highlightSelector: '[data-tour="create-project-btn"]',
-  },
-  {
     id: 'create-object',
-    title: 'Добавьте объект',
-    description: 'Объект — это конкретный адрес работ. Например: "ул. Ленина, д. 10"',
-    target: 'create-object',
+    title: 'Создайте объект',
+    description: 'Объект — это адрес стройки. Например: "ул. Ленина, д. 10" или "ЖК Солнечный"',
+    target: '/objects',
     position: 'center',
     highlightSelector: '[data-tour="create-object-btn"]',
   },
   {
     id: 'create-work',
-    title: 'Создайте работу',
-    description: 'Работа — это конкретный вид работ. Например: "Замена кровли"',
+    title: 'Добавьте работу',
+    description: 'Работа — это вид работ на объекте. Например: "Замена кровли" или "Фасадные работы"',
     target: 'create-work',
     position: 'center',
     highlightSelector: '[data-tour="create-work-btn"]',
   },
   {
     id: 'add-log-entry',
-    title: 'Добавьте запись в журнал',
+    title: 'Ведите журнал работ',
     description: 'Журнал работ — сердце системы. Здесь подрядчики отчитываются, а вы проверяете.',
     target: 'work-log',
     position: 'bottom',
@@ -91,8 +83,8 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
         step.action();
       }
 
-      if (step.target === '/projects') {
-        navigate('/projects');
+      if (step.target === '/objects') {
+        navigate('/objects');
       }
     } else {
       handleComplete();
@@ -201,7 +193,7 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
           </CardContent>
         </Card>
 
-        {step.id === 'create-project' && (
+        {step.id === 'create-object' && (
           <div className="mt-4 flex justify-center">
             <div className="animate-bounce">
               <Icon name="ArrowDown" size={32} className="text-white drop-shadow-lg" />

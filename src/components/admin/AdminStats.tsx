@@ -32,7 +32,7 @@ export default function AdminStats({ stats, loading }: AdminStatsProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card>
           <CardHeader>
             <CardTitle className="text-base font-medium text-slate-600">Всего пользователей</CardTitle>
@@ -65,14 +65,7 @@ export default function AdminStats({ stats, loading }: AdminStatsProps) {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-slate-600">Проекты</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold text-slate-900">{stats.projects_count}</p>
-          </CardContent>
-        </Card>
+
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

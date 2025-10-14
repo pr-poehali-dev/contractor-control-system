@@ -14,10 +14,8 @@ import Icon from '@/components/ui/icon';
 import { useNavigate } from 'react-router-dom';
 
 interface Assignment {
-  project_id: number;
-  project_name: string;
-  object_id: number | null;
-  object_name: string | null;
+  object_id: number;
+  object_name: string;
   work_id: number | null;
   work_title: string | null;
   status: string;
@@ -71,18 +69,13 @@ const ContractorDetailsModal = ({
       .slice(0, 2);
   };
 
-  const handleNavigateToProject = (projectId: number) => {
-    navigate(`/projects/${projectId}`);
+  const handleNavigateToObject = (objectId: number) => {
+    navigate(`/objects/${objectId}`);
     onOpenChange(false);
   };
 
-  const handleNavigateToObject = (projectId: number, objectId: number) => {
-    navigate(`/projects/${projectId}/objects/${objectId}`);
-    onOpenChange(false);
-  };
-
-  const handleNavigateToWork = (projectId: number, objectId: number, workId: number) => {
-    navigate(`/projects/${projectId}/objects/${objectId}/works/${workId}`);
+  const handleNavigateToWork = (objectId: number, workId: number) => {
+    navigate(`/objects/${objectId}/works/${workId}`);
     onOpenChange(false);
   };
 
@@ -103,18 +96,18 @@ const ContractorDetailsModal = ({
 
   if (!contractor) return null;
 
-  // Group assignments by project
+  // Group assignments by object
   const groupedAssignments = assignments.reduce((acc, assignment) => {
-    if (!acc[assignment.project_id]) {
-      acc[assignment.project_id] = {
-        project_name: assignment.project_name,
-        project_id: assignment.project_id,
+    if (!acc[assignment.object_id]) {
+      acc[assignment.object_id] = {
+        object_name: assignment.object_name,
+        object_id: assignment.object_id,
         items: [],
       };
     }
-    acc[assignment.project_id].items.push(assignment);
+    acc[assignment.object_id].items.push(assignment);
     return acc;
-  }, {} as Record<number, { project_name: string; project_id: number; items: Assignment[] }>);
+  }, {} as Record<number, { object_name: string; object_id: number; items: Assignment[] }>);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -193,7 +186,7 @@ const ContractorDetailsModal = ({
           <div>
             <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
               <Icon name="Briefcase" size={16} />
-              Назначения на проекты ({assignments.length})
+              Назначения на объекты ({assignments.length})
             </h3>
 
             {isLoading ? (
@@ -205,26 +198,26 @@ const ContractorDetailsModal = ({
                 <CardContent className="p-8 text-center">
                   <Icon name="Inbox" size={48} className="mx-auto text-slate-300 mb-3" />
                   <p className="text-sm text-slate-500">
-                    Подрядчик пока не назначен ни на один проект
+                    Подрядчик пока не назначен ни на один объект
                   </p>
                 </CardContent>
               </Card>
             ) : (
               <div className="space-y-4">
                 {Object.values(groupedAssignments).map((group) => (
-                  <Card key={group.project_id} className="border-l-4 border-l-blue-500">
+                  <Card key={group.object_id} className="border-l-4 border-l-blue-500">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-2">
-                          <Icon name="FolderKanban" size={20} className="text-blue-600" />
+                          <Icon name="Building2" size={20} className="text-blue-600" />
                           <h4 className="font-semibold text-slate-900">
-                            {group.project_name}
+                            {group.object_name}
                           </h4>
                         </div>
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => handleNavigateToProject(group.project_id)}
+                          onClick={() => handleNavigateToObject(group.object_id)}
                         >
                           <Icon name="ExternalLink" size={14} className="mr-1" />
                           Открыть
@@ -267,8 +260,7 @@ const ContractorDetailsModal = ({
                                   variant="outline"
                                   onClick={() =>
                                     handleNavigateToWork(
-                                      assignment.project_id,
-                                      assignment.object_id!,
+                                      assignment.object_id,
                                       assignment.work_id!
                                     )
                                   }
@@ -281,8 +273,7 @@ const ContractorDetailsModal = ({
                                   variant="outline"
                                   onClick={() =>
                                     handleNavigateToObject(
-                                      assignment.project_id,
-                                      assignment.object_id!
+                                      assignment.object_id
                                     )
                                   }
                                 >

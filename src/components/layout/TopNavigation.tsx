@@ -21,8 +21,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { id: 'dashboard', label: 'Лента событий', icon: 'LayoutDashboard', path: '/dashboard', roles: ['client', 'contractor', 'admin'] },
-  { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects', roles: ['contractor', 'admin'] },
-  { id: 'projects', label: 'Проекты', icon: 'FolderKanban', path: '/projects', roles: ['client', 'admin'] },
+  { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects', roles: ['client', 'contractor', 'admin'] },
   { id: 'admin', label: 'Админ-панель', icon: 'Shield', path: '/admin', roles: ['admin'] },
   { id: 'work-templates', label: 'Справочник', icon: 'BookOpen', path: '/work-templates', roles: ['client', 'contractor', 'admin'] },
   { id: 'defects', label: 'Замечания', icon: 'AlertTriangle', path: '/defects', roles: ['client', 'contractor', 'admin'] },
