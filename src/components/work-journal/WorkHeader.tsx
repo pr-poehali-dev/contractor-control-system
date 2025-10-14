@@ -50,61 +50,61 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
         </div>
 
         {/* Mobile tabs */}
-        <div className="flex gap-1 overflow-x-auto pb-1 -mx-3 px-3 scrollbar-hide">
+        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-3 px-3 scrollbar-hide">
           <button
             onClick={() => setActiveTab('journal')}
-            className={`py-1.5 px-2.5 text-[11px] font-medium transition-colors relative whitespace-nowrap flex items-center gap-1 rounded-lg ${
+            className={`py-2 px-3.5 text-[12px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-1 rounded-xl min-w-[70px] ${
               activeTab === 'journal'
-                ? 'text-blue-600 bg-blue-50'
-                : 'text-slate-600'
+                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100 shadow-sm'
+                : 'text-slate-500 hover:bg-slate-50'
             }`}
           >
-            <Icon name="MessageSquare" size={12} />
-            Журнал
+            <Icon name="MessageSquare" size={18} />
+            <span className="text-[10px]">Журнал</span>
           </button>
           <button
             onClick={() => setActiveTab('info')}
-            className={`py-1.5 px-2.5 text-[11px] font-medium transition-colors relative whitespace-nowrap flex items-center gap-1 rounded-lg ${
+            className={`py-2 px-3.5 text-[12px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-1 rounded-xl min-w-[70px] ${
               activeTab === 'info'
-                ? 'text-blue-600 bg-blue-50'
-                : 'text-slate-600'
+                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100 shadow-sm'
+                : 'text-slate-500 hover:bg-slate-50'
             }`}
           >
-            <Icon name="Info" size={12} />
-            Инфо
+            <Icon name="Info" size={18} />
+            <span className="text-[10px]">Инфо</span>
           </button>
           <button
             onClick={() => setActiveTab('description')}
-            className={`py-1.5 px-2.5 text-[11px] font-medium transition-colors relative whitespace-nowrap flex items-center gap-1 rounded-lg ${
+            className={`py-2 px-3.5 text-[12px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-1 rounded-xl min-w-[70px] ${
               activeTab === 'description'
-                ? 'text-blue-600 bg-blue-50'
-                : 'text-slate-600'
+                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100 shadow-sm'
+                : 'text-slate-500 hover:bg-slate-50'
             }`}
           >
-            <Icon name="FileText" size={12} />
-            Документы
+            <Icon name="FileText" size={18} />
+            <span className="text-[10px]">Докум.</span>
           </button>
           <button
             onClick={() => setActiveTab('estimate')}
-            className={`py-1.5 px-2.5 text-[11px] font-medium transition-colors relative whitespace-nowrap flex items-center gap-1 rounded-lg ${
+            className={`py-2 px-3.5 text-[12px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-1 rounded-xl min-w-[70px] ${
               activeTab === 'estimate'
-                ? 'text-blue-600 bg-blue-50'
-                : 'text-slate-600'
+                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100 shadow-sm'
+                : 'text-slate-500 hover:bg-slate-50'
             }`}
           >
-            <Icon name="Calculator" size={12} />
-            Смета
+            <Icon name="Calculator" size={18} />
+            <span className="text-[10px]">Смета</span>
           </button>
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`py-1.5 px-2.5 text-[11px] font-medium transition-colors relative whitespace-nowrap flex items-center gap-1 rounded-lg ${
+            className={`py-2 px-3.5 text-[12px] font-semibold transition-all relative whitespace-nowrap flex flex-col items-center gap-1 rounded-xl min-w-[70px] ${
               activeTab === 'analytics'
-                ? 'text-blue-600 bg-blue-50'
-                : 'text-slate-600'
+                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100 shadow-sm'
+                : 'text-slate-500 hover:bg-slate-50'
             }`}
           >
-            <Icon name="BarChart" size={12} />
-            Аналитика
+            <Icon name="BarChart" size={18} />
+            <span className="text-[10px]">Данные</span>
           </button>
         </div>
       </div>
@@ -147,91 +147,71 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
           </div>
         </div>
 
-        <div className="border-b border-slate-200 overflow-x-auto scrollbar-hide">
-          <div className="flex gap-3 md:gap-6">
+        <div className="border-b border-slate-100 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-1">
             <button
               onClick={() => setActiveTab('journal')}
-              className={`pb-2 md:pb-3 px-1 text-xs md:text-sm font-medium transition-colors relative whitespace-nowrap ${
+              className={`pb-3 px-4 text-[15px] font-semibold transition-all relative whitespace-nowrap rounded-t-xl ${
                 activeTab === 'journal'
-                  ? 'text-blue-600'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'text-blue-600 bg-gradient-to-b from-blue-50/50 to-transparent'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
               }`}
             >
-              <span className="hidden md:inline">Журнал</span>
-              <span className="md:hidden flex items-center gap-1">
-                <Icon name="MessageSquare" size={14} />
-                Журнал
-              </span>
+              Журнал
               {activeTab === 'journal' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-lg" />
               )}
             </button>
             <button
               onClick={() => setActiveTab('info')}
-              className={`pb-2 md:pb-3 px-1 text-xs md:text-sm font-medium transition-colors relative whitespace-nowrap ${
+              className={`pb-3 px-4 text-[15px] font-semibold transition-all relative whitespace-nowrap rounded-t-xl ${
                 activeTab === 'info'
-                  ? 'text-blue-600'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'text-blue-600 bg-gradient-to-b from-blue-50/50 to-transparent'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
               }`}
             >
-              <span className="hidden md:inline">Информация</span>
-              <span className="md:hidden flex items-center gap-1">
-                <Icon name="Info" size={14} />
-                Инфо
-              </span>
+              Информация
               {activeTab === 'info' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-lg" />
               )}
             </button>
             <button
               onClick={() => setActiveTab('description')}
-              className={`pb-2 md:pb-3 px-1 text-xs md:text-sm font-medium transition-colors relative whitespace-nowrap ${
+              className={`pb-3 px-4 text-[15px] font-semibold transition-all relative whitespace-nowrap rounded-t-xl ${
                 activeTab === 'description'
-                  ? 'text-blue-600'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'text-blue-600 bg-gradient-to-b from-blue-50/50 to-transparent'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
               }`}
             >
-              <span className="hidden md:inline">Нормативная документация</span>
-              <span className="md:hidden flex items-center gap-1">
-                <Icon name="FileText" size={14} />
-                Документы
-              </span>
+              Документация
               {activeTab === 'description' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-lg" />
               )}
             </button>
             <button
               onClick={() => setActiveTab('estimate')}
-              className={`pb-2 md:pb-3 px-1 text-xs md:text-sm font-medium transition-colors relative whitespace-nowrap ${
+              className={`pb-3 px-4 text-[15px] font-semibold transition-all relative whitespace-nowrap rounded-t-xl ${
                 activeTab === 'estimate'
-                  ? 'text-blue-600'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'text-blue-600 bg-gradient-to-b from-blue-50/50 to-transparent'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
               }`}
             >
-              <span className="hidden md:inline">Смета</span>
-              <span className="md:hidden flex items-center gap-1">
-                <Icon name="Calculator" size={14} />
-                Смета
-              </span>
+              Смета
               {activeTab === 'estimate' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-lg" />
               )}
             </button>
             <button
               onClick={() => setActiveTab('analytics')}
-              className={`pb-2 md:pb-3 px-1 text-xs md:text-sm font-medium transition-colors relative whitespace-nowrap ${
+              className={`pb-3 px-4 text-[15px] font-semibold transition-all relative whitespace-nowrap rounded-t-xl ${
                 activeTab === 'analytics'
-                  ? 'text-blue-600'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'text-blue-600 bg-gradient-to-b from-blue-50/50 to-transparent'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
               }`}
             >
-              <span className="hidden md:inline">Аналитика</span>
-              <span className="md:hidden flex items-center gap-1">
-                <Icon name="BarChart" size={14} />
-                Данные
-              </span>
+              Аналитика
               {activeTab === 'analytics' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-lg" />
               )}
             </button>
           </div>
