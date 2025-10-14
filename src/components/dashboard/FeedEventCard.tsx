@@ -132,71 +132,69 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, userRole }
           </Avatar>
           
           <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-3 mb-0.5">
+            <div className="flex items-center justify-between gap-3 mb-2">
               <h3 className="font-semibold text-slate-900 text-base truncate">
-                {event.author || event.projectTitle}
+                {event.author || 'Система'}
               </h3>
               <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full flex-shrink-0">
                 <Icon name="MoreHorizontal" size={18} />
               </Button>
             </div>
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap mb-2">
               <p className="text-xs text-slate-500">
                 {event.scheduledDate 
                   ? new Date(event.scheduledDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
                   : formatTimeAgo(event.timestamp)
                 }
               </p>
-              {event.type !== 'info_post' && (
-                <>
-                  <span className="text-slate-300">·</span>
-                  <Badge variant="secondary" className="text-[10px] font-normal px-1.5 py-0">
-                    {getEventLabel(event.type)}
-                  </Badge>
-                </>
-              )}
+              <span className="text-slate-300">·</span>
+              <Badge variant="secondary" className="text-[10px] font-normal px-1.5 py-0">
+                {getEventLabel(event.type)}
+              </Badge>
             </div>
+            
+            {event.type !== 'info_post' && (event.objectTitle || event.workTitle) && (
+              <div className="flex gap-2 flex-wrap">
+                {event.objectTitle && (
+                  <Badge 
+                    variant="outline" 
+                    className="text-xs px-2.5 py-1 font-normal cursor-pointer hover:bg-slate-100 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (event.objectId && onTagClick) {
+                        onTagClick(`object-${event.objectId}`, 'object');
+                      }
+                    }}
+                  >
+                    <Icon name="Building2" size={12} className="mr-1" />
+                    {event.objectTitle}
+                  </Badge>
+                )}
+                {event.workTitle && (
+                  <Badge 
+                    variant="outline" 
+                    className="text-xs px-2.5 py-1 font-normal cursor-pointer hover:bg-slate-100 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (event.workId && onTagClick) {
+                        onTagClick(`work-${event.workId}`, 'work');
+                      }
+                    }}
+                  >
+                    <Icon name="Wrench" size={12} className="mr-1" />
+                    {event.workTitle}
+                  </Badge>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
-        {event.type !== 'info_post' && (event.objectTitle || event.workTitle) && (
-          <div className="mb-3 flex gap-2 flex-wrap">
-            {event.objectTitle && (
-              <Badge 
-                variant="outline" 
-                className="text-xs px-2.5 py-1 font-normal cursor-pointer hover:bg-slate-100 transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (event.objectId && onTagClick) {
-                    onTagClick(`object-${event.objectId}`, 'object');
-                  }
-                }}
-              >
-                <Icon name="Building2" size={12} className="mr-1" />
-                {event.objectTitle}
-              </Badge>
-            )}
-            {event.workTitle && (
-              <Badge 
-                variant="outline" 
-                className="text-xs px-2.5 py-1 font-normal cursor-pointer hover:bg-slate-100 transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (event.workId && onTagClick) {
-                    onTagClick(`work-${event.workId}`, 'work');
-                  }
-                }}
-              >
-                <Icon name="Wrench" size={12} className="mr-1" />
-                {event.workTitle}
-              </Badge>
-            )}
+        {event.type === 'info_post' && (
+          <div className="mb-2">
+            <h4 className="font-medium text-slate-900 text-sm leading-snug">{event.title}</h4>
           </div>
         )}
-
-        <div className="mb-2">
-          <h4 className="font-medium text-slate-900 text-sm leading-snug">{event.title}</h4>
-        </div>
 
         {photos.length > 0 && (
         <div className="relative bg-black group mb-3 rounded-lg overflow-hidden">
