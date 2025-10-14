@@ -50,8 +50,8 @@ const PublicObject = () => {
                 <p className="text-[9px] md:text-sm text-slate-600 leading-tight">проверок</p>
               </div>
               <div className="text-center px-1">
-                <div className="text-xs md:text-4xl font-bold text-slate-900 mb-0.5 md:mb-1 leading-tight">
-                  {new Date(site.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+                <div className="text-lg md:text-4xl font-bold text-slate-900 mb-0.5 md:mb-1 leading-tight">
+                  {new Date(site.created_at).toLocaleDateString('ru-RU')}
                 </div>
                 <p className="text-[9px] md:text-sm text-slate-600 leading-tight">дата создания</p>
               </div>
