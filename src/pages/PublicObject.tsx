@@ -60,17 +60,13 @@ const PublicObject = () => {
         </Card>
 
         <Tabs defaultValue="journal" className="space-y-3 md:space-y-6">
-          <div className="relative -mx-3 md:mx-0">
-            <div className="overflow-x-auto scrollbar-hide px-3 md:px-0">
-              <TabsList className="inline-flex w-auto h-8 md:h-10">
-                <TabsTrigger value="journal" className="text-[10px] md:text-sm whitespace-nowrap px-2 md:px-4 h-7 md:h-9">Журнал</TabsTrigger>
-                <TabsTrigger value="schedule" className="text-[10px] md:text-sm whitespace-nowrap px-2 md:px-4 h-7 md:h-9">График</TabsTrigger>
-                <TabsTrigger value="analytics" className="text-[10px] md:text-sm whitespace-nowrap px-2 md:px-4 h-7 md:h-9">Аналитика</TabsTrigger>
-                <TabsTrigger value="inspections" className="text-[10px] md:text-sm whitespace-nowrap px-2 md:px-4 h-7 md:h-9">Проверки</TabsTrigger>
-                <TabsTrigger value="general" className="text-[10px] md:text-sm whitespace-nowrap px-2 md:px-4 h-7 md:h-9">Общее</TabsTrigger>
-              </TabsList>
-            </div>
-          </div>
+          <TabsList className="grid w-full grid-cols-5 h-9 md:h-10">
+            <TabsTrigger value="journal" className="text-xs md:text-sm px-1 md:px-4">Журнал</TabsTrigger>
+            <TabsTrigger value="schedule" className="text-xs md:text-sm px-1 md:px-4">График</TabsTrigger>
+            <TabsTrigger value="analytics" className="text-xs md:text-sm px-1 md:px-4">Аналитика</TabsTrigger>
+            <TabsTrigger value="inspections" className="text-xs md:text-sm px-1 md:px-4">Проверки</TabsTrigger>
+            <TabsTrigger value="general" className="text-xs md:text-sm px-1 md:px-4">Общее</TabsTrigger>
+          </TabsList>
 
           <TabsContent value="journal" className="space-y-2 md:space-y-4">
             <Card>
