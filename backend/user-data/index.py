@@ -1,7 +1,7 @@
 '''
-Business: Load user's data from database with JWT authentication
+Business: Load user's data from database with JWT authentication (simplified structure: objects → works)
 Args: event with httpMethod GET, headers (X-Auth-Token)
-Returns: JSON with all user data (projects, sites, works, inspections, remarks, workLogs, contractors)
+Returns: JSON with all user data (objects, works, inspections, remarks, workLogs, contractors)
 '''
 
 import json
@@ -47,7 +47,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'error': 'Method not allowed'})
         }
     
-    # Get and verify JWT token
     auth_header = event.get('headers', {}).get('X-Auth-Token') or event.get('headers', {}).get('x-auth-token')
     
     if not auth_header:
@@ -79,7 +78,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
-        # Verify user exists and is active
         cur.execute(
             "SELECT id, role, is_active FROM users WHERE id = %s",
             (user_id,)
@@ -97,22 +95,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         role = user['role']
         
-        # Load projects based on role
         if role == 'admin':
             cur.execute("""
-                SELECT id, title, description, client_id, status, created_at, updated_at
-                FROM projects
-                WHERE status != 'archived'
-                ORDER BY created_at DESC
-            """)
-            projects = cur.fetchall()
-            
-            cur.execute("""
-                SELECT id, title, address, project_id, status, created_at, updated_at
+                SELECT id, title, address, description, client_id, status, created_at, updated_at
                 FROM objects
                 ORDER BY created_at DESC
             """)
-            sites = cur.fetchall()
+            objects = cur.fetchall()
             
             cur.execute("""
                 SELECT w.id, w.title, w.description, w.object_id, w.contractor_id,
@@ -125,7 +114,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             works = cur.fetchall()
             
         elif role == 'contractor':
-            # Get contractor ID for this user
             cur.execute("""
                 SELECT id as contractor_id
                 FROM contractors
@@ -136,25 +124,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             if contractor_id:
                 cur.execute("""
-                    SELECT DISTINCT p.id, p.title, p.description, p.client_id, p.status, 
-                           p.created_at, p.updated_at
-                    FROM projects p
-                    JOIN objects o ON o.project_id = p.id
-                    JOIN works w ON w.object_id = o.id
-                    WHERE w.contractor_id = %s
-                    ORDER BY p.created_at DESC
-                """, (contractor_id,))
-                projects = cur.fetchall()
-                
-                cur.execute("""
-                    SELECT DISTINCT o.id, o.title, o.address, o.project_id, o.status,
-                           o.created_at, o.updated_at
+                    SELECT DISTINCT o.id, o.title, o.address, o.description, o.client_id, 
+                           o.status, o.created_at, o.updated_at
                     FROM objects o
                     JOIN works w ON w.object_id = o.id
                     WHERE w.contractor_id = %s
                     ORDER BY o.created_at DESC
                 """, (contractor_id,))
-                sites = cur.fetchall()
+                objects = cur.fetchall()
                 
                 cur.execute("""
                     SELECT w.id, w.title, w.description, w.object_id, w.contractor_id,
@@ -167,47 +144,33 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 """, (contractor_id,))
                 works = cur.fetchall()
             else:
-                projects, sites, works = [], [], []
+                objects, works = [], []
                 
-        else:  # client role
+        else:
             cur.execute("""
-                SELECT id, title, description, client_id, status, created_at, updated_at
-                FROM projects
-                WHERE client_id = %s AND status != 'archived'
+                SELECT id, title, address, description, client_id, status, created_at, updated_at
+                FROM objects
+                WHERE client_id = %s
                 ORDER BY created_at DESC
             """, (user_id,))
-            projects = cur.fetchall()
+            objects = cur.fetchall()
             
-            project_ids = [p['id'] for p in projects]
+            object_ids = [o['id'] for o in objects]
             
-            if project_ids:
+            if object_ids:
                 cur.execute("""
-                    SELECT id, title, address, project_id, status, created_at, updated_at
-                    FROM objects
-                    WHERE project_id = ANY(%s)
-                    ORDER BY created_at DESC
-                """, (project_ids,))
-                sites = cur.fetchall()
-                
-                site_ids = [s['id'] for s in sites]
-                
-                if site_ids:
-                    cur.execute("""
-                        SELECT w.id, w.title, w.description, w.object_id, w.contractor_id,
-                               c.name as contractor_name, w.status, w.start_date, w.end_date,
-                               w.created_at, w.updated_at
-                        FROM works w
-                        LEFT JOIN contractors c ON w.contractor_id = c.id
-                        WHERE w.object_id = ANY(%s)
-                        ORDER BY w.created_at DESC
-                    """, (site_ids,))
-                    works = cur.fetchall()
-                else:
-                    works = []
+                    SELECT w.id, w.title, w.description, w.object_id, w.contractor_id,
+                           c.name as contractor_name, w.status, w.start_date, w.end_date,
+                           w.created_at, w.updated_at
+                    FROM works w
+                    LEFT JOIN contractors c ON w.contractor_id = c.id
+                    WHERE w.object_id = ANY(%s)
+                    ORDER BY w.created_at DESC
+                """, (object_ids,))
+                works = cur.fetchall()
             else:
-                sites, works = [], []
+                works = []
         
-        # Load inspections, remarks, work logs for accessible works
         work_ids = [w['id'] for w in works]
         
         if work_ids:
@@ -249,7 +212,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         else:
             inspections, remarks, work_logs = [], [], []
         
-        # Load contractors based on role
         if role == 'client':
             cur.execute("""
                 SELECT c.id, c.name, c.inn, c.contact_info, c.email, c.phone, 
@@ -273,21 +235,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur.close()
         conn.close()
         
-        # Convert datetime objects to ISO format strings
-        for item in projects + sites + works + inspections + remarks + work_logs + contractors:
+        for item in objects + works + inspections + remarks + work_logs + contractors:
             for key, value in item.items():
                 if hasattr(value, 'isoformat'):
                     item[key] = value.isoformat()
         
-        # Build response
         result = {
-            'projects': [dict(p) for p in projects],
-            'sites': [dict(s) for s in sites],
+            'objects': [dict(o) for o in objects],
             'works': [dict(w) for w in works],
             'inspections': [dict(i) for i in inspections],
             'remarks': [dict(r) for r in remarks],
             'workLogs': [dict(wl) for wl in work_logs],
-            'checkpoints': [],  # Empty for now as per requirements
+            'checkpoints': [],
             'contractors': [dict(c) for c in contractors]
         }
         

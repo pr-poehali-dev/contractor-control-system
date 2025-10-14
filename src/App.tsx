@@ -67,13 +67,10 @@ const App = () => (
             <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/objects" element={<ProtectedRoute><Objects /></ProtectedRoute>} />
-            <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
-            <Route path="/projects/create" element={<ProtectedRoute><CreateProject /></ProtectedRoute>} />
-            <Route path="/projects/:projectId" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
-            <Route path="/projects/:projectId/objects/create" element={<ProtectedRoute><CreateObject /></ProtectedRoute>} />
-            <Route path="/projects/:projectId/objects/:objectId" element={<ProtectedRoute><ObjectDetail /></ProtectedRoute>} />
-            <Route path="/projects/:projectId/objects/:objectId/works/create" element={<ProtectedRoute><CreateWork /></ProtectedRoute>} />
-            <Route path="/projects/:projectId/objects/:objectId/works/:workId" element={<ProtectedRoute><WorkDetail /></ProtectedRoute>} />
+            <Route path="/objects/create" element={<ProtectedRoute><CreateObject /></ProtectedRoute>} />
+            <Route path="/objects/:objectId" element={<ProtectedRoute><ObjectDetail /></ProtectedRoute>} />
+            <Route path="/objects/:objectId/works/create" element={<ProtectedRoute><CreateWork /></ProtectedRoute>} />
+            <Route path="/objects/:objectId/works/:workId" element={<ProtectedRoute><WorkDetail /></ProtectedRoute>} />
             <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
             <Route path="/my-works" element={<ProtectedRoute><MyWorks /></ProtectedRoute>} />
             <Route path="/work-log" element={<ProtectedRoute><WorkLog /></ProtectedRoute>} />
@@ -88,8 +85,7 @@ const App = () => (
             <Route path="/work-templates" element={<ProtectedRoute><WorkTemplates /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="/pricing" element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
-            <Route path="/public/project/:projectId" element={<ProtectedRoute><PublicProject /></ProtectedRoute>} />
-            <Route path="/public/project/:projectId/object/:objectId" element={<ProtectedRoute><PublicObject /></ProtectedRoute>} />
+            <Route path="/public/object/:objectId" element={<ProtectedRoute><PublicObject /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

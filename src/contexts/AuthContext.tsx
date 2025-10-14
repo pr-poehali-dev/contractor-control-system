@@ -17,8 +17,7 @@ interface User {
 }
 
 interface UserData {
-  projects: any[];
-  sites: any[];
+  objects: any[];
   works: any[];
   inspections: any[];
   remarks: any[];
