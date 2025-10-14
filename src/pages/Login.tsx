@@ -7,18 +7,20 @@ import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [code, setCode] = useState('');
+  const [isCodeSent, setIsCodeSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const [devCode, setDevCode] = useState('');
+  const { loginWithPhone } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleLogin = async () => {
-    if (!email || !password) {
+  const handleSendCode = async () => {
+    if (!phone) {
       toast({
         title: 'Ошибка',
-        description: 'Введите email и пароль',
+        description: 'Введите номер телефона',
         variant: 'destructive',
       });
       return;
@@ -26,7 +28,48 @@ const Login = () => {
     
     setIsLoading(true);
     try {
-      await login(email, password);
+      const response = await fetch('https://functions.poehali.dev/ff8b8a8a-815e-455b-a052-81b59ae4cab2', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setIsCodeSent(true);
+        setDevCode(data.dev_code);
+        toast({
+          title: 'Код отправлен',
+          description: `Код для разработки: ${data.dev_code}`,
+        });
+      } else {
+        throw new Error(data.error || 'Ошибка отправки кода');
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: error instanceof Error ? error.message : 'Не удалось отправить код',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    if (!code) {
+      toast({
+        title: 'Ошибка',
+        description: 'Введите код подтверждения',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    setIsLoading(true);
+    try {
+      await loginWithPhone(phone, code);
       navigate('/dashboard');
       toast({
         title: 'Добро пожаловать!',
@@ -35,7 +78,7 @@ const Login = () => {
     } catch (error) {
       toast({
         title: 'Ошибка входа',
-        description: error instanceof Error ? error.message : 'Проверьте email и пароль',
+        description: error instanceof Error ? error.message : 'Неверный код',
         variant: 'destructive',
       });
     } finally {
@@ -60,58 +103,82 @@ const Login = () => {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                Email
+                Номер телефона
               </label>
               <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="user@example.com"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+7 (999) 123-45-67"
                 className="h-12"
                 autoFocus
-                onKeyDown={(e) => e.key === 'Enter' && !password && document.getElementById('password-input')?.focus()}
+                disabled={isCodeSent}
+                onKeyDown={(e) => e.key === 'Enter' && !isCodeSent && handleSendCode()}
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Пароль
-              </label>
-              <Input
-                id="password-input"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="h-12"
-                onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-              />
-            </div>
+            {isCodeSent && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Код подтверждения
+                </label>
+                <Input
+                  type="text"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="123456"
+                  className="h-12"
+                  maxLength={6}
+                  autoFocus
+                  onKeyDown={(e) => e.key === 'Enter' && handleVerifyCode()}
+                />
+                {devCode && (
+                  <p className="text-xs text-slate-500 mt-1">
+                    Код для разработки: {devCode}
+                  </p>
+                )}
+              </div>
+            )}
 
-            <Button
-              onClick={handleLogin}
-              disabled={isLoading}
-              className="w-full h-12 text-base font-semibold"
-            >
-              {isLoading ? (
-                <Icon name="Loader2" size={20} className="animate-spin" />
-              ) : (
-                'Войти'
-              )}
-            </Button>
+            {!isCodeSent ? (
+              <Button
+                onClick={handleSendCode}
+                disabled={isLoading}
+                className="w-full h-12 text-base font-semibold"
+              >
+                {isLoading ? (
+                  <Icon name="Loader2" size={20} className="animate-spin" />
+                ) : (
+                  'Получить код'
+                )}
+              </Button>
+            ) : (
+              <>
+                <Button
+                  onClick={handleVerifyCode}
+                  disabled={isLoading}
+                  className="w-full h-12 text-base font-semibold"
+                >
+                  {isLoading ? (
+                    <Icon name="Loader2" size={20} className="animate-spin" />
+                  ) : (
+                    'Войти'
+                  )}
+                </Button>
+                <Button
+                  onClick={() => {
+                    setIsCodeSent(false);
+                    setCode('');
+                    setDevCode('');
+                  }}
+                  variant="outline"
+                  className="w-full h-12 text-base"
+                >
+                  Изменить номер
+                </Button>
+              </>
+            )}
           </div>
-        </div>
-
-        <div className="mt-6 text-center">
-          <p className="text-sm text-slate-600">
-            Нет аккаунта?{' '}
-            <button
-              onClick={() => navigate('/register')}
-              className="text-blue-600 hover:underline font-medium"
-            >
-              Зарегистрироваться
-            </button>
-          </p>
         </div>
 
         <div className="mt-4 text-center text-xs text-slate-500">

@@ -3,6 +3,7 @@ import { createContext, useContext, useState, ReactNode, useEffect } from 'react
 const API_BASE = 'https://functions.poehali.dev';
 const AUTH_API = `${API_BASE}/b9d6731e-788e-476b-bad5-047bd3d6adc1`;
 const USER_DATA_API = `${API_BASE}/bdee636b-a6c0-42d0-8f77-23c316751e34`;
+const VERIFY_CODE_API = `${API_BASE}/09b6a02f-8537-4a53-875d-3a46d3fdc278`;
 
 type UserRole = 'contractor' | 'client' | 'admin';
 
@@ -33,6 +34,7 @@ interface AuthContextType {
   setUserData: (data: UserData) => void;
   loadUserData: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
+  loginWithPhone: (phone: string, code: string) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   verifyToken: () => Promise<boolean>;
@@ -153,6 +155,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const loginWithPhone = async (phone: string, code: string) => {
+    setIsLoading(true);
+    try {
+      console.log('Phone login attempt:', phone);
+      const response = await fetch(VERIFY_CODE_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ phone, code }),
+      });
+
+      const data = await response.json();
+      console.log('Phone login response:', { status: response.status, hasToken: !!data.token, hasUser: !!data.user });
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Ошибка входа');
+      }
+
+      console.log('Saving auth, token:', data.token?.substring(0, 20) + '...');
+      saveAuth(data.token, data.user);
+      console.log('Token saved to localStorage:', localStorage.getItem('auth_token')?.substring(0, 20) + '...');
+      await loadUserDataInternal(data.token);
+    } catch (error) {
+      console.error('Phone login error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Ошибка входа');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const register = async (registerData: RegisterData) => {
     setIsLoading(true);
     try {
@@ -236,7 +269,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       userData,
       setUserData,
       loadUserData,
-      login, 
+      login,
+      loginWithPhone,
       register,
       logout, 
       verifyToken,

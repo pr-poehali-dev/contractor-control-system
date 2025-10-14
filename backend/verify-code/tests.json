@@ -1,0 +1,16 @@
+{
+  "tests": [
+    {
+      "name": "Missing phone or code",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "phone": "+79991234567"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "Phone and code are required"
+      }
+    }
+  ]
+}
