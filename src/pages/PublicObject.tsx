@@ -73,7 +73,7 @@ const PublicObject = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
+      <div className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
         <div className="container max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <Button 
@@ -98,50 +98,71 @@ const PublicObject = () => {
             <h1 className="text-xl md:text-2xl font-bold text-slate-900 mb-6">{object.title}</h1>
           </div>
         </div>
+
+        <div className="container max-w-4xl mx-auto px-4 pb-3">
+          <div className="space-y-2 w-full">
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                onClick={() => setActiveTab('journal')}
+                className={`text-xs md:text-sm py-2 px-3 rounded-md transition-colors ${
+                  activeTab === 'journal' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                Журнал работ
+              </button>
+              <button
+                onClick={() => setActiveTab('schedule')}
+                className={`text-xs md:text-sm py-2 px-3 rounded-md transition-colors ${
+                  activeTab === 'schedule' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                График
+              </button>
+              <button
+                onClick={() => setActiveTab('analytics')}
+                className={`text-xs md:text-sm py-2 px-3 rounded-md transition-colors ${
+                  activeTab === 'analytics' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                Аналитика
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setActiveTab('inspections')}
+                className={`text-xs md:text-sm py-2 px-3 rounded-md transition-colors ${
+                  activeTab === 'inspections' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                Проверки
+              </button>
+              <button
+                onClick={() => setActiveTab('info')}
+                className={`text-xs md:text-sm py-2 px-3 rounded-md transition-colors ${
+                  activeTab === 'info' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                Общая информация
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="container max-w-4xl mx-auto px-4 py-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="h-auto bg-white p-0 w-full sticky top-0 z-10 pb-3 pt-1 shadow-sm">
-            <div className="space-y-2 w-full">
-              <div className="grid grid-cols-3 gap-2">
-                <TabsTrigger 
-                  value="journal" 
-                  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
-                >
-                  Журнал работ
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="schedule"
-                  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
-                >
-                  График
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="analytics"
-                  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
-                >
-                  Аналитика
-                </TabsTrigger>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <TabsTrigger 
-                  value="inspections"
-                  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
-                >
-                  Проверки
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="info"
-                  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm py-2"
-                >
-                  Общая информация
-                </TabsTrigger>
-              </div>
-            </div>
-          </TabsList>
-
-          <TabsContent value="info" className="space-y-6 mt-6">
+        <div className="space-y-6">
+          {activeTab === 'info' && (
+          <div className="space-y-6">
             <div>
               <h2 className="text-lg font-semibold text-slate-900 mb-4">Даты</h2>
               <div className="space-y-3">
@@ -217,9 +238,11 @@ const PublicObject = () => {
                 </Card>
               </div>
             </div>
-          </TabsContent>
+          </div>
+          )}
 
-          <TabsContent value="journal" className="space-y-4 mt-6">
+          {activeTab === 'journal' && (
+          <div className="space-y-4">
             <h2 className="text-lg font-semibold text-slate-900">Журнал работ</h2>
             {works.length === 0 ? (
               <Card>
@@ -248,9 +271,11 @@ const PublicObject = () => {
                 ))}
               </div>
             )}
-          </TabsContent>
+          </div>
+          )}
 
-          <TabsContent value="schedule" className="space-y-4 mt-6">
+          {activeTab === 'schedule' && (
+          <div className="space-y-4">
             <h2 className="text-lg font-semibold text-slate-900">График работ</h2>
             <Card>
               <CardContent className="p-8 text-center">
@@ -258,9 +283,11 @@ const PublicObject = () => {
                 <p className="text-slate-600">Раздел в разработке</p>
               </CardContent>
             </Card>
-          </TabsContent>
+          </div>
+          )}
 
-          <TabsContent value="analytics" className="space-y-4 mt-6">
+          {activeTab === 'analytics' && (
+          <div className="space-y-4">
             <h2 className="text-lg font-semibold text-slate-900">Аналитика</h2>
             <Card>
               <CardContent className="p-8 text-center">
@@ -268,9 +295,11 @@ const PublicObject = () => {
                 <p className="text-slate-600">Раздел в разработке</p>
               </CardContent>
             </Card>
-          </TabsContent>
+          </div>
+          )}
 
-          <TabsContent value="inspections" className="space-y-4 mt-6">
+          {activeTab === 'inspections' && (
+          <div className="space-y-4">
             <h2 className="text-lg font-semibold text-slate-900">Проверки</h2>
             <Card>
               <CardContent className="p-8 text-center">
@@ -278,8 +307,9 @@ const PublicObject = () => {
                 <p className="text-slate-600">Раздел в разработке</p>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+          </div>
+          )}
+        </div>
       </div>
     </div>
   );
