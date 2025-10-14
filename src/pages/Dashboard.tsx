@@ -99,7 +99,17 @@ const Dashboard = () => {
       const data = await response.json();
       
       if (data.success) {
-        setFeed(data.events);
+        const normalizedEvents = data.events.map((event: any) => {
+          if (event.photoUrls && typeof event.photoUrls === 'string') {
+            try {
+              event.photoUrls = JSON.parse(event.photoUrls);
+            } catch {
+              event.photoUrls = [event.photoUrls];
+            }
+          }
+          return event;
+        });
+        setFeed(normalizedEvents);
       }
     } catch (error) {
       console.error('Failed to load feed:', error);
