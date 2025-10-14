@@ -137,6 +137,7 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
                 </div>
               </PopoverContent>
             </Popover>
+            )}
 
             {workTags.length > 0 && (
             <Popover>
@@ -184,6 +185,7 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
                 </div>
               </PopoverContent>
             </Popover>
+            )}
 
             {contractorTags.length > 0 && (
             <Popover>
@@ -231,6 +233,7 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
                 </div>
               </PopoverContent>
             </Popover>
+            )}
 
             {selectedTags.length > 0 && (
             <Button
