@@ -6,9 +6,11 @@ import GanttChart from './GanttChart';
 
 interface ScheduleTabProps {
   works: Work[];
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 }
 
-const ScheduleTab = ({ works }: ScheduleTabProps) => {
+const ScheduleTab = ({ works, onRefresh, isRefreshing }: ScheduleTabProps) => {
   const [scheduleView, setScheduleView] = useState<'list' | 'gantt'>('list');
   const worksWithDates = works.filter(w => w.start_date && w.end_date);
 
@@ -16,7 +18,18 @@ const ScheduleTab = ({ works }: ScheduleTabProps) => {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-slate-900">График работ</h2>
-        <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
+        <div className="flex gap-2 items-center">
+          {onRefresh && (
+            <button
+              onClick={onRefresh}
+              disabled={isRefreshing}
+              className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors"
+              title="Обновить данные"
+            >
+              <Icon name={isRefreshing ? "Loader2" : "RefreshCw"} size={18} className={isRefreshing ? "animate-spin" : ""} />
+            </button>
+          )}
+          <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
           <button
             onClick={() => setScheduleView('list')}
             className={`px-3 py-1.5 text-xs md:text-sm rounded-md transition-colors ${
@@ -39,6 +52,7 @@ const ScheduleTab = ({ works }: ScheduleTabProps) => {
             <Icon name="BarChart3" size={16} className="inline mr-1 rotate-90" />
             Диаграмма
           </button>
+          </div>
         </div>
       </div>
 

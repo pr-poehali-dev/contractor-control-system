@@ -11,14 +11,18 @@ import JournalTab from '@/components/public-object/JournalTab';
 import ScheduleTab from '@/components/public-object/ScheduleTab';
 import AnalyticsTab from '@/components/public-object/AnalyticsTab';
 import InspectionsTab from '@/components/public-object/InspectionsTab';
+import { api } from '@/lib/api';
+import { useToast } from '@/hooks/use-toast';
 
 const PublicObject = () => {
   const { objectId } = useParams();
   const navigate = useNavigate();
-  const { userData } = useAuth();
+  const { userData, token, setUserData } = useAuth();
+  const { toast } = useToast();
   const [object, setObject] = useState<BuildingObject | null>(null);
   const [works, setWorks] = useState<Work[]>([]);
   const [activeTab, setActiveTab] = useState('info');
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     if (userData?.objects && objectId) {
@@ -56,6 +60,28 @@ const PublicObject = () => {
     });
   };
 
+  const handleRefreshData = async () => {
+    if (!token) return;
+    
+    setIsRefreshing(true);
+    try {
+      const refreshedData = await api.getUserData(token);
+      setUserData(refreshedData);
+      toast({
+        title: 'Данные обновлены',
+        description: 'График работ обновлён',
+      });
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось обновить данные',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
       <div className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
@@ -67,7 +93,13 @@ const PublicObject = () => {
         <div className="space-y-6">
           {activeTab === 'info' && <InfoTab object={object} formatDate={formatDate} />}
           {activeTab === 'journal' && <JournalTab works={works} />}
-          {activeTab === 'schedule' && <ScheduleTab works={works} />}
+          {activeTab === 'schedule' && (
+            <ScheduleTab 
+              works={works} 
+              onRefresh={handleRefreshData}
+              isRefreshing={isRefreshing}
+            />
+          )}
           {activeTab === 'analytics' && <AnalyticsTab />}
           {activeTab === 'inspections' && <InspectionsTab />}
         </div>

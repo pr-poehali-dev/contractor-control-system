@@ -228,49 +228,36 @@ def handler(event, context):
                 description = data.get('description', '').replace("'", "''")
                 status = data.get('status', 'active')
                 contractor_id = data.get('contractor_id')
+                start_date = data.get('start_date')
+                end_date = data.get('end_date')
+                
+                set_clause = f"title = '{title}', description = '{description}', status = '{status}'"
+                if contractor_id:
+                    set_clause += f", contractor_id = {int(contractor_id)}"
+                if start_date:
+                    set_clause += f", start_date = '{start_date}'"
+                if end_date:
+                    set_clause += f", end_date = '{end_date}'"
                 
                 if is_admin:
-                    if contractor_id:
-                        cur.execute(f"""
-                            UPDATE works 
-                            SET title = '{title}', description = '{description}', 
-                                status = '{status}', contractor_id = {int(contractor_id)}
-                            WHERE id = {int(item_id)}
-                            RETURNING id, title, description, object_id, contractor_id, status
-                        """)
-                    else:
-                        cur.execute(f"""
-                            UPDATE works 
-                            SET title = '{title}', description = '{description}', status = '{status}'
-                            WHERE id = {int(item_id)}
-                            RETURNING id, title, description, object_id, contractor_id, status
-                        """)
+                    cur.execute(f"""
+                        UPDATE works 
+                        SET {set_clause}
+                        WHERE id = {int(item_id)}
+                        RETURNING id, title, description, object_id, contractor_id, status, start_date, end_date
+                    """)
                 else:
-                    if contractor_id:
-                        cur.execute(f"""
-                            UPDATE works 
-                            SET title = '{title}', description = '{description}', 
-                                status = '{status}', contractor_id = {int(contractor_id)}
-                            WHERE id = {int(item_id)}
-                            AND object_id IN (
-                                SELECT o.id FROM objects o 
-                                JOIN projects p ON o.project_id = p.id 
-                                WHERE p.client_id = {user_id_int}
-                            )
-                            RETURNING id, title, description, object_id, contractor_id, status
-                        """)
-                    else:
-                        cur.execute(f"""
-                            UPDATE works 
-                            SET title = '{title}', description = '{description}', status = '{status}'
-                            WHERE id = {int(item_id)}
-                            AND object_id IN (
-                                SELECT o.id FROM objects o 
-                                JOIN projects p ON o.project_id = p.id 
-                                WHERE p.client_id = {user_id_int}
-                            )
-                            RETURNING id, title, description, object_id, contractor_id, status
-                        """)
+                    cur.execute(f"""
+                        UPDATE works 
+                        SET {set_clause}
+                        WHERE id = {int(item_id)}
+                        AND object_id IN (
+                            SELECT o.id FROM objects o 
+                            JOIN projects p ON o.project_id = p.id 
+                            WHERE p.client_id = {user_id_int}
+                        )
+                        RETURNING id, title, description, object_id, contractor_id, status, start_date, end_date
+                    """)
                 result_data = cur.fetchone()
             else:
                 cur.close()
