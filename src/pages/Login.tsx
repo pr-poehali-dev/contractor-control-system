@@ -202,13 +202,34 @@ const Login = () => {
           </div>
         </div>
 
-        <div className="mt-4 text-center text-xs text-slate-500">
-          <p>
-            Входя в систему, вы соглашаетесь с{' '}
-            <a href="#" className="text-blue-600 hover:underline">
-              условиями использования
-            </a>
-          </p>
+        <div className="mt-4 text-center space-y-2">
+          <Button
+            onClick={async () => {
+              try {
+                setIsLoading(true);
+                await login('admin@example.com', 'admin123');
+                navigate('/dashboard');
+              } catch (error) {
+                console.error('Quick admin login failed:', error);
+              } finally {
+                setIsLoading(false);
+              }
+            }}
+            variant="outline"
+            className="w-full"
+            disabled={isLoading}
+          >
+            Быстрый вход (admin)
+          </Button>
+          
+          <div className="text-center text-xs text-slate-500">
+            <p>
+              Входя в систему, вы соглашаетесь с{' '}
+              <a href="#" className="text-blue-600 hover:underline">
+                условиями использования
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </div>
