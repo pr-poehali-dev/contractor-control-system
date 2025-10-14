@@ -32,16 +32,16 @@ interface SiteData {
 
 interface ObjectsGridViewProps {
   sites: SiteData[];
-  userRole?: string;
-  onSiteClick: (site: SiteData) => void;
-  onDeleteObject: (objectId: number, e: React.MouseEvent) => Promise<void>;
+  isContractor?: boolean;
+  onSiteClick: (objectId: number) => void;
+  onDeleteSite: (objectId: number, e: React.MouseEvent) => Promise<void>;
 }
 
 export default function ObjectsGridView({
   sites,
-  userRole,
+  isContractor,
   onSiteClick,
-  onDeleteObject,
+  onDeleteSite,
 }: ObjectsGridViewProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -50,7 +50,7 @@ export default function ObjectsGridView({
           key={site.id}
           className="cursor-pointer hover:shadow-xl transition-all animate-fade-in group border-2 border-transparent hover:border-blue-200"
           style={{ animationDelay: `${index * 0.05}s` }}
-          onClick={() => onSiteClick(site)}
+          onClick={() => onSiteClick(site.id)}
         >
           <CardContent className="p-6">
             <div className="flex items-start justify-between gap-2 mb-4">
@@ -65,7 +65,7 @@ export default function ObjectsGridView({
                 }>
                   {statusLabels[site.status as keyof typeof statusLabels]}
                 </Badge>
-                {(userRole === 'client' || userRole === 'admin') && (
+                {!isContractor && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -75,7 +75,7 @@ export default function ObjectsGridView({
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem 
                         className="text-red-600"
-                        onClick={(e) => onDeleteObject(site.id, e)}
+                        onClick={(e) => onDeleteSite(site.id, e)}
                       >
                         <Icon name="Trash2" size={16} className="mr-2" />
                         Удалить
@@ -91,7 +91,7 @@ export default function ObjectsGridView({
               <span className="truncate">{site.address}</span>
             </div>
 
-            {userRole === 'client' && site.works[0]?.contractor_name && (
+            {!isContractor && site.works[0]?.contractor_name && (
               <div className="flex items-center gap-2 text-sm text-slate-600 mb-4">
                 <Icon name="User" size={16} />
                 <span>{site.works[0].contractor_name}</span>

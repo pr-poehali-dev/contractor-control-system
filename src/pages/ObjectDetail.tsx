@@ -26,8 +26,13 @@ const ObjectDetail = () => {
   const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
   const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
 
+  console.log('ObjectDetail: objectId =', objectId, 'type:', typeof objectId);
+  console.log('ObjectDetail: objects =', objects.map(o => ({ id: o.id, title: o.title })));
+  
   const object = objects.find(s => s.id === Number(objectId));
   let objectWorks = works.filter(w => w.object_id === Number(objectId));
+  
+  console.log('ObjectDetail: found object =', object ? object.title : 'NOT FOUND');
 
   if (sortBy === 'priority') {
     objectWorks = [...objectWorks].sort((a, b) => {

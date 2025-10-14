@@ -27,16 +27,16 @@ interface SiteData {
 
 interface ObjectsTableViewProps {
   sites: SiteData[];
-  userRole?: string;
-  onSiteClick: (site: SiteData) => void;
-  onDeleteObject: (objectId: number, e: React.MouseEvent) => Promise<void>;
+  isContractor?: boolean;
+  onSiteClick: (objectId: number) => void;
+  onDeleteSite: (objectId: number, e: React.MouseEvent) => Promise<void>;
 }
 
 export default function ObjectsTableView({
   sites,
-  userRole,
+  isContractor,
   onSiteClick,
-  onDeleteObject,
+  onDeleteSite,
 }: ObjectsTableViewProps) {
   return (
     <Card>
@@ -50,7 +50,7 @@ export default function ObjectsTableView({
                 <th className="text-left p-4 text-sm font-semibold text-slate-700">Статус</th>
                 <th className="text-left p-4 text-sm font-semibold text-slate-700">Прогресс</th>
                 <th className="text-right p-4 text-sm font-semibold text-slate-700">Работы</th>
-                {(userRole === 'client' || userRole === 'admin') && (
+                {!isContractor && (
                   <th className="text-right p-4 text-sm font-semibold text-slate-700">Действия</th>
                 )}
               </tr>
@@ -60,7 +60,7 @@ export default function ObjectsTableView({
                 <tr
                   key={site.id}
                   className="border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors"
-                  onClick={() => onSiteClick(site)}
+                  onClick={() => onSiteClick(site.id)}
                 >
                   <td className="p-4">
                     <p className="font-semibold text-slate-900">{site.title}</p>
@@ -91,7 +91,7 @@ export default function ObjectsTableView({
                       {site.completedWorks}/{site.worksCount}
                     </span>
                   </td>
-                  {(userRole === 'client' || userRole === 'admin') && (
+                  {!isContractor && (
                     <td className="p-4 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
@@ -102,7 +102,7 @@ export default function ObjectsTableView({
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem 
                             className="text-red-600"
-                            onClick={(e) => onDeleteObject(site.id, e)}
+                            onClick={(e) => onDeleteSite(site.id, e)}
                           >
                             <Icon name="Trash2" size={16} className="mr-2" />
                             Удалить

@@ -12,7 +12,7 @@ interface SiteData {
 
 interface ObjectsMobileListProps {
   sites: SiteData[];
-  onSiteClick: (site: SiteData) => void;
+  onSiteClick: (objectId: number) => void;
 }
 
 export default function ObjectsMobileList({
@@ -37,7 +37,7 @@ export default function ObjectsMobileList({
         <div
           key={site.id}
           className="p-4 active:bg-slate-50 transition-colors"
-          onClick={() => onSiteClick(site)}
+          onClick={() => onSiteClick(site.id)}
         >
           <div className="flex gap-3">
             <div className="flex-shrink-0 w-16 h-16 bg-slate-100 rounded-lg overflow-hidden flex items-center justify-center">
