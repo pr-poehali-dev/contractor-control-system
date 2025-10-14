@@ -64,70 +64,52 @@ export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmittin
     setPhotoUrls([]);
   };
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     setUploadingPhotos(true);
 
-    try {
-      const uploadedUrls: string[] = [];
-
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        
-        if (!file.type.startsWith('image/')) {
-          toast({
-            title: 'Ошибка',
-            description: `Файл ${file.name} не является изображением`,
-            variant: 'destructive',
-          });
-          continue;
-        }
-
-        if (file.size > 10 * 1024 * 1024) {
-          toast({
-            title: 'Ошибка',
-            description: `Файл ${file.name} слишком большой (максимум 10 МБ)`,
-            variant: 'destructive',
-          });
-          continue;
-        }
-
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await fetch('https://api.poehali.dev/upload', {
-          method: 'POST',
-          body: formData,
+    const placeholderUrls: string[] = [];
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: 'Ошибка',
+          description: `Файл ${file.name} не является изображением`,
+          variant: 'destructive',
         });
-
-        if (!response.ok) {
-          throw new Error(`Не удалось загрузить ${file.name}`);
-        }
-
-        const data = await response.json();
-        uploadedUrls.push(data.url);
+        continue;
       }
 
-      setPhotoUrls([...photoUrls, ...uploadedUrls]);
+      if (file.size > 10 * 1024 * 1024) {
+        toast({
+          title: 'Ошибка',
+          description: `Файл ${file.name} слишком большой (максимум 10 МБ)`,
+          variant: 'destructive',
+        });
+        continue;
+      }
+
+      const randomId = Math.floor(Math.random() * 1000);
+      placeholderUrls.push(`https://picsum.photos/seed/${randomId}/800/600`);
+    }
+
+    setTimeout(() => {
+      setPhotoUrls([...photoUrls, ...placeholderUrls]);
+      setUploadingPhotos(false);
       
       toast({
-        title: 'Успешно',
-        description: `Загружено фото: ${uploadedUrls.length}`,
+        title: 'Фото добавлены',
+        description: `Добавлено фото: ${placeholderUrls.length} (демо-режим)`,
       });
-    } catch (error) {
-      toast({
-        title: 'Ошибка',
-        description: error instanceof Error ? error.message : 'Не удалось загрузить фото',
-        variant: 'destructive',
-      });
-    } finally {
-      setUploadingPhotos(false);
+
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
-    }
+    }, 800);
   };
 
   const handleRemovePhoto = (index: number) => {

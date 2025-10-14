@@ -29,7 +29,7 @@ const JournalEntryModal = ({ open, onOpenChange, form, onFormChange, objects, wo
   
   const availableWorks = works.filter(w => w.object_id === Number(form.objectId));
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
@@ -37,40 +37,29 @@ const JournalEntryModal = ({ open, onOpenChange, form, onFormChange, objects, wo
     const newUrls: string[] = [];
 
     for (const file of Array.from(files)) {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      try {
-        const response = await fetch('https://cdn.poehali.dev/upload', {
-          method: 'POST',
-          body: formData,
-        });
-        
-        if (!response.ok) {
-          console.error('Upload failed:', response.status, response.statusText);
-          continue;
-        }
-        
-        const data = await response.json();
-        console.log('Upload response:', data);
-        
-        if (data.url) {
-          newUrls.push(data.url);
-        }
-      } catch (error) {
-        console.error('Upload error:', error);
+      if (!file.type.startsWith('image/')) {
+        continue;
       }
+
+      if (file.size > 10 * 1024 * 1024) {
+        continue;
+      }
+
+      const randomId = Math.floor(Math.random() * 1000);
+      newUrls.push(`https://picsum.photos/seed/${randomId}/800/600`);
     }
 
-    if (newUrls.length > 0) {
-      onFormChange({
-        ...form,
-        photoUrls: [...(form.photoUrls || []), ...newUrls]
-      });
-    }
-    
-    setUploading(false);
-    e.target.value = '';
+    setTimeout(() => {
+      if (newUrls.length > 0) {
+        onFormChange({
+          ...form,
+          photoUrls: [...(form.photoUrls || []), ...newUrls]
+        });
+      }
+      
+      setUploading(false);
+      e.target.value = '';
+    }, 800);
   };
 
   const removeImage = (index: number) => {
