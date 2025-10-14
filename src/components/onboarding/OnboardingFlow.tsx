@@ -67,7 +67,8 @@ const OnboardingFlow = ({ userId, userRole, registrationDate }: OnboardingFlowPr
 
   const handleWelcomeClose = (open: boolean) => {
     if (!open) {
-      localStorage.setItem(`onboarding_v2_${userId}`, 'closed');
+      localStorage.setItem(`onboarding_v2_${userId}`, 'skipped');
+      setShowProUpgrade(true);
     }
     setShowWelcome(open);
   };

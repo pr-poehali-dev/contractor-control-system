@@ -1,16 +1,12 @@
 import { ReactNode } from 'react';
 import TopNavigation from '@/components/layout/TopNavigation';
 import BottomNavigation from '@/components/layout/BottomNavigation';
-import DiscountTimer from '@/components/pricing/DiscountTimer';
-import { useAuth } from '@/contexts/AuthContext';
 
 interface LayoutProps {
   children: ReactNode;
 }
 
 const Layout = ({ children }: LayoutProps) => {
-  const { user } = useAuth();
-
   return (
     <div className="flex flex-col h-screen bg-slate-50">
       <TopNavigation />
@@ -18,8 +14,6 @@ const Layout = ({ children }: LayoutProps) => {
         {children}
       </main>
       <BottomNavigation />
-      
-      {user?.role === 'client' && <DiscountTimer />}
     </div>
   );
 };
