@@ -29,16 +29,11 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
             <Icon name="ChevronLeft" size={18} />
           </Button>
           
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex-shrink-0 flex items-center justify-center">
-              <Icon name="Wrench" size={15} className="text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              {organizationName && (
-                <div className="text-[10px] text-slate-500 truncate leading-tight">{organizationName}</div>
-              )}
-              <h1 className="text-[13px] font-bold text-slate-900 leading-tight truncate">{selectedWorkData.title}</h1>
-            </div>
+          <div className="flex-1 min-w-0">
+            {organizationName && (
+              <div className="text-[10px] text-slate-500 truncate leading-tight">{organizationName}</div>
+            )}
+            <h1 className="text-[14px] font-bold text-slate-900 leading-tight truncate">{selectedWorkData.title}</h1>
           </div>
 
           {(userRole === 'client' || userRole === 'admin') && onEdit && (
