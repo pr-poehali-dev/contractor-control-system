@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
 import { JournalEvent } from '@/types/journal';
+import { PhotoGallery, PhotoViewer, usePhotoGallery } from '@/components/ui/photo-gallery';
 
 interface EventItemProps {
   event: JournalEvent;
@@ -23,6 +24,9 @@ export default function EventItem({
   formatTime, 
   getInitials 
 }: EventItemProps) {
+  const workPhotosGallery = usePhotoGallery();
+  const inspectionPhotosGallery = usePhotoGallery();
+  const defectPhotosGallery = usePhotoGallery();
   
   const renderEventContent = () => {
     switch (event.type) {
@@ -61,15 +65,11 @@ export default function EventItem({
             )}
             
             {event.work_data?.photos && event.work_data.photos.length > 0 && (
-              <div className="mt-3 grid grid-cols-2 gap-2 sm:gap-3">
-                {event.work_data.photos.map((photo, idx) => (
-                  <img 
-                    key={idx}
-                    src={photo} 
-                    alt={`Фото ${idx + 1}`}
-                    className="w-full h-32 sm:h-40 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
-                  />
-                ))}
+              <div className="mt-3">
+                <PhotoGallery 
+                  photos={event.work_data.photos} 
+                  onPhotoClick={workPhotosGallery.openGallery}
+                />
               </div>
             )}
           </>
@@ -119,15 +119,11 @@ export default function EventItem({
             )}
             
             {event.inspection_data?.photos && event.inspection_data.photos.length > 0 && (
-              <div className="mt-3 grid grid-cols-2 gap-2 sm:gap-3">
-                {event.inspection_data.photos.map((photo, idx) => (
-                  <img 
-                    key={idx}
-                    src={photo} 
-                    alt={`Проверка ${idx + 1}`}
-                    className="w-full h-32 sm:h-40 object-cover rounded-lg hover:opacity-90 transition-opacity shadow-sm"
-                  />
-                ))}
+              <div className="mt-3">
+                <PhotoGallery 
+                  photos={event.inspection_data.photos} 
+                  onPhotoClick={inspectionPhotosGallery.openGallery}
+                />
               </div>
             )}
           </>
@@ -192,15 +188,11 @@ export default function EventItem({
                   </p>
                 )}
                 {event.defect_data?.photos && event.defect_data.photos.length > 0 && (
-                  <div className="mt-3 grid grid-cols-2 gap-2 sm:gap-3">
-                    {event.defect_data.photos.map((photo, idx) => (
-                      <img 
-                        key={idx}
-                        src={photo} 
-                        alt={`Замечание ${idx + 1}`}
-                        className="w-full h-32 sm:h-40 object-cover rounded-lg hover:opacity-90 transition-opacity shadow-sm"
-                      />
-                    ))}
+                  <div className="mt-3">
+                    <PhotoGallery 
+                      photos={event.defect_data.photos} 
+                      onPhotoClick={defectPhotosGallery.openGallery}
+                    />
                   </div>
                 )}
               </div>
@@ -298,6 +290,36 @@ export default function EventItem({
           </CardContent>
         </Card>
       </div>
+
+      {event.work_data?.photos && event.work_data.photos.length > 0 && (
+        <PhotoViewer
+          photos={event.work_data.photos}
+          currentIndex={workPhotosGallery.currentIndex}
+          isOpen={workPhotosGallery.isOpen}
+          onClose={workPhotosGallery.closeGallery}
+          onNavigate={workPhotosGallery.navigateToPhoto}
+        />
+      )}
+
+      {event.inspection_data?.photos && event.inspection_data.photos.length > 0 && (
+        <PhotoViewer
+          photos={event.inspection_data.photos}
+          currentIndex={inspectionPhotosGallery.currentIndex}
+          isOpen={inspectionPhotosGallery.isOpen}
+          onClose={inspectionPhotosGallery.closeGallery}
+          onNavigate={inspectionPhotosGallery.navigateToPhoto}
+        />
+      )}
+
+      {event.defect_data?.photos && event.defect_data.photos.length > 0 && (
+        <PhotoViewer
+          photos={event.defect_data.photos}
+          currentIndex={defectPhotosGallery.currentIndex}
+          isOpen={defectPhotosGallery.isOpen}
+          onClose={defectPhotosGallery.closeGallery}
+          onNavigate={defectPhotosGallery.navigateToPhoto}
+        />
+      )}
     </div>
   );
 }
