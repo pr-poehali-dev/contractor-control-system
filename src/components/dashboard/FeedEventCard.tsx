@@ -175,11 +175,11 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, userRole }
         )}
 
         {event.type !== 'info_post' && (event.objectTitle || event.author) && (
-          <div className="flex gap-2 flex-wrap mb-3">
+          <div className="flex gap-2 mb-3 overflow-hidden">
             {event.objectTitle && (
               <Badge 
                 variant="outline" 
-                className="text-xs px-2.5 py-1 font-normal cursor-pointer hover:bg-slate-100 transition-colors"
+                className="text-xs px-2.5 py-1 font-normal cursor-pointer hover:bg-slate-100 transition-colors flex items-center gap-1 max-w-[200px] flex-shrink-0"
                 onClick={(e) => {
                   e.stopPropagation();
                   if (event.objectId && onTagClick) {
@@ -187,17 +187,17 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, userRole }
                   }
                 }}
               >
-                <Icon name="Building2" size={12} className="mr-1" />
-                {event.objectTitle}
+                <Icon name="Building2" size={12} className="flex-shrink-0" />
+                <span className="truncate">{event.objectTitle}</span>
               </Badge>
             )}
             {event.author && (
               <Badge 
                 variant="outline" 
-                className="text-xs px-2.5 py-1 font-normal"
+                className="text-xs px-2.5 py-1 font-normal flex items-center gap-1 max-w-[180px] flex-shrink-0"
               >
-                <Icon name="User" size={12} className="mr-1" />
-                {event.author}
+                <Icon name="User" size={12} className="flex-shrink-0" />
+                <span className="truncate">{event.author}</span>
               </Badge>
             )}
           </div>
