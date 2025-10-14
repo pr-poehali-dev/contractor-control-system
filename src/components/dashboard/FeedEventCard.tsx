@@ -60,6 +60,16 @@ const getEventLabel = (type: string) => {
   }
 };
 
+const getEventBadgeColor = (type: string) => {
+  switch(type) {
+    case 'work_log': return 'bg-blue-100 text-blue-700 border-blue-200';
+    case 'inspection': return 'bg-purple-100 text-purple-700 border-purple-200';
+    case 'planned_inspection': return 'bg-purple-100 text-purple-700 border-purple-200';
+    case 'info_post': return 'bg-orange-100 text-orange-700 border-orange-200';
+    default: return 'bg-slate-100 text-slate-700';
+  }
+};
+
 const formatTimeAgo = (timestamp: string) => {
   const date = new Date(timestamp);
   const now = new Date();
@@ -148,7 +158,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, userRole }
                 }
               </p>
               <span className="text-slate-300">·</span>
-              <Badge variant="secondary" className="text-[10px] font-normal px-1.5 py-0">
+              <Badge variant="outline" className={`text-[10px] font-normal px-1.5 py-0 ${getEventBadgeColor(event.type)}`}>
                 {getEventLabel(event.type)}
               </Badge>
             </div>
