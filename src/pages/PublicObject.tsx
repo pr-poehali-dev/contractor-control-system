@@ -7,18 +7,18 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 
 interface Work {
-  id: string;
+  id: number;
   title: string;
   description: string;
+  object_id: number;
   status: string;
-  contractor_organization?: string;
+  contractor_name?: string;
   start_date?: string;
   end_date?: string;
-  progress: number;
 }
 
 interface BuildingObject {
-  id: string;
+  id: number;
   title: string;
   address?: string;
   description?: string;
@@ -36,12 +36,12 @@ const PublicObject = () => {
 
   useEffect(() => {
     if (userData?.objects && objectId) {
-      const foundObject = userData.objects.find((obj: BuildingObject) => obj.id === objectId);
+      const foundObject = userData.objects.find((obj: BuildingObject) => obj.id === Number(objectId));
       setObject(foundObject || null);
       
       if (userData.works) {
         const objectWorks = userData.works.filter((work: Work) => 
-          work.id.startsWith(objectId)
+          work.object_id === Number(objectId)
         );
         setWorks(objectWorks);
       }
@@ -143,10 +143,10 @@ const PublicObject = () => {
                     )}
                   </div>
 
-                  {work.contractor_organization && (
+                  {work.contractor_name && (
                     <div className="flex items-center gap-2 text-sm text-slate-600 mb-3">
                       <Icon name="Users" size={16} />
-                      <span className="truncate">{work.contractor_organization}</span>
+                      <span className="truncate">{work.contractor_name}</span>
                     </div>
                   )}
 
@@ -161,18 +161,7 @@ const PublicObject = () => {
                     </div>
                   )}
 
-                  <div className="mt-4">
-                    <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-slate-600">Прогресс</span>
-                      <span className="font-semibold text-slate-900">{work.progress}%</span>
-                    </div>
-                    <div className="w-full bg-slate-200 rounded-full h-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${work.progress}%` }}
-                      />
-                    </div>
-                  </div>
+
                 </CardContent>
               </Card>
             ))}
