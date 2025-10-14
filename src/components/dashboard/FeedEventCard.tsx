@@ -163,12 +163,12 @@ const FeedEventCard = ({ event, index, onStartInspection, userRole }: FeedEventC
           </div>
         )}
 
-        <div className="mb-3">
-          <h4 className="font-medium text-slate-900 mb-2 text-sm leading-snug">{event.title}</h4>
+        <div className="mb-2">
+          <h4 className="font-medium text-slate-900 text-sm leading-snug">{event.title}</h4>
         </div>
 
         {photos.length > 0 && (
-        <div className="relative bg-black group">
+        <div className="relative bg-black group mb-3 rounded-lg overflow-hidden">
           <div className="relative aspect-[4/3] md:aspect-video cursor-pointer" onClick={handleImageClick}>
             <img 
               src={photos[currentImageIndex]} 
@@ -222,7 +222,7 @@ const FeedEventCard = ({ event, index, onStartInspection, userRole }: FeedEventC
         </div>
       )}
 
-        <div className="mt-3">
+        <div>
           <p className="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed">
             {event.description}
           </p>
