@@ -99,29 +99,25 @@ def handler(event, context):
                 conn.commit()
                 
             elif item_type == 'object':
-                project_id = data.get('project_id')
-                
-                if not project_id:
-                    cur.execute(f"SELECT id FROM projects WHERE client_id = {user_id_int} LIMIT 1")
-                    project_row = cur.fetchone()
-                    
-                    if not project_row:
-                        cur.execute(f"""
-                            INSERT INTO projects (title, description, status, client_id, created_at)
-                            VALUES ('Мой проект', 'Основной проект', 'active', {user_id_int}, NOW())
-                            RETURNING id
-                        """)
-                        project_row = cur.fetchone()
-                        conn.commit()
-                    
-                    project_id = project_row['id']
-                
                 title = data.get('title', '').replace("'", "''")
                 address = data.get('address', '').replace("'", "''")
                 description = data.get('description', '').replace("'", "''") if data.get('description') else None
                 status = data.get('status', 'active')
                 
-                print(f"DEBUG: Creating object with title={title}, address={address}, project_id={project_id}")
+                # Получаем или создаем дефолтный project_id для обратной совместимости
+                cur.execute(f"SELECT id FROM projects WHERE client_id = {user_id_int} LIMIT 1")
+                project_row = cur.fetchone()
+                
+                if not project_row:
+                    cur.execute(f"""
+                        INSERT INTO projects (title, description, status, client_id, created_at)
+                        VALUES ('Основной', 'Автоматически созданный проект', 'active', {user_id_int}, NOW())
+                        RETURNING id
+                    """)
+                    project_row = cur.fetchone()
+                    conn.commit()
+                
+                project_id = project_row['id']
                 
                 fields = ['title', 'status', 'client_id', 'project_id', 'created_at', 'updated_at']
                 values = [f"'{title}'", f"'{status}'", str(user_id_int), str(int(project_id)), 'NOW()', 'NOW()']
@@ -136,18 +132,13 @@ def handler(event, context):
                 fields_str = ', '.join(fields)
                 values_str = ', '.join(values)
                 
-                sql = f"""
+                cur.execute(f"""
                     INSERT INTO objects ({fields_str})
                     VALUES ({values_str})
-                    RETURNING id, title, address, description, project_id, status, client_id, created_at, updated_at
-                """
-                print(f"DEBUG: SQL = {sql}")
-                
-                cur.execute(sql)
+                    RETURNING id, title, address, description, status, client_id, created_at, updated_at
+                """)
                 result = cur.fetchone()
                 conn.commit()
-                
-                print(f"DEBUG: Object created successfully, id={result.get('id')}")
                 
             elif item_type == 'work':
                 object_id = int(data.get('object_id', 0))
