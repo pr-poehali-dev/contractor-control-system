@@ -42,49 +42,10 @@ const CreateObject = () => {
     setIsSubmitting(true);
 
     try {
-      const userData = await api.getUserData(token!);
-      
-      if (!userData.objects || userData.objects.length === 0) {
-        const projectResponse = await fetch('https://functions.poehali.dev/8d57b03e-49c5-4589-abfb-691e6e084c6a', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Auth-Token': token!,
-          },
-          body: JSON.stringify({
-            type: 'project',
-            data: {
-              title: 'Мой проект',
-              description: 'Основной проект',
-              status: 'active'
-            }
-          })
-        });
-        
-        if (!projectResponse.ok) {
-          throw new Error('Не удалось создать проект');
-        }
-      }
-      
-      const refreshedData = await api.getUserData(token!);
-      const projects = await fetch('https://functions.poehali.dev/c30e1bf9-0423-48e8-b295-07120e205fa7?type=projects', {
-        method: 'GET',
-        headers: {
-          'X-Auth-Token': token!,
-        },
-      }).then(res => res.json());
-      
-      const projectId = projects.data?.[0]?.id;
-      
-      if (!projectId) {
-        throw new Error('Не найден проект для создания объекта');
-      }
-      
       await api.createItem(token!, 'object', {
         title: formData.title,
         address: formData.address,
         status: 'active',
-        project_id: projectId,
       });
 
       if (token) {

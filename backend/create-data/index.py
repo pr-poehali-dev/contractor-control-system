@@ -100,12 +100,21 @@ def handler(event, context):
                 
             elif item_type == 'object':
                 project_id = data.get('project_id')
+                
                 if not project_id:
-                    return {
-                        'statusCode': 400,
-                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                        'body': json.dumps({'error': 'project_id is required for object creation'})
-                    }
+                    cur.execute(f"SELECT id FROM projects WHERE client_id = {user_id_int} LIMIT 1")
+                    project_row = cur.fetchone()
+                    
+                    if not project_row:
+                        cur.execute(f"""
+                            INSERT INTO projects (title, description, status, client_id, created_at)
+                            VALUES ('Мой проект', 'Основной проект', 'active', {user_id_int}, NOW())
+                            RETURNING id
+                        """)
+                        project_row = cur.fetchone()
+                        conn.commit()
+                    
+                    project_id = project_row['id']
                 
                 title = data.get('title', '').replace("'", "''")
                 address = data.get('address', '').replace("'", "''")
