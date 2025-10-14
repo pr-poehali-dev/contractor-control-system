@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -8,62 +9,64 @@ import {
 } from "@/components/ui/select";
 import Icon from '@/components/ui/icon';
 
-interface Project {
-  id: number;
-  title: string;
+interface StatusOption {
+  value: string;
+  label: string;
 }
 
 interface ObjectsMobileHeaderProps {
-  selectedProject: string;
-  setSelectedProject: (value: string) => void;
-  sortBy: string;
-  setSortBy: (value: string) => void;
-  projects: Project[];
-  onNavigateProfile: () => void;
+  searchQuery: string;
+  setSearchQuery: (value: string) => void;
+  selectedStatus: string;
+  setSelectedStatus: (value: string) => void;
+  statusOptions: StatusOption[];
+  onCreateClick: () => void;
+  isContractor: boolean;
 }
 
 export default function ObjectsMobileHeader({
-  selectedProject,
-  setSelectedProject,
-  sortBy,
-  setSortBy,
-  projects,
-  onNavigateProfile,
+  searchQuery,
+  setSearchQuery,
+  selectedStatus,
+  setSelectedStatus,
+  statusOptions,
+  onCreateClick,
+  isContractor,
 }: ObjectsMobileHeaderProps) {
   return (
     <div className="md:hidden bg-white border-b border-slate-200 p-4">
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-slate-900">Главная</h1>
-        </div>
-        <Button variant="ghost" size="icon" onClick={onNavigateProfile}>
-          <Icon name="User" size={24} />
-        </Button>
+        <h1 className="text-2xl font-bold text-slate-900">Объекты</h1>
+        {!isContractor && (
+          <Button size="sm" onClick={onCreateClick}>
+            <Icon name="Plus" size={18} className="mr-1" />
+            Добавить
+          </Button>
+        )}
       </div>
       
-      <div className="space-y-2">
-        <Select value={selectedProject} onValueChange={setSelectedProject}>
+      <div className="space-y-3">
+        <div className="relative">
+          <Icon name="Search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Input
+            type="text"
+            placeholder="Поиск по названию, адресу..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 h-11"
+          />
+        </div>
+        
+        <Select value={selectedStatus} onValueChange={setSelectedStatus}>
           <SelectTrigger className="w-full h-11">
-            <SelectValue placeholder="Все объекты" />
+            <SelectValue placeholder="Все статусы" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Все объекты</SelectItem>
-            {projects.map(project => (
-              <SelectItem key={project.id} value={String(project.id)}>
-                {project.title}
+            {statusOptions && Array.isArray(statusOptions) && statusOptions.map(option => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
               </SelectItem>
             ))}
-          </SelectContent>
-        </Select>
-        
-        <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-full h-11">
-            <SelectValue placeholder="По дате" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="date">По дате</SelectItem>
-            <SelectItem value="name">По названию</SelectItem>
-            <SelectItem value="progress">По приоритету</SelectItem>
           </SelectContent>
         </Select>
       </div>
