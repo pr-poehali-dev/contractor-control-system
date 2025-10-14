@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
+import { useToast } from '@/hooks/use-toast';
 
 interface Material {
   name: string;
@@ -25,10 +26,13 @@ interface WorkReportModalProps {
 }
 
 export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmitting }: WorkReportModalProps) {
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [description, setDescription] = useState('');
   const [workVolume, setWorkVolume] = useState('');
   const [materials, setMaterials] = useState<Material[]>([{ name: '', quantity: 0, unit: '' }]);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
 
   const handleAddMaterial = () => {
     setMaterials([...materials, { name: '', quantity: 0, unit: '' }]);
@@ -58,6 +62,76 @@ export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmittin
     setWorkVolume('');
     setMaterials([{ name: '', quantity: 0, unit: '' }]);
     setPhotoUrls([]);
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadingPhotos(true);
+
+    try {
+      const uploadedUrls: string[] = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        if (!file.type.startsWith('image/')) {
+          toast({
+            title: 'Ошибка',
+            description: `Файл ${file.name} не является изображением`,
+            variant: 'destructive',
+          });
+          continue;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+          toast({
+            title: 'Ошибка',
+            description: `Файл ${file.name} слишком большой (максимум 10 МБ)`,
+            variant: 'destructive',
+          });
+          continue;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('https://api.poehali.dev/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Не удалось загрузить ${file.name}`);
+        }
+
+        const data = await response.json();
+        uploadedUrls.push(data.url);
+      }
+
+      setPhotoUrls([...photoUrls, ...uploadedUrls]);
+      
+      toast({
+        title: 'Успешно',
+        description: `Загружено фото: ${uploadedUrls.length}`,
+      });
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: error instanceof Error ? error.message : 'Не удалось загрузить фото',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploadingPhotos(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleRemovePhoto = (index: number) => {
+    setPhotoUrls(photoUrls.filter((_, i) => i !== index));
   };
 
   const handleClose = () => {
@@ -153,14 +227,54 @@ export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmittin
 
           <div>
             <Label>Фотографии</Label>
-            <div className="mt-2 border-2 border-dashed rounded-lg p-6 text-center hover:bg-slate-50 cursor-pointer transition-colors">
-              <Icon name="Camera" size={32} className="mx-auto text-slate-400 mb-2" />
-              <p className="text-sm text-slate-600 mb-1">Нажмите для добавления фото</p>
-              <p className="text-xs text-slate-400">(до/после работ)</p>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+            <div 
+              className="mt-2 border-2 border-dashed rounded-lg p-6 text-center hover:bg-slate-50 cursor-pointer transition-colors"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {uploadingPhotos ? (
+                <>
+                  <Icon name="Loader2" size={32} className="mx-auto text-blue-600 mb-2 animate-spin" />
+                  <p className="text-sm text-slate-600 mb-1">Загрузка...</p>
+                </>
+              ) : (
+                <>
+                  <Icon name="Camera" size={32} className="mx-auto text-slate-400 mb-2" />
+                  <p className="text-sm text-slate-600 mb-1">Нажмите для добавления фото</p>
+                  <p className="text-xs text-slate-400">(до/после работ, до 10 МБ каждое)</p>
+                </>
+              )}
             </div>
             {photoUrls.length > 0 && (
-              <div className="mt-3 text-sm text-slate-600">
-                Добавлено фото: {photoUrls.length}
+              <div className="mt-3 space-y-2">
+                <p className="text-sm text-slate-600 font-medium">Добавлено фото: {photoUrls.length}</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {photoUrls.map((url, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={url}
+                        alt={`Фото ${index + 1}`}
+                        className="w-full h-24 object-cover rounded-lg border"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => handleRemovePhoto(index)}
+                      >
+                        <Icon name="X" size={14} />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
