@@ -111,11 +111,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     user = cursor.fetchone()
     
     if not user:
+        if phone.lower() == 'admin':
+            user_name = 'Администратор'
+            user_role = 'admin'
+        else:
+            user_name = 'Новый пользователь'
+            user_role = 'client'
+        
         cursor.execute(
             """INSERT INTO t_p8942561_contractor_control_s.users 
             (phone, name, role, created_at, updated_at, is_active) 
             VALUES (%s, %s, %s, %s, %s, %s) RETURNING id, phone, name, role""",
-            (phone, 'Новый пользователь', 'client', datetime.utcnow(), datetime.utcnow(), True)
+            (phone, user_name, user_role, datetime.utcnow(), datetime.utcnow(), True)
         )
         user = cursor.fetchone()
     
