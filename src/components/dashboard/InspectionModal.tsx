@@ -9,21 +9,18 @@ interface InspectionModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   form: {
-    projectId: string;
     objectId: string;
     workId: string;
     scheduledDate: string;
     notes: string;
   };
   onFormChange: (form: any) => void;
-  projects: any[];
-  sites: any[];
+  objects: any[];
   works: any[];
   onSubmit: () => void;
 }
 
-const InspectionModal = ({ open, onOpenChange, form, onFormChange, projects, sites, works, onSubmit }: InspectionModalProps) => {
-  const projectSites = sites.filter(s => s.project_id === Number(form.projectId));
+const InspectionModal = ({ open, onOpenChange, form, onFormChange, objects, works, onSubmit }: InspectionModalProps) => {
   const availableWorks = works.filter(w => w.object_id === Number(form.objectId));
 
   return (
@@ -46,34 +43,18 @@ const InspectionModal = ({ open, onOpenChange, form, onFormChange, projects, sit
           </div>
 
           <div>
-            <Label>Проект</Label>
-            <Select value={form.projectId} onValueChange={(val) => onFormChange({...form, projectId: val, objectId: '', workId: ''})}>
+            <Label>Объект</Label>
+            <Select value={form.objectId} onValueChange={(val) => onFormChange({...form, objectId: val, workId: ''})}>
               <SelectTrigger>
-                <SelectValue placeholder="Выберите проект" />
+                <SelectValue placeholder="Выберите объект" />
               </SelectTrigger>
               <SelectContent>
-                {projects.map((p: any) => (
-                  <SelectItem key={p.id} value={String(p.id)}>{p.title}</SelectItem>
+                {objects.map((obj: any) => (
+                  <SelectItem key={obj.id} value={String(obj.id)}>{obj.title}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-
-          {form.projectId && (
-            <div>
-              <Label>Объект</Label>
-              <Select value={form.objectId} onValueChange={(val) => onFormChange({...form, objectId: val, workId: ''})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Выберите объект" />
-                </SelectTrigger>
-                <SelectContent>
-                  {projectSites.map((site: any) => (
-                    <SelectItem key={site.id} value={String(site.id)}>{site.title}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
 
           {form.objectId && (
             <div>
@@ -92,7 +73,7 @@ const InspectionModal = ({ open, onOpenChange, form, onFormChange, projects, sit
           )}
 
           <div>
-            <Label>Примечания (необязательно)</Label>
+            <Label>Примечания</Label>
             <Textarea 
               placeholder="Дополнительная информация..."
               value={form.notes}

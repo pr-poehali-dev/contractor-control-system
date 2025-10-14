@@ -23,9 +23,7 @@ interface FeedEvent {
   status?: string;
   workId?: number;
   objectId?: number;
-  projectId?: number;
   objectTitle?: string;
-  projectTitle?: string;
   workTitle?: string;
   author?: string;
   photoUrls?: string[];
@@ -49,7 +47,6 @@ const Dashboard = () => {
   const [showInfoPostModal, setShowInfoPostModal] = useState(false);
 
   const [journalForm, setJournalForm] = useState({
-    projectId: '',
     objectId: '',
     workId: '',
     description: '',
@@ -59,7 +56,6 @@ const Dashboard = () => {
   });
 
   const [inspectionForm, setInspectionForm] = useState({
-    projectId: '',
     objectId: '',
     workId: '',
     scheduledDate: '',
@@ -72,15 +68,14 @@ const Dashboard = () => {
     link: ''
   });
 
-  const projects = userData?.projects || [];
-  const sites = userData?.sites || [];
+  const objects = userData?.objects || [];
   const works = userData?.works || [];
 
   useEffect(() => {
     if (!user) return;
 
     const checkOnboarding = () => {
-      if (user.id === 3 && projects.length === 0) {
+      if (user.id === 3 && objects.length === 0) {
         const hasSeenOnboarding = localStorage.getItem(`onboarding_${user.id}`);
         if (!hasSeenOnboarding) {
           setShowOnboarding(true);
@@ -89,7 +84,7 @@ const Dashboard = () => {
     };
 
     checkOnboarding();
-  }, [user, projects.length]);
+  }, [user, objects.length]);
 
   useEffect(() => {
     loadFeed();
@@ -117,13 +112,11 @@ const Dashboard = () => {
     return <OnboardingBanner onClose={() => setShowOnboarding(false)} />;
   }
 
-
-
   const handleEventClick = (event: FeedEvent) => {
     if (event.type === 'info_post') return;
     
-    if (event.projectId && event.objectId && event.workId) {
-      navigate(`/projects/${event.projectId}/objects/${event.objectId}`, {
+    if (event.objectId && event.workId) {
+      navigate(`/objects/${event.objectId}`, {
         state: { scrollToWork: event.workId }
       });
     }
@@ -139,7 +132,7 @@ const Dashboard = () => {
       });
 
   const handleCreateJournalEntry = async () => {
-    if (!journalForm.projectId || !journalForm.objectId || !journalForm.workId || !journalForm.description) {
+    if (!journalForm.objectId || !journalForm.workId || !journalForm.description) {
       toast({
         title: 'Ошибка',
         description: 'Заполните все обязательные поля',
@@ -149,7 +142,6 @@ const Dashboard = () => {
     }
 
     try {
-      // Добавляем placeholder фотографии если их нет
       const photoUrls = journalForm.photoUrls && journalForm.photoUrls.length > 0 
         ? journalForm.photoUrls 
         : [
@@ -172,7 +164,6 @@ const Dashboard = () => {
 
       setShowJournalModal(false);
       setJournalForm({
-        projectId: '',
         objectId: '',
         workId: '',
         description: '',
@@ -194,7 +185,7 @@ const Dashboard = () => {
   };
 
   const handleScheduleInspection = async () => {
-    if (!inspectionForm.projectId || !inspectionForm.objectId || !inspectionForm.workId || !inspectionForm.scheduledDate) {
+    if (!inspectionForm.objectId || !inspectionForm.workId || !inspectionForm.scheduledDate) {
       toast({
         title: 'Ошибка',
         description: 'Заполните все обязательные поля',
@@ -218,7 +209,6 @@ const Dashboard = () => {
 
       setShowInspectionModal(false);
       setInspectionForm({
-        projectId: '',
         objectId: '',
         workId: '',
         scheduledDate: '',
@@ -305,7 +295,7 @@ const Dashboard = () => {
                       <Icon name="Inbox" size={32} className="text-slate-400" />
                     </div>
                     <p className="text-slate-600 mb-2">Пока нет событий</p>
-                    <p className="text-sm text-slate-500">События появятся, когда начнется работа над проектами</p>
+                    <p className="text-sm text-slate-500">События появятся, когда начнется работа над объектами</p>
                   </CardContent>
                 </Card>
               ) : (
@@ -317,8 +307,8 @@ const Dashboard = () => {
                     onClick={handleEventClick}
                     userRole={user?.role}
                     onStartInspection={(event) => {
-                      if (event.workId && event.objectId && event.projectId) {
-                        navigate(`/projects/${event.projectId}/objects/${event.objectId}`, {
+                      if (event.workId && event.objectId) {
+                        navigate(`/objects/${event.objectId}`, {
                           state: { scrollToWork: event.workId, startInspection: true }
                         });
                       }
@@ -335,8 +325,7 @@ const Dashboard = () => {
         onOpenChange={setShowJournalModal}
         form={journalForm}
         onFormChange={setJournalForm}
-        projects={projects}
-        sites={sites}
+        objects={objects}
         works={works}
         onSubmit={handleCreateJournalEntry}
       />
@@ -346,8 +335,7 @@ const Dashboard = () => {
         onOpenChange={setShowInspectionModal}
         form={inspectionForm}
         onFormChange={setInspectionForm}
-        projects={projects}
-        sites={sites}
+        objects={objects}
         works={works}
         onSubmit={handleScheduleInspection}
       />

@@ -11,7 +11,6 @@ interface JournalEntryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   form: {
-    projectId: string;
     objectId: string;
     workId: string;
     description: string;
@@ -20,16 +19,14 @@ interface JournalEntryModalProps {
     photoUrls?: string[];
   };
   onFormChange: (form: any) => void;
-  projects: any[];
-  sites: any[];
+  objects: any[];
   works: any[];
   onSubmit: () => void;
 }
 
-const JournalEntryModal = ({ open, onOpenChange, form, onFormChange, projects, sites, works, onSubmit }: JournalEntryModalProps) => {
+const JournalEntryModal = ({ open, onOpenChange, form, onFormChange, objects, works, onSubmit }: JournalEntryModalProps) => {
   const [uploading, setUploading] = useState(false);
   
-  const projectSites = sites.filter(s => s.project_id === Number(form.projectId));
   const availableWorks = works.filter(w => w.object_id === Number(form.objectId));
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,34 +89,18 @@ const JournalEntryModal = ({ open, onOpenChange, form, onFormChange, projects, s
 
         <div className="space-y-4 py-4">
           <div>
-            <Label>Проект</Label>
-            <Select value={form.projectId} onValueChange={(val) => onFormChange({...form, projectId: val, objectId: '', workId: ''})}>
+            <Label>Объект</Label>
+            <Select value={form.objectId} onValueChange={(val) => onFormChange({...form, objectId: val, workId: ''})}>
               <SelectTrigger>
-                <SelectValue placeholder="Выберите проект" />
+                <SelectValue placeholder="Выберите объект" />
               </SelectTrigger>
               <SelectContent>
-                {projects.map((p: any) => (
-                  <SelectItem key={p.id} value={String(p.id)}>{p.title}</SelectItem>
+                {objects.map((obj: any) => (
+                  <SelectItem key={obj.id} value={String(obj.id)}>{obj.title}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-
-          {form.projectId && (
-            <div>
-              <Label>Объект</Label>
-              <Select value={form.objectId} onValueChange={(val) => onFormChange({...form, objectId: val, workId: ''})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Выберите объект" />
-                </SelectTrigger>
-                <SelectContent>
-                  {projectSites.map((site: any) => (
-                    <SelectItem key={site.id} value={String(site.id)}>{site.title}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
 
           {form.objectId && (
             <div>

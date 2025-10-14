@@ -18,7 +18,6 @@ export default function Objects() {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  const [selectedProject, setSelectedProject] = useState<string>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [sortBy, setSortBy] = useState<string>('date');
   const isContractor = user?.role === 'contractor';
@@ -42,120 +41,122 @@ export default function Objects() {
     }
   };
 
-  const sites = userData?.sites || [];
+  const objects = userData?.objects || [];
   const works = userData?.works || [];
-  const projects = userData?.projects || [];
 
-  const siteData = sites.map(site => {
-    const project = projects.find(p => p.id === site.project_id);
-    const siteWorks = works.filter(w => w.object_id === site.id);
-    const completedWorks = siteWorks.filter(w => w.status === 'completed').length;
-    const progress = siteWorks.length > 0 
-      ? Math.round((completedWorks / siteWorks.length) * 100)
+  const objectData = objects.map(obj => {
+    const objectWorks = works.filter(w => w.object_id === obj.id);
+    const completedWorks = objectWorks.filter(w => w.status === 'completed').length;
+    const progress = objectWorks.length > 0 
+      ? Math.round((completedWorks / objectWorks.length) * 100)
       : 0;
     
     return {
-      ...site,
-      projectName: project?.title || '',
-      worksCount: siteWorks.length,
-      works: siteWorks,
+      ...obj,
+      worksCount: objectWorks.length,
+      works: objectWorks,
       progress,
       completedWorks,
     };
   });
 
-  let filteredSites = siteData.filter((site) => {
-    const matchesSearch = site.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      site.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      site.projectName.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = selectedStatus === 'all' || site.status === selectedStatus;
-    const matchesProject = selectedProject === 'all' || String(site.project_id) === selectedProject;
-    return matchesSearch && matchesStatus && matchesProject;
+  let filteredObjects = objectData.filter((obj) => {
+    const matchesSearch = obj.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (obj.address && obj.address.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (obj.description && obj.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesStatus = selectedStatus === 'all' || obj.status === selectedStatus;
+    return matchesSearch && matchesStatus;
   });
 
   if (sortBy === 'name') {
-    filteredSites = [...filteredSites].sort((a, b) => a.title.localeCompare(b.title));
+    filteredObjects = [...filteredObjects].sort((a, b) => a.title.localeCompare(b.title));
   } else if (sortBy === 'progress') {
-    filteredSites = [...filteredSites].sort((a, b) => b.progress - a.progress);
+    filteredObjects = [...filteredObjects].sort((a, b) => b.progress - a.progress);
   } else if (sortBy === 'works') {
-    filteredSites = [...filteredSites].sort((a, b) => b.worksCount - a.worksCount);
+    filteredObjects = [...filteredObjects].sort((a, b) => b.worksCount - a.worksCount);
+  } else {
+    filteredObjects = [...filteredObjects].sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
   }
 
-  const handleSiteClick = (site: typeof siteData[0]) => {
-    navigate(`/projects/${site.project_id}/objects/${site.id}`);
-  };
-
-  const stats = [
-    { label: 'Всего объектов', value: sites.length, icon: 'Building2', color: 'bg-blue-100 text-[#2563EB]' },
-    { label: 'В работе', value: sites.filter(s => s.status === 'active').length, icon: 'PlayCircle', color: 'bg-green-100 text-green-600' },
-    { label: 'Ожидание', value: sites.filter(s => s.status === 'pending').length, icon: 'Clock', color: 'bg-yellow-100 text-yellow-600' },
-    { label: 'Завершено', value: sites.filter(s => s.status === 'completed').length, icon: 'CheckCircle2', color: 'bg-slate-100 text-slate-600' },
+  const statusOptions = [
+    { value: 'all', label: 'Все статусы' },
+    { value: 'planning', label: 'Планирование' },
+    { value: 'active', label: 'В работе' },
+    { value: 'completed', label: 'Завершён' },
+    { value: 'on_hold', label: 'Приостановлен' }
   ];
 
-  const handleResetFilters = () => {
-    setSearchQuery('');
-    setSelectedStatus('all');
-    setSelectedProject('all');
+  const handleObjectClick = (objectId: number) => {
+    navigate(`/objects/${objectId}`);
   };
 
   return (
-    <div className="h-full flex flex-col bg-slate-50">
-      <ObjectsMobileHeader
-        selectedProject={selectedProject}
-        setSelectedProject={setSelectedProject}
-        sortBy={sortBy}
-        setSortBy={setSortBy}
-        projects={projects}
-        onNavigateProfile={() => navigate('/profile')}
-      />
-
-      <ObjectsDesktopHeader
-        stats={stats}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        sortBy={sortBy}
-        setSortBy={setSortBy}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-        selectedStatus={selectedStatus}
-        setSelectedStatus={setSelectedStatus}
-        selectedProject={selectedProject}
-        setSelectedProject={setSelectedProject}
-        projects={projects}
-        sites={sites}
-        isContractor={isContractor}
-        onNavigateProjects={() => navigate('/projects')}
-      />
-
-      <div className="md:hidden flex-1 overflow-y-auto pb-20 bg-white">
-        <ObjectsMobileList
-          sites={filteredSites}
-          onSiteClick={handleSiteClick}
+    <div className="min-h-screen bg-slate-50">
+      <div className="block md:hidden">
+        <ObjectsMobileHeader 
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedStatus={selectedStatus}
+          setSelectedStatus={setSelectedStatus}
+          statusOptions={statusOptions}
+          onCreateClick={() => navigate('/objects/create')}
+          isContractor={isContractor}
         />
+        
+        {filteredObjects.length === 0 ? (
+          <ObjectsEmptyState 
+            searchQuery={searchQuery}
+            onCreateClick={() => navigate('/objects/create')}
+            isContractor={isContractor}
+          />
+        ) : (
+          <ObjectsMobileList 
+            sites={filteredObjects}
+            onSiteClick={handleObjectClick}
+            onDeleteSite={handleDeleteObject}
+            isContractor={isContractor}
+          />
+        )}
       </div>
 
-      <div className="hidden md:block flex-1 overflow-y-auto p-6 md:p-8 pb-24 md:pb-8">
-        <div className="max-w-[1600px] mx-auto">
-          {filteredSites.length === 0 ? (
-            <ObjectsEmptyState
-              onResetFilters={handleResetFilters}
-            />
-          ) : viewMode === 'grid' ? (
-            <ObjectsGridView
-              sites={filteredSites}
-              userRole={user?.role}
-              onSiteClick={handleSiteClick}
-              onDeleteObject={handleDeleteObject}
-            />
-          ) : (
-            <ObjectsTableView
-              sites={filteredSites}
-              userRole={user?.role}
-              onSiteClick={handleSiteClick}
-              onDeleteObject={handleDeleteObject}
-            />
-          )}
-        </div>
+      <div className="hidden md:block p-8">
+        <ObjectsDesktopHeader 
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedStatus={selectedStatus}
+          setSelectedStatus={setSelectedStatus}
+          statusOptions={statusOptions}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          onCreateClick={() => navigate('/objects/create')}
+          isContractor={isContractor}
+        />
+
+        {filteredObjects.length === 0 ? (
+          <ObjectsEmptyState 
+            searchQuery={searchQuery}
+            onCreateClick={() => navigate('/objects/create')}
+            isContractor={isContractor}
+          />
+        ) : viewMode === 'grid' ? (
+          <ObjectsGridView 
+            sites={filteredObjects}
+            onSiteClick={handleObjectClick}
+            onDeleteSite={handleDeleteObject}
+            isContractor={isContractor}
+          />
+        ) : (
+          <ObjectsTableView 
+            sites={filteredObjects}
+            onSiteClick={handleObjectClick}
+            onDeleteSite={handleDeleteObject}
+            isContractor={isContractor}
+          />
+        )}
       </div>
     </div>
   );
