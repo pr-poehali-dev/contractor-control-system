@@ -63,10 +63,10 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap gap-2 items-center">
+      <div className="flex flex-wrap gap-2">
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="h-9">
+            <Button variant="outline" size="sm" className="h-9 flex-shrink-0">
               <Icon name={currentFilter?.icon as any} size={14} className="mr-1.5" />
               {currentFilter?.label}
               <ChevronDown size={14} className="ml-1.5" />
@@ -94,7 +94,7 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
           {objectTags.length > 0 && (
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-9">
+                <Button variant="outline" size="sm" className="h-9 flex-shrink-0">
                   <Icon name="Building2" size={14} className="mr-1.5" />
                   Объекты
                   {selectedObjectsCount > 0 && (
@@ -142,7 +142,7 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
             {workTags.length > 0 && (
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-9">
+                <Button variant="outline" size="sm" className="h-9 flex-shrink-0">
                   <Icon name="Wrench" size={14} className="mr-1.5" />
                   Работы
                   {selectedWorksCount > 0 && (
@@ -190,7 +190,7 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
             {contractorTags.length > 0 && (
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-9">
+                <Button variant="outline" size="sm" className="h-9 flex-shrink-0">
                   <Icon name="Users" size={14} className="mr-1.5" />
                   Подрядчики
                   {selectedContractorsCount > 0 && (
@@ -240,7 +240,7 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
               variant="ghost"
               size="sm"
               onClick={clearAllTags}
-              className="h-9"
+              className="h-9 flex-shrink-0"
             >
               <X size={14} className="mr-1" />
               Очистить
