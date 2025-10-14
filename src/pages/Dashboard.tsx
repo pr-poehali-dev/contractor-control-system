@@ -349,6 +349,8 @@ const Dashboard = () => {
               selectedTags={selectedTags}
               onTagsChange={setSelectedTags}
               availableTags={availableTags}
+              feed={feed}
+              works={works}
             />
 
             <div className="space-y-4">

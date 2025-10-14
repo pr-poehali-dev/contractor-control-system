@@ -17,6 +17,8 @@ interface FeedFiltersProps {
   selectedTags: string[];
   onTagsChange: (tags: string[]) => void;
   availableTags: Array<{ id: string; label: string; type: 'object' | 'work' | 'contractor' }>;
+  feed: any[];
+  works: any[];
 }
 
 const filterOptions = [
@@ -26,12 +28,14 @@ const filterOptions = [
   { value: 'info_posts', label: 'Инфо', icon: 'Bell' },
 ];
 
-const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, availableTags }: FeedFiltersProps) => {
+const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, availableTags, feed, works }: FeedFiltersProps) => {
   const [objectSearch, setObjectSearch] = useState('');
   const [workSearch, setWorkSearch] = useState('');
   const [contractorSearch, setContractorSearch] = useState('');
 
-  const toggleTag = (tagId: string) => {
+  const toggleTag = (tagId: string, isDisabled: boolean) => {
+    if (isDisabled) return;
+    
     if (selectedTags.includes(tagId)) {
       onTagsChange(selectedTags.filter(t => t !== tagId));
     } else {
@@ -43,17 +47,64 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
     onTagsChange([]);
   };
 
+  // Функция проверки доступности тега
+  const isTagAvailable = (tagId: string, tagType: 'object' | 'work' | 'contractor'): boolean => {
+    // Если ничего не выбрано, все доступны
+    if (selectedTags.length === 0) return true;
+
+    // Получаем выбранные теги по типам
+    const selectedObjects = selectedTags.filter(t => t.startsWith('object-'));
+    const selectedWorks = selectedTags.filter(t => t.startsWith('work-'));
+    const selectedContractors = selectedTags.filter(t => t.startsWith('contractor-'));
+
+    // Проверяем, есть ли в feed события, которые совместимы с этим тегом
+    const hasCompatibleEvents = feed.some(event => {
+      const eventObjectId = `object-${event.objectId}`;
+      const eventWorkId = `work-${event.workId}`;
+      const eventContractor = `contractor-${event.author}`;
+
+      // Проверяем совместимость с текущими выборами
+      const objectMatch = selectedObjects.length === 0 || selectedObjects.includes(eventObjectId);
+      const workMatch = selectedWorks.length === 0 || selectedWorks.includes(eventWorkId);
+      const contractorMatch = selectedContractors.length === 0 || selectedContractors.includes(eventContractor);
+
+      // Проверяем, подходит ли событие к новому тегу
+      if (tagType === 'object') {
+        return tagId === eventObjectId && workMatch && contractorMatch;
+      } else if (tagType === 'work') {
+        return tagId === eventWorkId && objectMatch && contractorMatch;
+      } else if (tagType === 'contractor') {
+        return tagId === eventContractor && objectMatch && workMatch;
+      }
+      return false;
+    });
+
+    return hasCompatibleEvents;
+  };
+
   const objectTags = availableTags
     .filter(t => t.type === 'object')
-    .filter(t => t.label.toLowerCase().includes(objectSearch.toLowerCase()));
+    .filter(t => t.label.toLowerCase().includes(objectSearch.toLowerCase()))
+    .map(tag => ({
+      ...tag,
+      disabled: !isTagAvailable(tag.id, 'object')
+    }));
     
   const workTags = availableTags
     .filter(t => t.type === 'work')
-    .filter(t => t.label.toLowerCase().includes(workSearch.toLowerCase()));
+    .filter(t => t.label.toLowerCase().includes(workSearch.toLowerCase()))
+    .map(tag => ({
+      ...tag,
+      disabled: !isTagAvailable(tag.id, 'work')
+    }));
     
   const contractorTags = availableTags
     .filter(t => t.type === 'contractor')
-    .filter(t => t.label.toLowerCase().includes(contractorSearch.toLowerCase()));
+    .filter(t => t.label.toLowerCase().includes(contractorSearch.toLowerCase()))
+    .map(tag => ({
+      ...tag,
+      disabled: !isTagAvailable(tag.id, 'contractor')
+    }));
 
   const selectedObjectsCount = selectedTags.filter(t => t.startsWith('object-')).length;
   const selectedWorksCount = selectedTags.filter(t => t.startsWith('work-')).length;
@@ -124,11 +175,16 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
                     objectTags.map((tag) => (
                     <label
                       key={tag.id}
-                      className="flex items-start gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer"
+                      className={`flex items-start gap-2 p-2 rounded transition-colors ${
+                        tag.disabled 
+                          ? 'opacity-40 cursor-not-allowed' 
+                          : 'hover:bg-slate-50 cursor-pointer'
+                      }`}
                     >
                       <Checkbox
                         checked={selectedTags.includes(tag.id)}
-                        onCheckedChange={() => toggleTag(tag.id)}
+                        onCheckedChange={() => toggleTag(tag.id, tag.disabled)}
+                        disabled={tag.disabled}
                         className="mt-0.5 flex-shrink-0"
                       />
                       <span className="text-sm flex-1 break-words leading-snug">{tag.label}</span>
@@ -173,11 +229,16 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
                     workTags.map((tag) => (
                     <label
                       key={tag.id}
-                      className="flex items-start gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer"
+                      className={`flex items-start gap-2 p-2 rounded transition-colors ${
+                        tag.disabled 
+                          ? 'opacity-40 cursor-not-allowed' 
+                          : 'hover:bg-slate-50 cursor-pointer'
+                      }`}
                     >
                       <Checkbox
                         checked={selectedTags.includes(tag.id)}
-                        onCheckedChange={() => toggleTag(tag.id)}
+                        onCheckedChange={() => toggleTag(tag.id, tag.disabled)}
+                        disabled={tag.disabled}
                         className="mt-0.5 flex-shrink-0"
                       />
                       <span className="text-sm flex-1 break-words leading-snug">{tag.label}</span>
@@ -222,11 +283,16 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
                     contractorTags.map((tag) => (
                     <label
                       key={tag.id}
-                      className="flex items-start gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer"
+                      className={`flex items-start gap-2 p-2 rounded transition-colors ${
+                        tag.disabled 
+                          ? 'opacity-40 cursor-not-allowed' 
+                          : 'hover:bg-slate-50 cursor-pointer'
+                      }`}
                     >
                       <Checkbox
                         checked={selectedTags.includes(tag.id)}
-                        onCheckedChange={() => toggleTag(tag.id)}
+                        onCheckedChange={() => toggleTag(tag.id, tag.disabled)}
+                        disabled={tag.disabled}
                         className="mt-0.5 flex-shrink-0"
                       />
                       <span className="text-sm flex-1 break-words leading-snug">{tag.label}</span>
