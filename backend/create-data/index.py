@@ -278,7 +278,13 @@ def handler(event, context):
                 
             elif item_type == 'chat_message':
                 work_id = int(data.get('work_id', 0))
-                message = data.get('message', '').replace("'", "''")
+                message = data.get('message', '').strip().replace("'", "''")
+                
+                if not message:
+                    print("ERROR: Message cannot be empty")
+                    return error_response(400, 'Message is required')
+                
+                print(f"DEBUG: Inserting chat_message: work_id={work_id}, message='{message}', user_id={user_id_int}")
                 
                 cur.execute(f"""
                     INSERT INTO chat_messages (work_id, message, created_by, created_at)
@@ -287,6 +293,7 @@ def handler(event, context):
                 """)
                 result = cur.fetchone()
                 conn.commit()
+                print(f"DEBUG: Chat message created successfully: {result}")
                 
             elif item_type == 'info_post':
                 title = data.get('title', '').replace("'", "''")
