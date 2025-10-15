@@ -165,6 +165,15 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
 
   const mockEvents: JournalEvent[] = [...workEntryEvents, ...chatEvents, ...inspectionEvents]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  
+  console.log('DEBUG WorkJournal:', {
+    selectedWork,
+    chatMessages: chatMessages.length,
+    chatEvents: chatEvents.length,
+    workEntryEvents: workEntryEvents.length,
+    inspectionEvents: inspectionEvents.length,
+    mockEvents: mockEvents.length
+  });
 
   return (
     <div className="flex flex-col h-full bg-white overflow-x-hidden">
