@@ -173,7 +173,6 @@ export default function EventItem({
                   <span>Запланирована на {new Date(event.inspection_data.scheduled_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}</span>
                 </div>
               )}
-              <p className="text-[11px] sm:text-sm text-slate-600 mt-1 break-words">{event.content}</p>
               <div className="mt-2 flex items-center gap-1 text-[11px] sm:text-sm text-blue-500 font-medium">
                 <span>Открыть проверку</span>
                 <Icon name="ArrowRight" size={14} />
