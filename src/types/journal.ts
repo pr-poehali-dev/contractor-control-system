@@ -28,6 +28,7 @@ export interface JournalEvent {
     materials?: string[];
     photos?: string[];
     progress?: number;
+    completion_percentage?: number;
   };
   
   inspection_data?: {

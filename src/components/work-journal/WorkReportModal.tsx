@@ -105,8 +105,10 @@ export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmittin
         continue;
       }
 
-      const randomId = Math.floor(Math.random() * 1000);
-      placeholderUrls.push(`https://picsum.photos/seed/${randomId}/800/600`);
+      const colors = ['FF6B6B', '4ECDC4', '45B7D1', 'FFA07A', '98D8C8', 'F7DC6F', 'BB8FCE', '85C1E2'];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      const fileName = encodeURIComponent(file.name);
+      placeholderUrls.push(`https://placehold.co/800x600/${randomColor}/white?text=${fileName}`);
     }
 
     setTimeout(() => {

@@ -51,6 +51,23 @@ export default function EventItem({
               </div>
             )}
             
+            {event.work_data?.completion_percentage !== undefined && (
+              <div className="mt-3 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+                <div className="flex items-center justify-between">
+                  <p className="text-[13px] sm:text-sm text-slate-700">
+                    Процент выполнения:
+                  </p>
+                  <span className="font-bold text-green-700 text-base">{event.work_data.completion_percentage}%</span>
+                </div>
+                <div className="mt-2 w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-green-500 to-emerald-600 h-full rounded-full transition-all duration-300"
+                    style={{ width: `${event.work_data.completion_percentage}%` }}
+                  />
+                </div>
+              </div>
+            )}
+            
             {event.work_data?.materials && event.work_data.materials.length > 0 && (
               <div className="mt-3">
                 <p className="text-[12px] sm:text-sm text-slate-600 mb-2 font-medium">Материалы:</p>

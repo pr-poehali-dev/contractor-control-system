@@ -183,6 +183,7 @@ def handler(event, context):
                 photo_urls_raw = data.get('photo_urls', '')
                 photo_urls = photo_urls_raw.replace("'", "''") if photo_urls_raw else None
                 is_work_start = data.get('is_work_start', False)
+                progress = data.get('progress')
                 
                 # Build SQL dynamically based on available fields
                 fields = ['work_id', 'description', 'created_by', 'created_at']
@@ -200,6 +201,9 @@ def handler(event, context):
                 if is_work_start:
                     fields.append('is_work_start')
                     values.append('TRUE')
+                if progress is not None:
+                    fields.append('completion_percentage')
+                    values.append(str(int(progress)))
                 
                 fields_str = ', '.join(fields)
                 values_str = ', '.join(values)
@@ -207,9 +211,17 @@ def handler(event, context):
                 cur.execute(f"""
                     INSERT INTO work_logs ({fields_str})
                     VALUES ({values_str})
-                    RETURNING id, work_id, description, volume, materials, photo_urls, created_by, created_at, is_work_start
+                    RETURNING id, work_id, description, volume, materials, photo_urls, created_by, created_at, is_work_start, completion_percentage
                 """)
                 result = cur.fetchone()
+                
+                if progress is not None:
+                    cur.execute(f"""
+                        UPDATE works 
+                        SET completion_percentage = {int(progress)}
+                        WHERE id = {work_id}
+                    """)
+                
                 conn.commit()
                 
             elif item_type == 'inspection':

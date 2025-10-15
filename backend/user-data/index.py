@@ -205,6 +205,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.execute("""
                 SELECT wl.id, wl.work_id, wl.volume, wl.materials, wl.photo_urls,
                        wl.description, wl.created_by, wl.created_at, wl.is_work_start,
+                       wl.completion_percentage,
                        u.name as author_name, u.role as author_role
                 FROM work_logs wl
                 LEFT JOIN users u ON wl.created_by = u.id

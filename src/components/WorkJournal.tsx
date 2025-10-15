@@ -133,6 +133,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
         materials: log.materials ? log.materials.split(',').map(m => m.trim()) : [],
         photos: log.photo_urls ? log.photo_urls.split(',').filter(url => url.trim()) : [],
         progress: log.progress,
+        completion_percentage: log.completion_percentage,
       } : undefined,
     };
   });

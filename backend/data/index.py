@@ -198,7 +198,7 @@ def handler(event, context):
             
             cur.execute(f"""
                 SELECT wl.id, wl.work_id, wl.volume, wl.materials, wl.photo_urls,
-                       wl.description, wl.created_by, wl.created_at,
+                       wl.description, wl.created_by, wl.created_at, wl.completion_percentage,
                        u.name as author_name, u.role as author_role
                 FROM work_logs wl
                 LEFT JOIN users u ON wl.created_by = u.id

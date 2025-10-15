@@ -1,0 +1,1 @@
+ALTER TABLE work_logs ADD COLUMN completion_percentage INTEGER DEFAULT NULL;
