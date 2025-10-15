@@ -36,8 +36,8 @@ export default function WorkStartNotification({ work, onNotified }: WorkStartNot
           'X-Auth-Token': token || ''
         },
         body: JSON.stringify({
-          item_type: 'work',
-          item_id: work.id,
+          type: 'work',
+          id: work.id,
           data: {
             start_date: new Date().toISOString().split('T')[0]
           }
