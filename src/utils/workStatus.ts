@@ -39,8 +39,8 @@ export function getWorkStatusInfo(work: Work): WorkStatus {
     };
   }
 
-  // Дата начала наступила, но подрядчик не уведомил
-  if (!work.work_started_notification_sent && !work.actual_start_date) {
+  // Дата начала наступила, но работы не начались (start_date не заполнен и процент = 0)
+  if (!work.start_date && (work.completion_percentage || 0) === 0) {
     const daysDelayed = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     return {
       status: 'awaiting_start',

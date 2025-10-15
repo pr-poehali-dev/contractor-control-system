@@ -24,12 +24,19 @@ export default function WorkStartNotification({ work, onNotified }: WorkStartNot
     setIsNotifying(true);
     
     try {
-      const response = await fetch('https://functions.poehali.dev/ce0181f5-d513-442e-a0ae-fbfb21271c60', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch('https://functions.poehali.dev/b69598bf-df90-4a71-93a1-6108c6c39317', {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Auth-Token': token || ''
+        },
         body: JSON.stringify({
-          action: 'notify_start',
-          work_id: work.id
+          item_type: 'work',
+          item_id: work.id,
+          data: {
+            start_date: new Date().toISOString().split('T')[0]
+          }
         })
       });
 
@@ -39,6 +46,8 @@ export default function WorkStartNotification({ work, onNotified }: WorkStartNot
           description: 'Заказчик получил уведомление о начале работ',
         });
         onNotified();
+      } else {
+        throw new Error('Failed to update work');
       }
     } catch (error) {
       toast({

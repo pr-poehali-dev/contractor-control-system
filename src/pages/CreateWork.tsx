@@ -50,8 +50,8 @@ const CreateWork = () => {
     description: '',
     volume: '',
     unit: '',
-    start_date: '',
-    end_date: '',
+    planned_start_date: '',
+    planned_end_date: '',
     estimated_cost: '',
     contractor_id: '',
     priority: 'medium',
@@ -165,8 +165,8 @@ const CreateWork = () => {
         description: formData.description,
         contractor_id: formData.contractor_id ? Number(formData.contractor_id) : null,
         status: 'active',
-        start_date: formData.start_date || null,
-        end_date: formData.end_date || null,
+        planned_start_date: formData.planned_start_date || null,
+        planned_end_date: formData.planned_end_date || null,
       });
 
       const newWorkId = result.data.id;
@@ -306,22 +306,22 @@ const CreateWork = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="start_date">Плановое начало</Label>
+                  <Label htmlFor="planned_start_date">Плановое начало</Label>
                   <Input
-                    id="start_date"
+                    id="planned_start_date"
                     type="date"
-                    value={formData.start_date}
-                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                    value={formData.planned_start_date}
+                    onChange={(e) => setFormData({ ...formData, planned_start_date: e.target.value })}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="end_date">Плановое окончание</Label>
+                  <Label htmlFor="planned_end_date">Плановое окончание</Label>
                   <Input
-                    id="end_date"
+                    id="planned_end_date"
                     type="date"
-                    value={formData.end_date}
-                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                    value={formData.planned_end_date}
+                    onChange={(e) => setFormData({ ...formData, planned_end_date: e.target.value })}
                   />
                 </div>
               </div>
