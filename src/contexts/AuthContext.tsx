@@ -128,6 +128,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         workLogs: Array.isArray(data.workLogs) ? data.workLogs : [],
         checkpoints: Array.isArray(data.checkpoints) ? data.checkpoints : [],
         contractors: Array.isArray(data.contractors) ? data.contractors : [],
+        chatMessages: Array.isArray(data.chatMessages) ? data.chatMessages : [],
       };
       
       console.log('Normalized user data:', normalizedData);
