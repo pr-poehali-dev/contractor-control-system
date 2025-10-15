@@ -194,7 +194,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, userRole }
             {event.author && (
               <Badge 
                 variant="outline" 
-                className="text-xs px-2.5 py-1 font-normal flex items-center gap-1 max-w-[180px] flex-shrink-0 cursor-pointer hover:bg-slate-100 transition-colors"
+                className="text-xs px-2.5 py-1 font-normal flex items-center gap-1 max-w-[180px] md:max-w-none flex-shrink-0 cursor-pointer hover:bg-slate-100 transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   if (event.author && onTagClick) {
