@@ -26,6 +26,7 @@ import PublicObject from "./pages/PublicObject";
 import JournalEntryDetail from "./pages/JournalEntryDetail";
 import InspectionDetail from "./pages/InspectionDetail";
 import CreateObject from "./pages/CreateObject";
+import EditObject from "./pages/EditObject";
 import CreateWork from "./pages/CreateWork";
 import WorkTemplates from "./pages/WorkTemplates";
 import Admin from "./pages/Admin";
@@ -67,6 +68,7 @@ const App = () => (
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/objects" element={<ProtectedRoute><Objects /></ProtectedRoute>} />
               <Route path="/objects/create" element={<ProtectedRoute><CreateObject /></ProtectedRoute>} />
+              <Route path="/objects/:objectId/edit" element={<ProtectedRoute><EditObject /></ProtectedRoute>} />
               <Route path="/objects/:objectId" element={<ProtectedRoute><ObjectDetail /></ProtectedRoute>} />
               <Route path="/objects/:objectId/works/create" element={<ProtectedRoute><CreateWork /></ProtectedRoute>} />
               <Route path="/objects/:objectId/works/:workId" element={<ProtectedRoute><WorkDetail /></ProtectedRoute>} />

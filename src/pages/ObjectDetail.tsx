@@ -101,7 +101,7 @@ const ObjectDetail = () => {
   }
 
   const handleEdit = () => {
-    toast({ title: 'Редактирование объекта', description: 'Функция в разработке' });
+    navigate(`/objects/${objectId}/edit`);
   };
 
   const handleDelete = async () => {
