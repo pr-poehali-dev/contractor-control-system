@@ -249,12 +249,12 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                       formatTime={formatTime}
                       getInitials={getInitials}
                       selectedWorkData={selectedWorkData}
+                      onWorkStartNotified={() => {
+                        toast({ title: 'Успешно', description: 'Уведомление о начале работ отправлено' });
+                      }}
+                    />
                   </>
                 )}
-                    onWorkStartNotified={() => {
-                      toast({ title: 'Успешно', description: 'Уведомление о начале работ отправлено' });
-                    }}
-                  />
                 )}
 
                 {activeTab === 'info' && (
