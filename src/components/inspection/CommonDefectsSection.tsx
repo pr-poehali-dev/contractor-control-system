@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Icon from '@/components/ui/icon';
 
 interface CommonDefectsSectionProps {
@@ -18,20 +19,34 @@ const COMMON_DEFECTS = [
 ];
 
 export default function CommonDefectsSection({ onSelectDefect }: CommonDefectsSectionProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-6">
-      <div className="flex items-center gap-2 mb-3">
-        <div className="bg-orange-100 p-1.5 rounded-lg">
-          <Icon name="FileWarning" size={18} className="text-orange-600" />
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 mb-6">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full p-6 flex items-center justify-between hover:bg-slate-50 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <div className="bg-orange-100 p-1.5 rounded-lg">
+            <Icon name="FileWarning" size={18} className="text-orange-600" />
+          </div>
+          <h3 className="font-semibold text-slate-900">Типовые нарушения ({COMMON_DEFECTS.length})</h3>
         </div>
-        <h3 className="font-semibold text-slate-900">Типовые нарушения</h3>
-      </div>
+        <Icon 
+          name={isOpen ? "ChevronUp" : "ChevronDown"} 
+          size={20} 
+          className="text-slate-400"
+        />
+      </button>
       
-      <p className="text-xs text-slate-500 mb-4">
-        Нажмите на нарушение, чтобы добавить его в замечание
-      </p>
-      
-      <div className="space-y-2">
+      {isOpen && (
+        <div className="px-6 pb-6">
+          <p className="text-xs text-slate-500 mb-4">
+            Нажмите на нарушение, чтобы добавить его в замечание
+          </p>
+          
+          <div className="space-y-2">
         {COMMON_DEFECTS.map((defect) => (
           <div 
             key={defect.id}
@@ -49,7 +64,9 @@ export default function CommonDefectsSection({ onSelectDefect }: CommonDefectsSe
             </div>
           </div>
         ))}
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

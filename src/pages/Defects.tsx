@@ -37,17 +37,17 @@ const Defects = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'bg-blue-100 text-blue-700';
-      case 'in_progress': return 'bg-yellow-100 text-yellow-700';
-      case 'completed': return 'bg-green-100 text-green-700';
-      default: return 'bg-slate-100 text-slate-700';
+      case 'draft': return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'in_progress': return 'bg-amber-100 text-amber-700 border-amber-200';
+      case 'completed': return 'bg-green-100 text-green-700 border-green-200';
+      default: return 'bg-slate-100 text-slate-700 border-slate-200';
     }
   };
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'pending': return 'Запланирована';
-      case 'in_progress': return 'В процессе';
+      case 'draft': return 'Запланирована';
+      case 'in_progress': return 'На проверке';
       case 'completed': return 'Завершена';
       default: return status;
     }
@@ -74,7 +74,8 @@ const Defects = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Все проверки ({inspections.length})</SelectItem>
-              <SelectItem value="pending">Запланированы ({inspections.filter(i => i.status === 'pending').length})</SelectItem>
+              <SelectItem value="draft">Запланированы ({inspections.filter(i => i.status === 'draft').length})</SelectItem>
+              <SelectItem value="in_progress">На проверке ({inspections.filter(i => i.status === 'in_progress').length})</SelectItem>
               <SelectItem value="completed">Завершены ({inspections.filter(i => i.status === 'completed').length})</SelectItem>
             </SelectContent>
           </Select>
@@ -82,8 +83,12 @@ const Defects = () => {
 
         <div className="flex gap-3">
           <div className="text-center">
-            <p className="text-2xl font-bold text-blue-600">{inspections.filter(i => i.status === 'pending').length}</p>
+            <p className="text-2xl font-bold text-blue-600">{inspections.filter(i => i.status === 'draft').length}</p>
             <p className="text-xs text-slate-500">Запланировано</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold text-amber-600">{inspections.filter(i => i.status === 'in_progress').length}</p>
+            <p className="text-xs text-slate-500">На проверке</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-green-600">{inspections.filter(i => i.status === 'completed').length}</p>
@@ -103,7 +108,10 @@ const Defects = () => {
             <Card 
               key={inspection.id} 
               className="hover:shadow-lg transition-shadow cursor-pointer"
-              onClick={() => navigate(`/inspections/${inspection.id}`)}
+              onClick={() => {
+                sessionStorage.setItem('inspectionFromPage', '/defects');
+                navigate(`/inspection/${inspection.id}`);
+              }}
             >
               <CardContent className="p-6">
                 <div className="flex items-start justify-between gap-4 mb-3">

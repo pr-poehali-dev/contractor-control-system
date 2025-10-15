@@ -1,4 +1,4 @@
-import { Checkbox } from '@/components/ui/checkbox';
+import { useState } from 'react';
 import Icon from '@/components/ui/icon';
 
 export interface ControlPoint {
@@ -20,29 +20,38 @@ export default function ControlPointsSection({
   checkedPoints,
   onControlPointClick
 }: ControlPointsSectionProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
   if (controlPoints.length === 0) return null;
 
   const checkedCount = controlPoints.filter(cp => checkedPoints.has(String(cp.id))).length;
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-6">
-      <div className="flex items-center justify-between mb-3">
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 mb-6">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full p-6 flex items-center justify-between hover:bg-slate-50 transition-colors"
+      >
         <div className="flex items-center gap-2">
           <div className="bg-blue-100 p-1.5 rounded-lg">
             <Icon name="ClipboardList" size={18} className="text-blue-600" />
           </div>
-          <h3 className="font-semibold text-slate-900">Что проверить?</h3>
+          <h3 className="font-semibold text-slate-900">Контрольные точки ({checkedCount}/{controlPoints.length})</h3>
         </div>
-        <span className="text-xs text-slate-500 font-medium bg-slate-100 px-2.5 py-1 rounded-full">
-          {checkedCount} / {controlPoints.length}
-        </span>
-      </div>
+        <Icon 
+          name={isOpen ? "ChevronUp" : "ChevronDown"} 
+          size={20} 
+          className="text-slate-400"
+        />
+      </button>
       
-      <p className="text-xs text-slate-500 mb-4">
-        Нажмите на пункт, чтобы быстро добавить замечание
-      </p>
-      
-      <div className="space-y-2">
+      {isOpen && (
+        <div className="px-6 pb-6">
+          <p className="text-xs text-slate-500 mb-4">
+            Нажмите на пункт, чтобы быстро добавить замечание
+          </p>
+          
+          <div className="space-y-2">
         {controlPoints.map((cp) => {
           const cpId = String(cp.id);
           const isChecked = checkedPoints.has(cpId);
@@ -83,7 +92,9 @@ export default function ControlPointsSection({
             </div>
           );
         })}
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

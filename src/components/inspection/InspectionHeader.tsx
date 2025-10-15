@@ -1,4 +1,5 @@
 import Icon from '@/components/ui/icon';
+import { Badge } from '@/components/ui/badge';
 
 interface InspectionHeaderProps {
   inspectionNumber: string;
@@ -10,6 +11,7 @@ interface InspectionHeaderProps {
 }
 
 export default function InspectionHeader({
+  status,
   workTitle,
   objectTitle,
   scheduledDate
@@ -23,8 +25,41 @@ export default function InspectionHeader({
     });
   };
 
+  const getStatusConfig = (status: string) => {
+    switch (status) {
+      case 'draft':
+        return {
+          label: 'Запланирована',
+          className: 'bg-blue-100 text-blue-700 border-blue-200'
+        };
+      case 'in_progress':
+        return {
+          label: 'На проверке',
+          className: 'bg-amber-100 text-amber-700 border-amber-200'
+        };
+      case 'completed':
+        return {
+          label: 'Завершена',
+          className: 'bg-green-100 text-green-700 border-green-200'
+        };
+      default:
+        return {
+          label: status,
+          className: 'bg-slate-100 text-slate-700 border-slate-200'
+        };
+    }
+  };
+
+  const statusConfig = getStatusConfig(status);
+
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-slate-900">Информация о проверке</h2>
+        <Badge variant="outline" className={statusConfig.className}>
+          {statusConfig.label}
+        </Badge>
+      </div>
       <div className="space-y-4">
         {objectTitle && (
           <div className="flex items-start gap-3">

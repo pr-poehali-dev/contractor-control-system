@@ -18,7 +18,7 @@ const InspectionDetail = () => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const fromPage = sessionStorage.getItem('inspectionFromPage') || '/inspections';
+  const fromPage = sessionStorage.getItem('inspectionFromPage') || '/defects';
   
   const [inspection, setInspection] = useState<any>(null);
   const [defects, setDefects] = useState<Defect[]>([]);
@@ -205,7 +205,7 @@ const InspectionDetail = () => {
       await loadUserData();
       
       toast({ title: 'Проверка завершена' });
-      navigate('/inspections');
+      handleBack();
     } catch (error) {
       toast({ 
         title: 'Ошибка', 
@@ -233,6 +233,30 @@ const InspectionDetail = () => {
       toast({ 
         title: 'Ошибка', 
         description: 'Не удалось сохранить',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStartInspection = async () => {
+    if (!token) return;
+    
+    setLoading(true);
+    try {
+      await api.updateItem(token, 'inspection', inspection.id, {
+        status: 'in_progress',
+        defects: JSON.stringify(defects)
+      });
+      
+      await loadUserData();
+      
+      toast({ title: 'Проверка переведена в статус "На проверке"' });
+    } catch (error) {
+      toast({ 
+        title: 'Ошибка', 
+        description: 'Не удалось обновить статус',
         variant: 'destructive'
       });
     } finally {
@@ -286,7 +310,7 @@ const InspectionDetail = () => {
     return scheduledDate <= today;
   };
   
-  const canEdit = inspection.status === 'draft' && (inspection.type === 'unscheduled' || isScheduledForToday());
+  const canEdit = (inspection.status === 'draft' || inspection.status === 'in_progress') && (inspection.type === 'unscheduled' || isScheduledForToday());
   
   const workInspections = userData?.inspections?.filter((i: any) => i.work_id === inspection.work_id) || [];
   const inspectionIndex = workInspections.findIndex((i: any) => i.id === inspection.id) + 1;
@@ -382,13 +406,24 @@ const InspectionDetail = () => {
               >
                 Сохранить
               </Button>
-              <Button
-                onClick={handleCompleteInspection}
-                className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
-                disabled={loading}
-              >
-                {loading ? 'Завершение...' : 'Завершить проверку'}
-              </Button>
+              {inspection.status === 'draft' && (
+                <Button
+                  onClick={handleStartInspection}
+                  className="flex-1 bg-amber-600 hover:bg-amber-700"
+                  disabled={loading}
+                >
+                  Начать проверку
+                </Button>
+              )}
+              {inspection.status === 'in_progress' && (
+                <Button
+                  onClick={handleCompleteInspection}
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  disabled={loading}
+                >
+                  {loading ? 'Завершение...' : 'Завершить проверку'}
+                </Button>
+              )}
             </div>
           </div>
         )}

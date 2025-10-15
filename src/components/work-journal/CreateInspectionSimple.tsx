@@ -42,7 +42,8 @@ export default function CreateInspectionSimple({ isOpen, onClose, workId }: Crea
       onClose();
       
       if (result?.id) {
-        navigate(`/inspections/${result.id}`);
+        sessionStorage.setItem('inspectionFromPage', '/journal');
+        navigate(`/inspection/${result.id}`);
       }
     } catch (error) {
       toast({ 
