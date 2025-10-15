@@ -79,6 +79,9 @@ export interface WorkLog {
   created_at: string;
   author_name: string;
   author_role: 'contractor' | 'client';
+  is_work_start?: boolean;
+  progress?: number;
+  unit?: string;
 }
 
 export interface Contractor {

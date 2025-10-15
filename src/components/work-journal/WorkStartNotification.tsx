@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { api } from '@/lib/api';
 import type { Work } from '@/contexts/AuthContext';
 import { getWorkStatusInfo } from '@/utils/workStatus';
 
@@ -13,6 +15,7 @@ interface WorkStartNotificationProps {
 
 export default function WorkStartNotification({ work, onNotified }: WorkStartNotificationProps) {
   const { toast } = useToast();
+  const { token, setUserData } = useAuth();
   const [isNotifying, setIsNotifying] = useState(false);
   const statusInfo = getWorkStatusInfo(work);
 
@@ -25,7 +28,8 @@ export default function WorkStartNotification({ work, onNotified }: WorkStartNot
     
     try {
       const token = localStorage.getItem('auth_token');
-      const response = await fetch('https://functions.poehali.dev/b69598bf-df90-4a71-93a1-6108c6c39317', {
+      
+      const updateResponse = await fetch('https://functions.poehali.dev/b69598bf-df90-4a71-93a1-6108c6c39317', {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -40,14 +44,43 @@ export default function WorkStartNotification({ work, onNotified }: WorkStartNot
         })
       });
 
-      if (response.ok) {
+      if (!updateResponse.ok) {
+        throw new Error('Failed to update work');
+      }
+
+      const createLogResponse = await fetch('https://functions.poehali.dev/8d57b03e-49c5-4589-abfb-691e6e084c6a', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Auth-Token': token || ''
+        },
+        body: JSON.stringify({
+          type: 'work_log',
+          data: {
+            work_id: work.id,
+            description: '🚀 Начало работ',
+            progress: 0,
+            volume: null,
+            materials: null,
+            photo_urls: null,
+            is_work_start: true
+          }
+        })
+      });
+
+      if (createLogResponse.ok) {
+        if (token) {
+          const refreshedData = await api.getUserData(token);
+          setUserData(refreshedData);
+        }
+        
         toast({
           title: 'Уведомление отправлено',
           description: 'Заказчик получил уведомление о начале работ',
         });
         onNotified();
       } else {
-        throw new Error('Failed to update work');
+        throw new Error('Failed to create work log entry');
       }
     } catch (error) {
       toast({

@@ -182,6 +182,7 @@ def handler(event, context):
                 materials = data.get('materials', '').replace("'", "''") if data.get('materials') else None
                 photo_urls_raw = data.get('photo_urls', '')
                 photo_urls = photo_urls_raw.replace("'", "''") if photo_urls_raw else None
+                is_work_start = data.get('is_work_start', False)
                 
                 # Build SQL dynamically based on available fields
                 fields = ['work_id', 'description', 'created_by', 'created_at']
@@ -196,6 +197,9 @@ def handler(event, context):
                 if photo_urls:
                     fields.append('photo_urls')
                     values.append(f"'{photo_urls}'")
+                if is_work_start:
+                    fields.append('is_work_start')
+                    values.append('TRUE')
                 
                 fields_str = ', '.join(fields)
                 values_str = ', '.join(values)
@@ -203,7 +207,7 @@ def handler(event, context):
                 cur.execute(f"""
                     INSERT INTO work_logs ({fields_str})
                     VALUES ({values_str})
-                    RETURNING id, work_id, description, volume, materials, photo_urls, created_by, created_at
+                    RETURNING id, work_id, description, volume, materials, photo_urls, created_by, created_at, is_work_start
                 """)
                 result = cur.fetchone()
                 conn.commit()

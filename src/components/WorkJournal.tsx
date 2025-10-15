@@ -109,9 +109,18 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
 
   const workEntryEvents: JournalEvent[] = workEntries.map(log => {
     const hasWorkData = log.volume || log.materials || log.photo_urls;
+    const isWorkStart = log.is_work_start === true;
+    
+    let eventType: EventType = 'chat_message';
+    if (isWorkStart) {
+      eventType = 'work_start';
+    } else if (hasWorkData) {
+      eventType = 'work_entry';
+    }
+    
     return {
       id: log.id,
-      type: hasWorkData ? ('work_entry' as const) : ('chat_message' as const),
+      type: eventType,
       work_id: log.work_id,
       created_by: log.created_by,
       author_name: log.author_name,

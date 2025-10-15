@@ -1,5 +1,6 @@
 export type EventType = 
   | 'work_entry'
+  | 'work_start'
   | 'inspection'
   | 'inspection_created' 
   | 'inspection_completed'

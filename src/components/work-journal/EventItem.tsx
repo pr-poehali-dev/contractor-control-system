@@ -219,6 +219,23 @@ export default function EventItem({
           </div>
         );
         
+      case 'work_start':
+        return (
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+              <Icon name="Rocket" size={20} className="text-amber-700" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[15px] sm:text-lg font-bold text-amber-900 break-words">
+                {event.content}
+              </p>
+              <p className="text-[12px] sm:text-sm text-amber-700 mt-1">
+                Подрядчик приступил к выполнению работ
+              </p>
+            </div>
+          </div>
+        );
+        
       case 'chat_message':
         return (
           <p className="text-base leading-relaxed text-slate-800 whitespace-pre-wrap break-words">{event.content}</p>
@@ -231,7 +248,7 @@ export default function EventItem({
     }
   };
 
-  const isSystemEvent = ['inspection_created', 'inspection_completed', 'act_signed'].includes(event.type);
+  const isSystemEvent = ['inspection_created', 'inspection_completed', 'act_signed', 'work_start'].includes(event.type);
 
   if (isSystemEvent) {
     return (
