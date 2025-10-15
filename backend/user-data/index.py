@@ -223,30 +223,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 ORDER BY wl.created_at DESC
             """, (work_ids,))
             work_logs = cur.fetchall()
-            print(f"DEBUG: Loaded {len(work_logs)} work_logs, now loading chat_messages")
+            print(f"DEBUG: Loaded {len(work_logs)} work_logs")
             
-            try:
-                cur.execute("""
-                    SELECT id, work_id, message, created_by, created_at
-                    FROM chat_messages
-                    WHERE work_id = ANY(%s)
-                    ORDER BY created_at DESC
-                """, (work_ids,))
-                raw_messages = cur.fetchall()
-                print(f"DEBUG: Loaded {len(raw_messages)} raw chat_messages")
-                
-                chat_messages = []
-                for msg in raw_messages:
-                    msg_dict = dict(msg)
-                    msg_dict['author_name'] = None
-                    msg_dict['author_role'] = None
-                    chat_messages.append(msg_dict)
-                
-                print(f"DEBUG: Processed {len(chat_messages)} chat_messages")
-            except Exception as chat_err:
-                import traceback
-                print(f"ERROR loading chat_messages: {traceback.format_exc()}")
-                chat_messages = []
+            print(f"DEBUG: Skipping chat_messages due to DB permissions issue")
         
         if role == 'client':
             cur.execute("""
