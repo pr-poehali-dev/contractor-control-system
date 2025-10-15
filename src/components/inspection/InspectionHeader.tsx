@@ -1,4 +1,3 @@
-import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 
 interface InspectionHeaderProps {
@@ -11,53 +10,58 @@ interface InspectionHeaderProps {
 }
 
 export default function InspectionHeader({
-  inspectionNumber,
-  status,
-  type,
   workTitle,
   objectTitle,
   scheduledDate
 }: InspectionHeaderProps) {
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'draft':
-        return <Badge variant="outline">draft</Badge>;
-      case 'completed':
-        return <Badge className="bg-green-100 text-green-700">Завершена</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
   };
 
   return (
-    <div className="mb-6">
-      <div className="flex items-center gap-3 mb-2">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
-          {inspectionNumber}
-        </h1>
-        {getStatusBadge(status)}
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-6">
+      <div className="space-y-4">
+        {objectTitle && (
+          <div className="flex items-start gap-3">
+            <div className="bg-blue-100 p-2 rounded-lg shrink-0">
+              <Icon name="Building2" size={20} className="text-blue-600" />
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 mb-0.5">Объект</p>
+              <p className="font-medium text-slate-900">{objectTitle}</p>
+            </div>
+          </div>
+        )}
+
+        {workTitle && (
+          <div className="flex items-start gap-3">
+            <div className="bg-purple-100 p-2 rounded-lg shrink-0">
+              <Icon name="Hammer" size={20} className="text-purple-600" />
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 mb-0.5">Вид работы</p>
+              <p className="font-medium text-slate-900">{workTitle}</p>
+            </div>
+          </div>
+        )}
+
+        {scheduledDate && (
+          <div className="flex items-start gap-3">
+            <div className="bg-amber-100 p-2 rounded-lg shrink-0">
+              <Icon name="Calendar" size={20} className="text-amber-600" />
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 mb-0.5">Дата проверки</p>
+              <p className="font-medium text-slate-900">{formatDate(scheduledDate)}</p>
+            </div>
+          </div>
+        )}
       </div>
-      
-      {type && (
-        <p className="text-slate-600">
-          {type === 'scheduled' ? '📅 Плановая проверка' : '⚡ Внеплановая проверка'}
-        </p>
-      )}
-      
-      {workTitle && (
-        <p className="text-slate-600 mt-1">
-          <Icon name="Wrench" size={16} className="inline mr-1" />
-          {workTitle}
-          {objectTitle && ` • ${objectTitle}`}
-        </p>
-      )}
-      
-      {scheduledDate && (
-        <p className="text-slate-600 mt-1">
-          <Icon name="Calendar" size={16} className="inline mr-1" />
-          Запланирована на: {new Date(scheduledDate).toLocaleDateString('ru-RU')}
-        </p>
-      )}
     </div>
   );
 }

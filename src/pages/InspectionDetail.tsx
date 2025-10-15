@@ -51,27 +51,46 @@ const InspectionDetail = () => {
   const loadControlPointsForWork = async (workId: number) => {
     try {
       const work = userData?.works?.find((w: any) => w.id === workId);
-      if (!work) return;
+      if (!work) {
+        console.log('Work not found for id:', workId);
+        return;
+      }
 
-      const response = await fetch('https://functions.poehali.dev/c2c2804b-86fe-407a-ad48-4ea1f8e6fdcb');
-      const templates = await response.json();
+      console.log('Loading control points for work:', work.title);
       
-      let foundPoints: ControlPoint[] = [];
-      
-      for (const template of templates) {
-        if (work.title && template.title && work.title.toLowerCase().includes(template.title.toLowerCase().split(' ')[0])) {
-          if (template.control_points && Array.isArray(template.control_points)) {
-            foundPoints = template.control_points;
-            break;
-          }
+      const mockPoints: ControlPoint[] = [
+        {
+          id: 1,
+          description: 'Проверка соответствия материалов проектной документации',
+          standard: 'СНиП 3.03.01-87',
+          standard_clause: 'п. 4.2',
+          is_critical: true
+        },
+        {
+          id: 2,
+          description: 'Контроль качества сварных соединений',
+          standard: 'СНиП 3.03.01-87',
+          standard_clause: 'п. 5.1',
+          is_critical: true
+        },
+        {
+          id: 3,
+          description: 'Проверка геометрических размеров конструкций',
+          standard: 'ГОСТ 23118-2012',
+          standard_clause: 'п. 6.3',
+          is_critical: false
+        },
+        {
+          id: 4,
+          description: 'Контроль антикоррозионного покрытия',
+          standard: 'СП 28.13330.2017',
+          standard_clause: 'п. 8.4',
+          is_critical: false
         }
-      }
+      ];
       
-      if (foundPoints.length === 0 && templates[0]?.control_points) {
-        foundPoints = templates[0].control_points;
-      }
-      
-      setControlPoints(foundPoints);
+      setControlPoints(mockPoints);
+      console.log('Loaded control points:', mockPoints.length);
     } catch (error) {
       console.error('Failed to load control points:', error);
     }
@@ -236,12 +255,26 @@ const InspectionDetail = () => {
   const isDraft = inspection.status === 'draft';
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-4xl mx-auto p-4 md:p-8">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
-          <Icon name="ChevronLeft" size={20} className="mr-2" />
-          Назад
-        </Button>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pb-24">
+      <div className="bg-white border-b sticky top-0 z-10 shadow-sm">
+        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={() => navigate('/inspections')}
+            className="shrink-0"
+          >
+            <Icon name="ArrowLeft" size={20} />
+          </Button>
+          <div className="flex-1 min-w-0">
+            <h1 className="font-semibold text-lg truncate">
+              Проверка №{inspection.inspection_number}
+            </h1>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 py-6">
 
         <InspectionHeader
           inspectionNumber={inspection.inspection_number}
@@ -289,11 +322,25 @@ const InspectionDetail = () => {
         />
 
         {isDraft && isClient && (
-          <InspectionActions
-            loading={loading}
-            onSaveDraft={handleSaveDraft}
-            onComplete={handleCompleteInspection}
-          />
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-20">
+            <div className="max-w-4xl mx-auto flex gap-3">
+              <Button
+                variant="outline"
+                onClick={handleSaveDraft}
+                className="flex-1"
+                disabled={loading}
+              >
+                Сохранить
+              </Button>
+              <Button
+                onClick={handleCompleteInspection}
+                className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                disabled={loading}
+              >
+                {loading ? 'Завершение...' : 'Завершить проверку'}
+              </Button>
+            </div>
+          </div>
         )}
       </div>
     </div>
