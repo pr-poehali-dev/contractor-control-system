@@ -39,7 +39,8 @@ export default function WorkStartNotification({ work, onNotified }: WorkStartNot
           type: 'work',
           id: work.id,
           data: {
-            start_date: new Date().toISOString().split('T')[0]
+            start_date: new Date().toISOString().split('T')[0],
+            status: 'active'
           }
         })
       });
