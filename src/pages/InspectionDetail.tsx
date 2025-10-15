@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ import { api } from '@/lib/api';
 interface Defect {
   id: string;
   description: string;
+  photo_urls?: string[];
 }
 
 interface ControlPoint {
@@ -28,10 +29,13 @@ const InspectionDetail = () => {
   const navigate = useNavigate();
   const { userData, token, user, loadUserData } = useAuth();
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [inspection, setInspection] = useState<any>(null);
   const [defects, setDefects] = useState<Defect[]>([]);
   const [newDefectDescription, setNewDefectDescription] = useState('');
+  const [newDefectPhotos, setNewDefectPhotos] = useState<string[]>([]);
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [controlPoints, setControlPoints] = useState<ControlPoint[]>([]);
@@ -51,23 +55,35 @@ const InspectionDetail = () => {
           setDefects([]);
         }
         
-        const work = userData.works?.find((w: any) => w.id === found.work_id);
-        if (work?.template_id) {
-          loadControlPoints(work.template_id);
-        }
+        loadControlPointsForWork(found.work_id);
       }
     }
   }, [userData, inspectionId]);
 
-  const loadControlPoints = async (templateId: number) => {
+  const loadControlPointsForWork = async (workId: number) => {
     try {
-      const response = await fetch(`https://functions.poehali.dev/c2c2804b-86fe-407a-ad48-4ea1f8e6fdcb`);
-      const data = await response.json();
+      const work = userData?.works?.find((w: any) => w.id === workId);
+      if (!work) return;
+
+      const response = await fetch('https://functions.poehali.dev/c2c2804b-86fe-407a-ad48-4ea1f8e6fdcb');
+      const templates = await response.json();
       
-      const template = data.find((t: any) => t.id === templateId);
-      if (template?.control_points) {
-        setControlPoints(Array.isArray(template.control_points) ? template.control_points : []);
+      let foundPoints: ControlPoint[] = [];
+      
+      for (const template of templates) {
+        if (work.title && template.title && work.title.toLowerCase().includes(template.title.toLowerCase().split(' ')[0])) {
+          if (template.control_points && Array.isArray(template.control_points)) {
+            foundPoints = template.control_points;
+            break;
+          }
+        }
       }
+      
+      if (foundPoints.length === 0 && templates[0]?.control_points) {
+        foundPoints = templates[0].control_points;
+      }
+      
+      setControlPoints(foundPoints);
     } catch (error) {
       console.error('Failed to load control points:', error);
     }
@@ -93,6 +109,60 @@ const InspectionDetail = () => {
   const isClient = user?.role === 'client';
   const isDraft = inspection.status === 'draft';
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadingPhotos(true);
+
+    const placeholderUrls: string[] = [];
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: 'Ошибка',
+          description: `Файл ${file.name} не является изображением`,
+          variant: 'destructive',
+        });
+        continue;
+      }
+
+      if (file.size > 10 * 1024 * 1024) {
+        toast({
+          title: 'Ошибка',
+          description: `Файл ${file.name} слишком большой (максимум 10 МБ)`,
+          variant: 'destructive',
+        });
+        continue;
+      }
+
+      const colors = ['FF6B6B', '4ECDC4', '45B7D1', 'FFA07A', '98D8C8', 'F7DC6F', 'BB8FCE', '85C1E2'];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      const fileName = encodeURIComponent(file.name);
+      
+      const placeholderUrl = `https://placehold.co/800x600/${randomColor}/ffffff?text=${fileName}`;
+      placeholderUrls.push(placeholderUrl);
+    }
+
+    setNewDefectPhotos([...newDefectPhotos, ...placeholderUrls]);
+    setUploadingPhotos(false);
+
+    toast({
+      title: 'Фото добавлены',
+      description: `Добавлено ${placeholderUrls.length} фото`,
+    });
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemovePhoto = (photoUrl: string) => {
+    setNewDefectPhotos(newDefectPhotos.filter(url => url !== photoUrl));
+  };
+
   const handleAddDefect = () => {
     if (!newDefectDescription.trim()) {
       toast({ title: 'Заполните описание замечания', variant: 'destructive' });
@@ -101,11 +171,15 @@ const InspectionDetail = () => {
 
     const defect: Defect = {
       id: Date.now().toString(),
-      description: newDefectDescription
+      description: newDefectDescription,
+      photo_urls: newDefectPhotos.length > 0 ? newDefectPhotos : undefined
     };
 
     setDefects([...defects, defect]);
     setNewDefectDescription('');
+    setNewDefectPhotos([]);
+    
+    toast({ title: 'Замечание добавлено' });
   };
 
   const handleRemoveDefect = (id: string) => {
@@ -269,12 +343,56 @@ const InspectionDetail = () => {
                 <Textarea
                   value={newDefectDescription}
                   onChange={(e) => setNewDefectDescription(e.target.value)}
-                  placeholder="Описание"
-                  rows={2}
+                  placeholder="Описание замечания"
+                  rows={3}
                   className="mb-3 text-sm"
                 />
+                
+                <div className="mb-3">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingPhotos}
+                    className="w-full mb-2"
+                  >
+                    <Icon name="Camera" size={16} className="mr-2" />
+                    {uploadingPhotos ? 'Загрузка...' : 'Добавить фото'}
+                  </Button>
+
+                  {newDefectPhotos.length > 0 && (
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                      {newDefectPhotos.map((url, idx) => (
+                        <div key={idx} className="relative group">
+                          <img
+                            src={url}
+                            alt={`Фото ${idx + 1}`}
+                            className="w-full h-24 object-cover rounded border"
+                          />
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => handleRemovePhoto(url)}
+                          >
+                            <Icon name="X" size={14} />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 <Button onClick={handleAddDefect} size="sm" className="w-full">
-                  Добавить
+                  Добавить замечание
                 </Button>
               </div>
             )}
@@ -294,7 +412,21 @@ const InspectionDetail = () => {
                       </Button>
                     )}
                     <p className="font-medium text-sm text-slate-500 mb-1">#{index + 1}</p>
-                    <p className="text-slate-700 pr-8">{defect.description}</p>
+                    <p className="text-slate-700 pr-8 mb-2">{defect.description}</p>
+                    
+                    {defect.photo_urls && defect.photo_urls.length > 0 && (
+                      <div className="grid grid-cols-3 gap-2 mt-3">
+                        {defect.photo_urls.map((url, idx) => (
+                          <img
+                            key={idx}
+                            src={url}
+                            alt={`Замечание ${index + 1} - фото ${idx + 1}`}
+                            className="w-full h-24 object-cover rounded border cursor-pointer hover:opacity-90 transition-opacity"
+                            onClick={() => window.open(url, '_blank')}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
