@@ -9,8 +9,8 @@ interface ObjectHeaderProps {
 
 const ObjectHeader = ({ object, onBack }: ObjectHeaderProps) => {
   return (
-    <div className="container max-w-4xl mx-auto px-4 py-4">
-      <div className="flex items-center justify-between mb-4">
+    <div className="container max-w-4xl mx-auto px-4 py-3">
+      <div className="flex items-center justify-between mb-3">
         <Button 
           variant="ghost" 
           size="icon"
@@ -26,11 +26,11 @@ const ObjectHeader = ({ object, onBack }: ObjectHeaderProps) => {
         </Button>
       </div>
 
-      <div className="flex flex-col items-center text-center">
-        <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 mb-4 flex items-center justify-center">
-          <Icon name="Building2" size={40} className="text-blue-600" />
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center flex-shrink-0">
+          <Icon name="Building2" size={24} className="text-blue-600" />
         </div>
-        <h1 className="text-xl md:text-2xl font-bold text-slate-900 mb-6">{object.title}</h1>
+        <h1 className="text-lg md:text-xl font-bold text-slate-900">{object.title}</h1>
       </div>
     </div>
   );
