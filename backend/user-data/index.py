@@ -149,6 +149,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 objects, works = [], []
                 
         else:
+            print(f"DEBUG: Executing query for client user_id={user_id}")
             cur.execute("""
                 SELECT id, title, address, description, client_id, status, created_at, updated_at
                 FROM objects
@@ -156,6 +157,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 ORDER BY created_at DESC
             """, (user_id,))
             objects = cur.fetchall()
+            print(f"DEBUG: Found {len(objects)} objects")
             
             object_ids = [o['id'] for o in objects]
             
@@ -252,10 +254,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur.close()
         conn.close()
         
+        print(f"DEBUG: Processing dates - objects={len(objects)}, works={len(works)}, inspections={len(inspections)}, remarks={len(remarks)}, work_logs={len(work_logs)}, contractors={len(contractors)}, chat_messages={len(chat_messages)}")
+        
         for item in objects + works + inspections + remarks + work_logs + contractors + chat_messages:
             for key, value in item.items():
                 if hasattr(value, 'isoformat'):
                     item[key] = value.isoformat()
+        
+        print(f"DEBUG: Dates processed successfully")
         
         result = {
             'objects': [dict(o) for o in objects],
