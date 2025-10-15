@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
 
 const ObjectDetail = () => {
   const { objectId } = useParams();
@@ -250,21 +251,20 @@ const ObjectDetail = () => {
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-base text-slate-900 mb-1 line-clamp-2">{work.title}</h3>
                       
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <Badge 
                           variant="outline"
-                          className={
-                            work.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
-                            work.status === 'active' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                            work.status === 'completed' ? 'bg-green-50 text-green-700 border-green-200' :
-                            'bg-slate-50 text-slate-700 border-slate-200'
-                          }
+                          className={`text-xs ${getWorkStatusInfo(work).color}`}
                         >
-                          {work.status === 'pending' && '⏳ Ожидание'}
-                          {work.status === 'active' && '🟢 В работе'}
-                          {work.status === 'completed' && '✅ Готово'}
-                          {work.status === 'on_hold' && '⏸️ Пауза'}
+                          {getWorkStatusInfo(work).icon} {getWorkStatusInfo(work).message}
                         </Badge>
+                        
+                        {work.planned_start_date && (
+                          <span className="text-xs text-slate-500 flex items-center gap-1">
+                            <Icon name="Calendar" size={11} />
+                            {formatDateRange(work.planned_start_date, work.planned_end_date)}
+                          </span>
+                        )}
                       </div>
 
                       {work.contractor_name && (
