@@ -224,6 +224,8 @@ def handler(event, context):
                 result_data = cur.fetchone()
                 
             elif item_type == 'work':
+                from datetime import datetime, date
+                
                 title = data.get('title', '').replace("'", "''")
                 description = data.get('description', '').replace("'", "''")
                 status = data.get('status', 'active')
@@ -233,6 +235,13 @@ def handler(event, context):
                 planned_start_date = data.get('planned_start_date')
                 planned_end_date = data.get('planned_end_date')
                 completion_percentage = data.get('completion_percentage')
+                
+                today_date = date.today()
+                
+                if planned_start_date:
+                    planned_start = datetime.fromisoformat(planned_start_date.replace('Z', '+00:00')).date()
+                    if planned_start <= today_date and not start_date and status == 'pending':
+                        status = 'active'
                 
                 set_clause = f"title = '{title}', description = '{description}', status = '{status}'"
                 if contractor_id:
