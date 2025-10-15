@@ -238,9 +238,16 @@ def handler(event, context):
                 photo_urls_raw = data.get('photo_urls', '')
                 photo_urls = photo_urls_raw.replace("'", "''") if photo_urls_raw else None
                 
-                # Generate inspection number
+                # Generate inspection number - get last number after last dash
                 cur.execute(f"""
-                    SELECT COALESCE(MAX(CAST(SUBSTRING(inspection_number FROM '[0-9]+') AS INTEGER)), 0) + 1 as next_num
+                    SELECT COALESCE(
+                        MAX(
+                            CAST(
+                                SUBSTRING(inspection_number FROM 'INS-{work_id}-([0-9]+)') 
+                                AS INTEGER
+                            )
+                        ), 0
+                    ) + 1 as next_num
                     FROM inspections
                     WHERE work_id = {work_id}
                 """)
