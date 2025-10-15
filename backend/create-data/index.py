@@ -287,8 +287,8 @@ def handler(event, context):
                 print(f"DEBUG: Inserting chat_message: work_id={work_id}, message='{message}', user_id={user_id_int}")
                 
                 cur.execute(f"""
-                    INSERT INTO chat_messages (work_id, message, created_by, created_at)
-                    VALUES ({work_id}, '{message}', {user_id_int}, NOW())
+                    INSERT INTO chat_messages (work_id, message, message_type, created_by, created_at)
+                    VALUES ({work_id}, '{message}', 'text', {user_id_int}, NOW())
                     RETURNING id, work_id, message, created_by, created_at
                 """)
                 result = cur.fetchone()
