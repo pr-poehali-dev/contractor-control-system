@@ -223,16 +223,22 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 ORDER BY wl.created_at DESC
             """, (work_ids,))
             work_logs = cur.fetchall()
+            print(f"DEBUG: Loaded {len(work_logs)} work_logs, now loading chat_messages")
             
-            cur.execute("""
-                SELECT cm.id, cm.work_id, cm.message, cm.created_by, cm.created_at,
-                       u.name as author_name, u.role as author_role
-                FROM chat_messages cm
-                LEFT JOIN users u ON cm.created_by = u.id
-                WHERE cm.work_id = ANY(%s)
-                ORDER BY cm.created_at DESC
-            """, (work_ids,))
-            chat_messages = cur.fetchall()
+            try:
+                cur.execute("""
+                    SELECT cm.id, cm.work_id, cm.message, cm.created_by, cm.created_at,
+                           u.name as author_name, u.role as author_role
+                    FROM chat_messages cm
+                    LEFT JOIN users u ON cm.created_by = u.id
+                    WHERE cm.work_id = ANY(%s)
+                    ORDER BY cm.created_at DESC
+                """, (work_ids,))
+                chat_messages = cur.fetchall()
+                print(f"DEBUG: Loaded {len(chat_messages)} chat_messages")
+            except Exception as chat_err:
+                print(f"ERROR loading chat_messages: {chat_err}")
+                chat_messages = []
         
         if role == 'client':
             cur.execute("""
