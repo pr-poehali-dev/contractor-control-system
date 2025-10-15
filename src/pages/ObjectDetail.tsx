@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
+import { NotificationGroup } from '@/components/ui/notification-badge';
 
 const ObjectDetail = () => {
   const { objectId } = useParams();
@@ -27,6 +28,8 @@ const ObjectDetail = () => {
 
   const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
   const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
+  const unreadCounts = userData?.unreadCounts || {};
+  const isContractor = user?.role === 'contractor';
 
   console.log('ObjectDetail: objectId =', objectId, 'type:', typeof objectId);
   console.log('ObjectDetail: objects =', objects.map(o => ({ id: o.id, title: o.title })));
@@ -288,6 +291,14 @@ const ObjectDetail = () => {
                           </span>
                         )}
                       </div>
+                      
+                      <NotificationGroup
+                        messages={unreadCounts[work.id]?.messages}
+                        logs={!isContractor ? unreadCounts[work.id]?.logs : undefined}
+                        inspections={isContractor ? unreadCounts[work.id]?.inspections : undefined}
+                        size="xs"
+                        className="mb-2"
+                      />
 
                       {work.contractor_name && (
                         <p className="text-sm text-slate-500">

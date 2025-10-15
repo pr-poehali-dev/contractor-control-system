@@ -223,6 +223,9 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                 organizationName={currentObject?.title}
                 userRole={userRole}
                 onEdit={() => handlers.handleEditClick(selectedWorkData)}
+                unreadMessages={unreadCounts[selectedWork]?.messages}
+                unreadLogs={unreadCounts[selectedWork]?.logs}
+                unreadInspections={unreadCounts[selectedWork]?.inspections}
               />
 
               <div className="flex-1 flex flex-col min-h-0 w-full overflow-x-hidden">

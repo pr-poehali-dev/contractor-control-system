@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
+import { NotificationGroup } from '@/components/ui/notification-badge';
 import type { Work } from '@/contexts/AuthContext';
 
 interface WorkHeaderProps {
@@ -12,9 +13,12 @@ interface WorkHeaderProps {
   organizationName?: string;
   userRole?: string;
   onEdit?: () => void;
+  unreadMessages?: number;
+  unreadLogs?: number;
+  unreadInspections?: number;
 }
 
-export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, organizationName, userRole, onEdit }: WorkHeaderProps) {
+export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, organizationName, userRole, onEdit, unreadMessages, unreadLogs, unreadInspections }: WorkHeaderProps) {
   const navigate = useNavigate();
   const { objectId } = useParams();
 
@@ -52,6 +56,13 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
                 </div>
               )}
             </div>
+            
+            <NotificationGroup
+              messages={unreadMessages}
+              logs={userRole !== 'contractor' ? unreadLogs : undefined}
+              inspections={userRole === 'contractor' ? unreadInspections : undefined}
+              size="xs"
+            />
           </div>
 
           {(userRole === 'client' || userRole === 'admin') && onEdit && (

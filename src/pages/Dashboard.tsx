@@ -13,6 +13,7 @@ import CreateActionButton from '@/components/dashboard/CreateActionButton';
 import JournalEntryModal from '@/components/dashboard/JournalEntryModal';
 import InspectionModal from '@/components/dashboard/InspectionModal';
 import InfoPostModal from '@/components/dashboard/InfoPostModal';
+import NotificationsSummary from '@/components/work-journal/NotificationsSummary';
 
 
 interface FeedEvent {
@@ -81,6 +82,11 @@ const Dashboard = () => {
 
   const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
   const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
+  const unreadCounts = userData?.unreadCounts || {};
+  
+  const totalMessages = Object.values(unreadCounts).reduce((sum, c: any) => sum + (c.messages || 0), 0);
+  const totalLogs = Object.values(unreadCounts).reduce((sum, c: any) => sum + (c.logs || 0), 0);
+  const totalInspections = Object.values(unreadCounts).reduce((sum, c: any) => sum + (c.inspections || 0), 0);
 
   useEffect(() => {
     loadFeed();
@@ -343,6 +349,14 @@ const Dashboard = () => {
           </div>
 
         <div className="space-y-4">
+            <NotificationsSummary
+              totalMessages={totalMessages}
+              totalLogs={user?.role === 'client' ? totalLogs : undefined}
+              totalInspections={user?.role === 'contractor' ? totalInspections : undefined}
+              userRole={user?.role || 'contractor'}
+              className="mx-0 mt-0"
+            />
+            
             <FeedFilters 
               filter={filter} 
               onFilterChange={setFilter}

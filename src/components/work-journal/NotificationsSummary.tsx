@@ -7,49 +7,45 @@ interface NotificationsSummaryProps {
   totalLogs?: number;
   totalInspections?: number;
   userRole: 'client' | 'contractor' | 'admin';
+  className?: string;
 }
 
 export default function NotificationsSummary({ 
   totalMessages, 
   totalLogs, 
   totalInspections,
-  userRole 
+  userRole,
+  className 
 }: NotificationsSummaryProps) {
-  const hasNotifications = totalMessages > 0 || (totalLogs || 0) > 0 || (totalInspections || 0) > 0;
-  
-  if (!hasNotifications) return null;
-  
   const items = [];
   
-  if (totalMessages > 0) {
-    items.push({
-      icon: 'MessageCircle',
-      label: 'новых сообщений',
-      count: totalMessages,
-      color: 'text-blue-600 bg-blue-50'
-    });
-  }
+  items.push({
+    icon: 'MessageCircle',
+    label: 'новых сообщений',
+    count: totalMessages || 0,
+    color: totalMessages > 0 ? 'text-blue-600 bg-blue-50' : 'text-slate-400 bg-slate-50'
+  });
   
-  if (userRole === 'client' && totalLogs && totalLogs > 0) {
+  if (userRole === 'client') {
     items.push({
       icon: 'FileText',
       label: 'новых отчётов',
-      count: totalLogs,
-      color: 'text-green-600 bg-green-50'
+      count: totalLogs || 0,
+      color: (totalLogs || 0) > 0 ? 'text-green-600 bg-green-50' : 'text-slate-400 bg-slate-50'
     });
   }
   
-  if (userRole === 'contractor' && totalInspections && totalInspections > 0) {
+  if (userRole === 'contractor') {
     items.push({
       icon: 'ClipboardCheck',
       label: 'новых проверок',
-      count: totalInspections,
-      color: 'text-orange-600 bg-orange-50'
+      count: totalInspections || 0,
+      color: (totalInspections || 0) > 0 ? 'text-orange-600 bg-orange-50' : 'text-slate-400 bg-slate-50'
     });
   }
   
   return (
-    <Card className="mx-4 mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+    <Card className={cn("mx-4 mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200", className)}>
       <div className="flex items-center gap-2 mb-3">
         <Icon name="Bell" size={20} className="text-blue-600" />
         <h3 className="font-semibold text-slate-900">Новые уведомления</h3>
