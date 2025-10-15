@@ -255,7 +255,6 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                     />
                   </>
                 )}
-                )}
 
                 {activeTab === 'info' && (
                   <InfoTab
