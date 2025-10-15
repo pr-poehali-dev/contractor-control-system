@@ -147,9 +147,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 works = cur.fetchall()
             else:
                 objects, works = [], []
-                
         else:
-            print(f"DEBUG: Executing query for client user_id={user_id}")
+            print(f"DEBUG: Executing query for {role} user_id={user_id}")
             cur.execute("""
                 SELECT id, title, address, description, client_id, status, created_at, updated_at
                 FROM objects
