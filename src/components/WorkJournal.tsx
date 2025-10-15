@@ -261,7 +261,18 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
         onClose={() => handlers.setIsEditDialogOpen(false)}
         onSubmit={() => handlers.handleEditSubmit(selectedWorkData)}
         onDelete={() => handlers.handleDeleteWork(selectedWorkData, () => {
-          navigate(`/projects/${projectId}/objects/${objectId}`);
+          const isMobile = window.innerWidth < 768;
+          
+          if (isMobile) {
+            navigate(`/objects/${objectId}`);
+          } else {
+            const remainingWorks = works.filter(w => w.id !== selectedWork);
+            if (remainingWorks.length > 0) {
+              navigate(`/objects/${objectId}/works/${remainingWorks[0].id}`);
+            } else {
+              navigate(`/objects/${objectId}`);
+            }
+          }
         })}
         formData={handlers.editFormData}
         setFormData={handlers.setEditFormData}
