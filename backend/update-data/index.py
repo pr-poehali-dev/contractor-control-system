@@ -226,9 +226,9 @@ def handler(event, context):
             elif item_type == 'work':
                 from datetime import datetime, date
                 
-                title = data.get('title', '').replace("'", "''")
-                description = data.get('description', '').replace("'", "''")
-                status = data.get('status', 'active')
+                title = data.get('title')
+                description = data.get('description')
+                status = data.get('status')
                 contractor_id = data.get('contractor_id')
                 start_date = data.get('start_date')
                 end_date = data.get('end_date')
@@ -243,19 +243,36 @@ def handler(event, context):
                     if planned_start <= today_date and not start_date and status == 'pending':
                         status = 'active'
                 
-                set_clause = f"title = '{title}', description = '{description}', status = '{status}'"
-                if contractor_id:
-                    set_clause += f", contractor_id = {int(contractor_id)}"
-                if start_date:
-                    set_clause += f", start_date = '{start_date}'"
-                if end_date:
-                    set_clause += f", end_date = '{end_date}'"
-                if planned_start_date:
-                    set_clause += f", planned_start_date = '{planned_start_date}'"
-                if planned_end_date:
-                    set_clause += f", planned_end_date = '{planned_end_date}'"
+                set_parts = []
+                if title is not None:
+                    set_parts.append(f"title = '{title.replace(chr(39), chr(39)+chr(39))}'")
+                if description is not None:
+                    set_parts.append(f"description = '{description.replace(chr(39), chr(39)+chr(39))}'")
+                if status is not None:
+                    set_parts.append(f"status = '{status}'")
+                if contractor_id is not None:
+                    set_parts.append(f"contractor_id = {int(contractor_id)}")
+                if start_date is not None:
+                    set_parts.append(f"start_date = '{start_date}'")
+                if end_date is not None:
+                    set_parts.append(f"end_date = '{end_date}'")
+                if planned_start_date is not None:
+                    set_parts.append(f"planned_start_date = '{planned_start_date}'")
+                if planned_end_date is not None:
+                    set_parts.append(f"planned_end_date = '{planned_end_date}'")
                 if completion_percentage is not None:
-                    set_clause += f", completion_percentage = {int(completion_percentage)}"
+                    set_parts.append(f"completion_percentage = {int(completion_percentage)}")
+                
+                if not set_parts:
+                    cur.close()
+                    conn.close()
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'body': json.dumps({'error': 'No fields to update'})
+                    }
+                
+                set_clause = ', '.join(set_parts)
                 
                 if is_admin:
                     cur.execute(f"""
