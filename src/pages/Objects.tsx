@@ -50,7 +50,7 @@ export default function Objects() {
     const objectWorks = works.filter(w => w.object_id === obj.id);
     const completedWorks = objectWorks.filter(w => w.completion_percentage >= 100).length;
     const progress = objectWorks.length > 0 
-      ? Math.round((completedWorks / objectWorks.length) * 100)
+      ? Math.round(objectWorks.reduce((sum, w) => sum + (w.completion_percentage || 0), 0) / objectWorks.length)
       : 0;
     
     const statusInfo = getObjectStatusInfo(objectWorks);
