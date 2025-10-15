@@ -281,6 +281,22 @@ def handler(event, context):
                         WHERE id = {int(item_id)}
                         RETURNING id, title, description, object_id, contractor_id, status, start_date, end_date, planned_start_date, planned_end_date, completion_percentage
                     """)
+                elif user_role == 'contractor':
+                    cur.execute(f"""
+                        SELECT id FROM contractors WHERE user_id = {user_id_int}
+                    """)
+                    contractor_row = cur.fetchone()
+                    contractor_id_val = contractor_row['id'] if contractor_row else None
+                    
+                    if contractor_id_val:
+                        cur.execute(f"""
+                            UPDATE works 
+                            SET {set_clause}
+                            WHERE id = {int(item_id)} AND contractor_id = {contractor_id_val}
+                            RETURNING id, title, description, object_id, contractor_id, status, start_date, end_date, planned_start_date, planned_end_date, completion_percentage
+                        """)
+                    else:
+                        result_data = None
                 else:
                     cur.execute(f"""
                         UPDATE works 
@@ -293,7 +309,11 @@ def handler(event, context):
                         )
                         RETURNING id, title, description, object_id, contractor_id, status, start_date, end_date, planned_start_date, planned_end_date, completion_percentage
                     """)
-                result_data = cur.fetchone()
+                
+                if user_role != 'contractor' or (user_role == 'contractor' and contractor_id_val):
+                    result_data = cur.fetchone()
+                else:
+                    result_data = None
             else:
                 cur.close()
                 conn.close()

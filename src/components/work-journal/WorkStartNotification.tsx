@@ -28,6 +28,16 @@ export default function WorkStartNotification({ work, onNotified }: WorkStartNot
     
     try {
       const token = localStorage.getItem('auth_token');
+      const updatePayload = {
+        type: 'work',
+        id: work.id,
+        data: {
+          start_date: new Date().toISOString().split('T')[0],
+          status: 'active'
+        }
+      };
+      
+      console.log('Sending update request:', updatePayload);
       
       const updateResponse = await fetch('https://functions.poehali.dev/b69598bf-df90-4a71-93a1-6108c6c39317', {
         method: 'PUT',
@@ -35,17 +45,14 @@ export default function WorkStartNotification({ work, onNotified }: WorkStartNot
           'Content-Type': 'application/json',
           'X-Auth-Token': token || ''
         },
-        body: JSON.stringify({
-          type: 'work',
-          id: work.id,
-          data: {
-            start_date: new Date().toISOString().split('T')[0],
-            status: 'active'
-          }
-        })
+        body: JSON.stringify(updatePayload)
       });
 
+      const updateResult = await updateResponse.json();
+      console.log('Update response:', updateResponse.status, updateResult);
+
       if (!updateResponse.ok) {
+        console.error('Update failed:', updateResult);
         throw new Error('Failed to update work');
       }
 
