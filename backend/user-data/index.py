@@ -285,6 +285,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"ERROR in user-data: {error_details}")
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
