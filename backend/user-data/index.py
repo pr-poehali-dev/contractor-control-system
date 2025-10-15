@@ -160,6 +160,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             print(f"DEBUG: Found {len(objects)} objects")
             
             object_ids = [o['id'] for o in objects]
+            print(f"DEBUG: object_ids={object_ids}")
             
             if object_ids:
                 cur.execute("""
@@ -173,10 +174,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     ORDER BY w.created_at DESC
                 """, (object_ids,))
                 works = cur.fetchall()
+                print(f"DEBUG: Found {len(works)} works")
             else:
                 works = []
         
         work_ids = [w['id'] for w in works]
+        print(f"DEBUG: work_ids={work_ids}")
         
         inspections = []
         remarks = []
@@ -241,6 +244,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 ORDER BY c.created_at DESC
             """, (user_id,))
             contractors = cur.fetchall()
+            print(f"DEBUG: Found {len(contractors)} contractors")
         elif role == 'admin':
             cur.execute("""
                 SELECT id, name, inn, contact_info, email, phone, user_id, created_at
