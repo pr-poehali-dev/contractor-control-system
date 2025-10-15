@@ -49,6 +49,11 @@ export default function WorkStartNotification({ work, onNotified }: WorkStartNot
         throw new Error('Failed to update work');
       }
 
+      if (token) {
+        const refreshedData = await api.getUserData(token);
+        setUserData(refreshedData);
+      }
+
       const createLogResponse = await fetch('https://functions.poehali.dev/8d57b03e-49c5-4589-abfb-691e6e084c6a', {
         method: 'POST',
         headers: { 
