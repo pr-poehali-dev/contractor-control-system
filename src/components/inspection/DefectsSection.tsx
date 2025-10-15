@@ -31,19 +31,6 @@ interface DefectsSectionProps {
   onRemoveDefect: (id: string) => void;
 }
 
-const COMMON_DEFECTS = [
-  'Отклонение от проектной документации',
-  'Некачественное выполнение работ',
-  'Использование материалов несоответствующего качества',
-  'Нарушение технологии производства работ',
-  'Дефекты поверхности (трещины, сколы, неровности)',
-  'Нарушение геометрических размеров',
-  'Некачественная гидроизоляция',
-  'Дефекты окраски и отделки',
-  'Нарушение правил техники безопасности',
-  'Загрязнение строительной площадки'
-];
-
 export default function DefectsSection({
   defects,
   newDefect,
@@ -59,7 +46,6 @@ export default function DefectsSection({
   onRemoveDefect
 }: DefectsSectionProps) {
   const [showForm, setShowForm] = useState(false);
-  const [showCommonDefects, setShowCommonDefects] = useState(false);
 
   React.useEffect(() => {
     if (newDefect.description && !showForm) {
@@ -70,12 +56,6 @@ export default function DefectsSection({
   const handleAddDefect = () => {
     onAddDefect();
     setShowForm(false);
-    setShowCommonDefects(false);
-  };
-
-  const handleSelectCommonDefect = (defect: string) => {
-    onDefectChange('description', defect);
-    setShowCommonDefects(false);
   };
 
   return (
@@ -107,44 +87,6 @@ export default function DefectsSection({
 
       {isDraft && isClient && showForm && (
         <div className="mb-6 p-5 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border border-slate-200 space-y-4">
-          
-          {!showCommonDefects ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowCommonDefects(true)}
-              className="w-full border-dashed"
-            >
-              <Icon name="List" size={16} className="mr-2" />
-              Выбрать типовое нарушение
-            </Button>
-          ) : (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between mb-2">
-                <Label className="text-xs text-slate-600">Типовые нарушения</Label>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowCommonDefects(false)}
-                  className="h-6 text-xs"
-                >
-                  Свернуть
-                </Button>
-              </div>
-              <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
-                {COMMON_DEFECTS.map((defect, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handleSelectCommonDefect(defect)}
-                    className="text-left text-sm p-2 rounded-lg border border-slate-200 hover:bg-blue-50 hover:border-blue-300 transition-colors"
-                  >
-                    {defect}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
           <div>
             <Label htmlFor="description" className="text-xs text-slate-600 mb-1.5 block">
               Описание нарушения *

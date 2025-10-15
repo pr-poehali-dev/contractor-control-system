@@ -9,6 +9,7 @@ import { api } from '@/lib/api';
 import InspectionHeader from '@/components/inspection/InspectionHeader';
 import DefectsSection, { Defect } from '@/components/inspection/DefectsSection';
 import ControlPointsSection, { ControlPoint } from '@/components/inspection/ControlPointsSection';
+import CommonDefectsSection from '@/components/inspection/CommonDefectsSection';
 
 const InspectionDetail = () => {
   const { inspectionId } = useParams<{ inspectionId: string }>();
@@ -16,6 +17,8 @@ const InspectionDetail = () => {
   const { userData, token, user, loadUserData } = useAuth();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const fromPage = sessionStorage.getItem('inspectionFromPage') || '/inspections';
   
   const [inspection, setInspection] = useState<any>(null);
   const [defects, setDefects] = useState<Defect[]>([]);
@@ -273,10 +276,25 @@ const InspectionDetail = () => {
   const object = userData?.objects?.find((o: any) => o.id === work?.object_id);
   
   const isClient = user?.role === 'client';
-  const isDraft = inspection.status === 'draft';
+  
+  const isScheduledForToday = () => {
+    if (!inspection.scheduled_date) return false;
+    const scheduledDate = new Date(inspection.scheduled_date);
+    const today = new Date();
+    scheduledDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    return scheduledDate <= today;
+  };
+  
+  const canEdit = inspection.status === 'draft' && (inspection.type === 'unscheduled' || isScheduledForToday());
   
   const workInspections = userData?.inspections?.filter((i: any) => i.work_id === inspection.work_id) || [];
   const inspectionIndex = workInspections.findIndex((i: any) => i.id === inspection.id) + 1;
+
+  const handleBack = () => {
+    sessionStorage.removeItem('inspectionFromPage');
+    navigate(fromPage);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pb-24">
@@ -285,7 +303,7 @@ const InspectionDetail = () => {
           <Button 
             variant="ghost" 
             size="icon"
-            onClick={() => navigate('/inspections')}
+            onClick={handleBack}
             className="shrink-0"
           >
             <Icon name="ArrowLeft" size={20} />
@@ -309,11 +327,17 @@ const InspectionDetail = () => {
           scheduledDate={inspection.scheduled_date}
         />
 
-        <ControlPointsSection
-          controlPoints={controlPoints}
-          checkedPoints={checkedPoints}
-          onControlPointClick={handleControlPointClick}
-        />
+        {!canEdit && inspection.type === 'scheduled' && !isScheduledForToday() && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+            <Icon name="Clock" size={20} className="text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-medium text-amber-900 mb-1">Проверка запланирована</p>
+              <p className="text-sm text-amber-700">
+                Редактирование будет доступно {new Date(inspection.scheduled_date).toLocaleDateString('ru-RU')}
+              </p>
+            </div>
+          </div>
+        )}
 
         <div ref={defectsRef}>
           <DefectsSection
@@ -321,7 +345,7 @@ const InspectionDetail = () => {
             newDefect={newDefect}
             newDefectPhotos={newDefectPhotos}
             uploadingPhotos={uploadingPhotos}
-            isDraft={isDraft}
+            isDraft={canEdit}
             isClient={isClient}
             fileInputRef={fileInputRef}
             onDefectChange={handleDefectChange}
@@ -332,7 +356,22 @@ const InspectionDetail = () => {
           />
         </div>
 
-        {isDraft && isClient && (
+        <CommonDefectsSection
+          onSelectDefect={(description) => {
+            handleDefectChange('description', description);
+            setTimeout(() => {
+              defectsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+          }}
+        />
+
+        <ControlPointsSection
+          controlPoints={controlPoints}
+          checkedPoints={checkedPoints}
+          onControlPointClick={handleControlPointClick}
+        />
+
+        {canEdit && isClient && (
           <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-20">
             <div className="max-w-4xl mx-auto flex gap-3">
               <Button

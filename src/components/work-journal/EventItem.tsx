@@ -32,6 +32,7 @@ export default function EventItem({
   
   const handleInspectionClick = () => {
     if (event.inspection_data?.inspection_id) {
+      sessionStorage.setItem('inspectionFromPage', '/journal');
       navigate(`/inspection/${event.inspection_data.inspection_id}`);
     }
   };
