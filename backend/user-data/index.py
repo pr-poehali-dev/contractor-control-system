@@ -225,7 +225,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             work_logs = cur.fetchall()
             print(f"DEBUG: Loaded {len(work_logs)} work_logs")
             
-            print(f"DEBUG: Skipping chat_messages due to DB permissions issue")
+            cur.execute("""
+                SELECT cm.id, cm.work_id, cm.message, cm.created_by, cm.created_at,
+                       u.name as author_name, u.role as author_role
+                FROM chat_messages cm
+                LEFT JOIN users u ON cm.created_by = u.id
+                WHERE cm.work_id = ANY(%s)
+                ORDER BY cm.created_at DESC
+            """, (work_ids,))
+            chat_messages = cur.fetchall()
+            print(f"DEBUG: Loaded {len(chat_messages)} chat_messages")
         
         if role == 'client':
             cur.execute("""
