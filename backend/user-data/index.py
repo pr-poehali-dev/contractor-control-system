@@ -268,11 +268,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 if role == 'client':
                     unread_logs = len([wl for wl in work_logs if wl['work_id'] == work_id and (not last_seen or wl['created_at'] > last_seen)])
-                    unread_messages = len([cm for cm in chat_messages if cm['work_id'] == work_id and (not last_seen or cm['created_at'] > last_seen)])
+                    unread_messages = len([cm for cm in chat_messages if cm['work_id'] == work_id and (not last_seen or cm['created_at'] > last_seen) and cm['created_by'] != user_id])
                     unread_counts[work_id] = {'logs': unread_logs, 'messages': unread_messages}
                 else:
                     unread_inspections = len([i for i in inspections if i['work_id'] == work_id and (not last_seen or i['created_at'] > last_seen)])
-                    unread_messages = len([cm for cm in chat_messages if cm['work_id'] == work_id and (not last_seen or cm['created_at'] > last_seen)])
+                    unread_messages = len([cm for cm in chat_messages if cm['work_id'] == work_id and (not last_seen or cm['created_at'] > last_seen) and cm['created_by'] != user_id])
                     unread_counts[work_id] = {'inspections': unread_inspections, 'messages': unread_messages}
         
         cur.close()

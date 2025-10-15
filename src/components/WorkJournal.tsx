@@ -17,7 +17,6 @@ import CreateInspectionModal from '@/components/work-journal/CreateInspectionMod
 import WorkReportModal from '@/components/work-journal/WorkReportModal';
 import WorkEditDialog from '@/components/work-detail/WorkEditDialog';
 import JournalTabContent from '@/components/work-journal/JournalTabContent';
-import NotificationsSummary from '@/components/work-journal/NotificationsSummary';
 import { NoWorksEmptyState, NoWorkSelectedEmptyState } from '@/components/work-journal/WorkJournalEmptyStates';
 import { useWorkJournalHandlers } from '@/components/work-journal/useWorkJournalHandlers';
 import type { JournalEvent, UserRole } from '@/types/journal';
@@ -231,12 +230,6 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
               <div className="flex-1 flex flex-col min-h-0 w-full overflow-x-hidden">
                 {activeTab === 'journal' && (
                   <>
-                    <NotificationsSummary
-                      totalMessages={Object.values(unreadCounts).reduce((sum, c) => sum + (c.messages || 0), 0)}
-                      totalLogs={userRole === 'client' ? Object.values(unreadCounts).reduce((sum, c) => sum + (c.logs || 0), 0) : undefined}
-                      totalInspections={userRole === 'contractor' ? Object.values(unreadCounts).reduce((sum, c) => sum + (c.inspections || 0), 0) : undefined}
-                      userRole={userRole}
-                    />
                     <JournalTabContent
                       mockEvents={mockEvents}
                       userId={user?.id}
