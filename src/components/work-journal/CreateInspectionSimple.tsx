@@ -96,37 +96,39 @@ export default function CreateInspectionSimple({ isOpen, onClose, workId }: Crea
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Icon name="ClipboardCheck" size={20} />
+          <DialogTitle className="flex items-center gap-2 text-base md:text-lg">
+            <Icon name="ClipboardCheck" size={18} className="md:hidden" />
+            <Icon name="ClipboardCheck" size={20} className="hidden md:block" />
             Создать проверку
           </DialogTitle>
           {work && (
-            <p className="text-sm text-slate-600 mt-2">
-              Работа: {work.title}
+            <p className="text-xs md:text-sm text-slate-600 mt-1 md:mt-2 line-clamp-2">
+              {work.title}
             </p>
           )}
         </DialogHeader>
 
         {step === 'type' ? (
-          <div className="space-y-4 py-4">
-            <p className="text-sm text-slate-600">Выберите тип проверки:</p>
+          <div className="space-y-3 md:space-y-4 py-2 md:py-4">
+            <p className="text-xs md:text-sm text-slate-600">Выберите тип проверки:</p>
             
-            <div className="grid gap-3">
+            <div className="grid gap-2.5 md:gap-3">
               <Card 
                 className="cursor-pointer hover:border-blue-400 hover:shadow-md transition-all"
                 onClick={() => handleTypeSelect('scheduled')}
               >
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                      <Icon name="Calendar" size={24} className="text-blue-600" />
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex items-start gap-3 md:gap-4">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <Icon name="Calendar" size={20} className="text-blue-600 md:hidden" />
+                      <Icon name="Calendar" size={24} className="text-blue-600 hidden md:block" />
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-lg mb-1">Плановая проверка</h3>
-                      <p className="text-sm text-slate-600">
-                        Запланировать проверку на конкретную дату. Подрядчик получит уведомление.
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-base md:text-lg mb-0.5 md:mb-1">Плановая проверка</h3>
+                      <p className="text-xs md:text-sm text-slate-600 leading-relaxed">
+                        Запланировать проверку на конкретную дату
                       </p>
                     </div>
                   </div>
@@ -137,15 +139,16 @@ export default function CreateInspectionSimple({ isOpen, onClose, workId }: Crea
                 className="cursor-pointer hover:border-amber-400 hover:shadow-md transition-all"
                 onClick={() => handleTypeSelect('unscheduled')}
               >
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
-                      <Icon name="Zap" size={24} className="text-amber-600" />
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex items-start gap-3 md:gap-4">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                      <Icon name="Zap" size={20} className="text-amber-600 md:hidden" />
+                      <Icon name="Zap" size={24} className="text-amber-600 hidden md:block" />
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-lg mb-1">Внеплановая проверка</h3>
-                      <p className="text-sm text-slate-600">
-                        Провести незапланированную проверку работ прямо сейчас.
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-base md:text-lg mb-0.5 md:mb-1">Внеплановая проверка</h3>
+                      <p className="text-xs md:text-sm text-slate-600 leading-relaxed">
+                        Провести проверку прямо сейчас
                       </p>
                     </div>
                   </div>
@@ -154,77 +157,82 @@ export default function CreateInspectionSimple({ isOpen, onClose, workId }: Crea
             </div>
           </div>
         ) : (
-          <div className="space-y-4 py-4">
-            <div className="flex items-center gap-2 text-sm text-slate-600 mb-4">
+          <div className="space-y-3 md:space-y-4 py-2 md:py-4">
+            <div className="flex items-center gap-2 text-xs md:text-sm text-slate-600 mb-2 md:mb-4">
               <Button 
                 variant="ghost" 
                 size="sm"
                 onClick={() => setStep('type')}
+                className="h-8 px-2 md:px-3"
               >
                 <Icon name="ChevronLeft" size={16} className="mr-1" />
                 Назад
               </Button>
-              <span>
-                {inspectionType === 'scheduled' ? '📅 Плановая проверка' : '⚡ Внеплановая проверка'}
+              <span className="text-xs md:text-sm">
+                {inspectionType === 'scheduled' ? '📅 Плановая' : '⚡ Внеплановая'}
               </span>
             </div>
 
-            <div>
-              <Label>Название проверки *</Label>
+            <div className="space-y-1.5">
+              <Label className="text-sm">Название проверки *</Label>
               <Input
                 value={form.title}
                 onChange={(e) => setForm(prev => ({ ...prev, title: e.target.value }))}
                 placeholder="Проверка качества работ"
+                className="h-10 text-sm"
               />
             </div>
 
-            <div>
-              <Label>Описание</Label>
+            <div className="space-y-1.5">
+              <Label className="text-sm">Описание</Label>
               <Textarea
                 value={form.description}
                 onChange={(e) => setForm(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Дополнительная информация о проверке..."
-                rows={3}
+                placeholder="Дополнительная информация..."
+                rows={2}
+                className="text-sm resize-none"
               />
             </div>
 
             {inspectionType === 'scheduled' && (
-              <div>
-                <Label>Дата проверки *</Label>
+              <div className="space-y-1.5">
+                <Label className="text-sm">Дата проверки *</Label>
                 <Input
                   type="date"
                   value={form.scheduledDate}
                   onChange={(e) => setForm(prev => ({ ...prev, scheduledDate: e.target.value }))}
                   min={new Date().toISOString().split('T')[0]}
+                  className="h-10 text-sm"
                 />
               </div>
             )}
 
-            <div>
-              <Label>Примечания</Label>
+            <div className="space-y-1.5">
+              <Label className="text-sm">Примечания</Label>
               <Textarea
                 value={form.notes}
                 onChange={(e) => setForm(prev => ({ ...prev, notes: e.target.value }))}
                 placeholder="Дополнительные примечания..."
                 rows={2}
+                className="text-sm resize-none"
               />
             </div>
 
-            <div className="flex gap-3 pt-4">
+            <div className="flex flex-col md:flex-row gap-2 md:gap-3 pt-2 md:pt-4">
               <Button
                 variant="outline"
                 onClick={handleClose}
-                className="flex-1"
+                className="flex-1 h-10 text-sm"
                 disabled={loading}
               >
                 Отмена
               </Button>
               <Button
                 onClick={handleCreate}
-                className="flex-1"
+                className="flex-1 h-10 text-sm"
                 disabled={loading}
               >
-                {loading ? 'Создание...' : 'Создать и перейти к проверке'}
+                {loading ? 'Создание...' : 'Создать проверку'}
               </Button>
             </div>
           </div>
