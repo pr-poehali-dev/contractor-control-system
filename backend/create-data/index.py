@@ -146,19 +146,32 @@ def handler(event, context):
                 description = data.get('description', '').replace("'", "''")
                 status = data.get('status', 'pending')
                 contractor_id = data.get('contractor_id')
+                start_date = data.get('start_date')
+                end_date = data.get('end_date')
+                
+                fields = ['title', 'description', 'object_id', 'status']
+                values = [f"'{title}'", f"'{description}'", str(object_id), f"'{status}'"]
                 
                 if contractor_id:
-                    cur.execute(f"""
-                        INSERT INTO works (title, description, object_id, contractor_id, status)
-                        VALUES ('{title}', '{description}', {object_id}, {int(contractor_id)}, '{status}')
-                        RETURNING id, title, description, object_id, contractor_id, status, start_date, end_date
-                    """)
-                else:
-                    cur.execute(f"""
-                        INSERT INTO works (title, description, object_id, status)
-                        VALUES ('{title}', '{description}', {object_id}, '{status}')
-                        RETURNING id, title, description, object_id, contractor_id, status, start_date, end_date
-                    """)
+                    fields.append('contractor_id')
+                    values.append(str(int(contractor_id)))
+                
+                if start_date:
+                    fields.append('planned_start_date')
+                    values.append(f"'{start_date}'")
+                    
+                if end_date:
+                    fields.append('planned_end_date')
+                    values.append(f"'{end_date}'")
+                
+                fields_str = ', '.join(fields)
+                values_str = ', '.join(values)
+                
+                cur.execute(f"""
+                    INSERT INTO works ({fields_str})
+                    VALUES ({values_str})
+                    RETURNING id, title, description, object_id, contractor_id, status, planned_start_date, planned_end_date, completion_percentage
+                """)
                 result = cur.fetchone()
                 conn.commit()
                 

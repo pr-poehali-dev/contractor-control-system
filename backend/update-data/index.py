@@ -230,6 +230,9 @@ def handler(event, context):
                 contractor_id = data.get('contractor_id')
                 start_date = data.get('start_date')
                 end_date = data.get('end_date')
+                planned_start_date = data.get('planned_start_date')
+                planned_end_date = data.get('planned_end_date')
+                completion_percentage = data.get('completion_percentage')
                 
                 set_clause = f"title = '{title}', description = '{description}', status = '{status}'"
                 if contractor_id:
@@ -238,13 +241,19 @@ def handler(event, context):
                     set_clause += f", start_date = '{start_date}'"
                 if end_date:
                     set_clause += f", end_date = '{end_date}'"
+                if planned_start_date:
+                    set_clause += f", planned_start_date = '{planned_start_date}'"
+                if planned_end_date:
+                    set_clause += f", planned_end_date = '{planned_end_date}'"
+                if completion_percentage is not None:
+                    set_clause += f", completion_percentage = {int(completion_percentage)}"
                 
                 if is_admin:
                     cur.execute(f"""
                         UPDATE works 
                         SET {set_clause}
                         WHERE id = {int(item_id)}
-                        RETURNING id, title, description, object_id, contractor_id, status, start_date, end_date
+                        RETURNING id, title, description, object_id, contractor_id, status, start_date, end_date, planned_start_date, planned_end_date, completion_percentage
                     """)
                 else:
                     cur.execute(f"""
@@ -256,7 +265,7 @@ def handler(event, context):
                             JOIN projects p ON o.project_id = p.id 
                             WHERE p.client_id = {user_id_int}
                         )
-                        RETURNING id, title, description, object_id, contractor_id, status, start_date, end_date
+                        RETURNING id, title, description, object_id, contractor_id, status, start_date, end_date, planned_start_date, planned_end_date, completion_percentage
                     """)
                 result_data = cur.fetchone()
             else:

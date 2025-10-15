@@ -106,6 +106,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.execute("""
                 SELECT w.id, w.title, w.description, w.object_id, w.contractor_id,
                        c.name as contractor_name, w.status, w.start_date, w.end_date,
+                       w.planned_start_date, w.planned_end_date, w.completion_percentage,
                        w.created_at, w.updated_at
                 FROM works w
                 LEFT JOIN contractors c ON w.contractor_id = c.id
@@ -136,6 +137,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 cur.execute("""
                     SELECT w.id, w.title, w.description, w.object_id, w.contractor_id,
                            c.name as contractor_name, w.status, w.start_date, w.end_date,
+                           w.planned_start_date, w.planned_end_date, w.completion_percentage,
                            w.created_at, w.updated_at
                     FROM works w
                     LEFT JOIN contractors c ON w.contractor_id = c.id
@@ -161,6 +163,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 cur.execute("""
                     SELECT w.id, w.title, w.description, w.object_id, w.contractor_id,
                            c.name as contractor_name, w.status, w.start_date, w.end_date,
+                           w.planned_start_date, w.planned_end_date, w.completion_percentage,
                            w.created_at, w.updated_at
                     FROM works w
                     LEFT JOIN contractors c ON w.contractor_id = c.id

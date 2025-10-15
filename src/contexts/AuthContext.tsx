@@ -22,13 +22,16 @@ export interface Work {
   object_id: number;
   title: string;
   description?: string;
-  status: 'planned' | 'awaiting_start' | 'in_progress' | 'awaiting_acceptance' | 'completed' | 'delayed';
+  status: 'active' | 'completed' | 'delayed';
+  contractor_id?: number;
+  contractor_name?: string;
+  start_date?: string;
+  end_date?: string;
   planned_start_date?: string;
   planned_end_date?: string;
-  actual_start_date?: string;
-  completion_percentage: number;
-  work_started_notification_sent?: boolean;
+  completion_percentage?: number;
   created_at?: string;
+  updated_at?: string;
 }
 
 interface UserData {
