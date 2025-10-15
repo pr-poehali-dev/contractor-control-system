@@ -14,7 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getWorkStatusInfo } from '@/utils/workStatus';
 import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
 
 const ObjectDetail = () => {
