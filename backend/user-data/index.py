@@ -15,11 +15,7 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 JWT_SECRET = os.environ.get('JWT_SECRET', 'default-secret-change-in-production')
 
 def get_db_connection():
-    conn = psycopg2.connect(DATABASE_URL)
-    cur = conn.cursor()
-    cur.execute("SET search_path TO t_p8942561_contractor_control_s, public")
-    cur.close()
-    return conn
+    return psycopg2.connect(DATABASE_URL)
 
 def verify_jwt_token(token: str) -> Dict[str, Any]:
     try:
