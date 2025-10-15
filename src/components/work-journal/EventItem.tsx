@@ -6,6 +6,7 @@ import Icon from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
 import { JournalEvent } from '@/types/journal';
 import { PhotoGallery, PhotoViewer, usePhotoGallery } from '@/components/ui/photo-gallery';
+import { useNavigate } from 'react-router-dom';
 
 interface EventItemProps {
   event: JournalEvent;
@@ -24,9 +25,16 @@ export default function EventItem({
   formatTime, 
   getInitials 
 }: EventItemProps) {
+  const navigate = useNavigate();
   const workPhotosGallery = usePhotoGallery();
   const inspectionPhotosGallery = usePhotoGallery();
   const defectPhotosGallery = usePhotoGallery();
+  
+  const handleInspectionClick = () => {
+    if (event.inspection_data?.inspection_id) {
+      navigate(`/inspection/${event.inspection_data.inspection_id}`);
+    }
+  };
   
   const renderEventContent = () => {
     switch (event.type) {
@@ -148,7 +156,10 @@ export default function EventItem({
 
       case 'inspection_created':
         return (
-          <div className="flex items-start gap-3">
+          <div 
+            className="flex items-start gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={handleInspectionClick}
+          >
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
               <Icon name="ClipboardCheck" size={18} className="text-blue-600" />
             </div>
@@ -156,7 +167,17 @@ export default function EventItem({
               <p className="text-[13px] sm:text-base font-bold text-slate-800 break-words">
                 Создана проверка №{event.inspection_data?.inspection_number}
               </p>
+              {event.inspection_data?.scheduled_date && (
+                <div className="mt-2 flex items-center gap-1.5 text-[11px] sm:text-sm text-blue-600">
+                  <Icon name="Calendar" size={14} />
+                  <span>Запланирована на {new Date(event.inspection_data.scheduled_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}</span>
+                </div>
+              )}
               <p className="text-[11px] sm:text-sm text-slate-600 mt-1 break-words">{event.content}</p>
+              <div className="mt-2 flex items-center gap-1 text-[11px] sm:text-sm text-blue-500 font-medium">
+                <span>Открыть проверку</span>
+                <Icon name="ArrowRight" size={14} />
+              </div>
             </div>
           </div>
         );

@@ -168,22 +168,28 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
 
   const inspectionEvents: JournalEvent[] = inspections
     .filter(insp => insp.work_id === selectedWork)
-    .map(insp => ({
-      id: insp.id,
-      type: 'inspection' as const,
-      work_id: insp.work_id,
-      created_by: insp.created_by,
-      author_name: insp.author_name,
-      author_role: (insp.author_role || 'client') as UserRole,
-      created_at: insp.created_at,
-      content: insp.description,
-      inspection_data: {
-        status: insp.status,
-        defects: insp.defects ? JSON.parse(insp.defects) : [],
-        photos: insp.photo_urls ? insp.photo_urls.split(',').filter(url => url.trim()) : [],
-        work_log_id: insp.work_log_id,
-      },
-    }));
+    .map(insp => {
+      const isDraft = insp.status === 'draft';
+      return {
+        id: insp.id,
+        type: (isDraft ? 'inspection_created' : 'inspection') as const,
+        work_id: insp.work_id,
+        created_by: insp.created_by,
+        author_name: insp.author_name,
+        author_role: (insp.author_role || 'client') as UserRole,
+        created_at: insp.created_at,
+        content: insp.description || (insp.title ? `${insp.title}` : 'Проверка создана'),
+        inspection_data: {
+          inspection_id: insp.id,
+          inspection_number: insp.inspection_number,
+          status: insp.status,
+          scheduled_date: insp.scheduled_date,
+          defects: insp.defects ? JSON.parse(insp.defects) : [],
+          photos: insp.photo_urls ? insp.photo_urls.split(',').filter(url => url.trim()) : [],
+          work_log_id: insp.work_log_id,
+        },
+      };
+    });
 
   const mockEvents: JournalEvent[] = [...workEntryEvents, ...chatEvents, ...inspectionEvents]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());

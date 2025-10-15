@@ -39,6 +39,7 @@ export interface JournalEvent {
     defects?: Array<{ description: string; severity: string }>;
     photos?: string[];
     work_log_id?: number;
+    scheduled_date?: string;
   };
   
   defect_data?: {
