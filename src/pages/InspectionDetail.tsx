@@ -2,27 +2,15 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { api } from '@/lib/api';
-
-interface Defect {
-  id: string;
-  description: string;
-  photo_urls?: string[];
-}
-
-interface ControlPoint {
-  id: string | number;
-  description: string;
-  standard: string;
-  standard_clause: string;
-  is_critical: boolean;
-}
+import InspectionHeader from '@/components/inspection/InspectionHeader';
+import InspectionNotes from '@/components/inspection/InspectionNotes';
+import DefectsSection, { Defect } from '@/components/inspection/DefectsSection';
+import ControlPointsSection, { ControlPoint } from '@/components/inspection/ControlPointsSection';
+import InspectionActions from '@/components/inspection/InspectionActions';
 
 const InspectionDetail = () => {
   const { inspectionId } = useParams<{ inspectionId: string }>();
@@ -88,26 +76,6 @@ const InspectionDetail = () => {
       console.error('Failed to load control points:', error);
     }
   };
-
-  if (!inspection) {
-    return (
-      <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-        <div className="max-w-4xl mx-auto">
-          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
-            <Icon name="ChevronLeft" size={20} className="mr-2" />
-            Назад
-          </Button>
-          <p className="text-slate-500 text-center mt-8">Проверка не найдена</p>
-        </div>
-      </div>
-    );
-  }
-
-  const work = userData?.works?.find((w: any) => w.id === inspection.work_id);
-  const object = userData?.objects?.find((o: any) => o.id === work?.object_id);
-  
-  const isClient = user?.role === 'client';
-  const isDraft = inspection.status === 'draft';
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -247,16 +215,25 @@ const InspectionDetail = () => {
     setCheckedPoints(newChecked);
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'draft':
-        return <Badge variant="outline">draft</Badge>;
-      case 'completed':
-        return <Badge className="bg-green-100 text-green-700">Завершена</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
-  };
+  if (!inspection) {
+    return (
+      <div className="min-h-screen bg-slate-50 p-4 md:p-8">
+        <div className="max-w-4xl mx-auto">
+          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
+            <Icon name="ChevronLeft" size={20} className="mr-2" />
+            Назад
+          </Button>
+          <p className="text-slate-500 text-center mt-8">Проверка не найдена</p>
+        </div>
+      </div>
+    );
+  }
+
+  const work = userData?.works?.find((w: any) => w.id === inspection.work_id);
+  const object = userData?.objects?.find((o: any) => o.id === work?.object_id);
+  
+  const isClient = user?.role === 'client';
+  const isDraft = inspection.status === 'draft';
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -266,35 +243,14 @@ const InspectionDetail = () => {
           Назад
         </Button>
 
-        <div className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
-              {inspection.inspection_number}
-            </h1>
-            {getStatusBadge(inspection.status)}
-          </div>
-          
-          {inspection.type && (
-            <p className="text-slate-600">
-              {inspection.type === 'scheduled' ? '📅 Плановая проверка' : '⚡ Внеплановая проверка'}
-            </p>
-          )}
-          
-          {work && (
-            <p className="text-slate-600 mt-1">
-              <Icon name="Wrench" size={16} className="inline mr-1" />
-              {work.title}
-              {object && ` • ${object.title}`}
-            </p>
-          )}
-          
-          {inspection.scheduled_date && (
-            <p className="text-slate-600 mt-1">
-              <Icon name="Calendar" size={16} className="inline mr-1" />
-              Запланирована на: {new Date(inspection.scheduled_date).toLocaleDateString('ru-RU')}
-            </p>
-          )}
-        </div>
+        <InspectionHeader
+          inspectionNumber={inspection.inspection_number}
+          status={inspection.status}
+          type={inspection.type}
+          workTitle={work?.title}
+          objectTitle={object?.title}
+          scheduledDate={inspection.scheduled_date}
+        />
 
         {inspection.description && (
           <Card className="mb-6">
@@ -305,192 +261,39 @@ const InspectionDetail = () => {
           </Card>
         )}
 
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="font-semibold mb-4">Примечания</h3>
-            <Textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Общие примечания по проверке..."
-              rows={3}
-              disabled={!isDraft || !isClient}
-              className="text-sm"
-            />
-          </CardContent>
-        </Card>
+        <InspectionNotes
+          notes={notes}
+          onNotesChange={setNotes}
+          disabled={!isDraft || !isClient}
+        />
 
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold flex items-center gap-2">
-                <Icon name="AlertCircle" size={20} />
-                Замечания ({defects.length})
-              </h3>
-              {isDraft && isClient && (
-                <Button
-                  variant="link"
-                  size="sm"
-                  onClick={() => setNewDefectDescription('')}
-                  className="text-sm"
-                >
-                  Добавить замечание
-                </Button>
-              )}
-            </div>
+        <DefectsSection
+          defects={defects}
+          newDefectDescription={newDefectDescription}
+          newDefectPhotos={newDefectPhotos}
+          uploadingPhotos={uploadingPhotos}
+          isDraft={isDraft}
+          isClient={isClient}
+          fileInputRef={fileInputRef}
+          onDescriptionChange={setNewDefectDescription}
+          onFileSelect={handleFileSelect}
+          onRemovePhoto={handleRemovePhoto}
+          onAddDefect={handleAddDefect}
+          onRemoveDefect={handleRemoveDefect}
+        />
 
-            {isDraft && isClient && (
-              <div className="mb-6 p-4 bg-slate-50 rounded-lg">
-                <Textarea
-                  value={newDefectDescription}
-                  onChange={(e) => setNewDefectDescription(e.target.value)}
-                  placeholder="Описание замечания"
-                  rows={3}
-                  className="mb-3 text-sm"
-                />
-                
-                <div className="mb-3">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploadingPhotos}
-                    className="w-full mb-2"
-                  >
-                    <Icon name="Camera" size={16} className="mr-2" />
-                    {uploadingPhotos ? 'Загрузка...' : 'Добавить фото'}
-                  </Button>
-
-                  {newDefectPhotos.length > 0 && (
-                    <div className="grid grid-cols-3 gap-2 mt-2">
-                      {newDefectPhotos.map((url, idx) => (
-                        <div key={idx} className="relative group">
-                          <img
-                            src={url}
-                            alt={`Фото ${idx + 1}`}
-                            className="w-full h-24 object-cover rounded border"
-                          />
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={() => handleRemovePhoto(url)}
-                          >
-                            <Icon name="X" size={14} />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <Button onClick={handleAddDefect} size="sm" className="w-full">
-                  Добавить замечание
-                </Button>
-              </div>
-            )}
-
-            {defects.length > 0 ? (
-              <div className="space-y-3">
-                {defects.map((defect, index) => (
-                  <div key={defect.id} className="border rounded-lg p-4 bg-white relative">
-                    {isDraft && isClient && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemoveDefect(defect.id)}
-                        className="absolute top-2 right-2 h-8 w-8 p-0"
-                      >
-                        <Icon name="X" size={16} />
-                      </Button>
-                    )}
-                    <p className="font-medium text-sm text-slate-500 mb-1">#{index + 1}</p>
-                    <p className="text-slate-700 pr-8 mb-2">{defect.description}</p>
-                    
-                    {defect.photo_urls && defect.photo_urls.length > 0 && (
-                      <div className="grid grid-cols-3 gap-2 mt-3">
-                        {defect.photo_urls.map((url, idx) => (
-                          <img
-                            key={idx}
-                            src={url}
-                            alt={`Замечание ${index + 1} - фото ${idx + 1}`}
-                            className="w-full h-24 object-cover rounded border cursor-pointer hover:opacity-90 transition-opacity"
-                            onClick={() => window.open(url, '_blank')}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-slate-500 text-center py-4">Замечаний нет</p>
-            )}
-          </CardContent>
-        </Card>
-
-        {controlPoints.length > 0 && (
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <h3 className="font-semibold mb-4">Рекомендации для проверки</h3>
-              <div className="space-y-3">
-                {controlPoints.map((cp) => {
-                  const cpId = String(cp.id);
-                  const isChecked = checkedPoints.has(cpId);
-                  
-                  return (
-                    <div 
-                      key={cpId}
-                      className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                        isChecked ? 'bg-green-50 border-green-200' : 'bg-white hover:bg-slate-50'
-                      }`}
-                      onClick={() => toggleCheckpoint(cpId)}
-                    >
-                      <div className="flex items-start gap-3">
-                        <Checkbox
-                          checked={isChecked}
-                          className="mt-1"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-slate-900 mb-1">
-                            Соответствие с регламентом {cp.standard}
-                          </p>
-                          <p className="text-sm text-slate-700">{cp.description}</p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        <ControlPointsSection
+          controlPoints={controlPoints}
+          checkedPoints={checkedPoints}
+          onToggleCheckpoint={toggleCheckpoint}
+        />
 
         {isDraft && isClient && (
-          <div className="flex gap-3 sticky bottom-4">
-            <Button
-              variant="outline"
-              onClick={handleSaveDraft}
-              className="flex-1"
-              disabled={loading}
-            >
-              Сохранить
-            </Button>
-            <Button
-              onClick={handleCompleteInspection}
-              className="flex-1"
-              disabled={loading}
-            >
-              {loading ? 'Завершение...' : 'Завершить проверку'}
-            </Button>
-          </div>
+          <InspectionActions
+            loading={loading}
+            onSaveDraft={handleSaveDraft}
+            onComplete={handleCompleteInspection}
+          />
         )}
       </div>
     </div>
