@@ -2,9 +2,11 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { NotificationGroup } from '@/components/ui/notification-badge';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
+import { useAuth } from '@/contexts/AuthContext';
 import type { Work } from '@/contexts/AuthContext';
 
 interface WorksListProps {
@@ -27,6 +29,9 @@ export default function WorksList({
   objectId,
 }: WorksListProps) {
   const navigate = useNavigate();
+  const { user, userData } = useAuth();
+  const unreadCounts = userData?.unreadCounts || {};
+  const isContractor = user?.role === 'contractor';
   return (
     <div className="hidden md:block w-80 bg-white border-r border-slate-200 flex-col">
       <div className="p-4 border-b border-slate-200">
@@ -96,10 +101,11 @@ export default function WorksList({
                         >
                           {getWorkStatusInfo(work).icon} {getWorkStatusInfo(work).message}
                         </Badge>
-                        <span className="flex items-center gap-1 text-xs text-slate-500">
-                          <Icon name="MessageSquare" size={12} />
-                          {logs.length}
-                        </span>
+                        <NotificationGroup
+                          messages={unreadCounts[work.id]?.messages}
+                          logs={!isContractor ? unreadCounts[work.id]?.logs : undefined}
+                          inspections={isContractor ? unreadCounts[work.id]?.inspections : undefined}
+                        />
                       </div>
                     </div>
                   </div>

@@ -44,6 +44,7 @@ export default function Objects() {
 
   const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
   const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
+  const unreadCounts = userData?.unreadCounts || {};
 
   const objectData = objects.map(obj => {
     const objectWorks = works.filter(w => w.object_id === obj.id);
@@ -53,6 +54,10 @@ export default function Objects() {
       : 0;
     
     const statusInfo = getObjectStatusInfo(objectWorks);
+    
+    const totalMessages = objectWorks.reduce((sum, w) => sum + (unreadCounts[w.id]?.messages || 0), 0);
+    const totalLogs = objectWorks.reduce((sum, w) => sum + (unreadCounts[w.id]?.logs || 0), 0);
+    const totalInspections = objectWorks.reduce((sum, w) => sum + (unreadCounts[w.id]?.inspections || 0), 0);
     
     return {
       ...obj,
@@ -64,6 +69,9 @@ export default function Objects() {
       statusMessage: statusInfo.message,
       statusColor: statusInfo.color,
       statusIcon: statusInfo.icon,
+      unreadMessages: totalMessages,
+      unreadLogs: totalLogs,
+      unreadInspections: totalInspections,
     };
   });
 

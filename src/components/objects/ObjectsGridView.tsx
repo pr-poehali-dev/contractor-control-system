@@ -2,6 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { NotificationGroup } from '@/components/ui/notification-badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,6 +32,9 @@ interface SiteData {
   statusMessage?: string;
   statusColor?: string;
   statusIcon?: string;
+  unreadMessages?: number;
+  unreadLogs?: number;
+  unreadInspections?: number;
 }
 
 interface ObjectsGridViewProps {
@@ -96,6 +100,13 @@ export default function ObjectsGridView({
                 <span>{site.works[0].contractor_name}</span>
               </div>
             )}
+            
+            <NotificationGroup
+              messages={site.unreadMessages}
+              logs={!isContractor ? site.unreadLogs : undefined}
+              inspections={isContractor ? site.unreadInspections : undefined}
+              className="mb-4"
+            />
 
             <div className="space-y-2 mb-4">
               <div className="flex items-center justify-between text-sm">

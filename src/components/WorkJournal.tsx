@@ -17,6 +17,7 @@ import CreateInspectionModal from '@/components/work-journal/CreateInspectionMod
 import WorkReportModal from '@/components/work-journal/WorkReportModal';
 import WorkEditDialog from '@/components/work-detail/WorkEditDialog';
 import JournalTabContent from '@/components/work-journal/JournalTabContent';
+import NotificationsSummary from '@/components/work-journal/NotificationsSummary';
 import { NoWorksEmptyState, NoWorkSelectedEmptyState } from '@/components/work-journal/WorkJournalEmptyStates';
 import { useWorkJournalHandlers } from '@/components/work-journal/useWorkJournalHandlers';
 import type { JournalEvent, UserRole } from '@/types/journal';
@@ -36,10 +37,32 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
   const inspections = (userData?.inspections && Array.isArray(userData.inspections)) ? userData.inspections : [];
   const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
   const chatMessages = (userData?.chatMessages && Array.isArray(userData.chatMessages)) ? userData.chatMessages : [];
+  const unreadCounts = userData?.unreadCounts || {};
   
   const currentObject = objects.find(o => o.id === objectId);
 
   const selectedWork = selectedWorkId || works[0]?.id || null;
+  
+  useEffect(() => {
+    if (selectedWork) {
+      const markAsSeen = async () => {
+        try {
+          const token = localStorage.getItem('auth_token');
+          await fetch('https://functions.poehali.dev/e9dd5b4f-67a6-44f8-9e1a-9108341f41df', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Auth-Token': token || ''
+            },
+            body: JSON.stringify({ work_id: selectedWork })
+          });
+        } catch (error) {
+          console.error('Failed to mark work as seen:', error);
+        }
+      };
+      markAsSeen();
+    }
+  }, [selectedWork]);
   
   const handlers = useWorkJournalHandlers(selectedWork);
 
@@ -204,21 +227,30 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
 
               <div className="flex-1 flex flex-col min-h-0 w-full overflow-x-hidden">
                 {activeTab === 'journal' && (
-                  <JournalTabContent
-                    mockEvents={mockEvents}
-                    userId={user?.id}
-                    userRole={userRole}
-                    newMessage={handlers.newMessage}
-                    setNewMessage={handlers.setNewMessage}
-                    isSubmitting={handlers.isSubmitting}
-                    handleSendMessage={handlers.handleSendMessage}
-                    handleCreateInspectionClick={handlers.handleCreateInspectionClick}
-                    setIsWorkReportModalOpen={handlers.setIsWorkReportModalOpen}
-                    setIsInspectionModalOpen={handlers.setIsInspectionModalOpen}
-                    formatDate={formatDate}
-                    formatTime={formatTime}
-                    getInitials={getInitials}
-                    selectedWorkData={selectedWorkData}
+                  <>
+                    <NotificationsSummary
+                      totalMessages={Object.values(unreadCounts).reduce((sum, c) => sum + (c.messages || 0), 0)}
+                      totalLogs={userRole === 'client' ? Object.values(unreadCounts).reduce((sum, c) => sum + (c.logs || 0), 0) : undefined}
+                      totalInspections={userRole === 'contractor' ? Object.values(unreadCounts).reduce((sum, c) => sum + (c.inspections || 0), 0) : undefined}
+                      userRole={userRole}
+                    />
+                    <JournalTabContent
+                      mockEvents={mockEvents}
+                      userId={user?.id}
+                      userRole={userRole}
+                      newMessage={handlers.newMessage}
+                      setNewMessage={handlers.setNewMessage}
+                      isSubmitting={handlers.isSubmitting}
+                      handleSendMessage={handlers.handleSendMessage}
+                      handleCreateInspectionClick={handlers.handleCreateInspectionClick}
+                      setIsWorkReportModalOpen={handlers.setIsWorkReportModalOpen}
+                      setIsInspectionModalOpen={handlers.setIsInspectionModalOpen}
+                      formatDate={formatDate}
+                      formatTime={formatTime}
+                      getInitials={getInitials}
+                      selectedWorkData={selectedWorkData}
+                  </>
+                )}
                     onWorkStartNotified={() => {
                       toast({ title: 'Успешно', description: 'Уведомление о начале работ отправлено' });
                     }}

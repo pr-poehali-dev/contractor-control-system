@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
+import { NotificationGroup } from '@/components/ui/notification-badge';
 
 interface SiteData {
   id: number;
@@ -11,6 +12,9 @@ interface SiteData {
   statusMessage?: string;
   statusColor?: string;
   statusIcon?: string;
+  unreadMessages?: number;
+  unreadLogs?: number;
+  unreadInspections?: number;
 }
 
 interface ObjectsMobileListProps {
@@ -53,12 +57,17 @@ export default function ObjectsMobileList({
                   {site.address}
                 </p>
               )}
-              <div className="flex items-center gap-2 text-xs">
+              <div className="flex items-center gap-2 text-xs mb-2">
                 <Badge className={site.statusColor || 'bg-slate-100 text-slate-700'}>
                   {site.statusIcon} {site.statusMessage || 'Запланировано'}
                 </Badge>
                 <span className="text-slate-400">{site.completedWorks}/{site.worksCount}</span>
               </div>
+              <NotificationGroup
+                messages={site.unreadMessages}
+                logs={site.unreadLogs}
+                inspections={site.unreadInspections}
+              />
             </div>
             <div className="flex-shrink-0 text-right">
               <div className="text-xs text-slate-400 mb-1">2 часа назад</div>

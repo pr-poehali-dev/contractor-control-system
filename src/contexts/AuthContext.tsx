@@ -43,6 +43,7 @@ interface UserData {
   checkpoints: any[];
   contractors: any[];
   chatMessages?: any[];
+  unreadCounts?: Record<number, { logs?: number; messages?: number; inspections?: number }>;
 }
 
 interface AuthContextType {
@@ -129,6 +130,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         checkpoints: Array.isArray(data.checkpoints) ? data.checkpoints : [],
         contractors: Array.isArray(data.contractors) ? data.contractors : [],
         chatMessages: Array.isArray(data.chatMessages) ? data.chatMessages : [],
+        unreadCounts: data.unreadCounts || {},
       };
       
       console.log('Normalized user data:', normalizedData);

@@ -256,6 +256,25 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         else:
             contractors = []
         
+        unread_counts = {}
+        if work_ids:
+            for work_id in work_ids:
+                cur.execute("""
+                    SELECT last_seen_at FROM work_views 
+                    WHERE user_id = %s AND work_id = %s
+                """, (user_id, work_id))
+                view_record = cur.fetchone()
+                last_seen = view_record['last_seen_at'] if view_record else None
+                
+                if role == 'client':
+                    unread_logs = len([wl for wl in work_logs if wl['work_id'] == work_id and (not last_seen or wl['created_at'] > last_seen)])
+                    unread_messages = len([cm for cm in chat_messages if cm['work_id'] == work_id and (not last_seen or cm['created_at'] > last_seen)])
+                    unread_counts[work_id] = {'logs': unread_logs, 'messages': unread_messages}
+                else:
+                    unread_inspections = len([i for i in inspections if i['work_id'] == work_id and (not last_seen or i['created_at'] > last_seen)])
+                    unread_messages = len([cm for cm in chat_messages if cm['work_id'] == work_id and (not last_seen or cm['created_at'] > last_seen)])
+                    unread_counts[work_id] = {'inspections': unread_inspections, 'messages': unread_messages}
+        
         cur.close()
         conn.close()
         
@@ -276,7 +295,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'workLogs': [dict(wl) for wl in work_logs],
             'checkpoints': [],
             'contractors': [dict(c) for c in contractors],
-            'chatMessages': [dict(cm) for cm in chat_messages]
+            'chatMessages': [dict(cm) for cm in chat_messages],
+            'unreadCounts': unread_counts
         }
         
         return {

@@ -1,0 +1,19 @@
+{
+  "tests": [
+    {
+      "name": "Mark work as seen without token",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "work_id": 1
+      },
+      "expectedStatus": 401
+    },
+    {
+      "name": "OPTIONS request",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}
