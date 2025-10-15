@@ -227,7 +227,9 @@ def handler(event, context):
             elif item_type == 'inspection':
                 work_id = int(data.get('work_id', 0))
                 work_log_id = data.get('work_log_id')
+                title = data.get('title', '').replace("'", "''") if data.get('title') else None
                 description = data.get('description', '').replace("'", "''") if data.get('description') else ''
+                inspection_type = data.get('type', 'scheduled')
                 status = data.get('status', 'pending')
                 notes = data.get('notes', '').replace("'", "''") if data.get('notes') else None
                 scheduled_date = data.get('scheduled_date')
@@ -246,12 +248,15 @@ def handler(event, context):
                 inspection_number = f'INS-{work_id}-{next_num}'
                 
                 # Build SQL dynamically based on available fields
-                fields = ['work_id', 'inspection_number', 'status', 'defects', 'created_by', 'created_at', 'updated_at']
-                values = [str(work_id), f"'{inspection_number}'", f"'{status}'", f"'{defects}'", str(user_id_int), 'NOW()', 'NOW()']
+                fields = ['work_id', 'inspection_number', 'type', 'status', 'defects', 'created_by', 'created_at', 'updated_at']
+                values = [str(work_id), f"'{inspection_number}'", f"'{inspection_type}'", f"'{status}'", f"'{defects}'", str(user_id_int), 'NOW()', 'NOW()']
                 
                 if work_log_id:
                     fields.append('work_log_id')
                     values.append(str(int(work_log_id)))
+                if title:
+                    fields.append('title')
+                    values.append(f"'{title}'")
                 if description:
                     fields.append('description')
                     values.append(f"'{description}'")
@@ -271,7 +276,7 @@ def handler(event, context):
                 cur.execute(f"""
                     INSERT INTO inspections ({fields_str})
                     VALUES ({values_str})
-                    RETURNING id, work_id, work_log_id, inspection_number, description, status, notes, scheduled_date, defects, photo_urls, created_by, created_at
+                    RETURNING id, work_id, work_log_id, inspection_number, title, type, description, status, notes, scheduled_date, defects, photo_urls, created_by, created_at
                 """)
                 result = cur.fetchone()
                 conn.commit()

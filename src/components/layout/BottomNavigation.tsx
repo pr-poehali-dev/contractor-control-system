@@ -15,7 +15,7 @@ interface NavItem {
 const mobileNavItems: NavItem[] = [
   { id: 'dashboard', label: 'Главная', icon: 'Home', path: '/dashboard' },
   { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects' },
-  { id: 'defects', label: 'Задачи', icon: 'ListTodo', path: '/defects' },
+  { id: 'defects', label: 'Проверки', icon: 'ClipboardCheck', path: '/defects' },
 ];
 
 export default function BottomNavigation() {

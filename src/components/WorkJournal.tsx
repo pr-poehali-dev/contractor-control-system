@@ -13,7 +13,7 @@ import InfoTab from '@/components/work-journal/InfoTab';
 import DescriptionTab from '@/components/work-journal/DescriptionTab';
 import EstimateTab from '@/components/work-journal/EstimateTab';
 import AnalyticsTab from '@/components/work-journal/AnalyticsTab';
-import CreateInspectionModal from '@/components/work-journal/CreateInspectionModal';
+import CreateInspectionSimple from '@/components/work-journal/CreateInspectionSimple';
 import WorkReportModal from '@/components/work-journal/WorkReportModal';
 import WorkEditDialog from '@/components/work-detail/WorkEditDialog';
 import JournalTabContent from '@/components/work-journal/JournalTabContent';
@@ -275,18 +275,10 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                 )}
               </div>
 
-              <CreateInspectionModal
+              <CreateInspectionSimple
                 isOpen={handlers.isInspectionModalOpen}
-                onClose={() => {
-                  handlers.setIsInspectionModalOpen(false);
-                  handlers.setSelectedEntryForInspection(undefined);
-                }}
-                onSubmit={handlers.handleInspectionSubmit}
-                journalEntryId={handlers.selectedEntryForInspection}
-                workType={selectedWorkData?.title}
-                controlPoints={
-                  workTemplates.find(t => t.title === selectedWorkData?.title)?.control_points || []
-                }
+                onClose={() => handlers.setIsInspectionModalOpen(false)}
+                workId={selectedWork}
               />
             </>
           ) : (
