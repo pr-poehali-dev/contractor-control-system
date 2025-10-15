@@ -21,8 +21,8 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
   return (
     <>
       {/* MOBILE: Compact header with back button */}
-      <div className="md:hidden bg-white border-b border-slate-200 px-2.5 py-2 overflow-x-hidden">
-        <div className="flex items-center gap-2 mb-2">
+      <div className="md:hidden bg-white border-b border-slate-200 px-2.5 py-2.5 overflow-x-hidden">
+        <div className="flex items-start gap-2 mb-2">
           <Button 
             variant="ghost" 
             size="icon"
@@ -34,9 +34,24 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
           
           <div className="flex-1 min-w-0">
             {organizationName && (
-              <div className="text-[10px] text-slate-500 truncate leading-tight">{organizationName}</div>
+              <div className="text-[10px] text-slate-500 truncate leading-tight mb-0.5">{organizationName}</div>
             )}
-            <h1 className="text-[14px] font-bold text-slate-900 leading-tight truncate">{selectedWorkData.title}</h1>
+            <h1 className="text-[14px] font-bold text-slate-900 leading-tight mb-1.5 line-clamp-2">{selectedWorkData.title}</h1>
+            
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <Badge 
+                className={`text-[10px] font-semibold px-1.5 py-0.5 ${getWorkStatusInfo(selectedWorkData).color}`}
+              >
+                {getWorkStatusInfo(selectedWorkData).icon} {getWorkStatusInfo(selectedWorkData).message}
+              </Badge>
+              
+              {selectedWorkData.planned_start_date && (
+                <div className="flex items-center gap-1 text-[10px] text-slate-500">
+                  <Icon name="Calendar" size={11} />
+                  <span>{formatDateRange(selectedWorkData.planned_start_date, selectedWorkData.planned_end_date)}</span>
+                </div>
+              )}
+            </div>
           </div>
 
           {(userRole === 'client' || userRole === 'admin') && onEdit && (
