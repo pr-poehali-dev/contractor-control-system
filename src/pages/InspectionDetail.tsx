@@ -19,7 +19,14 @@ const InspectionDetail = () => {
   
   const [inspection, setInspection] = useState<any>(null);
   const [defects, setDefects] = useState<Defect[]>([]);
-  const [newDefectDescription, setNewDefectDescription] = useState('');
+  const [newDefect, setNewDefect] = useState<Defect>({
+    id: '',
+    description: '',
+    location: '',
+    severity: '',
+    responsible: '',
+    deadline: ''
+  });
   const [newDefectPhotos, setNewDefectPhotos] = useState<string[]>([]);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -147,20 +154,31 @@ const InspectionDetail = () => {
     setNewDefectPhotos(newDefectPhotos.filter(url => url !== photoUrl));
   };
 
+  const handleDefectChange = (field: keyof Defect, value: string) => {
+    setNewDefect(prev => ({ ...prev, [field]: value }));
+  };
+
   const handleAddDefect = () => {
-    if (!newDefectDescription.trim()) {
+    if (!newDefect.description.trim()) {
       toast({ title: 'Заполните описание замечания', variant: 'destructive' });
       return;
     }
 
     const defect: Defect = {
+      ...newDefect,
       id: Date.now().toString(),
-      description: newDefectDescription,
       photo_urls: newDefectPhotos.length > 0 ? newDefectPhotos : undefined
     };
 
     setDefects([...defects, defect]);
-    setNewDefectDescription('');
+    setNewDefect({
+      id: '',
+      description: '',
+      location: '',
+      severity: '',
+      responsible: '',
+      deadline: ''
+    });
     setNewDefectPhotos([]);
     
     toast({ title: 'Замечание добавлено' });
@@ -227,7 +245,7 @@ const InspectionDetail = () => {
       newChecked.delete(cpId);
     } else {
       newChecked.add(cpId);
-      setNewDefectDescription(cp.description);
+      setNewDefect(prev => ({ ...prev, description: cp.description }));
       
       setTimeout(() => {
         defectsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -256,6 +274,9 @@ const InspectionDetail = () => {
   
   const isClient = user?.role === 'client';
   const isDraft = inspection.status === 'draft';
+  
+  const workInspections = userData?.inspections?.filter((i: any) => i.work_id === inspection.work_id) || [];
+  const inspectionIndex = workInspections.findIndex((i: any) => i.id === inspection.id) + 1;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pb-24">
@@ -271,7 +292,7 @@ const InspectionDetail = () => {
           </Button>
           <div className="flex-1 min-w-0">
             <h1 className="font-semibold text-lg truncate">
-              Проверка №{inspection.inspection_number}
+              Проверка №{inspectionIndex}
             </h1>
           </div>
         </div>
@@ -297,13 +318,13 @@ const InspectionDetail = () => {
         <div ref={defectsRef}>
           <DefectsSection
             defects={defects}
-            newDefectDescription={newDefectDescription}
+            newDefect={newDefect}
             newDefectPhotos={newDefectPhotos}
             uploadingPhotos={uploadingPhotos}
             isDraft={isDraft}
             isClient={isClient}
             fileInputRef={fileInputRef}
-            onDescriptionChange={setNewDefectDescription}
+            onDefectChange={handleDefectChange}
             onFileSelect={handleFileSelect}
             onRemovePhoto={handleRemovePhoto}
             onAddDefect={handleAddDefect}
