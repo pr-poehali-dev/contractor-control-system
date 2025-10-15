@@ -122,7 +122,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
         volume: log.volume,
         unit: log.unit,
         materials: log.materials ? log.materials.split(',').map(m => m.trim()) : [],
-        photos: log.photo_urls ? log.photo_urls.split(',') : ['', '', ''],
+        photos: log.photo_urls ? log.photo_urls.split(',').filter(url => url.trim()) : [],
         progress: log.progress,
       } : undefined,
     };
@@ -142,7 +142,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
       inspection_data: {
         status: insp.status,
         defects: insp.defects ? JSON.parse(insp.defects) : [],
-        photos: insp.photo_urls ? insp.photo_urls.split(',') : ['', ''],
+        photos: insp.photo_urls ? insp.photo_urls.split(',').filter(url => url.trim()) : [],
         work_log_id: insp.work_log_id,
       },
     }));
