@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getWorkStatusInfo } from '@/utils/workStatus';
 import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
 
 const ObjectDetail = () => {
@@ -23,6 +24,7 @@ const ObjectDetail = () => {
   const { toast } = useToast();
   const [showActions, setShowActions] = useState(false);
   const [sortBy, setSortBy] = useState<string>('priority');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
   const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
@@ -35,10 +37,28 @@ const ObjectDetail = () => {
   
   console.log('ObjectDetail: found object =', object ? object.title : 'NOT FOUND');
 
+  // Фильтрация по статусу
+  if (statusFilter !== 'all') {
+    objectWorks = objectWorks.filter(w => {
+      const statusInfo = getWorkStatusInfo(w);
+      return statusInfo.status === statusFilter;
+    });
+  }
+
+  // Сортировка
   if (sortBy === 'priority') {
     objectWorks = [...objectWorks].sort((a, b) => {
-      const priorityOrder = { pending: 0, active: 1, completed: 2, on_hold: 3 };
-      return (priorityOrder[a.status] || 99) - (priorityOrder[b.status] || 99);
+      const statusA = getWorkStatusInfo(a);
+      const statusB = getWorkStatusInfo(b);
+      const priorityOrder = { 
+        awaiting_start: 0, 
+        delayed: 1, 
+        in_progress: 2, 
+        awaiting_acceptance: 3, 
+        completed: 4, 
+        planned: 5 
+      };
+      return (priorityOrder[statusA.status] || 99) - (priorityOrder[statusB.status] || 99);
     });
   } else if (sortBy === 'name') {
     objectWorks = [...objectWorks].sort((a, b) => a.title.localeCompare(b.title));
@@ -148,14 +168,17 @@ const ObjectDetail = () => {
         )}
 
         <div className="mt-3 space-y-2">
-          <Select value="all" onValueChange={() => {}}>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full h-10">
-              <SelectValue placeholder="Все журналы" />
+              <SelectValue placeholder="Все работы" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Все журналы</SelectItem>
-              <SelectItem value="active">В работе</SelectItem>
-              <SelectItem value="completed">Завершено</SelectItem>
+              <SelectItem value="all">Все работы</SelectItem>
+              <SelectItem value="planned">Плановые</SelectItem>
+              <SelectItem value="awaiting_start">Требуется подтверждение</SelectItem>
+              <SelectItem value="in_progress">В процессе</SelectItem>
+              <SelectItem value="awaiting_acceptance">Готово к приемке</SelectItem>
+              <SelectItem value="delayed">С задержкой</SelectItem>
             </SelectContent>
           </Select>
 

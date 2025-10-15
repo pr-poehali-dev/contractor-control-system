@@ -71,7 +71,7 @@ export default function Objects() {
     const matchesSearch = obj.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (obj.address && obj.address.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (obj.description && obj.description.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesStatus = selectedStatus === 'all' || obj.status === selectedStatus;
+    const matchesStatus = selectedStatus === 'all' || obj.calculatedStatus === selectedStatus;
     return matchesSearch && matchesStatus;
   });
 
@@ -89,10 +89,9 @@ export default function Objects() {
 
   const statusOptions = [
     { value: 'all', label: 'Все статусы' },
-    { value: 'planning', label: 'Планирование' },
-    { value: 'active', label: 'В работе' },
-    { value: 'completed', label: 'Завершён' },
-    { value: 'on_hold', label: 'Приостановлен' }
+    { value: 'planning', label: 'Запланировано' },
+    { value: 'in_progress', label: 'Работы начаты' },
+    { value: 'completed', label: 'Работы завершены' }
   ];
 
   const handleObjectClick = (objectId: number) => {
