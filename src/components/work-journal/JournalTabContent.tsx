@@ -2,8 +2,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import EventItem from '@/components/work-journal/EventItem';
+import WorkStartNotification from '@/components/work-journal/WorkStartNotification';
 import { NoJournalEntriesEmptyState } from '@/components/work-journal/WorkJournalEmptyStates';
 import type { JournalEvent, UserRole } from '@/types/journal';
+import type { Work } from '@/contexts/AuthContext';
 
 interface JournalTabContentProps {
   mockEvents: JournalEvent[];
@@ -19,6 +21,8 @@ interface JournalTabContentProps {
   formatDate: (timestamp: string) => string;
   formatTime: (timestamp: string) => string;
   getInitials: (name: string) => string;
+  selectedWorkData?: Work;
+  onWorkStartNotified?: () => void;
 }
 
 export default function JournalTabContent({
@@ -35,10 +39,17 @@ export default function JournalTabContent({
   formatDate,
   formatTime,
   getInitials,
+  selectedWorkData,
+  onWorkStartNotified = () => {},
 }: JournalTabContentProps) {
   return (
     <div className="flex flex-col flex-1 min-h-0 w-full overflow-x-hidden">
       <div className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-6 lg:p-8 bg-gradient-to-b from-slate-50 to-white w-full">
+        {selectedWorkData && userRole === 'contractor' && (
+          <div className="max-w-4xl mx-auto mb-4">
+            <WorkStartNotification work={selectedWorkData} onNotified={onWorkStartNotified} />
+          </div>
+        )}
         {mockEvents.length === 0 ? (
           <NoJournalEntriesEmptyState />
         ) : (

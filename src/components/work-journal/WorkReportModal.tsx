@@ -21,15 +21,19 @@ interface WorkReportModalProps {
     work_volume: string;
     materials: Material[];
     photo_urls: string[];
+    completion_percentage: number;
   }) => void;
   isSubmitting?: boolean;
+  currentCompletion?: number;
 }
 
-export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmitting }: WorkReportModalProps) {
+export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmitting, currentCompletion = 0 }: WorkReportModalProps) {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [description, setDescription] = useState('');
   const [workVolume, setWorkVolume] = useState('');
+  const [completionPercentage, setCompletionPercentage] = useState(currentCompletion);
+  const [showCompletionWarning, setShowCompletionWarning] = useState(false);
   const [materials, setMaterials] = useState<Material[]>([{ name: '', quantity: 0, unit: '' }]);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
@@ -49,6 +53,11 @@ export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmittin
   };
 
   const handleSubmit = () => {
+    if (completionPercentage === 100 && !showCompletionWarning) {
+      setShowCompletionWarning(true);
+      return;
+    }
+
     const validMaterials = materials.filter(m => m.name.trim() !== '');
     
     onSubmit({
@@ -56,12 +65,15 @@ export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmittin
       work_volume: workVolume,
       materials: validMaterials,
       photo_urls: photoUrls,
+      completion_percentage: completionPercentage,
     });
 
     setDescription('');
     setWorkVolume('');
+    setCompletionPercentage(0);
     setMaterials([{ name: '', quantity: 0, unit: '' }]);
     setPhotoUrls([]);
+    setShowCompletionWarning(false);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,8 +131,10 @@ export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmittin
   const handleClose = () => {
     setDescription('');
     setWorkVolume('');
+    setCompletionPercentage(currentCompletion);
     setMaterials([{ name: '', quantity: 0, unit: '' }]);
     setPhotoUrls([]);
+    setShowCompletionWarning(false);
     onClose();
   };
 
@@ -153,6 +167,44 @@ export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmittin
               onChange={(e) => setWorkVolume(e.target.value)}
               className="mt-1.5"
             />
+          </div>
+
+          <div>
+            <Label htmlFor="completion">Процент выполнения работ</Label>
+            <div className="flex items-center gap-3 mt-1.5">
+              <input
+                id="completion"
+                type="range"
+                min="0"
+                max="100"
+                step="5"
+                value={completionPercentage}
+                onChange={(e) => setCompletionPercentage(Number(e.target.value))}
+                className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              />
+              <div className="flex items-center gap-1 min-w-[70px]">
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={completionPercentage}
+                  onChange={(e) => {
+                    const val = Math.max(0, Math.min(100, Number(e.target.value)));
+                    setCompletionPercentage(val);
+                  }}
+                  className="w-16 text-center"
+                />
+                <span className="text-sm font-semibold text-slate-600">%</span>
+              </div>
+            </div>
+            {completionPercentage === 100 && (
+              <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-2">
+                <Icon name="AlertTriangle" size={16} className="text-amber-600 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-amber-800">
+                  При отправке отчета с 100% выполнения Заказчик получит уведомление о готовности к приемке работ
+                </p>
+              </div>
+            )}
           </div>
 
           <div>
@@ -262,23 +314,61 @@ export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmittin
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={isSubmitting}>
-            Отмена
-          </Button>
-          <Button 
-            onClick={handleSubmit} 
-            disabled={!description.trim() || isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <Icon name="Loader2" size={16} className="mr-2 animate-spin" />
-                Сохранение...
-              </>
-            ) : (
-              'Сохранить'
-            )}
-          </Button>
+        <DialogFooter className="flex-col sm:flex-row gap-2">
+          {showCompletionWarning && (
+            <div className="w-full p-4 bg-blue-50 border border-blue-200 rounded-lg mb-2">
+              <div className="flex items-start gap-3">
+                <Icon name="CheckCircle2" size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-blue-900 mb-1">
+                    Подтверждение готовности к приемке
+                  </p>
+                  <p className="text-xs text-blue-800 mb-3">
+                    Вы указали 100% выполнения. После отправки отчета Заказчик получит уведомление 
+                    о готовности работ к приемке. Уверены что работы полностью завершены?
+                  </p>
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm"
+                      variant="outline" 
+                      onClick={() => setShowCompletionWarning(false)}
+                    >
+                      Изменить процент
+                    </Button>
+                    <Button 
+                      size="sm"
+                      onClick={handleSubmit}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Icon name="Check" size={16} className="mr-1" />
+                      Да, отправить
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {!showCompletionWarning && (
+            <>
+              <Button variant="outline" onClick={handleClose} disabled={isSubmitting}>
+                Отмена
+              </Button>
+              <Button 
+                onClick={handleSubmit} 
+                disabled={!description.trim() || isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Icon name="Loader2" size={16} className="mr-2 animate-spin" />
+                    Сохранение...
+                  </>
+                ) : (
+                  'Сохранить'
+                )}
+              </Button>
+            </>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

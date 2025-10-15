@@ -148,6 +148,7 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
     work_volume: string;
     materials: Array<{ name: string; quantity: number; unit: string }>;
     photo_urls: string[];
+    completion_percentage: number;
   }) => {
     if (!user || !selectedWork) return;
     
@@ -157,7 +158,7 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
       await api.createItem(token!, 'work_log', {
         work_id: selectedWork,
         description: data.text_content,
-        progress: 0,
+        progress: data.completion_percentage,
         volume: data.work_volume || null,
         materials: data.materials.map(m => `${m.name} ${m.quantity} ${m.unit}`).join(', ') || null,
         photo_urls: data.photo_urls.join(',') || null,

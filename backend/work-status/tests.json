@@ -1,0 +1,61 @@
+{
+  "tests": [
+    {
+      "name": "Get status for planned work",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "get_status",
+        "planned_start_date": "2025-12-01T00:00:00Z",
+        "planned_end_date": "2025-12-15T00:00:00Z",
+        "completion_percentage": 0,
+        "work_started_notification_sent": false
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "status": "planned",
+        "days_delayed": 0
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get status for work in progress",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "get_status",
+        "planned_start_date": "2025-10-01T00:00:00Z",
+        "planned_end_date": "2025-12-31T00:00:00Z",
+        "actual_start_date": "2025-10-01T00:00:00Z",
+        "completion_percentage": 45,
+        "work_started_notification_sent": true
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "status": "in_progress"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Notify start of work",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "notify_start",
+        "work_id": 123
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "work_started_notification_sent": true
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Handle OPTIONS for CORS",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}

@@ -193,6 +193,10 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                     formatDate={formatDate}
                     formatTime={formatTime}
                     getInitials={getInitials}
+                    selectedWorkData={selectedWorkData}
+                    onWorkStartNotified={() => {
+                      toast({ title: 'Успешно', description: 'Уведомление о начале работ отправлено' });
+                    }}
                   />
                 )}
 
@@ -249,6 +253,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
         onClose={() => handlers.setIsWorkReportModalOpen(false)}
         onSubmit={handlers.handleWorkReportSubmit}
         isSubmitting={handlers.isSubmitting}
+        currentCompletion={selectedWorkData?.completion_percentage || 0}
       />
 
       <WorkEditDialog

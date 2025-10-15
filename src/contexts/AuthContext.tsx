@@ -17,9 +17,23 @@ interface User {
   created_at?: string;
 }
 
+export interface Work {
+  id: number;
+  object_id: number;
+  title: string;
+  description?: string;
+  status: 'planned' | 'awaiting_start' | 'in_progress' | 'awaiting_acceptance' | 'completed' | 'delayed';
+  planned_start_date?: string;
+  planned_end_date?: string;
+  actual_start_date?: string;
+  completion_percentage: number;
+  work_started_notification_sent?: boolean;
+  created_at?: string;
+}
+
 interface UserData {
   objects: any[];
-  works: any[];
+  works: Work[];
   inspections: any[];
   remarks: any[];
   workLogs: any[];

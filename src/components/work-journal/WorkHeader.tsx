@@ -1,9 +1,12 @@
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { useNavigate, useParams } from 'react-router-dom';
+import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
+import type { Work } from '@/contexts/AuthContext';
 
 interface WorkHeaderProps {
-  selectedWorkData: any;
+  selectedWorkData: Work;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   organizationName?: string;
@@ -123,7 +126,20 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
                   {organizationName}
                 </p>
               )}
-              <h2 className="text-2xl font-bold text-slate-900 leading-tight line-clamp-2">{selectedWorkData.title}</h2>
+              <h2 className="text-2xl font-bold text-slate-900 leading-tight line-clamp-2 mb-2">{selectedWorkData.title}</h2>
+              <div className="flex items-center gap-3 flex-wrap">
+                {selectedWorkData.planned_start_date && (
+                  <div className="flex items-center gap-1.5 text-sm text-slate-600">
+                    <Icon name="Calendar" size={14} />
+                    <span>{formatDateRange(selectedWorkData.planned_start_date, selectedWorkData.planned_end_date)}</span>
+                  </div>
+                )}
+                <Badge 
+                  className={`text-xs font-semibold px-2.5 py-1 ${getWorkStatusInfo(selectedWorkData).color}`}
+                >
+                  {getWorkStatusInfo(selectedWorkData).icon} {getWorkStatusInfo(selectedWorkData).message}
+                </Badge>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">

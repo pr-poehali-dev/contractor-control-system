@@ -3,10 +3,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
+import type { Work } from '@/contexts/AuthContext';
 
 interface WorksListProps {
-  works: any[];
+  works: Work[];
   workLogs: any[];
   selectedWork: number | null;
   setSelectedWork: (id: number) => void;
@@ -81,12 +83,18 @@ export default function WorksList({
                           <span className="text-xs text-slate-400 ml-2">{formatTime(lastLog.created_at)}</span>
                         )}
                       </div>
-                      {lastLog && (
-                        <p className="text-xs text-slate-600 truncate">{lastLog.description}</p>
+                      {work.planned_start_date && (
+                        <div className="flex items-center gap-1 text-xs text-slate-500 mb-1.5">
+                          <Icon name="Calendar" size={11} />
+                          <span>{formatDateRange(work.planned_start_date, work.planned_end_date)}</span>
+                        </div>
                       )}
-                      <div className="flex items-center gap-2 mt-2">
-                        <Badge variant="outline" className="text-xs">
-                          {work.status === 'active' ? '🟢 В работе' : work.status === 'completed' ? '✅ Готово' : '🟡 Ожидание'}
+                      <div className="flex items-center gap-2 mt-2 flex-wrap">
+                        <Badge 
+                          variant="outline" 
+                          className={cn("text-xs font-medium px-2 py-0.5", getWorkStatusInfo(work).color)}
+                        >
+                          {getWorkStatusInfo(work).icon} {getWorkStatusInfo(work).message}
                         </Badge>
                         <span className="flex items-center gap-1 text-xs text-slate-500">
                           <Icon name="MessageSquare" size={12} />
