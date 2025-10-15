@@ -7,10 +7,8 @@ import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { api } from '@/lib/api';
 import InspectionHeader from '@/components/inspection/InspectionHeader';
-import InspectionNotes from '@/components/inspection/InspectionNotes';
 import DefectsSection, { Defect } from '@/components/inspection/DefectsSection';
 import ControlPointsSection, { ControlPoint } from '@/components/inspection/ControlPointsSection';
-import InspectionActions from '@/components/inspection/InspectionActions';
 
 const InspectionDetail = () => {
   const { inspectionId } = useParams<{ inspectionId: string }>();
@@ -24,17 +22,16 @@ const InspectionDetail = () => {
   const [newDefectDescription, setNewDefectDescription] = useState('');
   const [newDefectPhotos, setNewDefectPhotos] = useState<string[]>([]);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
-  const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [controlPoints, setControlPoints] = useState<ControlPoint[]>([]);
   const [checkedPoints, setCheckedPoints] = useState<Set<string>>(new Set());
+  const defectsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (userData?.inspections) {
       const found = userData.inspections.find((i: any) => i.id === Number(inspectionId));
       if (found) {
         setInspection(found);
-        setNotes(found.notes || '');
         
         try {
           const parsedDefects = found.defects ? JSON.parse(found.defects) : [];
@@ -180,7 +177,6 @@ const InspectionDetail = () => {
     try {
       await api.updateItem(token, 'inspection', inspection.id, {
         status: 'completed',
-        notes: notes,
         defects: JSON.stringify(defects),
         completed_at: new Date().toISOString()
       });
@@ -188,7 +184,7 @@ const InspectionDetail = () => {
       await loadUserData();
       
       toast({ title: 'Проверка завершена' });
-      navigate(-1);
+      navigate('/inspections');
     } catch (error) {
       toast({ 
         title: 'Ошибка', 
@@ -206,7 +202,6 @@ const InspectionDetail = () => {
     setLoading(true);
     try {
       await api.updateItem(token, 'inspection', inspection.id, {
-        notes: notes,
         defects: JSON.stringify(defects)
       });
       
@@ -224,13 +219,21 @@ const InspectionDetail = () => {
     }
   };
 
-  const toggleCheckpoint = (cpId: string) => {
+  const handleControlPointClick = (cp: ControlPoint) => {
+    const cpId = String(cp.id);
     const newChecked = new Set(checkedPoints);
+    
     if (newChecked.has(cpId)) {
       newChecked.delete(cpId);
     } else {
       newChecked.add(cpId);
+      setNewDefectDescription(cp.description);
+      
+      setTimeout(() => {
+        defectsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     }
+    
     setCheckedPoints(newChecked);
   };
 
@@ -285,41 +288,28 @@ const InspectionDetail = () => {
           scheduledDate={inspection.scheduled_date}
         />
 
-        {inspection.description && (
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <h3 className="font-semibold mb-2">Описание</h3>
-              <p className="text-slate-700">{inspection.description}</p>
-            </CardContent>
-          </Card>
-        )}
-
-        <InspectionNotes
-          notes={notes}
-          onNotesChange={setNotes}
-          disabled={!isDraft || !isClient}
-        />
-
-        <DefectsSection
-          defects={defects}
-          newDefectDescription={newDefectDescription}
-          newDefectPhotos={newDefectPhotos}
-          uploadingPhotos={uploadingPhotos}
-          isDraft={isDraft}
-          isClient={isClient}
-          fileInputRef={fileInputRef}
-          onDescriptionChange={setNewDefectDescription}
-          onFileSelect={handleFileSelect}
-          onRemovePhoto={handleRemovePhoto}
-          onAddDefect={handleAddDefect}
-          onRemoveDefect={handleRemoveDefect}
-        />
-
         <ControlPointsSection
           controlPoints={controlPoints}
           checkedPoints={checkedPoints}
-          onToggleCheckpoint={toggleCheckpoint}
+          onControlPointClick={handleControlPointClick}
         />
+
+        <div ref={defectsRef}>
+          <DefectsSection
+            defects={defects}
+            newDefectDescription={newDefectDescription}
+            newDefectPhotos={newDefectPhotos}
+            uploadingPhotos={uploadingPhotos}
+            isDraft={isDraft}
+            isClient={isClient}
+            fileInputRef={fileInputRef}
+            onDescriptionChange={setNewDefectDescription}
+            onFileSelect={handleFileSelect}
+            onRemovePhoto={handleRemovePhoto}
+            onAddDefect={handleAddDefect}
+            onRemoveDefect={handleRemoveDefect}
+          />
+        </div>
 
         {isDraft && isClient && (
           <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-20">

@@ -40,6 +40,12 @@ export default function DefectsSection({
 }: DefectsSectionProps) {
   const [showForm, setShowForm] = React.useState(false);
 
+  React.useEffect(() => {
+    if (newDefectDescription && !showForm) {
+      setShowForm(true);
+    }
+  }, [newDefectDescription, showForm]);
+
   const handleAddDefect = () => {
     onAddDefect();
     setShowForm(false);
