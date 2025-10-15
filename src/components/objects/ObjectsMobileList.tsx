@@ -39,38 +39,48 @@ export default function ObjectsMobileList({
   }
 
   return (
-    <div className="divide-y divide-slate-100">
+    <div className="divide-y divide-slate-200 bg-white">
       {sites.map((site) => (
         <div
           key={site.id}
-          className="p-4 active:bg-slate-50 transition-colors"
+          className="p-4 active:bg-slate-50 transition-colors cursor-pointer"
           onClick={() => onSiteClick(site.id)}
         >
           <div className="flex gap-3">
-            <div className="flex-shrink-0 w-16 h-16 bg-slate-100 rounded-lg overflow-hidden flex items-center justify-center">
-              <Icon name="Building2" size={28} className="text-slate-400" />
+            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm">
+              <Icon name="Building2" size={24} className="text-white" />
             </div>
+            
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-base text-slate-900 mb-1">{site.title}</h3>
+              <div className="flex items-start justify-between gap-2 mb-1.5">
+                <h3 className="font-semibold text-base text-slate-900 line-clamp-1">{site.title}</h3>
+                <span className="flex-shrink-0 text-xs text-slate-400 whitespace-nowrap">2 ч назад</span>
+              </div>
+              
               {site.address && (
-                <p className="text-sm text-slate-500 mb-2">
+                <p className="text-sm text-slate-500 mb-2.5 line-clamp-1">
                   {site.address}
                 </p>
               )}
-              <div className="flex items-center gap-2 text-xs mb-2">
-                <Badge className={site.statusColor || 'bg-slate-100 text-slate-700'}>
-                  {site.statusIcon} {site.statusMessage || 'Запланировано'}
+              
+              <div className="flex items-center gap-2 mb-2.5">
+                <Badge 
+                  className={`${site.statusColor || 'bg-slate-100 text-slate-700'} text-xs px-2 py-0.5 font-medium`}
+                >
+                  {site.statusIcon && <span className="mr-1">{site.statusIcon}</span>}
+                  {site.statusMessage || 'Запланировано'}
                 </Badge>
-                <span className="text-slate-400">{site.completedWorks}/{site.worksCount}</span>
+                <div className="flex items-center gap-1 text-xs text-slate-500">
+                  <Icon name="ClipboardList" size={14} />
+                  <span className="font-medium">{site.completedWorks}/{site.worksCount}</span>
+                </div>
               </div>
+              
               <NotificationGroup
                 messages={site.unreadMessages}
                 logs={site.unreadLogs}
                 inspections={site.unreadInspections}
               />
-            </div>
-            <div className="flex-shrink-0 text-right">
-              <div className="text-xs text-slate-400 mb-1">2 часа назад</div>
             </div>
           </div>
         </div>
