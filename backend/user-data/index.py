@@ -227,17 +227,25 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             try:
                 cur.execute("""
-                    SELECT cm.id, cm.work_id, cm.message, cm.created_by, cm.created_at,
-                           u.name as author_name, u.role as author_role
-                    FROM chat_messages cm
-                    LEFT JOIN users u ON cm.created_by = u.id
-                    WHERE cm.work_id = ANY(%s)
-                    ORDER BY cm.created_at DESC
+                    SELECT id, work_id, message, created_by, created_at
+                    FROM chat_messages
+                    WHERE work_id = ANY(%s)
+                    ORDER BY created_at DESC
                 """, (work_ids,))
-                chat_messages = cur.fetchall()
-                print(f"DEBUG: Loaded {len(chat_messages)} chat_messages")
+                raw_messages = cur.fetchall()
+                print(f"DEBUG: Loaded {len(raw_messages)} raw chat_messages")
+                
+                chat_messages = []
+                for msg in raw_messages:
+                    msg_dict = dict(msg)
+                    msg_dict['author_name'] = None
+                    msg_dict['author_role'] = None
+                    chat_messages.append(msg_dict)
+                
+                print(f"DEBUG: Processed {len(chat_messages)} chat_messages")
             except Exception as chat_err:
-                print(f"ERROR loading chat_messages: {chat_err}")
+                import traceback
+                print(f"ERROR loading chat_messages: {traceback.format_exc()}")
                 chat_messages = []
         
         if role == 'client':
