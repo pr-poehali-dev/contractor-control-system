@@ -176,6 +176,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         work_ids = [w['id'] for w in works]
         
+        inspections = []
+        remarks = []
+        work_logs = []
+        chat_messages = []
+        
         if work_ids:
             cur.execute("""
                 SELECT i.id, i.work_id, i.work_log_id, i.inspection_number, i.created_by, i.status,
@@ -223,8 +228,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 ORDER BY cm.created_at DESC
             """, (work_ids,))
             chat_messages = cur.fetchall()
-        else:
-            inspections, remarks, work_logs, chat_messages = [], [], [], []
         
         if role == 'client':
             cur.execute("""

@@ -161,6 +161,12 @@ def handler(event, context):
         
         work_ids = [w['id'] for w in works]
         
+        inspections = []
+        checkpoints = []
+        remarks = []
+        work_logs = []
+        chat_messages = []
+        
         if work_ids:
             work_ids_str = ','.join(str(wid) for wid in work_ids)
             
@@ -217,8 +223,6 @@ def handler(event, context):
                 ORDER BY cm.created_at DESC
             """)
             chat_messages = cur.fetchall()
-        else:
-            inspections, checkpoints, remarks, work_logs, chat_messages = [], [], [], [], []
         
         if role == 'client':
             cur.execute(f"""
