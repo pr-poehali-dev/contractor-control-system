@@ -42,6 +42,7 @@ interface UserData {
   workLogs: any[];
   checkpoints: any[];
   contractors: any[];
+  chatMessages?: any[];
 }
 
 interface AuthContextType {

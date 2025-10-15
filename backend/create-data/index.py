@@ -276,6 +276,18 @@ def handler(event, context):
                 result = cur.fetchone()
                 conn.commit()
                 
+            elif item_type == 'chat_message':
+                work_id = int(data.get('work_id', 0))
+                message = data.get('message', '').replace("'", "''")
+                
+                cur.execute(f"""
+                    INSERT INTO chat_messages (work_id, message, created_by, created_at)
+                    VALUES ({work_id}, '{message}', {user_id_int}, NOW())
+                    RETURNING id, work_id, message, created_by, created_at
+                """)
+                result = cur.fetchone()
+                conn.commit()
+                
             elif item_type == 'info_post':
                 title = data.get('title', '').replace("'", "''")
                 content = data.get('content', '').replace("'", "''")

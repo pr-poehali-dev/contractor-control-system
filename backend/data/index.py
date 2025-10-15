@@ -199,6 +199,7 @@ def handler(event, context):
             cur.execute(f"""
                 SELECT wl.id, wl.work_id, wl.volume, wl.materials, wl.photo_urls,
                        wl.description, wl.created_by, wl.created_at, wl.completion_percentage,
+                       wl.is_work_start,
                        u.name as author_name, u.role as author_role
                 FROM work_logs wl
                 LEFT JOIN users u ON wl.created_by = u.id
@@ -206,8 +207,18 @@ def handler(event, context):
                 ORDER BY wl.created_at DESC
             """)
             work_logs = cur.fetchall()
+            
+            cur.execute(f"""
+                SELECT cm.id, cm.work_id, cm.message, cm.created_by, cm.created_at,
+                       u.name as author_name, u.role as author_role
+                FROM chat_messages cm
+                LEFT JOIN users u ON cm.created_by = u.id
+                WHERE cm.work_id IN ({work_ids_str})
+                ORDER BY cm.created_at DESC
+            """)
+            chat_messages = cur.fetchall()
         else:
-            inspections, checkpoints, remarks, work_logs = [], [], [], []
+            inspections, checkpoints, remarks, work_logs, chat_messages = [], [], [], [], []
         
         if role == 'client':
             cur.execute(f"""
@@ -223,7 +234,7 @@ def handler(event, context):
         cur.close()
         conn.close()
         
-        for item in projects + sites + works + inspections + checkpoints + remarks + work_logs + contractors:
+        for item in projects + sites + works + inspections + checkpoints + remarks + work_logs + contractors + chat_messages:
             for key, value in item.items():
                 if hasattr(value, 'isoformat'):
                     item[key] = value.isoformat()
@@ -236,7 +247,8 @@ def handler(event, context):
             'checkpoints': [dict(c) for c in checkpoints],
             'remarks': [dict(r) for r in remarks],
             'workLogs': [dict(wl) for wl in work_logs],
-            'contractors': [dict(c) for c in contractors]
+            'contractors': [dict(c) for c in contractors],
+            'chatMessages': [dict(cm) for cm in chat_messages]
         }
         
         return {

@@ -175,7 +175,7 @@ export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmittin
               <input
                 id="completion"
                 type="range"
-                min="0"
+                min={currentCompletion}
                 max="100"
                 step="5"
                 value={completionPercentage}
@@ -185,11 +185,11 @@ export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmittin
               <div className="flex items-center gap-1 min-w-[70px]">
                 <Input
                   type="number"
-                  min="0"
+                  min={currentCompletion}
                   max="100"
                   value={completionPercentage}
                   onChange={(e) => {
-                    const val = Math.max(0, Math.min(100, Number(e.target.value)));
+                    const val = Math.max(currentCompletion, Math.min(100, Number(e.target.value)));
                     setCompletionPercentage(val);
                   }}
                   className="w-16 text-center"
@@ -197,6 +197,11 @@ export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmittin
                 <span className="text-sm font-semibold text-slate-600">%</span>
               </div>
             </div>
+            {currentCompletion > 0 && (
+              <p className="text-xs text-slate-500 mt-1.5">
+                Текущий процент: {currentCompletion}%. Можно только увеличить.
+              </p>
+            )}
             {completionPercentage === 100 && (
               <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-2">
                 <Icon name="AlertTriangle" size={16} className="text-amber-600 flex-shrink-0 mt-0.5" />

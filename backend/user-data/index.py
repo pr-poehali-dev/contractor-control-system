@@ -213,8 +213,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 ORDER BY wl.created_at DESC
             """, (work_ids,))
             work_logs = cur.fetchall()
+            
+            cur.execute("""
+                SELECT cm.id, cm.work_id, cm.message, cm.created_by, cm.created_at,
+                       u.name as author_name, u.role as author_role
+                FROM chat_messages cm
+                LEFT JOIN users u ON cm.created_by = u.id
+                WHERE cm.work_id = ANY(%s)
+                ORDER BY cm.created_at DESC
+            """, (work_ids,))
+            chat_messages = cur.fetchall()
         else:
-            inspections, remarks, work_logs = [], [], []
+            inspections, remarks, work_logs, chat_messages = [], [], [], []
         
         if role == 'client':
             cur.execute("""
@@ -239,7 +249,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur.close()
         conn.close()
         
-        for item in objects + works + inspections + remarks + work_logs + contractors:
+        for item in objects + works + inspections + remarks + work_logs + contractors + chat_messages:
             for key, value in item.items():
                 if hasattr(value, 'isoformat'):
                     item[key] = value.isoformat()
@@ -251,7 +261,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'remarks': [dict(r) for r in remarks],
             'workLogs': [dict(wl) for wl in work_logs],
             'checkpoints': [],
-            'contractors': [dict(c) for c in contractors]
+            'contractors': [dict(c) for c in contractors],
+            'chatMessages': [dict(cm) for cm in chat_messages]
         }
         
         return {

@@ -35,6 +35,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
   const workLogs = (userData?.workLogs && Array.isArray(userData.workLogs)) ? userData.workLogs : [];
   const inspections = (userData?.inspections && Array.isArray(userData.inspections)) ? userData.inspections : [];
   const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
+  const chatMessages = (userData?.chatMessages && Array.isArray(userData.chatMessages)) ? userData.chatMessages : [];
   
   const currentObject = objects.find(o => o.id === objectId);
 
@@ -108,35 +109,40 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
   };
 
   const workEntryEvents: JournalEvent[] = workEntries.map(log => {
-    const hasWorkData = log.volume || log.materials || log.photo_urls;
     const isWorkStart = log.is_work_start === true;
-    
-    let eventType: EventType = 'chat_message';
-    if (isWorkStart) {
-      eventType = 'work_start';
-    } else if (hasWorkData) {
-      eventType = 'work_entry';
-    }
     
     return {
       id: log.id,
-      type: eventType,
+      type: isWorkStart ? 'work_start' : 'work_entry',
       work_id: log.work_id,
       created_by: log.created_by,
       author_name: log.author_name,
       author_role: (log.author_role || 'contractor') as UserRole,
       created_at: log.created_at,
       content: log.description,
-      work_data: hasWorkData ? {
+      work_data: {
         volume: log.volume,
         unit: log.unit,
         materials: log.materials ? log.materials.split(',').map(m => m.trim()) : [],
         photos: log.photo_urls ? log.photo_urls.split(',').filter(url => url.trim()) : [],
         progress: log.progress,
         completion_percentage: log.completion_percentage,
-      } : undefined,
+      },
     };
   });
+
+  const chatEvents: JournalEvent[] = chatMessages
+    .filter(msg => msg.work_id === selectedWork)
+    .map(msg => ({
+      id: `chat-${msg.id}`,
+      type: 'chat_message' as const,
+      work_id: msg.work_id,
+      created_by: msg.created_by,
+      author_name: msg.author_name,
+      author_role: (msg.author_role || 'contractor') as UserRole,
+      created_at: msg.created_at,
+      content: msg.message,
+    }));
 
   const inspectionEvents: JournalEvent[] = inspections
     .filter(insp => insp.work_id === selectedWork)
@@ -157,7 +163,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
       },
     }));
 
-  const mockEvents: JournalEvent[] = [...workEntryEvents, ...inspectionEvents]
+  const mockEvents: JournalEvent[] = [...workEntryEvents, ...chatEvents, ...inspectionEvents]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   return (

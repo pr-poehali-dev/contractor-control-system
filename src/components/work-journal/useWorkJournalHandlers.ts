@@ -31,12 +31,9 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
     setIsSubmitting(true);
 
     try {
-      await api.createItem(token!, 'work_log', {
+      await api.createItem(token!, 'chat_message', {
         work_id: selectedWork,
-        description: newMessage,
-        progress: parseInt(progress),
-        volume: volume || null,
-        materials: materials || null,
+        message: newMessage,
       });
 
       if (token) {
@@ -45,18 +42,15 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
       }
 
       toast({
-        title: 'Запись добавлена',
-        description: 'Новая запись в журнале создана',
+        title: 'Сообщение отправлено',
+        description: 'Ваше сообщение добавлено в чат',
       });
 
       setNewMessage('');
-      setProgress('0');
-      setVolume('');
-      setMaterials('');
     } catch (error) {
       toast({
         title: 'Ошибка',
-        description: 'Не удалось добавить запись',
+        description: 'Не удалось отправить сообщение',
         variant: 'destructive',
       });
     } finally {
