@@ -64,7 +64,7 @@ export default function CreateInspectionSimple({ isOpen, onClose, workId }: Crea
         description: form.description,
         scheduled_date: inspectionType === 'scheduled' ? form.scheduledDate : undefined,
         notes: form.notes,
-        status: 'pending'
+        status: 'draft'
       });
       
       await loadUserData();
