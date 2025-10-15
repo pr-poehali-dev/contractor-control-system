@@ -45,25 +45,25 @@ export default function NotificationsSummary({
   }
   
   return (
-    <Card className={cn("mx-4 mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200", className)}>
-      <div className="flex items-center gap-2 mb-3">
-        <Icon name="Bell" size={20} className="text-blue-600" />
-        <h3 className="font-semibold text-slate-900">Новые уведомления</h3>
+    <Card className={cn("mx-4 mt-4 p-3 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200", className)}>
+      <div className="flex items-center gap-2 mb-2">
+        <Icon name="Bell" size={16} className="text-blue-600" />
+        <h3 className="text-sm font-semibold text-slate-900">Новые уведомления</h3>
       </div>
       
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-2">
         {items.map((item, idx) => (
           <div 
             key={idx}
             className={cn(
-              'flex items-center gap-2 px-3 py-2 rounded-lg',
+              'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg',
               item.color
             )}
           >
-            <Icon name={item.icon} size={18} />
+            <Icon name={item.icon} size={14} />
             <div>
-              <div className="text-xl font-bold">{item.count}</div>
-              <div className="text-sm">{item.label}</div>
+              <div className="text-base font-bold leading-none mb-0.5">{item.count}</div>
+              <div className="text-xs leading-none">{item.label}</div>
             </div>
           </div>
         ))}
