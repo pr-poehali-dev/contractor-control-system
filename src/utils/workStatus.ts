@@ -46,8 +46,8 @@ export function getWorkStatusInfo(work: Work): WorkStatus {
       status: 'awaiting_start',
       daysDelayed,
       message: daysDelayed > 0 
-        ? `Требуется подтверждение начала (−${daysDelayed} дн.)`
-        : 'Требуется подтверждение начала',
+        ? `Требуется подтверждение (−${daysDelayed} дн.)`
+        : 'Требуется подтверждение',
       color: daysDelayed > 0 ? 'text-red-700 bg-red-100' : 'text-amber-700 bg-amber-100',
       icon: '⏳'
     };

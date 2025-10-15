@@ -146,8 +146,8 @@ def handler(event, context):
                 description = data.get('description', '').replace("'", "''")
                 status = data.get('status', 'pending')
                 contractor_id = data.get('contractor_id')
-                start_date = data.get('start_date')
-                end_date = data.get('end_date')
+                planned_start_date = data.get('planned_start_date')
+                planned_end_date = data.get('planned_end_date')
                 
                 fields = ['title', 'description', 'object_id', 'status']
                 values = [f"'{title}'", f"'{description}'", str(object_id), f"'{status}'"]
@@ -156,13 +156,13 @@ def handler(event, context):
                     fields.append('contractor_id')
                     values.append(str(int(contractor_id)))
                 
-                if start_date:
+                if planned_start_date:
                     fields.append('planned_start_date')
-                    values.append(f"'{start_date}'")
+                    values.append(f"'{planned_start_date}'")
                     
-                if end_date:
+                if planned_end_date:
                     fields.append('planned_end_date')
-                    values.append(f"'{end_date}'")
+                    values.append(f"'{planned_end_date}'")
                 
                 fields_str = ', '.join(fields)
                 values_str = ', '.join(values)

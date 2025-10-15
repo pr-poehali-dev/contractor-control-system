@@ -69,7 +69,7 @@ export default function WorkStartNotification({ work, onNotified }: WorkStartNot
           </div>
           <div className="flex-1">
             <h3 className="font-bold text-amber-900 mb-1 text-sm md:text-base">
-              Требуется уведомление о начале работ
+              Требуется подтверждение начала работ
             </h3>
             <p className="text-xs md:text-sm text-amber-800 mb-3">
               {statusInfo.daysDelayed > 0 ? (
