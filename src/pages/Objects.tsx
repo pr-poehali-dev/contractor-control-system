@@ -9,6 +9,7 @@ import ObjectsMobileList from '@/components/objects/ObjectsMobileList';
 import ObjectsGridView from '@/components/objects/ObjectsGridView';
 import ObjectsTableView from '@/components/objects/ObjectsTableView';
 import ObjectsEmptyState from '@/components/objects/ObjectsEmptyState';
+import { getObjectStatusInfo } from '@/utils/workStatus';
 
 type ViewMode = 'grid' | 'table';
 
@@ -46,10 +47,12 @@ export default function Objects() {
 
   const objectData = objects.map(obj => {
     const objectWorks = works.filter(w => w.object_id === obj.id);
-    const completedWorks = objectWorks.filter(w => w.status === 'completed').length;
+    const completedWorks = objectWorks.filter(w => w.completion_percentage >= 100).length;
     const progress = objectWorks.length > 0 
       ? Math.round((completedWorks / objectWorks.length) * 100)
       : 0;
+    
+    const statusInfo = getObjectStatusInfo(objectWorks);
     
     return {
       ...obj,
@@ -57,6 +60,10 @@ export default function Objects() {
       works: objectWorks,
       progress,
       completedWorks,
+      calculatedStatus: statusInfo.status,
+      statusMessage: statusInfo.message,
+      statusColor: statusInfo.color,
+      statusIcon: statusInfo.icon,
     };
   });
 

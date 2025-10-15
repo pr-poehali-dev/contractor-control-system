@@ -23,6 +23,9 @@ interface SiteData {
   worksCount: number;
   completedWorks: number;
   progress: number;
+  statusMessage?: string;
+  statusColor?: string;
+  statusIcon?: string;
 }
 
 interface ObjectsTableViewProps {
@@ -67,12 +70,8 @@ export default function ObjectsTableView({
                   </td>
                   <td className="p-4 text-sm text-slate-600">{site.address}</td>
                   <td className="p-4">
-                    <Badge className={
-                      site.status === 'active' ? 'bg-green-100 text-green-700' :
-                      site.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-slate-100 text-slate-700'
-                    }>
-                      {statusLabels[site.status as keyof typeof statusLabels]}
+                    <Badge className={site.statusColor || 'bg-slate-100 text-slate-700'}>
+                      {site.statusIcon} {site.statusMessage || 'Запланировано'}
                     </Badge>
                   </td>
                   <td className="p-4">

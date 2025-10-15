@@ -8,6 +8,9 @@ interface SiteData {
   address?: string;
   worksCount: number;
   completedWorks: number;
+  statusMessage?: string;
+  statusColor?: string;
+  statusIcon?: string;
 }
 
 interface ObjectsMobileListProps {
@@ -51,14 +54,8 @@ export default function ObjectsMobileList({
                 </p>
               )}
               <div className="flex items-center gap-2 text-xs">
-                <Badge className={
-                  site.status === 'active' ? 'bg-yellow-100 text-yellow-700' :
-                  site.status === 'pending' ? 'bg-blue-100 text-blue-700' :
-                  'bg-green-100 text-green-700'
-                }>
-                  {site.status === 'active' ? 'Запланировано' : 
-                   site.status === 'pending' ? 'Требуется проверка' : 
-                   'Завершено'}
+                <Badge className={site.statusColor || 'bg-slate-100 text-slate-700'}>
+                  {site.statusIcon} {site.statusMessage || 'Запланировано'}
                 </Badge>
                 <span className="text-slate-400">{site.completedWorks}/{site.worksCount}</span>
               </div>

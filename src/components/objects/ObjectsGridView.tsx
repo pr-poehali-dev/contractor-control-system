@@ -28,6 +28,9 @@ interface SiteData {
   completedWorks: number;
   progress: number;
   works: Work[];
+  statusMessage?: string;
+  statusColor?: string;
+  statusIcon?: string;
 }
 
 interface ObjectsGridViewProps {
@@ -58,12 +61,8 @@ export default function ObjectsGridView({
                 {site.title}
               </h3>
               <div className="flex items-center gap-2">
-                <Badge className={
-                  site.status === 'active' ? 'bg-green-100 text-green-700' :
-                  site.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                  'bg-slate-100 text-slate-700'
-                }>
-                  {statusLabels[site.status as keyof typeof statusLabels]}
+                <Badge className={site.statusColor || 'bg-slate-100 text-slate-700'}>
+                  {site.statusIcon} {site.statusMessage || 'Запланировано'}
                 </Badge>
                 {!isContractor && (
                   <DropdownMenu>

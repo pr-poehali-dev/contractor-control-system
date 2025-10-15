@@ -110,3 +110,48 @@ export function formatDateRange(startDate?: string, endDate?: string): string {
   
   return `с ${start.toLocaleDateString('ru-RU', formatOptions)}`;
 }
+
+export interface ObjectStatus {
+  status: 'planning' | 'in_progress' | 'completed';
+  message: string;
+  color: string;
+  icon: string;
+}
+
+export function getObjectStatusInfo(works: Work[]): ObjectStatus {
+  if (works.length === 0) {
+    return {
+      status: 'planning',
+      message: 'Запланировано',
+      color: 'text-slate-600 bg-slate-100',
+      icon: '📋'
+    };
+  }
+
+  const allCompleted = works.every(work => work.completion_percentage >= 100);
+  if (allCompleted) {
+    return {
+      status: 'completed',
+      message: 'Работы завершены',
+      color: 'text-green-700 bg-green-100',
+      icon: '✅'
+    };
+  }
+
+  const anyStarted = works.some(work => work.start_date || (work.completion_percentage || 0) > 0);
+  if (anyStarted) {
+    return {
+      status: 'in_progress',
+      message: 'Работы начаты',
+      color: 'text-blue-700 bg-blue-100',
+      icon: '🔨'
+    };
+  }
+
+  return {
+    status: 'planning',
+    message: 'Запланировано',
+    color: 'text-slate-600 bg-slate-100',
+    icon: '📋'
+  };
+}
