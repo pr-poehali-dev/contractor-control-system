@@ -169,12 +169,12 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
         setUserData(refreshedData);
       }
 
+      setIsWorkReportModalOpen(false);
+
       toast({
         title: 'Отчёт создан',
         description: 'Запись в журнале добавлена',
       });
-
-      setIsWorkReportModalOpen(false);
     } catch (error) {
       toast({
         title: 'Ошибка',

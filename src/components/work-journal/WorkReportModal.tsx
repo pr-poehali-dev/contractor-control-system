@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,6 +38,12 @@ export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmittin
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
 
+  useEffect(() => {
+    if (isOpen) {
+      setCompletionPercentage(currentCompletion);
+    }
+  }, [isOpen, currentCompletion]);
+
   const handleAddMaterial = () => {
     setMaterials([...materials, { name: '', quantity: 0, unit: '' }]);
   };
@@ -67,13 +73,6 @@ export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmittin
       photo_urls: photoUrls,
       completion_percentage: completionPercentage,
     });
-
-    setDescription('');
-    setWorkVolume('');
-    setCompletionPercentage(0);
-    setMaterials([{ name: '', quantity: 0, unit: '' }]);
-    setPhotoUrls([]);
-    setShowCompletionWarning(false);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,7 +132,6 @@ export default function WorkReportModal({ isOpen, onClose, onSubmit, isSubmittin
   const handleClose = () => {
     setDescription('');
     setWorkVolume('');
-    setCompletionPercentage(currentCompletion);
     setMaterials([{ name: '', quantity: 0, unit: '' }]);
     setPhotoUrls([]);
     setShowCompletionWarning(false);
