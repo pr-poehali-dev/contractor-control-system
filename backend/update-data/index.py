@@ -129,7 +129,7 @@ def handler(event, context):
                 cur.execute(f"DELETE FROM objects WHERE project_id = {int(item_id)}")
                 cur.execute(f"DELETE FROM projects {project_filter}")
             elif item_type == 'object':
-                object_filter = f"WHERE id = {int(item_id)}" if is_admin else f"WHERE id = {int(item_id)} AND project_id IN (SELECT id FROM projects WHERE client_id = {user_id_int})"
+                object_filter = f"WHERE id = {int(item_id)}" if is_admin else f"WHERE id = {int(item_id)} AND (client_id = {user_id_int} OR project_id IN (SELECT id FROM projects WHERE client_id = {user_id_int}))"
                 
                 cur.execute(f"""
                     DELETE FROM remarks 
