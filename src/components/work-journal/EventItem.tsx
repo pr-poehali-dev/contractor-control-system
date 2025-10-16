@@ -158,7 +158,10 @@ export default function EventItem({
 
       case 'inspection_scheduled':
         return (
-          <div className="space-y-3">
+          <div 
+            className="space-y-3 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={handleInspectionClick}
+          >
             <div className="flex items-start gap-3">
               <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0">
                 <Icon name="ClipboardCheck" size={22} className="text-white" />
@@ -196,7 +199,10 @@ export default function EventItem({
         
       case 'inspection_started':
         return (
-          <div className="space-y-3">
+          <div 
+            className="space-y-3 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={handleInspectionClick}
+          >
             <div className="flex items-start gap-3">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0">
                 <Icon name="PlayCircle" size={22} className="text-white" />
@@ -225,47 +231,46 @@ export default function EventItem({
         
       case 'inspection_completed':
         return (
-          <div className="space-y-3">
+          <div 
+            className="space-y-3 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={handleInspectionClick}
+          >
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
-                <Icon name="CheckCircle2" size={18} className="text-green-600" />
+              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                <Icon name="CheckCircle2" size={22} className="text-white" />
               </div>
+              
               <div className="min-w-0 flex-1">
-                <p className="text-[13px] sm:text-base font-bold text-slate-800 break-words">
-                  {event.inspection_data?.inspection_number 
-                    ? `Завершена проверка №${event.inspection_data.inspection_number}`
-                    : event.content || 'Проверка завершена'
-                  }
-                </p>
-                <div className="flex flex-wrap gap-1.5 mt-2">
+                <h3 className="text-base font-bold text-slate-900 mb-2">
+                  Проверка №{event.inspection_data?.inspection_number}
+                </h3>
+                
+                <div className="flex flex-wrap gap-1.5 mb-2">
                   <Badge variant="outline" className="text-[10px] bg-purple-50 text-purple-700 border-purple-200">
                     <Icon name="ClipboardCheck" size={12} className="mr-1" />
                     Проверка
                   </Badge>
-                  {event.inspection_data?.defects_count && event.inspection_data.defects_count > 0 && (
+                  <Badge variant="outline" className="text-[10px] bg-green-50 text-green-700 border-green-200">
+                    <Icon name="CheckCircle2" size={12} className="mr-1" />
+                    Завершена
+                  </Badge>
+                  {event.inspection_data?.defects_count !== undefined && event.inspection_data.defects_count > 0 && (
                     <Badge variant="outline" className="text-[10px] bg-red-50 text-red-700 border-red-200">
                       <Icon name="AlertTriangle" size={12} className="mr-1" />
                       {event.inspection_data.defects_count} замечаний
                     </Badge>
                   )}
                 </div>
-                {event.inspection_data?.defects_count ? (
-                  <p className="text-[11px] sm:text-sm text-amber-600 mt-1 font-medium">
-                    Выявлено замечаний: {event.inspection_data.defects_count}
-                  </p>
-                ) : (
-                  <p className="text-[11px] sm:text-sm text-green-600 mt-1 font-medium">
-                    Замечаний не выявлено
-                  </p>
-                )}
-                <Button 
-                  onClick={handleInspectionClick}
-                  className="w-full bg-purple-600 hover:bg-purple-700 mt-3"
-                  size="sm"
-                >
-                  <Icon name="FileText" size={16} className="mr-1.5" />
-                  Перейти к результатам
-                </Button>
+                
+                <div className="flex items-center gap-1.5 text-xs text-slate-600">
+                  <Icon name="CheckCircle2" size={14} className="text-slate-500" />
+                  <span>
+                    {event.inspection_data?.defects_count ? 
+                      `Замечаний: ${event.inspection_data.defects_count}` : 
+                      'Замечаний не выявлено'
+                    }
+                  </span>
+                </div>
               </div>
             </div>
           </div>

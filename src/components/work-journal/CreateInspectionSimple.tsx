@@ -36,21 +36,29 @@ export default function CreateInspectionSimple({ isOpen, onClose, workId }: Crea
         status: scheduledDate ? 'draft' : 'active'
       });
       
-      // Event is created automatically by backend
+      console.log('Created inspection:', result);
       
-      await loadUserData();
+      // Event is created automatically by backend
+      const inspectionId = result?.id;
+      
+      if (!inspectionId) {
+        console.error('No inspection ID returned');
+        throw new Error('Не удалось получить ID проверки');
+      }
+      
+      onClose();
       
       toast({ 
         title: scheduledDate ? 'Проверка запланирована' : 'Проверка создана',
         description: scheduledDate ? `Проверка назначена на ${new Date(scheduledDate).toLocaleDateString('ru-RU')}` : 'Переход на страницу проверки...'
       });
-      onClose();
       
-      // Always navigate to inspection page after creation
-      if (result?.id) {
-        sessionStorage.setItem('inspectionFromPage', window.location.pathname);
-        navigate(`/inspection/${result.id}`);
-      }
+      // Navigate immediately before loading user data
+      sessionStorage.setItem('inspectionFromPage', window.location.pathname);
+      navigate(`/inspection/${inspectionId}`);
+      
+      // Load data in background
+      loadUserData();
     } catch (error) {
       toast({ 
         title: 'Ошибка', 
