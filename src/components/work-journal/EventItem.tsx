@@ -157,29 +157,44 @@ export default function EventItem({
 
       case 'inspection_created':
         const isPlanned = event.inspection_data?.scheduled_date;
+        const hasDefects = event.inspection_data?.defects_count && event.inspection_data.defects_count > 0;
         return (
           <div className="space-y-3">
             <div className="flex items-start gap-3">
-              <div className={cn(
-                "w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm",
-                isPlanned ? "bg-gradient-to-br from-blue-100 to-blue-200" : "bg-gradient-to-br from-amber-100 to-orange-200"
-              )}>
-                <Icon name={isPlanned ? "Calendar" : "AlertCircle"} size={20} className={isPlanned ? "text-blue-600" : "text-orange-600"} />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                <Icon name="ClipboardCheck" size={20} className="text-purple-600" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
                   <p className="text-[13px] sm:text-base font-bold text-slate-800 break-words">
                     Проверка №{event.inspection_data?.inspection_number}
                   </p>
-                  <Badge 
-                    variant="outline" 
-                    className={cn(
-                      "text-[10px] sm:text-xs",
-                      isPlanned ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-orange-50 text-orange-700 border-orange-200"
-                    )}
-                  >
-                    {isPlanned ? "Запланированная" : "Внеплановая"}
-                  </Badge>
+                  {isPlanned ? (
+                    <Badge 
+                      variant="outline" 
+                      className="text-[10px] sm:text-xs bg-blue-50 text-blue-700 border-blue-200"
+                    >
+                      <Icon name="Calendar" size={12} className="mr-1" />
+                      Запланированная
+                    </Badge>
+                  ) : (
+                    <Badge 
+                      variant="outline" 
+                      className="text-[10px] sm:text-xs bg-orange-50 text-orange-700 border-orange-200"
+                    >
+                      <Icon name="Zap" size={12} className="mr-1" />
+                      Внеплановая
+                    </Badge>
+                  )}
+                  {hasDefects && (
+                    <Badge 
+                      variant="outline" 
+                      className="text-[10px] sm:text-xs bg-red-50 text-red-700 border-red-200"
+                    >
+                      <Icon name="AlertTriangle" size={12} className="mr-1" />
+                      Есть замечания
+                    </Badge>
+                  )}
                 </div>
                 {event.inspection_data?.scheduled_date ? (
                   <div className="flex items-center gap-1.5 text-[11px] sm:text-sm text-slate-600">
@@ -187,21 +202,16 @@ export default function EventItem({
                     <span>Запланирована на {new Date(event.inspection_data.scheduled_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}</span>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-1.5 text-[11px] sm:text-sm text-orange-600">
-                    <Icon name="Zap" size={14} />
-                    <span>Требует немедленного внимания</span>
+                  <div className="flex items-center gap-1.5 text-[11px] sm:text-sm text-slate-600">
+                    <Icon name="Clock" size={14} />
+                    <span>Создана {new Date(event.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}</span>
                   </div>
                 )}
               </div>
             </div>
             <Button 
               onClick={handleInspectionClick}
-              className={cn(
-                "w-full sm:w-auto",
-                isPlanned 
-                  ? "bg-blue-600 hover:bg-blue-700" 
-                  : "bg-orange-600 hover:bg-orange-700"
-              )}
+              className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700"
               size="sm"
             >
               <Icon name="ArrowRight" size={16} className="mr-2" />

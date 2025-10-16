@@ -169,10 +169,11 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
   const inspectionEvents: JournalEvent[] = inspections
     .filter(insp => insp.work_id === selectedWork)
     .map(insp => {
-      const isDraft = insp.status === 'draft';
+      const isCreatedStatus = insp.status === 'draft' || insp.status === 'active';
+      const defectsArray = insp.defects ? JSON.parse(insp.defects) : [];
       return {
         id: insp.id,
-        type: (isDraft ? 'inspection_created' : 'inspection') as const,
+        type: (isCreatedStatus ? 'inspection_created' : 'inspection') as const,
         work_id: insp.work_id,
         created_by: insp.created_by,
         author_name: insp.author_name,
@@ -184,7 +185,8 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
           inspection_number: insp.inspection_number,
           status: insp.status,
           scheduled_date: insp.scheduled_date,
-          defects: insp.defects ? JSON.parse(insp.defects) : [],
+          defects: defectsArray,
+          defects_count: defectsArray.length,
           photos: insp.photo_urls ? insp.photo_urls.split(',').filter(url => url.trim()) : [],
           work_log_id: insp.work_log_id,
         },
