@@ -109,8 +109,10 @@ const Dashboard = () => {
     
     setLoading(true);
     try {
+      console.log('Loading feed for user:', user.id);
       const response = await fetch(`https://functions.poehali.dev/f38edb91-216d-4887-b091-ef224db01905?user_id=${user.id}`);
       const data = await response.json();
+      console.log('Feed response:', data);
       
       if (data.success) {
         const normalizedEvents = data.events.map((event: any) => {
@@ -123,6 +125,8 @@ const Dashboard = () => {
           }
           return event;
         });
+        console.log('Setting feed with', normalizedEvents.length, 'events');
+        console.log('Event types:', normalizedEvents.map((e: any) => e.type));
         setFeed(normalizedEvents);
       }
     } catch (error) {

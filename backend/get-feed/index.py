@@ -317,6 +317,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     cur.execute(inspection_events_query)
     inspection_events = cur.fetchall()
     
+    print(f"DEBUG: Found {len(inspection_events)} inspection events for user {user_id} (role: {user_role})")
+    
     for ie in inspection_events:
         photo_urls = []
         if ie['photo_urls']:
@@ -430,6 +432,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     # Sort all events by timestamp (handle empty timestamps)
     events.sort(key=lambda x: x.get('timestamp') or '', reverse=True)
+    
+    print(f"DEBUG: Total events before slicing: {len(events)}")
+    print(f"DEBUG: Event types: {[e.get('type') for e in events[:10]]}")
     
     return {
         'statusCode': 200,

@@ -294,6 +294,15 @@ def handler(event, context):
                     RETURNING id, work_id, work_log_id, inspection_number, title, type, description, status, notes, scheduled_date, defects, photo_urls, created_by, created_at
                 """)
                 result = cur.fetchone()
+                
+                # Create inspection event for scheduled inspections
+                if inspection_type == 'scheduled' and scheduled_date:
+                    metadata = json.dumps({'scheduled_date': scheduled_date})
+                    cur.execute(f"""
+                        INSERT INTO inspection_events (inspection_id, event_type, created_by, metadata)
+                        VALUES ({result['id']}, 'scheduled', {user_id_int}, '{metadata}')
+                    """)
+                
                 conn.commit()
                 
             elif item_type == 'chat_message':
