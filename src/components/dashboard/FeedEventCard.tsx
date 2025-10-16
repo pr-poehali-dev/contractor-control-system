@@ -282,12 +282,6 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
         </div>
       )}
 
-        <div>
-          <p className="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed">
-            {event.description}
-          </p>
-        </div>
-
         {(event.type === 'inspection' || event.type === 'planned_inspection') && event.scheduledDate && (
           <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-center gap-2 text-sm text-blue-900">
