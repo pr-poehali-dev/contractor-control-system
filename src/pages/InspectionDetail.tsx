@@ -406,7 +406,7 @@ const InspectionDetail = () => {
               >
                 Сохранить
               </Button>
-              {inspection.status === 'draft' && (
+              {inspection.status === 'draft' && inspection.type === 'scheduled' && (
                 <Button
                   onClick={handleStartInspection}
                   className="flex-1 bg-amber-600 hover:bg-amber-700"

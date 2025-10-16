@@ -33,7 +33,7 @@ export default function CreateInspectionSimple({ isOpen, onClose, workId }: Crea
         type: scheduledDate ? 'scheduled' : 'unscheduled',
         title: 'Проверка',
         scheduled_date: scheduledDate || undefined,
-        status: 'draft'
+        status: scheduledDate ? 'draft' : 'in_progress'
       });
       
       await loadUserData();
