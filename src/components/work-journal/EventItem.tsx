@@ -214,6 +214,26 @@ export default function EventItem({
           </div>
         );
         
+      case 'inspection_started':
+        return (
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+              <Icon name="PlayCircle" size={18} className="text-blue-600" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[13px] sm:text-base font-bold text-slate-800 break-words">
+                {event.inspection_data?.inspection_number 
+                  ? `Начата проверка №${event.inspection_data.inspection_number}`
+                  : event.content || 'Проверка начата'
+                }
+              </p>
+              <p className="text-[11px] sm:text-sm text-blue-600 mt-1">
+                Заказчик начал проверку
+              </p>
+            </div>
+          </div>
+        );
+        
       case 'inspection_completed':
         return (
           <div className="flex items-start gap-3">
@@ -222,7 +242,10 @@ export default function EventItem({
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-[13px] sm:text-base font-bold text-slate-800 break-words">
-                Проверка №{event.inspection_data?.inspection_number} завершена
+                {event.inspection_data?.inspection_number 
+                  ? `Завершена проверка №${event.inspection_data.inspection_number}`
+                  : event.content || 'Проверка завершена'
+                }
               </p>
               {event.inspection_data?.defects_count ? (
                 <p className="text-[11px] sm:text-sm text-amber-600 mt-1 font-medium">
@@ -318,7 +341,7 @@ export default function EventItem({
     }
   };
 
-  const isSystemEvent = ['inspection_created', 'inspection_completed', 'act_signed', 'work_start'].includes(event.type);
+  const isSystemEvent = ['inspection_created', 'inspection_started', 'inspection_completed', 'act_signed', 'work_start'].includes(event.type);
 
   if (isSystemEvent) {
     return (

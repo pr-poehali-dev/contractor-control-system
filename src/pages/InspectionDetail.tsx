@@ -202,6 +202,14 @@ const InspectionDetail = () => {
         completed_at: new Date().toISOString()
       });
       
+      await api.createItem(token, 'work_log', {
+        work_id: inspection.work_id,
+        description: `Завершена проверка №${inspection.inspection_number}`,
+        is_inspection_completed: true,
+        inspection_id: inspection.id,
+        defects_count: defects.length
+      });
+      
       await loadUserData();
       
       toast({ title: 'Проверка завершена' });
@@ -248,6 +256,13 @@ const InspectionDetail = () => {
       await api.updateItem(token, 'inspection', inspection.id, {
         status: 'active',
         defects: JSON.stringify(defects)
+      });
+      
+      await api.createItem(token, 'work_log', {
+        work_id: inspection.work_id,
+        description: `Начата проверка №${inspection.inspection_number}`,
+        is_inspection_start: true,
+        inspection_id: inspection.id
       });
       
       await loadUserData();

@@ -215,10 +215,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.execute("""
                 SELECT wl.id, wl.work_id, wl.volume, wl.materials, wl.photo_urls,
                        wl.description, wl.created_by, wl.created_at, wl.is_work_start,
+                       wl.is_inspection_start, wl.is_inspection_completed, 
+                       wl.inspection_id, wl.defects_count,
                        wl.completion_percentage,
+                       i.inspection_number,
                        u.name as author_name, u.role as author_role
                 FROM work_logs wl
                 LEFT JOIN users u ON wl.created_by = u.id
+                LEFT JOIN inspections i ON wl.inspection_id = i.id
                 WHERE wl.work_id = ANY(%s)
                 ORDER BY wl.created_at DESC
             """, (work_ids,))

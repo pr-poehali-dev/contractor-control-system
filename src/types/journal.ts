@@ -3,6 +3,7 @@ export type EventType =
   | 'work_start'
   | 'inspection'
   | 'inspection_created' 
+  | 'inspection_started'
   | 'inspection_completed'
   | 'defect_added' 
   | 'act_signed' 

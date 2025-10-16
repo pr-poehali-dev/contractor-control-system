@@ -42,13 +42,25 @@ export default function CreateInspectionWithWorkSelect({ isOpen, onClose }: Crea
     
     setLoading(true);
     try {
+      const isUnscheduled = !scheduledDate;
+      const workId = Number(selectedWorkId);
+      
       const result = await api.createItem(token, 'inspection', {
-        work_id: Number(selectedWorkId),
+        work_id: workId,
         type: scheduledDate ? 'scheduled' : 'unscheduled',
         title: 'Проверка',
         scheduled_date: scheduledDate || undefined,
         status: scheduledDate ? 'draft' : 'active'
       });
+      
+      if (isUnscheduled && result?.id) {
+        await api.createItem(token, 'work_log', {
+          work_id: workId,
+          description: `Начата проверка №${result.inspection_number || 'N/A'}`,
+          is_inspection_start: true,
+          inspection_id: result.id
+        });
+      }
       
       await loadUserData();
       
