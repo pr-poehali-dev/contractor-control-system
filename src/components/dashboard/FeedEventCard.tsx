@@ -12,7 +12,7 @@ import {
 
 interface FeedEvent {
   id: string;
-  type: 'work_log' | 'inspection' | 'info_post' | 'planned_inspection';
+  type: 'work_log' | 'inspection' | 'info_post';
   inspectionType?: 'scheduled' | 'unscheduled';
   inspectionNumber?: string;
   title: string;
@@ -49,7 +49,6 @@ const getEventIcon = (type: string) => {
     case 'work_log': return 'FileText';
     case 'inspection': return 'ClipboardCheck';
     case 'info_post': return 'Bell';
-    case 'planned_inspection': return 'Calendar';
     default: return 'Activity';
   }
 };
@@ -59,7 +58,6 @@ const getEventLabel = (type: string) => {
     case 'work_log': return 'Запись в журнале';
     case 'inspection': return 'Проверка';
     case 'info_post': return 'Инфо-пост';
-    case 'planned_inspection': return 'Проверка';
     default: return type;
   }
 };
@@ -68,7 +66,6 @@ const getEventBadgeColor = (type: string) => {
   switch(type) {
     case 'work_log': return 'bg-blue-100 text-blue-700 border-blue-200';
     case 'inspection': return 'bg-purple-100 text-purple-700 border-purple-200';
-    case 'planned_inspection': return 'bg-purple-100 text-purple-700 border-purple-200';
     case 'info_post': return 'bg-orange-100 text-orange-700 border-orange-200';
     default: return 'bg-slate-100 text-slate-700';
   }
@@ -96,7 +93,6 @@ const getEventBgColor = (type: string) => {
   switch(type) {
     case 'work_log': return 'bg-blue-50/50';
     case 'inspection': return 'bg-purple-50/50';
-    case 'planned_inspection': return 'bg-purple-50/50';
     case 'info_post': return 'bg-orange-50/50';
     default: return 'bg-white';
   }
@@ -147,25 +143,25 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
             <Badge variant="outline" className={`text-[10px] font-normal px-1.5 py-0 ${getEventBadgeColor(event.type)}`}>
               {getEventLabel(event.type)}
             </Badge>
-            {(event.type === 'inspection' || event.type === 'planned_inspection') && (
+            {event.type === 'inspection' && (
               <Badge variant="outline" className="text-[10px] font-normal px-1.5 py-0 bg-purple-50 text-purple-700 border-purple-200">
                 <Icon name="ClipboardCheck" size={10} className="mr-1" />
                 Проверка
               </Badge>
             )}
-            {(event.scheduledDate || event.inspectionType === 'scheduled') && (event.type === 'inspection' || event.type === 'planned_inspection') && (
+            {(event.scheduledDate || event.inspectionType === 'scheduled') && event.type === 'inspection' && (
               <Badge variant="outline" className="text-[10px] font-normal px-1.5 py-0 bg-blue-50 text-blue-700 border-blue-200">
                 <Icon name="Calendar" size={10} className="mr-1" />
                 Запланированная
               </Badge>
             )}
-            {!event.scheduledDate && event.inspectionType === 'unscheduled' && (event.type === 'inspection' || event.type === 'planned_inspection') && (
+            {!event.scheduledDate && event.inspectionType === 'unscheduled' && event.type === 'inspection' && (
               <Badge variant="outline" className="text-[10px] font-normal px-1.5 py-0 bg-orange-50 text-orange-700 border-orange-200">
                 <Icon name="Zap" size={10} className="mr-1" />
                 Внеплановая
               </Badge>
             )}
-            {(event.type === 'inspection' || event.type === 'planned_inspection') && event.status === 'completed' && event.defectsCount && event.defectsCount > 0 && (
+            {event.type === 'inspection' && event.status === 'completed' && event.defectsCount && event.defectsCount > 0 && (
               <Badge variant="outline" className="text-[10px] font-normal px-1.5 py-0 bg-red-50 text-red-700 border-red-200">
                 <Icon name="AlertTriangle" size={10} className="mr-1" />
                 {event.defectsCount} замечаний
@@ -289,7 +285,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
         </div>
       )}
 
-        {(event.type === 'inspection' || event.type === 'planned_inspection') && event.scheduledDate && (
+        {event.type === 'inspection' && event.scheduledDate && (
           <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-center gap-2 text-sm text-blue-900">
               <Icon name="Calendar" size={16} className="text-blue-600" />
@@ -318,7 +314,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
           </div>
         )}
 
-        {(event.type === 'inspection' || event.type === 'planned_inspection') && event.status === 'completed' && (
+        {event.type === 'inspection' && event.status === 'completed' && (
           <div className="mt-3 pt-3 border-t border-slate-100">
             <Button 
               onClick={(e) => {

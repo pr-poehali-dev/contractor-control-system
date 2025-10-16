@@ -18,7 +18,7 @@ import NotificationsSummary from '@/components/work-journal/NotificationsSummary
 
 interface FeedEvent {
   id: string;
-  type: 'work_log' | 'inspection' | 'info_post' | 'planned_inspection';
+  type: 'work_log' | 'inspection' | 'info_post';
   inspectionType?: 'scheduled' | 'unscheduled';
   inspectionNumber?: string;
   title: string;
