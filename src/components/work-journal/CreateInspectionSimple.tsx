@@ -36,29 +36,19 @@ export default function CreateInspectionSimple({ isOpen, onClose, workId }: Crea
         status: scheduledDate ? 'draft' : 'active'
       });
       
-      if (result?.id && user?.id) {
-        const eventType = scheduledDate ? 'scheduled' : 'started';
-        const metadata = scheduledDate ? { scheduled_date: scheduledDate } : {};
-        
-        try {
-          await api.createInspectionEvent(token, {
-            inspection_id: result.id,
-            event_type: eventType,
-            created_by: user.id,
-            metadata
-          });
-        } catch (err) {
-          console.error('Failed to create event:', err);
-        }
-      }
+      // Event is created automatically by backend
       
       await loadUserData();
       
-      toast({ title: 'Проверка создана' });
+      toast({ 
+        title: scheduledDate ? 'Проверка запланирована' : 'Проверка создана',
+        description: scheduledDate ? `Проверка назначена на ${new Date(scheduledDate).toLocaleDateString('ru-RU')}` : 'Переход на страницу проверки...'
+      });
       onClose();
       
+      // Always navigate to inspection page after creation
       if (result?.id) {
-        sessionStorage.setItem('inspectionFromPage', '/journal');
+        sessionStorage.setItem('inspectionFromPage', window.location.pathname);
         navigate(`/inspection/${result.id}`);
       }
     } catch (error) {

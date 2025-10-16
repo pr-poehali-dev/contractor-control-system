@@ -196,26 +196,29 @@ export default function EventItem({
         
       case 'inspection_started':
         return (
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
-              <Icon name="PlayCircle" size={18} className="text-blue-600" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[13px] sm:text-base font-bold text-slate-800 break-words">
-                {event.inspection_data?.inspection_number 
-                  ? `Начата проверка №${event.inspection_data.inspection_number}`
-                  : event.content || 'Проверка начата'
-                }
-              </p>
-              <div className="flex flex-wrap gap-1.5 mt-2">
-                <Badge variant="outline" className="text-[10px] bg-purple-50 text-purple-700 border-purple-200">
-                  <Icon name="ClipboardCheck" size={12} className="mr-1" />
-                  Проверка
-                </Badge>
+          <div className="space-y-3">
+            <div className="flex items-start gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                <Icon name="PlayCircle" size={22} className="text-white" />
               </div>
-              <p className="text-[11px] sm:text-sm text-blue-600 mt-1">
-                Заказчик начал проверку
-              </p>
+              
+              <div className="min-w-0 flex-1">
+                <h3 className="text-base font-bold text-slate-900 mb-2">
+                  Проверка №{event.inspection_data?.inspection_number}
+                </h3>
+                
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  <Badge variant="outline" className="text-[10px] bg-purple-50 text-purple-700 border-purple-200">
+                    <Icon name="ClipboardCheck" size={12} className="mr-1" />
+                    Проверка
+                  </Badge>
+                </div>
+                
+                <div className="flex items-center gap-1.5 text-xs text-slate-600">
+                  <Icon name="PlayCircle" size={14} className="text-slate-500" />
+                  <span>Заказчик начал проверку</span>
+                </div>
+              </div>
             </div>
           </div>
         );
@@ -349,7 +352,7 @@ export default function EventItem({
     }
   };
 
-  const isSystemEvent = ['inspection_created', 'inspection_started', 'inspection_completed', 'act_signed', 'work_start'].includes(event.type);
+  const isSystemEvent = ['inspection_scheduled', 'inspection_started', 'inspection_completed', 'act_signed', 'work_start'].includes(event.type);
 
   if (isSystemEvent) {
     return (
