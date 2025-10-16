@@ -314,6 +314,54 @@ def handler(event, context):
                     result_data = cur.fetchone()
                 else:
                     result_data = None
+            
+            elif item_type == 'inspection':
+                status = data.get('status')
+                defects = data.get('defects')
+                notes = data.get('notes')
+                description = data.get('description')
+                completed_at = data.get('completed_at')
+                
+                set_parts = []
+                if status is not None:
+                    set_parts.append(f"status = '{status}'")
+                if defects is not None:
+                    set_parts.append(f"defects = '{defects.replace(chr(39), chr(39)+chr(39))}'")
+                if notes is not None:
+                    set_parts.append(f"notes = '{notes.replace(chr(39), chr(39)+chr(39))}'")
+                if description is not None:
+                    set_parts.append(f"description = '{description.replace(chr(39), chr(39)+chr(39))}'")
+                if completed_at is not None:
+                    set_parts.append(f"completed_at = '{completed_at}'")
+                
+                if not set_parts:
+                    cur.close()
+                    conn.close()
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'body': json.dumps({'error': 'No fields to update'})
+                    }
+                
+                set_clause = ', '.join(set_parts)
+                
+                if is_admin:
+                    cur.execute(f"""
+                        UPDATE inspections 
+                        SET {set_clause}
+                        WHERE id = {int(item_id)}
+                        RETURNING id, work_id, status, defects, notes, description, completed_at
+                    """)
+                else:
+                    cur.execute(f"""
+                        UPDATE inspections 
+                        SET {set_clause}
+                        WHERE id = {int(item_id)} AND created_by = {user_id_int}
+                        RETURNING id, work_id, status, defects, notes, description, completed_at
+                    """)
+                
+                result_data = cur.fetchone()
+            
             else:
                 cur.close()
                 conn.close()
