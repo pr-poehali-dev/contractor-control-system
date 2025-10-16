@@ -38,6 +38,7 @@ interface FeedEventCardProps {
   onClick: (event: FeedEvent) => void;
   onStartInspection?: (event: FeedEvent) => void;
   onTagClick?: (tagId: string, tagType: 'object' | 'work' | 'contractor') => void;
+  onInspectionClick?: (event: FeedEvent) => void;
   userRole?: 'client' | 'contractor' | 'admin';
 }
 
@@ -56,7 +57,7 @@ const getEventLabel = (type: string) => {
     case 'work_log': return 'Запись в журнале';
     case 'inspection': return 'Проверка';
     case 'info_post': return 'Инфо-пост';
-    case 'planned_inspection': return 'Запланирована проверка';
+    case 'planned_inspection': return 'Проверка';
     default: return type;
   }
 };
@@ -99,7 +100,7 @@ const getEventBgColor = (type: string) => {
   }
 };
 
-const FeedEventCard = ({ event, index, onStartInspection, onTagClick, userRole }: FeedEventCardProps) => {
+const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspectionClick, userRole }: FeedEventCardProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
   const photos = event.photoUrls || [];
@@ -308,18 +309,18 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, userRole }
           </div>
         )}
 
-        {event.type === 'planned_inspection' && event.status === 'draft' && userRole === 'client' && (
+        {(event.type === 'inspection' || event.type === 'planned_inspection') && (
           <div className="mt-3 pt-3 border-t border-slate-100">
             <Button 
               onClick={(e) => {
                 e.stopPropagation();
-                onStartInspection?.(event);
+                onInspectionClick?.(event);
               }}
-              className="w-full"
-              variant="default"
+              className="w-full bg-purple-600 hover:bg-purple-700"
+              size="sm"
             >
-              <Icon name="ClipboardCheck" size={16} className="mr-2" />
-              Начать проверку
+              <Icon name="ArrowRight" size={16} className="mr-2" />
+              Перейти к проверке
             </Button>
           </div>
         )}

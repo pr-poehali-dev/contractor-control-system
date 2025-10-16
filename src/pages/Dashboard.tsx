@@ -362,6 +362,10 @@ const Dashboard = () => {
                         setSelectedTags([...selectedTags, tagId]);
                       }
                     }}
+                    onInspectionClick={(event) => {
+                      const inspectionId = event.id.replace('inspection_', '').replace('planned_inspection_', '');
+                      navigate(`/inspection/${inspectionId}`);
+                    }}
                     onStartInspection={(event) => {
                       if (event.workId && event.objectId) {
                         navigate(`/objects/${event.objectId}`, {
