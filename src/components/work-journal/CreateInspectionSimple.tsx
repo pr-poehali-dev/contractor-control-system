@@ -39,10 +39,11 @@ export default function CreateInspectionSimple({ isOpen, onClose, workId }: Crea
       console.log('Created inspection:', result);
       
       // Event is created automatically by backend
-      const inspectionId = result?.id;
+      // Backend returns {success: true, data: {id, ...}}
+      const inspectionId = result?.data?.id;
       
       if (!inspectionId) {
-        console.error('No inspection ID returned');
+        console.error('No inspection ID returned, result:', result);
         throw new Error('Не удалось получить ID проверки');
       }
       
