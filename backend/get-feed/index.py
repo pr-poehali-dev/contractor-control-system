@@ -178,7 +178,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 if photo_url_str.startswith('['):
                     try:
                         photo_urls = json.loads(photo_url_str)
-                    except:
+                    except Exception:
                         photo_urls = [photo_url_str]
                 else:
                     photo_urls = [photo_url_str]
@@ -298,7 +298,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 if photo_url_str.startswith('['):
                     try:
                         photo_urls = json.loads(photo_url_str)
-                    except:
+                    except Exception:
                         photo_urls = [photo_url_str]
                 else:
                     photo_urls = [photo_url_str]
@@ -312,7 +312,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             try:
                 defects_array = json.loads(insp['defects']) if isinstance(insp['defects'], str) else insp['defects']
                 defects_count = len(defects_array) if isinstance(defects_array, list) else 0
-            except:
+            except Exception:
                 defects_count = 0
         
         events.append({
@@ -424,7 +424,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             try:
                 defects_data = json.loads(planned['defects']) if isinstance(planned['defects'], str) else planned['defects']
                 defects_count = len(defects_data) if isinstance(defects_data, list) else 0
-            except:
+            except Exception:
                 defects_count = 0
         
         # Handle scheduled_date properly
@@ -432,11 +432,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         if planned['scheduled_date']:
             scheduled_date_str = planned['scheduled_date'].isoformat() if hasattr(planned['scheduled_date'], 'isoformat') else str(planned['scheduled_date'])
         
-        # Determine timestamp - use created_at for unscheduled, scheduled_date for scheduled
-        timestamp_str = scheduled_date_str
-        if planned.get('type') == 'unscheduled' or not scheduled_date_str:
-            if planned.get('created_at'):
-                timestamp_str = planned['created_at'].isoformat() if hasattr(planned['created_at'], 'isoformat') else str(planned['created_at'])
+        # Always use created_at as timestamp (when the record was created)
+        timestamp_str = planned['created_at'].isoformat() if hasattr(planned['created_at'], 'isoformat') else str(planned['created_at'])
         
         events.append({
             'id': f"inspection_{planned['id']}",

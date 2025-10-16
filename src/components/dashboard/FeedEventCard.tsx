@@ -139,10 +139,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-2 flex-wrap">
             <p className="text-xs text-slate-500">
-              {event.scheduledDate 
-                ? new Date(event.scheduledDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
-                : formatTimeAgo(event.timestamp)
-              }
+              {formatTimeAgo(event.timestamp)}
             </p>
             <span className="text-slate-300">·</span>
             <Badge variant="outline" className={`text-[10px] font-normal px-1.5 py-0 ${getEventBadgeColor(event.type)}`}>
@@ -289,6 +286,16 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
             {event.description}
           </p>
         </div>
+
+        {(event.type === 'inspection' || event.type === 'planned_inspection') && event.scheduledDate && (
+          <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center gap-2 text-sm text-blue-900">
+              <Icon name="Calendar" size={16} className="text-blue-600" />
+              <span className="font-medium">Запланирована на:</span>
+              <span>{new Date(event.scheduledDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            </div>
+          </div>
+        )}
 
         {(event.volume || event.materials) && (
           <div className="flex flex-wrap gap-3 mt-3 p-3 bg-slate-50 rounded-lg">
