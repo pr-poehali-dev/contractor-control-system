@@ -149,6 +149,7 @@ def handler(event, context):
                 """)
                 cur.execute(f"DELETE FROM work_logs WHERE work_id IN (SELECT id FROM works WHERE object_id = {int(item_id)})")
                 cur.execute(f"DELETE FROM chat_messages WHERE work_id IN (SELECT id FROM works WHERE object_id = {int(item_id)})")
+                cur.execute(f"DELETE FROM work_views WHERE work_id IN (SELECT id FROM works WHERE object_id = {int(item_id)})")
                 cur.execute(f"DELETE FROM inspections WHERE work_id IN (SELECT id FROM works WHERE object_id = {int(item_id)})")
                 cur.execute(f"DELETE FROM estimates WHERE work_id IN (SELECT id FROM works WHERE object_id = {int(item_id)})")
                 cur.execute(f"DELETE FROM works WHERE object_id = {int(item_id)}")
