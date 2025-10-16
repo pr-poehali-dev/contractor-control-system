@@ -183,8 +183,6 @@ def handler(event, context):
                 photo_urls_raw = data.get('photo_urls', '')
                 photo_urls = photo_urls_raw.replace("'", "''") if photo_urls_raw else None
                 is_work_start = data.get('is_work_start', False)
-                is_inspection_start = data.get('is_inspection_start', False)
-                is_inspection_completed = data.get('is_inspection_completed', False)
                 inspection_id = data.get('inspection_id')
                 defects_count = data.get('defects_count')
                 progress = data.get('progress')
@@ -205,12 +203,6 @@ def handler(event, context):
                 if is_work_start:
                     fields.append('is_work_start')
                     values.append('TRUE')
-                if is_inspection_start:
-                    fields.append('is_inspection_start')
-                    values.append('TRUE')
-                if is_inspection_completed:
-                    fields.append('is_inspection_completed')
-                    values.append('TRUE')
                 if inspection_id:
                     fields.append('inspection_id')
                     values.append(str(int(inspection_id)))
@@ -227,7 +219,7 @@ def handler(event, context):
                 cur.execute(f"""
                     INSERT INTO work_logs ({fields_str})
                     VALUES ({values_str})
-                    RETURNING id, work_id, description, volume, materials, photo_urls, created_by, created_at, is_work_start, is_inspection_start, is_inspection_completed, inspection_id, defects_count, completion_percentage
+                    RETURNING id, work_id, description, volume, materials, photo_urls, created_by, created_at, is_work_start, inspection_id, defects_count, completion_percentage
                 """)
                 result = cur.fetchone()
                 
