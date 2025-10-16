@@ -143,12 +143,6 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
             <Badge variant="outline" className={`text-[10px] font-normal px-1.5 py-0 ${getEventBadgeColor(event.type)}`}>
               {getEventLabel(event.type)}
             </Badge>
-            {event.type === 'inspection' && (
-              <Badge variant="outline" className="text-[10px] font-normal px-1.5 py-0 bg-purple-50 text-purple-700 border-purple-200">
-                <Icon name="ClipboardCheck" size={10} className="mr-1" />
-                Проверка
-              </Badge>
-            )}
             {(event.scheduledDate || event.inspectionType === 'scheduled') && event.type === 'inspection' && (
               <Badge variant="outline" className="text-[10px] font-normal px-1.5 py-0 bg-blue-50 text-blue-700 border-blue-200">
                 <Icon name="Calendar" size={10} className="mr-1" />
@@ -192,6 +186,21 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
         {event.type === 'info_post' && (
           <div className="mb-2">
             <h3 className="font-semibold text-slate-900 text-lg leading-snug break-words">{event.title}</h3>
+          </div>
+        )}
+
+        {event.type === 'inspection' && event.inspectionNumber && (
+          <div className="mb-3">
+            <p className="text-sm text-slate-600">
+              Проверка <span className="font-mono font-medium text-purple-600">№{event.inspectionNumber}</span>
+              {event.description && ` • ${event.description}`}
+            </p>
+          </div>
+        )}
+
+        {event.type === 'work_log' && event.description && (
+          <div className="mb-3">
+            <p className="text-sm text-slate-600 break-words">{event.description}</p>
           </div>
         )}
 
@@ -285,16 +294,6 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
         </div>
       )}
 
-        {event.type === 'inspection' && event.scheduledDate && (
-          <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <div className="flex items-center gap-2 text-sm text-blue-900">
-              <Icon name="Calendar" size={16} className="text-blue-600" />
-              <span className="font-medium">Запланирована на:</span>
-              <span>{new Date(event.scheduledDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-            </div>
-          </div>
-        )}
-
         {(event.volume || event.materials) && (
           <div className="flex flex-wrap gap-3 mt-3 p-3 bg-slate-50 rounded-lg">
             {event.volume && (
@@ -314,19 +313,72 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
           </div>
         )}
 
-        {event.type === 'inspection' && event.status === 'completed' && (
+        {event.type === 'inspection' && (
           <div className="mt-3 pt-3 border-t border-slate-100">
-            <Button 
-              onClick={(e) => {
-                e.stopPropagation();
-                onInspectionClick?.(event);
-              }}
-              className="w-full bg-purple-600 hover:bg-purple-700"
-              size="sm"
-            >
-              <Icon name="ArrowRight" size={16} className="mr-2" />
-              Перейти к проверке
-            </Button>
+            {event.status === 'pending' && event.scheduledDate && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <Icon name="Clock" size={16} className="text-slate-500" />
+                  <span>Запланирована на {new Date(event.scheduledDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}</span>
+                </div>
+                {userRole === 'client' && (
+                  <Button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onStartInspection?.(event);
+                    }}
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    size="sm"
+                  >
+                    <Icon name="Play" size={16} className="mr-2" />
+                    Начать проверку
+                  </Button>
+                )}
+              </div>
+            )}
+            {event.status === 'active' && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm font-medium text-blue-600">
+                  <Icon name="Activity" size={16} />
+                  <span>Заказчик начал проверку</span>
+                </div>
+                <Button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onInspectionClick?.(event);
+                  }}
+                  className="w-full bg-purple-600 hover:bg-purple-700"
+                  size="sm"
+                >
+                  <Icon name="ArrowRight" size={16} className="mr-2" />
+                  Перейти к проверке
+                </Button>
+              </div>
+            )}
+            {event.status === 'completed' && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm font-medium text-green-600">
+                  <Icon name="CheckCircle" size={16} />
+                  <span>Проверка завершена</span>
+                  {event.defectsCount && event.defectsCount > 0 && (
+                    <Badge variant="outline" className="ml-auto bg-red-50 text-red-700 border-red-200">
+                      {event.defectsCount} {event.defectsCount === 1 ? 'замечание' : event.defectsCount < 5 ? 'замечания' : 'замечаний'}
+                    </Badge>
+                  )}
+                </div>
+                <Button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onInspectionClick?.(event);
+                  }}
+                  className="w-full bg-purple-600 hover:bg-purple-700"
+                  size="sm"
+                >
+                  <Icon name="Eye" size={16} className="mr-2" />
+                  Перейти к результатам
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>

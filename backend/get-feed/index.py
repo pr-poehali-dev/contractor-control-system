@@ -210,11 +210,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 i.id,
                 i.work_id,
                 i.inspection_number,
+                i.type,
                 i.status,
                 i.description,
                 i.defects,
+                i.scheduled_date,
                 i.photo_urls,
                 i.created_at,
+                i.updated_at,
                 w.title as work_title,
                 w.object_id,
                 o.title as object_title,
@@ -229,7 +232,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             WHERE w.contractor_id = (
                 SELECT contractor_id FROM users WHERE id = {user_id}
             )
-            AND i.status IN ('completed', 'on_rework')
             ORDER BY i.created_at DESC
             LIMIT 10
         '''
@@ -239,11 +241,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 i.id,
                 i.work_id,
                 i.inspection_number,
+                i.type,
                 i.status,
                 i.description,
                 i.defects,
+                i.scheduled_date,
                 i.photo_urls,
                 i.created_at,
+                i.updated_at,
                 w.title as work_title,
                 w.object_id,
                 o.title as object_title,
@@ -255,7 +260,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             JOIN objects o ON w.object_id = o.id
             JOIN projects p ON o.project_id = p.id
             JOIN users u ON i.created_by = u.id
-            WHERE i.status IN ('completed', 'on_rework')
             ORDER BY i.created_at DESC
             LIMIT 15
         '''
@@ -265,11 +269,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 i.id,
                 i.work_id,
                 i.inspection_number,
+                i.type,
                 i.status,
                 i.description,
                 i.defects,
+                i.scheduled_date,
                 i.photo_urls,
                 i.created_at,
+                i.updated_at,
                 w.title as work_title,
                 w.object_id,
                 o.title as object_title,
@@ -282,7 +289,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             JOIN projects p ON o.project_id = p.id
             JOIN users u ON i.created_by = u.id
             WHERE p.client_id = {user_id}
-            AND i.status IN ('completed', 'on_rework')
             ORDER BY i.created_at DESC
             LIMIT 10
         '''
@@ -305,8 +311,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             elif isinstance(photo_url_str, list):
                 photo_urls = photo_url_str
         
-        status_label = 'Проверка завершена' if insp['status'] == 'completed' else 'Обнаружены замечания' if insp['status'] == 'on_rework' else 'Проверка'
-        
         defects_count = 0
         if insp['defects']:
             try:
@@ -315,12 +319,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             except Exception:
                 defects_count = 0
         
+        # Use updated_at for timestamp when available, otherwise created_at
+        timestamp_value = insp.get('updated_at') or insp['created_at']
+        timestamp_str = timestamp_value.isoformat() if hasattr(timestamp_value, 'isoformat') else str(timestamp_value)
+        
+        # Handle scheduled_date
+        scheduled_date_str = None
+        if insp.get('scheduled_date'):
+            scheduled_date_str = insp['scheduled_date'].isoformat() if hasattr(insp['scheduled_date'], 'isoformat') else str(insp['scheduled_date'])
+        
         events.append({
             'id': f"inspection_{insp['id']}",
             'type': 'inspection',
             'title': f"Проверка №{insp['inspection_number']}",
-            'description': insp['description'] or f"{status_label}: {insp['work_title']}",
-            'timestamp': insp['created_at'].isoformat() if hasattr(insp['created_at'], 'isoformat') else str(insp['created_at']),
+            'description': insp.get('description', ''),
+            'timestamp': timestamp_str,
             'status': insp['status'],
             'inspectionNumber': insp['inspection_number'],
             'inspectionType': insp.get('type', 'scheduled'),
@@ -329,127 +342,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'projectId': insp['project_id'],
             'objectTitle': insp['object_title'],
             'projectTitle': insp['project_title'],
+            'workTitle': insp['work_title'],
             'author': insp['author_name'],
             'photoUrls': photo_urls,
             'defects': insp['defects'],
-            'defectsCount': defects_count
+            'defectsCount': defects_count,
+            'scheduledDate': scheduled_date_str
         })
     
-    # Get planned inspections (draft and active status)
-    if user_role == 'contractor':
-        planned_query = f'''
-            SELECT 
-                i.id,
-                i.work_id,
-                i.inspection_number,
-                i.type,
-                i.scheduled_date,
-                i.notes,
-                i.defects,
-                i.created_at,
-                w.title as work_title,
-                w.object_id,
-                o.title as object_title,
-                o.project_id,
-                p.title as project_title,
-                u.name as author_name
-            FROM inspections i
-            JOIN works w ON i.work_id = w.id
-            JOIN objects o ON w.object_id = o.id
-            JOIN projects p ON o.project_id = p.id
-            JOIN users u ON i.created_by = u.id
-            WHERE w.contractor_id = (
-                SELECT contractor_id FROM users WHERE id = {user_id}
-            )
-            AND i.status IN ('draft', 'active')
-            ORDER BY i.created_at DESC
-            LIMIT 10
-        '''
-    elif user_role == 'admin':
-        planned_query = '''
-            SELECT 
-                i.id,
-                i.work_id,
-                i.inspection_number,
-                i.type,
-                i.scheduled_date,
-                i.notes,
-                i.defects,
-                i.created_at,
-                w.title as work_title,
-                w.object_id,
-                o.title as object_title,
-                o.project_id,
-                p.title as project_title,
-                u.name as author_name
-            FROM inspections i
-            JOIN works w ON i.work_id = w.id
-            JOIN objects o ON w.object_id = o.id
-            JOIN projects p ON o.project_id = p.id
-            JOIN users u ON i.created_by = u.id
-            WHERE i.status IN ('draft', 'active')
-            ORDER BY i.created_at DESC
-            LIMIT 10
-        '''
-    else:
-        planned_query = f'''
-            SELECT 
-                i.id,
-                i.work_id,
-                i.inspection_number,
-                i.type,
-                i.scheduled_date,
-                i.notes,
-                i.defects,
-                i.created_at,
-                w.title as work_title,
-                w.object_id,
-                o.title as object_title,
-                o.project_id,
-                p.title as project_title,
-                u.name as author_name
-            FROM inspections i
-            JOIN works w ON i.work_id = w.id
-            JOIN objects o ON w.object_id = o.id
-            JOIN projects p ON o.project_id = p.id
-            JOIN users u ON i.created_by = u.id
-            WHERE p.client_id = {user_id}
-            AND i.status IN ('draft', 'active')
-            ORDER BY i.created_at DESC
-            LIMIT 10
-        '''
-    
-    cur.execute(planned_query)
-    planned_inspections = cur.fetchall()
-    
-    for planned in planned_inspections:
-        # Handle scheduled_date properly
-        scheduled_date_str = None
-        if planned['scheduled_date']:
-            scheduled_date_str = planned['scheduled_date'].isoformat() if hasattr(planned['scheduled_date'], 'isoformat') else str(planned['scheduled_date'])
-        
-        # Always use created_at as timestamp (when the record was created)
-        timestamp_str = planned['created_at'].isoformat() if hasattr(planned['created_at'], 'isoformat') else str(planned['created_at'])
-        
-        events.append({
-            'id': f"inspection_{planned['id']}",
-            'type': 'inspection',
-            'inspectionType': planned.get('type', 'scheduled'),
-            'inspectionNumber': planned['inspection_number'],
-            'title': f"\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u2116{planned['inspection_number']}",
-            'description': planned['notes'] or '\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0437\u0430\u043f\u043b\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u043d\u0430',
-            'timestamp': timestamp_str,
-            'scheduledDate': scheduled_date_str if planned.get('type') == 'scheduled' else None,
-            'status': 'draft',
-            'workId': planned['work_id'],
-            'objectId': planned['object_id'],
-            'projectId': planned['project_id'],
-            'objectTitle': planned['object_title'],
-            'projectTitle': planned['project_title'],
-            'workTitle': planned['work_title'],
-            'author': planned['author_name']
-        })
-    
+
     # Get info posts (visible to all users, limited to last 5)
     info_posts_query = '''
         SELECT 

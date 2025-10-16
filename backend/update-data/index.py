@@ -336,6 +336,8 @@ def handler(event, context):
                 if completed_at is not None:
                     set_parts.append(f"completed_at = '{completed_at}'")
                 
+                set_parts.append("updated_at = NOW()")
+                
                 if not set_parts:
                     cur.close()
                     conn.close()

@@ -302,18 +302,6 @@ def handler(event, context):
                     RETURNING id, work_id, work_log_id, inspection_number, title, type, description, status, notes, scheduled_date, defects, photo_urls, created_by, created_at
                 """)
                 result = cur.fetchone()
-                
-                # Create inspection started log entry if status is active (unscheduled)
-                if status == 'active' and result:
-                    inspection_id = result['id']
-                    inspection_num = result['inspection_number']
-                    start_description = f"Начата проверка №{inspection_num}".replace("'", "''")
-                    
-                    cur.execute(f"""
-                        INSERT INTO work_logs (work_id, description, is_inspection_start, inspection_id, created_by, created_at)
-                        VALUES ({work_id}, '{start_description}', TRUE, {inspection_id}, {user_id_int}, NOW())
-                    """)
-                
                 conn.commit()
                 
             elif item_type == 'chat_message':
