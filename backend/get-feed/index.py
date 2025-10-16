@@ -307,6 +307,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         status_label = 'Проверка завершена' if insp['status'] == 'completed' else 'Обнаружены замечания' if insp['status'] == 'on_rework' else 'Проверка'
         
+        defects_count = 0
+        if insp['defects']:
+            try:
+                defects_array = json.loads(insp['defects']) if isinstance(insp['defects'], str) else insp['defects']
+                defects_count = len(defects_array) if isinstance(defects_array, list) else 0
+            except:
+                defects_count = 0
+        
         events.append({
             'id': f"inspection_{insp['id']}",
             'type': 'inspection',
@@ -321,10 +329,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'projectTitle': insp['project_title'],
             'author': insp['author_name'],
             'photoUrls': photo_urls,
-            'defects': insp['defects']
+            'defects': insp['defects'],
+            'defectsCount': defects_count
         })
     
-    # Get planned inspections (draft status with scheduled_date)
+    # Get planned inspections (draft and active status)
     if user_role == 'contractor':
         planned_query = f'''
             SELECT 
@@ -332,6 +341,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 i.work_id,
                 i.scheduled_date,
                 i.notes,
+                i.defects,
                 w.title as work_title,
                 w.object_id,
                 o.title as object_title,
@@ -346,9 +356,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             WHERE w.contractor_id = (
                 SELECT contractor_id FROM users WHERE id = {user_id}
             )
-            AND i.status = 'draft'
-            AND i.scheduled_date IS NOT NULL
-            ORDER BY i.scheduled_date ASC
+            AND i.status IN ('draft', 'active')
+            ORDER BY i.created_at DESC
             LIMIT 10
         '''
     elif user_role == 'admin':
@@ -358,6 +367,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 i.work_id,
                 i.scheduled_date,
                 i.notes,
+                i.defects,
                 w.title as work_title,
                 w.object_id,
                 o.title as object_title,
@@ -369,9 +379,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             JOIN objects o ON w.object_id = o.id
             JOIN projects p ON o.project_id = p.id
             JOIN users u ON i.created_by = u.id
-            WHERE i.status = 'draft'
-            AND i.scheduled_date IS NOT NULL
-            ORDER BY i.scheduled_date ASC
+            WHERE i.status IN ('draft', 'active')
+            ORDER BY i.created_at DESC
             LIMIT 10
         '''
     else:
@@ -381,6 +390,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 i.work_id,
                 i.scheduled_date,
                 i.notes,
+                i.defects,
                 w.title as work_title,
                 w.object_id,
                 o.title as object_title,
@@ -393,8 +403,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             JOIN projects p ON o.project_id = p.id
             JOIN users u ON i.created_by = u.id
             WHERE p.client_id = {user_id}
-            AND i.status = 'draft'
-            AND i.scheduled_date IS NOT NULL
+            AND i.status IN ('draft', 'active')
             ORDER BY i.scheduled_date ASC
             LIMIT 10
         '''
@@ -403,13 +412,27 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     planned_inspections = cur.fetchall()
     
     for planned in planned_inspections:
+        # Calculate defects count
+        defects_count = 0
+        if planned['defects']:
+            try:
+                defects_data = json.loads(planned['defects']) if isinstance(planned['defects'], str) else planned['defects']
+                defects_count = len(defects_data) if isinstance(defects_data, list) else 0
+            except:
+                defects_count = 0
+        
+        # Handle scheduled_date properly
+        scheduled_date_str = None
+        if planned['scheduled_date']:
+            scheduled_date_str = planned['scheduled_date'].isoformat() if hasattr(planned['scheduled_date'], 'isoformat') else str(planned['scheduled_date'])
+        
         events.append({
             'id': f"planned_inspection_{planned['id']}",
             'type': 'planned_inspection',
             'title': f"\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 {planned['work_title']}",
             'description': planned['notes'] or '\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0437\u0430\u043f\u043b\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u043d\u0430',
-            'timestamp': planned['scheduled_date'].isoformat() if hasattr(planned['scheduled_date'], 'isoformat') else str(planned['scheduled_date']),
-            'scheduledDate': planned['scheduled_date'].isoformat() if hasattr(planned['scheduled_date'], 'isoformat') else str(planned['scheduled_date']),
+            'timestamp': scheduled_date_str,
+            'scheduledDate': scheduled_date_str,
             'status': 'draft',
             'workId': planned['work_id'],
             'objectId': planned['object_id'],
@@ -417,7 +440,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'objectTitle': planned['object_title'],
             'projectTitle': planned['project_title'],
             'workTitle': planned['work_title'],
-            'author': planned['author_name']
+            'author': planned['author_name'],
+            'defectsCount': defects_count
         })
     
     # Get info posts (visible to all users, limited to last 5)
@@ -452,8 +476,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     cur.close()
     conn.close()
     
-    # Sort all events by timestamp
-    events.sort(key=lambda x: x['timestamp'], reverse=True)
+    # Sort all events by timestamp (handle empty timestamps)
+    events.sort(key=lambda x: x.get('timestamp') or '', reverse=True)
     
     return {
         'statusCode': 200,

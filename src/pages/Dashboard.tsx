@@ -32,6 +32,7 @@ interface FeedEvent {
   materials?: string;
   volume?: string;
   defects?: string;
+  defectsCount?: number;
   scheduledDate?: string;
 }
 

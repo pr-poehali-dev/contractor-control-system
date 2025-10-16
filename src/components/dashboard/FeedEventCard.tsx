@@ -28,6 +28,7 @@ interface FeedEvent {
   materials?: string;
   volume?: string;
   defects?: string;
+  defectsCount?: number;
   scheduledDate?: string;
 }
 
@@ -146,6 +147,24 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, userRole }
             <Badge variant="outline" className={`text-[10px] font-normal px-1.5 py-0 ${getEventBadgeColor(event.type)}`}>
               {getEventLabel(event.type)}
             </Badge>
+            {event.scheduledDate && event.type === 'planned_inspection' && (
+              <Badge variant="outline" className="text-[10px] font-normal px-1.5 py-0 bg-blue-50 text-blue-700 border-blue-200">
+                <Icon name="Calendar" size={10} className="mr-1" />
+                Запланированная
+              </Badge>
+            )}
+            {!event.scheduledDate && (event.type === 'inspection' || event.type === 'planned_inspection') && (
+              <Badge variant="outline" className="text-[10px] font-normal px-1.5 py-0 bg-orange-50 text-orange-700 border-orange-200">
+                <Icon name="Zap" size={10} className="mr-1" />
+                Внеплановая
+              </Badge>
+            )}
+            {(event.type === 'inspection' || event.type === 'planned_inspection') && event.defectsCount && event.defectsCount > 0 && (
+              <Badge variant="outline" className="text-[10px] font-normal px-1.5 py-0 bg-red-50 text-red-700 border-red-200">
+                <Icon name="AlertTriangle" size={10} className="mr-1" />
+                Есть замечания
+              </Badge>
+            )}
           </div>
           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full flex-shrink-0">
             <Icon name="MoreHorizontal" size={18} />
