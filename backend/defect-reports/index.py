@@ -207,11 +207,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     SELECT dr.id, dr.inspection_id, dr.report_number, dr.work_id, dr.object_id,
                            dr.created_by, dr.created_at, dr.status, dr.total_defects, 
                            dr.critical_defects, dr.report_data, dr.notes,
-                           u.full_name as created_by_name,
                            w.title as work_title,
                            o.title as object_title
                     FROM defect_reports dr
-                    JOIN users u ON dr.created_by = u.id
                     JOIN works w ON dr.work_id = w.id
                     JOIN objects o ON dr.object_id = o.id
                     WHERE dr.id = {report_id}
@@ -239,9 +237,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'critical_defects': report_row[9],
                     'report_data': report_row[10],
                     'notes': report_row[11],
-                    'created_by_name': report_row[12],
-                    'work_title': report_row[13],
-                    'object_title': report_row[14]
+                    'created_by_name': 'Инспектор',
+                    'work_title': report_row[12],
+                    'object_title': report_row[13]
                 }
                 
                 # Get remediations
@@ -249,10 +247,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     SELECT dr.id, dr.defect_report_id, dr.defect_id, dr.contractor_id,
                            dr.status, dr.remediation_description, dr.remediation_photos,
                            dr.completed_at, dr.verified_at, dr.verified_by, dr.verification_notes,
-                           dr.created_at, dr.updated_at,
-                           u.full_name as contractor_name
+                           dr.created_at, dr.updated_at
                     FROM defect_remediations dr
-                    LEFT JOIN users u ON dr.contractor_id = u.id
                     WHERE dr.defect_report_id = {report_id}
                     ORDER BY dr.created_at
                 """)
@@ -273,7 +269,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'verification_notes': rem_row[10],
                         'created_at': rem_row[11].isoformat() if rem_row[11] else None,
                         'updated_at': rem_row[12].isoformat() if rem_row[12] else None,
-                        'contractor_name': rem_row[13]
+                        'contractor_name': 'Подрядчик'
                     })
                 
                 report['remediations'] = remediations
@@ -297,19 +293,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'isBase64Encoded': False
                     }
                 
-                cur.execute("""
+                cur.execute(f"""
                     SELECT dr.id, dr.inspection_id, dr.report_number, dr.work_id, dr.object_id,
                            dr.created_by, dr.created_at, dr.status, dr.total_defects, 
                            dr.critical_defects, dr.report_data, dr.notes,
-                           u.name as created_by_name,
                            w.title as work_title,
                            o.title as object_title
                     FROM defect_reports dr
-                    JOIN users u ON dr.created_by = u.id
                     JOIN works w ON dr.work_id = w.id
                     JOIN objects o ON dr.object_id = o.id
-                    WHERE dr.inspection_id = %s
-                """, (inspection_id_int,))
+                    WHERE dr.inspection_id = {inspection_id_int}
+                """)
                 
                 report_row = cur.fetchone()
                 report = None
@@ -327,9 +321,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'critical_defects': report_row[9],
                         'report_data': report_row[10],
                         'notes': report_row[11],
-                        'created_by_name': report_row[12],
-                        'work_title': report_row[13],
-                        'object_title': report_row[14]
+                        'created_by_name': 'Инспектор',
+                        'work_title': report_row[12],
+                        'object_title': report_row[13]
                     }
                 
                 return {
@@ -345,11 +339,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     SELECT dr.id, dr.inspection_id, dr.report_number, dr.work_id, dr.object_id,
                            dr.created_by, dr.created_at, dr.status, dr.total_defects, 
                            dr.critical_defects, dr.report_data, dr.notes,
-                           u.full_name as created_by_name,
                            w.title as work_title,
                            o.title as object_title
                     FROM defect_reports dr
-                    JOIN users u ON dr.created_by = u.id
                     JOIN works w ON dr.work_id = w.id
                     JOIN objects o ON dr.object_id = o.id
                     WHERE dr.work_id = {work_id}
@@ -371,9 +363,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'critical_defects': report_row[9],
                         'report_data': report_row[10],
                         'notes': report_row[11],
-                        'created_by_name': report_row[12],
-                        'work_title': report_row[13],
-                        'object_title': report_row[14]
+                        'created_by_name': 'Инспектор',
+                        'work_title': report_row[12],
+                        'object_title': report_row[13]
                     })
                 
                 return {
