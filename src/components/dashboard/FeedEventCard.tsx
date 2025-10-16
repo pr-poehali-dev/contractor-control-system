@@ -311,7 +311,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
           </div>
         )}
 
-        {(event.type === 'inspection' || event.type === 'planned_inspection') && (
+        {(event.type === 'inspection' || event.type === 'planned_inspection') && event.status === 'completed' && (
           <div className="mt-3 pt-3 border-t border-slate-100">
             <Button 
               onClick={(e) => {

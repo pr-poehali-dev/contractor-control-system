@@ -191,7 +191,7 @@ export default function EventItem({
                   )}
                 </div>
                 
-                <div className="flex items-center gap-1.5 text-xs text-slate-600 mb-3">
+                <div className="flex items-center gap-1.5 text-xs text-slate-600">
                   <Icon name={event.inspection_data?.scheduled_date ? "Calendar" : "Clock"} size={14} className="text-slate-500" />
                   <span>
                     {event.inspection_data?.scheduled_date 
@@ -200,15 +200,6 @@ export default function EventItem({
                     }
                   </span>
                 </div>
-                
-                <Button 
-                  onClick={handleInspectionClick}
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                  size="sm"
-                >
-                  <Icon name="ArrowRight" size={16} className="mr-1.5" />
-                  Перейти к проверке
-                </Button>
               </div>
             </div>
           </div>
@@ -236,26 +227,36 @@ export default function EventItem({
         
       case 'inspection_completed':
         return (
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
-              <Icon name="CheckCircle2" size={18} className="text-green-600" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[13px] sm:text-base font-bold text-slate-800 break-words">
-                {event.inspection_data?.inspection_number 
-                  ? `Завершена проверка №${event.inspection_data.inspection_number}`
-                  : event.content || 'Проверка завершена'
-                }
-              </p>
-              {event.inspection_data?.defects_count ? (
-                <p className="text-[11px] sm:text-sm text-amber-600 mt-1 font-medium">
-                  Выявлено замечаний: {event.inspection_data.defects_count}
+          <div className="space-y-3">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                <Icon name="CheckCircle2" size={18} className="text-green-600" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[13px] sm:text-base font-bold text-slate-800 break-words">
+                  {event.inspection_data?.inspection_number 
+                    ? `Завершена проверка №${event.inspection_data.inspection_number}`
+                    : event.content || 'Проверка завершена'
+                  }
                 </p>
-              ) : (
-                <p className="text-[11px] sm:text-sm text-green-600 mt-1 font-medium">
-                  Замечаний не выявлено
-                </p>
-              )}
+                {event.inspection_data?.defects_count ? (
+                  <p className="text-[11px] sm:text-sm text-amber-600 mt-1 font-medium">
+                    Выявлено замечаний: {event.inspection_data.defects_count}
+                  </p>
+                ) : (
+                  <p className="text-[11px] sm:text-sm text-green-600 mt-1 font-medium">
+                    Замечаний не выявлено
+                  </p>
+                )}
+                <Button 
+                  onClick={handleInspectionClick}
+                  className="w-full bg-purple-600 hover:bg-purple-700 mt-3"
+                  size="sm"
+                >
+                  <Icon name="ArrowRight" size={16} className="mr-1.5" />
+                  Перейти к проверке
+                </Button>
+              </div>
             </div>
           </div>
         );
