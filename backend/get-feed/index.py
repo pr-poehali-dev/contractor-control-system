@@ -112,6 +112,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             WHERE w.contractor_id = (
                 SELECT contractor_id FROM users WHERE id = {user_id}
             )
+            AND (wl.is_inspection_start IS NULL OR wl.is_inspection_start = FALSE)
+            AND (wl.is_inspection_completed IS NULL OR wl.is_inspection_completed = FALSE)
             ORDER BY wl.created_at DESC
             LIMIT 20
         '''
@@ -137,6 +139,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             JOIN objects o ON w.object_id = o.id
             JOIN projects p ON o.project_id = p.id
             JOIN users u ON wl.created_by = u.id
+            WHERE (wl.is_inspection_start IS NULL OR wl.is_inspection_start = FALSE)
+            AND (wl.is_inspection_completed IS NULL OR wl.is_inspection_completed = FALSE)
             ORDER BY wl.created_at DESC
             LIMIT 30
         '''
@@ -163,6 +167,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             JOIN projects p ON o.project_id = p.id
             JOIN users u ON wl.created_by = u.id
             WHERE p.client_id = {user_id}
+            AND (wl.is_inspection_start IS NULL OR wl.is_inspection_start = FALSE)
+            AND (wl.is_inspection_completed IS NULL OR wl.is_inspection_completed = FALSE)
             ORDER BY wl.created_at DESC
             LIMIT 20
         '''
