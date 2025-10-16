@@ -16,8 +16,9 @@ export function useInspectionData(inspectionId: string | undefined) {
       if (found) {
         setInspection(found);
         
+        let parsedDefects: Defect[] = [];
         try {
-          const parsedDefects = found.defects ? JSON.parse(found.defects) : [];
+          parsedDefects = found.defects ? JSON.parse(found.defects) : [];
           setDefects(Array.isArray(parsedDefects) ? parsedDefects : []);
         } catch (e) {
           setDefects([]);
@@ -25,7 +26,7 @@ export function useInspectionData(inspectionId: string | undefined) {
         
         loadControlPointsForWork(found.work_id);
         
-        if (found.status === 'completed') {
+        if (found.status === 'completed' && parsedDefects.length > 0) {
           loadDefectReport(found.id);
         }
       }
