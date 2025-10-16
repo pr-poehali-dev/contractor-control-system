@@ -337,9 +337,10 @@ const InspectionDetail = () => {
 
   const handleBack = () => {
     sessionStorage.removeItem('inspectionFromPage');
-    // Always return to work journal page for the specific work
-    if (inspection?.work_id) {
-      navigate(`/journal?work=${inspection.work_id}`);
+    // Return to work detail page
+    const work = userData?.works?.find((w: any) => w.id === inspection?.work_id);
+    if (work?.object_id && inspection?.work_id) {
+      navigate(`/objects/${work.object_id}/works/${inspection.work_id}`);
     } else {
       navigate('/dashboard');
     }
