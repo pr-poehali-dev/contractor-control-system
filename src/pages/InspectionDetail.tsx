@@ -202,12 +202,16 @@ const InspectionDetail = () => {
         completed_at: new Date().toISOString()
       });
       
-      await api.createInspectionEvent(token, {
-        inspection_id: inspection.id,
-        event_type: 'completed',
-        created_by: user.id,
-        metadata: { defects_count: defects.length }
-      });
+      try {
+        await api.createInspectionEvent(token, {
+          inspection_id: inspection.id,
+          event_type: 'completed',
+          created_by: user.id,
+          metadata: { defects_count: defects.length }
+        });
+      } catch (err) {
+        console.error('Failed to create event:', err);
+      }
       
       await loadUserData();
       
@@ -257,12 +261,16 @@ const InspectionDetail = () => {
         defects: JSON.stringify(defects)
       });
       
-      await api.createInspectionEvent(token, {
-        inspection_id: inspection.id,
-        event_type: 'started',
-        created_by: user.id,
-        metadata: {}
-      });
+      try {
+        await api.createInspectionEvent(token, {
+          inspection_id: inspection.id,
+          event_type: 'started',
+          created_by: user.id,
+          metadata: {}
+        });
+      } catch (err) {
+        console.error('Failed to create event:', err);
+      }
       
       await loadUserData();
       

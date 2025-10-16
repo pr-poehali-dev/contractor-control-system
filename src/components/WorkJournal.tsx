@@ -202,33 +202,50 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
       content: msg.message,
     }));
 
-  const inspectionJournalEvents: JournalEvent[] = inspections
-    .filter(insp => insp.work_id === selectedWork)
-    .filter(insp => insp.status === 'draft' || insp.status === 'active')
-    .map(insp => {
-      const defectsArray = insp.defects ? JSON.parse(insp.defects) : [];
-      const isPlanned = insp.type === 'scheduled';
+  const inspectionJournalEvents: JournalEvent[] = inspectionEvents
+    .map(event => {
+      const inspection = inspections.find(i => i.id === event.inspection_id);
+      if (!inspection || inspection.work_id !== selectedWork) return null;
+      
+      const defectsArray = inspection.defects ? JSON.parse(inspection.defects) : [];
+      
+      let eventType: 'inspection_scheduled' | 'inspection_started' | 'inspection_completed';
+      let content = '';
+      
+      if (event.event_type === 'scheduled') {
+        eventType = 'inspection_scheduled';
+        content = event.metadata?.scheduled_date 
+          ? `Проверка запланирована на ${new Date(event.metadata.scheduled_date).toLocaleDateString('ru-RU')}`
+          : 'Проверка запланирована';
+      } else if (event.event_type === 'started') {
+        eventType = 'inspection_started';
+        content = 'Заказчик начал проверку';
+      } else {
+        eventType = 'inspection_completed';
+        content = `Проверка завершена. Замечаний: ${event.metadata?.defects_count || 0}`;
+      }
       
       return {
-        id: `insp-${insp.id}`,
-        type: isPlanned ? 'inspection_scheduled' : 'inspection_started' as const,
-        work_id: insp.work_id,
-        created_by: insp.created_by,
-        author_name: insp.author_name,
-        author_role: (insp.author_role || 'client') as UserRole,
-        created_at: insp.created_at,
-        content: insp.description || (insp.title ? `${insp.title}` : 'Проверка создана'),
+        id: `insp-event-${event.id}`,
+        type: eventType,
+        work_id: inspection.work_id,
+        created_by: event.created_by,
+        author_name: event.author_name || inspection.author_name || '',
+        author_role: (event.author_role || inspection.author_role || 'client') as UserRole,
+        created_at: event.created_at,
+        content,
         inspection_data: {
-          inspection_id: insp.id,
-          inspection_number: insp.inspection_number,
-          status: insp.status,
-          scheduled_date: insp.scheduled_date,
+          inspection_id: inspection.id,
+          inspection_number: inspection.inspection_number,
+          status: inspection.status,
+          scheduled_date: inspection.scheduled_date,
           defects: defectsArray,
-          defects_count: defectsArray.length,
-          photos: insp.photo_urls ? insp.photo_urls.split(',').filter(url => url.trim()) : [],
+          defects_count: event.metadata?.defects_count || defectsArray.length,
+          photos: inspection.photo_urls ? inspection.photo_urls.split(',').filter(url => url.trim()) : [],
         },
       };
-    });
+    })
+    .filter(Boolean) as JournalEvent[];
 
   const mockEvents: JournalEvent[] = [...workEntryEvents, ...chatEvents, ...inspectionJournalEvents]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());

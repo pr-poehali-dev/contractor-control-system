@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { api } from '@/lib/api';
+import { api, InspectionEvent as ApiInspectionEvent } from '@/lib/api';
 import Icon from '@/components/ui/icon';
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
 import FeedFilters from '@/components/dashboard/FeedFilters';
@@ -56,6 +56,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'work_logs' | 'inspections' | 'info_posts'>('all');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [inspectionEvents, setInspectionEvents] = useState<ApiInspectionEvent[]>([]);
 
   const [showJournalModal, setShowJournalModal] = useState(false);
   const [showInspectionModal, setShowInspectionModal] = useState(false);
@@ -88,7 +89,20 @@ const Dashboard = () => {
 
   useEffect(() => {
     loadFeed();
-  }, [user]);
+    loadInspectionEvents();
+  }, [user, userData]);
+
+  const loadInspectionEvents = async () => {
+    const authToken = localStorage.getItem('auth_token');
+    if (!authToken) return;
+    
+    try {
+      const events = await api.getInspectionEvents(authToken);
+      setInspectionEvents(events);
+    } catch (error) {
+      console.error('Failed to load inspection events:', error);
+    }
+  };
 
   const loadFeed = async () => {
     if (!user) return;
