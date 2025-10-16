@@ -151,16 +151,16 @@ const DefectItem = ({
   };
 
   return (
-    <div className="border rounded-lg p-5 space-y-4 bg-white hover:shadow-md transition-shadow">
+    <div className="border rounded-lg p-4 md:p-5 space-y-4 bg-white hover:shadow-md transition-shadow">
       {/* Defect Header */}
-      <div className="flex items-start gap-4">
-        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-700">
+      <div className="flex items-start gap-3 md:gap-4">
+        <div className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-sm md:text-base text-slate-700">
           {index + 1}
         </div>
-        <div className="flex-1">
-          <div className="flex items-start justify-between gap-3 mb-2">
-            <h3 className="font-semibold text-lg">{defect.description}</h3>
-            <div className="flex gap-2">
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-col sm:flex-row items-start justify-between gap-2 mb-2">
+            <h3 className="font-semibold text-base md:text-lg">{defect.description}</h3>
+            <div className="flex flex-wrap gap-2">
               {getSeverityBadge(defect.severity)}
               {remediation && getStatusBadge(remediation.status)}
             </div>
@@ -244,7 +244,7 @@ const DefectItem = ({
                     </Button>
 
                     {uploadedPhotos.length > 0 && (
-                      <div className="grid grid-cols-3 gap-2 mt-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3">
                         {uploadedPhotos.map((photoUrl, idx) => (
                           <div key={idx} className="relative group">
                             <img
@@ -319,7 +319,7 @@ const DefectItem = ({
               {remediation.remediation_photos && remediation.remediation_photos.length > 0 && (
                 <div className="mb-3">
                   <p className="text-sm font-medium text-slate-700 mb-2">Фото после устранения:</p>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {remediation.remediation_photos.map((photo, idx) => (
                       <img
                         key={idx}
@@ -347,7 +347,7 @@ const DefectItem = ({
               )}
 
               {remediation.status === 'completed' && (isClient || userId) && (
-                <div className="flex gap-2 mt-4">
+                <div className="flex flex-col sm:flex-row gap-2 mt-4">
                   <Button
                     size="sm"
                     onClick={() => onVerifyRemediation(remediation.id, true, '')}

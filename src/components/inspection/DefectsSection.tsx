@@ -59,13 +59,13 @@ export default function DefectsSection({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-6">
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <div className="bg-red-100 p-1.5 rounded-lg">
             <Icon name="AlertCircle" size={18} className="text-red-600" />
           </div>
-          <h3 className="font-semibold text-slate-900">Замечания</h3>
+          <h3 className="text-sm md:text-base font-semibold text-slate-900">Замечания</h3>
           {defects.length > 0 && (
             <span className="bg-red-100 text-red-700 text-xs font-medium px-2.5 py-0.5 rounded-full">
               {defects.length}
@@ -114,7 +114,7 @@ export default function DefectsSection({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <Label htmlFor="severity" className="text-xs text-slate-600 mb-1.5 block">
                 Критичность
@@ -184,7 +184,7 @@ export default function DefectsSection({
           </div>
 
           {newDefectPhotos.length > 0 && (
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {newDefectPhotos.map((url, idx) => (
                 <div key={idx} className="relative group">
                   <img

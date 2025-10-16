@@ -17,8 +17,8 @@ interface DefectReportInfoProps {
 const DefectReportInfo = ({ report, progress }: DefectReportInfoProps) => {
   return (
     <Card>
-      <CardContent className="p-6">
-        <div className="grid md:grid-cols-2 gap-6">
+      <CardContent className="p-4 md:p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <div className="space-y-3">
             <div className="flex items-start gap-3">
               <div className="bg-blue-100 rounded-lg p-2.5">

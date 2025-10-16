@@ -66,8 +66,8 @@ const Defects = () => {
         <p className="text-slate-600">Все проверки качества работ</p>
       </div>
 
-      <div className="mb-6 flex gap-4 items-center justify-between">
-        <div className="w-64">
+      <div className="mb-6 flex flex-col md:flex-row gap-4 items-stretch md:items-center md:justify-between">
+        <div className="w-full md:w-64">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger>
               <SelectValue />
@@ -81,17 +81,17 @@ const Defects = () => {
           </Select>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 justify-around md:justify-end">
           <div className="text-center">
-            <p className="text-2xl font-bold text-blue-600">{inspections.filter(i => i.status === 'draft').length}</p>
+            <p className="text-2xl md:text-2xl font-bold text-blue-600">{inspections.filter(i => i.status === 'draft').length}</p>
             <p className="text-xs text-slate-500">Запланировано</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-amber-600">{inspections.filter(i => i.status === 'active').length}</p>
+            <p className="text-2xl md:text-2xl font-bold text-amber-600">{inspections.filter(i => i.status === 'active').length}</p>
             <p className="text-xs text-slate-500">На проверке</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-green-600">{inspections.filter(i => i.status === 'completed').length}</p>
+            <p className="text-2xl md:text-2xl font-bold text-green-600">{inspections.filter(i => i.status === 'completed').length}</p>
             <p className="text-xs text-slate-500">Завершено</p>
           </div>
         </div>
@@ -113,10 +113,10 @@ const Defects = () => {
                 navigate(`/inspection/${inspection.id}`);
               }}
             >
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between gap-4 mb-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
+              <CardContent className="p-4 md:p-6">
+                <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-3">
+                  <div className="flex-1 w-full">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
                       <Badge className={getStatusColor(inspection.status)}>
                         {getStatusLabel(inspection.status)}
                       </Badge>
@@ -126,7 +126,7 @@ const Defects = () => {
                         </span>
                       )}
                     </div>
-                    <h3 className="font-semibold text-lg">
+                    <h3 className="font-semibold text-base md:text-lg">
                       {inspection.title || `Проверка #${inspection.inspection_number}`}
                     </h3>
                     {inspection.description && (
@@ -135,7 +135,7 @@ const Defects = () => {
                   </div>
                   
                   {inspection.defectsCount > 0 && (
-                    <div className="flex items-center gap-2 px-3 py-2 bg-red-100 rounded-lg">
+                    <div className="flex items-center gap-2 px-3 py-2 bg-red-100 rounded-lg self-start">
                       <Icon name="AlertCircle" size={18} className="text-red-600" />
                       <span className="font-semibold text-red-600">{inspection.defectsCount}</span>
                     </div>

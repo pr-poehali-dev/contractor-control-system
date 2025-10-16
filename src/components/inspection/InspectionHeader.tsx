@@ -53,14 +53,14 @@ export default function InspectionHeader({
   const statusConfig = getStatusConfig(status);
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-slate-900">Информация о проверке</h2>
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6 mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-4">
+        <h2 className="text-base md:text-lg font-semibold text-slate-900">Информация о проверке</h2>
         <Badge variant="outline" className={statusConfig.className}>
           {statusConfig.label}
         </Badge>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-3 md:space-y-4">
         {objectTitle && (
           <div className="flex items-start gap-3">
             <div className="bg-blue-100 p-2 rounded-lg shrink-0">
