@@ -159,51 +159,40 @@ export default function EventItem({
         const isPlanned = event.inspection_data?.scheduled_date;
         const hasDefects = event.inspection_data?.defects_count && event.inspection_data.defects_count > 0;
         return (
-          <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                <Icon name="ClipboardCheck" size={28} className="text-white" />
+          <div className="space-y-3">
+            <div className="flex items-start gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                <Icon name="ClipboardCheck" size={22} className="text-white" />
               </div>
               
-              <div className="min-w-0 flex-1 space-y-3">
-                <div>
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">
-                    Проверка №{event.inspection_data?.inspection_number}
-                  </h3>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-base font-bold text-slate-900 mb-2">
+                  Проверка №{event.inspection_data?.inspection_number}
+                </h3>
+                
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {isPlanned ? (
+                    <Badge variant="outline" className="text-[10px] bg-blue-50 text-blue-700 border-blue-200">
+                      <Icon name="Calendar" size={12} className="mr-1" />
+                      Запланированная
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-[10px] bg-orange-50 text-orange-700 border-orange-200">
+                      <Icon name="Zap" size={12} className="mr-1" />
+                      Внеплановая
+                    </Badge>
+                  )}
                   
-                  <div className="flex flex-wrap gap-2">
-                    {isPlanned ? (
-                      <Badge 
-                        variant="outline" 
-                        className="text-xs bg-blue-50 text-blue-700 border-blue-200 px-3 py-1"
-                      >
-                        <Icon name="Calendar" size={14} className="mr-1.5" />
-                        Запланированная
-                      </Badge>
-                    ) : (
-                      <Badge 
-                        variant="outline" 
-                        className="text-xs bg-orange-50 text-orange-700 border-orange-200 px-3 py-1"
-                      >
-                        <Icon name="Zap" size={14} className="mr-1.5" />
-                        Внеплановая
-                      </Badge>
-                    )}
-                    
-                    {hasDefects && (
-                      <Badge 
-                        variant="outline" 
-                        className="text-xs bg-red-50 text-red-700 border-red-200 px-3 py-1"
-                      >
-                        <Icon name="AlertTriangle" size={14} className="mr-1.5" />
-                        {event.inspection_data?.defects_count}
-                      </Badge>
-                    )}
-                  </div>
+                  {hasDefects && (
+                    <Badge variant="outline" className="text-[10px] bg-red-50 text-red-700 border-red-200">
+                      <Icon name="AlertTriangle" size={12} className="mr-1" />
+                      {event.inspection_data?.defects_count}
+                    </Badge>
+                  )}
                 </div>
                 
-                <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 rounded-lg px-3 py-2">
-                  <Icon name={event.inspection_data?.scheduled_date ? "Calendar" : "Clock"} size={16} className="text-slate-500 flex-shrink-0" />
+                <div className="flex items-center gap-1.5 text-xs text-slate-600 mb-3">
+                  <Icon name={event.inspection_data?.scheduled_date ? "Calendar" : "Clock"} size={14} className="text-slate-500" />
                   <span>
                     {event.inspection_data?.scheduled_date 
                       ? `Запланирована на ${new Date(event.inspection_data.scheduled_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}`
@@ -214,10 +203,10 @@ export default function EventItem({
                 
                 <Button 
                   onClick={handleInspectionClick}
-                  className="w-full bg-purple-600 hover:bg-purple-700 shadow-md hover:shadow-lg transition-all"
-                  size="default"
+                  className="w-full bg-purple-600 hover:bg-purple-700"
+                  size="sm"
                 >
-                  <Icon name="ArrowRight" size={18} className="mr-2" />
+                  <Icon name="ArrowRight" size={16} className="mr-1.5" />
                   Перейти к проверке
                 </Button>
               </div>
