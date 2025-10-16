@@ -58,6 +58,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             inspection_id = int(body_data.get('inspection_id', 0))
             notes = body_data.get('notes', '').replace("'", "''")
             
+            print(f"Creating defect report for inspection_id: {inspection_id}")
+            
             if not inspection_id:
                 return {
                     'statusCode': 400,
@@ -67,6 +69,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             # Get inspection with defects
+            print(f"Fetching inspection data...")
             cur.execute(f"""
                 SELECT i.id, i.work_id, i.inspection_number, i.created_by, i.created_at, i.defects,
                        w.object_id, w.title as work_title,
@@ -78,6 +81,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 JOIN users u ON i.created_by = u.id
                 WHERE i.id = {inspection_id}
             """)
+            print(f"Inspection query executed")
             
             row = cur.fetchone()
             if not row:
@@ -138,6 +142,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             report_data_json = json.dumps(report_data, ensure_ascii=False).replace("'", "''")
             
             # Create defect report
+            print(f"Inserting defect report...")
             cur.execute(f"""
                 INSERT INTO defect_reports 
                 (inspection_id, report_number, work_id, object_id, created_by, 
@@ -164,7 +169,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
             
             # Get contractor for work
+            print(f"Fetching contractor...")
             cur.execute(f"SELECT contractor_id FROM works WHERE id = {inspection['work_id']}")
+            print(f"Contractor query executed")
             contractor_row = cur.fetchone()
             contractor_id = contractor_row[0] if contractor_row else None
             
@@ -178,7 +185,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         VALUES ({report['id']}, '{defect_id}', {contractor_id}, 'pending')
                     """)
             
+            print(f"Committing transaction...")
             conn.commit()
+            print(f"Report created successfully: {report['id']}")
             
             return {
                 'statusCode': 201,
