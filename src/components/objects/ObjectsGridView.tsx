@@ -50,6 +50,12 @@ export default function ObjectsGridView({
   onSiteClick,
   onDeleteSite,
 }: ObjectsGridViewProps) {
+  const handleDelete = (siteId: number, e: React.MouseEvent) => {
+    console.log('GridView: Delete button clicked for site', siteId);
+    e.stopPropagation();
+    onDeleteSite(siteId, e);
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {sites.map((site, index) => (
@@ -78,7 +84,7 @@ export default function ObjectsGridView({
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem 
                         className="text-red-600"
-                        onClick={(e) => onDeleteSite(site.id, e)}
+                        onClick={(e) => handleDelete(site.id, e)}
                       >
                         <Icon name="Trash2" size={16} className="mr-2" />
                         Удалить
