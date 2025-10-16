@@ -14,6 +14,7 @@ interface FeedEvent {
   id: string;
   type: 'work_log' | 'inspection' | 'info_post' | 'planned_inspection';
   inspectionType?: 'scheduled' | 'unscheduled';
+  inspectionNumber?: string;
   title: string;
   description: string;
   timestamp: string;
@@ -146,6 +147,12 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
             <Badge variant="outline" className={`text-[10px] font-normal px-1.5 py-0 ${getEventBadgeColor(event.type)}`}>
               {getEventLabel(event.type)}
             </Badge>
+            {(event.type === 'inspection' || event.type === 'planned_inspection') && (
+              <Badge variant="outline" className="text-[10px] font-normal px-1.5 py-0 bg-purple-50 text-purple-700 border-purple-200">
+                <Icon name="ClipboardCheck" size={10} className="mr-1" />
+                Проверка
+              </Badge>
+            )}
             {(event.scheduledDate || event.inspectionType === 'scheduled') && (event.type === 'inspection' || event.type === 'planned_inspection') && (
               <Badge variant="outline" className="text-[10px] font-normal px-1.5 py-0 bg-blue-50 text-blue-700 border-blue-200">
                 <Icon name="Calendar" size={10} className="mr-1" />
@@ -158,10 +165,10 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
                 Внеплановая
               </Badge>
             )}
-            {(event.type === 'inspection' || event.type === 'planned_inspection') && event.defectsCount && event.defectsCount > 0 && (
+            {(event.type === 'inspection' || event.type === 'planned_inspection') && event.status === 'completed' && event.defectsCount && event.defectsCount > 0 && (
               <Badge variant="outline" className="text-[10px] font-normal px-1.5 py-0 bg-red-50 text-red-700 border-red-200">
                 <Icon name="AlertTriangle" size={10} className="mr-1" />
-                Есть замечания
+                {event.defectsCount} замечаний
               </Badge>
             )}
           </div>

@@ -322,6 +322,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'description': insp['description'] or f"{status_label}: {insp['work_title']}",
             'timestamp': insp['created_at'].isoformat() if hasattr(insp['created_at'], 'isoformat') else str(insp['created_at']),
             'status': insp['status'],
+            'inspectionNumber': insp['inspection_number'],
+            'inspectionType': insp.get('type', 'scheduled'),
             'workId': insp['work_id'],
             'objectId': insp['object_id'],
             'projectId': insp['project_id'],
@@ -339,6 +341,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             SELECT 
                 i.id,
                 i.work_id,
+                i.inspection_number,
                 i.type,
                 i.scheduled_date,
                 i.notes,
@@ -367,6 +370,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             SELECT 
                 i.id,
                 i.work_id,
+                i.inspection_number,
                 i.type,
                 i.scheduled_date,
                 i.notes,
@@ -392,6 +396,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             SELECT 
                 i.id,
                 i.work_id,
+                i.inspection_number,
                 i.type,
                 i.scheduled_date,
                 i.notes,
@@ -418,15 +423,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     planned_inspections = cur.fetchall()
     
     for planned in planned_inspections:
-        # Calculate defects count
-        defects_count = 0
-        if planned['defects']:
-            try:
-                defects_data = json.loads(planned['defects']) if isinstance(planned['defects'], str) else planned['defects']
-                defects_count = len(defects_data) if isinstance(defects_data, list) else 0
-            except Exception:
-                defects_count = 0
-        
         # Handle scheduled_date properly
         scheduled_date_str = None
         if planned['scheduled_date']:
@@ -439,7 +435,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'id': f"inspection_{planned['id']}",
             'type': 'inspection',
             'inspectionType': planned.get('type', 'scheduled'),
-            'title': f"\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 {planned['work_title']}",
+            'inspectionNumber': planned['inspection_number'],
+            'title': f"\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u2116{planned['inspection_number']}",
             'description': planned['notes'] or '\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0437\u0430\u043f\u043b\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u043d\u0430',
             'timestamp': timestamp_str,
             'scheduledDate': scheduled_date_str if planned.get('type') == 'scheduled' else None,
@@ -450,8 +447,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'objectTitle': planned['object_title'],
             'projectTitle': planned['project_title'],
             'workTitle': planned['work_title'],
-            'author': planned['author_name'],
-            'defectsCount': defects_count
+            'author': planned['author_name']
         })
     
     # Get info posts (visible to all users, limited to last 5)

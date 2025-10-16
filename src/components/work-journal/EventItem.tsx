@@ -157,7 +157,6 @@ export default function EventItem({
 
       case 'inspection_created':
         const isPlanned = event.inspection_data?.scheduled_date;
-        const hasDefects = event.inspection_data?.defects_count && event.inspection_data.defects_count > 0;
         return (
           <div className="space-y-3">
             <div className="flex items-start gap-3">
@@ -171,6 +170,10 @@ export default function EventItem({
                 </h3>
                 
                 <div className="flex flex-wrap gap-1.5 mb-2">
+                  <Badge variant="outline" className="text-[10px] bg-purple-50 text-purple-700 border-purple-200">
+                    <Icon name="ClipboardCheck" size={12} className="mr-1" />
+                    Проверка
+                  </Badge>
                   {isPlanned ? (
                     <Badge variant="outline" className="text-[10px] bg-blue-50 text-blue-700 border-blue-200">
                       <Icon name="Calendar" size={12} className="mr-1" />
@@ -180,13 +183,6 @@ export default function EventItem({
                     <Badge variant="outline" className="text-[10px] bg-orange-50 text-orange-700 border-orange-200">
                       <Icon name="Zap" size={12} className="mr-1" />
                       Внеплановая
-                    </Badge>
-                  )}
-                  
-                  {hasDefects && (
-                    <Badge variant="outline" className="text-[10px] bg-red-50 text-red-700 border-red-200">
-                      <Icon name="AlertTriangle" size={12} className="mr-1" />
-                      {event.inspection_data?.defects_count}
                     </Badge>
                   )}
                 </div>
@@ -218,6 +214,12 @@ export default function EventItem({
                   : event.content || 'Проверка начата'
                 }
               </p>
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                <Badge variant="outline" className="text-[10px] bg-purple-50 text-purple-700 border-purple-200">
+                  <Icon name="ClipboardCheck" size={12} className="mr-1" />
+                  Проверка
+                </Badge>
+              </div>
               <p className="text-[11px] sm:text-sm text-blue-600 mt-1">
                 Заказчик начал проверку
               </p>
@@ -239,6 +241,18 @@ export default function EventItem({
                     : event.content || 'Проверка завершена'
                   }
                 </p>
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  <Badge variant="outline" className="text-[10px] bg-purple-50 text-purple-700 border-purple-200">
+                    <Icon name="ClipboardCheck" size={12} className="mr-1" />
+                    Проверка
+                  </Badge>
+                  {event.inspection_data?.defects_count && event.inspection_data.defects_count > 0 && (
+                    <Badge variant="outline" className="text-[10px] bg-red-50 text-red-700 border-red-200">
+                      <Icon name="AlertTriangle" size={12} className="mr-1" />
+                      {event.inspection_data.defects_count} замечаний
+                    </Badge>
+                  )}
+                </div>
                 {event.inspection_data?.defects_count ? (
                   <p className="text-[11px] sm:text-sm text-amber-600 mt-1 font-medium">
                     Выявлено замечаний: {event.inspection_data.defects_count}
