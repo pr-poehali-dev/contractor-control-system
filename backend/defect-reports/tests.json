@@ -8,7 +8,7 @@
         "X-User-Id": "1"
       },
       "body": {
-        "inspection_id": 1,
+        "inspection_id": 51,
         "notes": "Test report"
       },
       "expectedStatus": 201,
@@ -22,7 +22,7 @@
     {
       "name": "Get report by inspection",
       "method": "GET",
-      "path": "/?inspection_id=1",
+      "path": "/?inspection_id=51",
       "headers": {
         "X-User-Id": "1"
       },

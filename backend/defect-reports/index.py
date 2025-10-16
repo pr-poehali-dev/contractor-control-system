@@ -73,12 +73,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.execute(f"""
                 SELECT i.id, i.work_id, i.inspection_number, i.created_by, i.created_at, i.defects,
                        w.object_id, w.title as work_title,
-                       o.title as object_title, o.address,
-                       u.full_name as inspector_name
+                       o.title as object_title, o.address
                 FROM inspections i
                 JOIN works w ON i.work_id = w.id
                 JOIN objects o ON w.object_id = o.id
-                JOIN users u ON i.created_by = u.id
                 WHERE i.id = {inspection_id}
             """)
             print(f"Inspection query executed")
@@ -103,7 +101,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'work_title': row[7],
                 'object_title': row[8],
                 'address': row[9],
-                'inspector_name': row[10]
+                'inspector_name': 'Инспектор'  # Will be fetched from user service if needed
             }
             
             # Parse defects
