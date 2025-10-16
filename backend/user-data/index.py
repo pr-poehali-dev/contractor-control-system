@@ -184,6 +184,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         remarks = []
         work_logs = []
         chat_messages = []
+        defect_reports = []
         
         if work_ids:
             cur.execute("""
@@ -211,6 +212,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 remarks = cur.fetchall()
             else:
                 remarks = []
+            
+            cur.execute("""
+                SELECT dr.id, dr.inspection_id, dr.report_number, dr.work_id, 
+                       dr.object_id, dr.created_by, dr.created_at, dr.status,
+                       dr.total_defects, dr.critical_defects, dr.report_data,
+                       dr.pdf_url, dr.notes
+                FROM defect_reports dr
+                WHERE dr.work_id = ANY(%s)
+                ORDER BY dr.created_at DESC
+            """, (work_ids,))
+            defect_reports = cur.fetchall()
+            print(f"DEBUG: Loaded {len(defect_reports)} defect_reports")
             
             cur.execute("""
                 SELECT wl.id, wl.work_id, wl.volume, wl.materials, wl.photo_urls,
@@ -283,9 +296,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur.close()
         conn.close()
         
-        print(f"DEBUG: Processing dates - objects={len(objects)}, works={len(works)}, inspections={len(inspections)}, remarks={len(remarks)}, work_logs={len(work_logs)}, contractors={len(contractors)}, chat_messages={len(chat_messages)}")
+        print(f"DEBUG: Processing dates - objects={len(objects)}, works={len(works)}, inspections={len(inspections)}, remarks={len(remarks)}, work_logs={len(work_logs)}, contractors={len(contractors)}, chat_messages={len(chat_messages)}, defect_reports={len(defect_reports)}")
         
-        for item in objects + works + inspections + remarks + work_logs + contractors + chat_messages:
+        for item in objects + works + inspections + remarks + work_logs + contractors + chat_messages + defect_reports:
             for key, value in item.items():
                 if hasattr(value, 'isoformat'):
                     item[key] = value.isoformat()
@@ -301,7 +314,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'checkpoints': [],
             'contractors': [dict(c) for c in contractors],
             'chatMessages': [dict(cm) for cm in chat_messages],
-            'unreadCounts': unread_counts
+            'unreadCounts': unread_counts,
+            'defect_reports': [dict(dr) for dr in defect_reports]
         }
         
         return {

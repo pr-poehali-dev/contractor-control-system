@@ -44,6 +44,7 @@ interface UserData {
   contractors: any[];
   chatMessages?: any[];
   unreadCounts?: Record<number, { logs?: number; messages?: number; inspections?: number }>;
+  defect_reports?: any[];
 }
 
 interface AuthContextType {
@@ -131,6 +132,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         contractors: Array.isArray(data.contractors) ? data.contractors : [],
         chatMessages: Array.isArray(data.chatMessages) ? data.chatMessages : [],
         unreadCounts: data.unreadCounts || {},
+        defect_reports: Array.isArray(data.defect_reports) ? data.defect_reports : [],
       };
       
       console.log('Normalized user data:', normalizedData);

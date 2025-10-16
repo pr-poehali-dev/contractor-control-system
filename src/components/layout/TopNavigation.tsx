@@ -26,6 +26,7 @@ const navItems: NavItem[] = [
   { id: 'admin', label: 'Админ-панель', icon: 'Shield', path: '/admin', roles: ['admin'] },
   { id: 'work-templates', label: 'Справочник', icon: 'BookOpen', path: '/work-templates', roles: ['client', 'contractor', 'admin'] },
   { id: 'defects', label: 'Проверки', icon: 'ClipboardCheck', path: '/defects', roles: ['client', 'contractor', 'admin'] },
+  { id: 'documents', label: 'Документы', icon: 'FileText', path: '/documents', roles: ['client', 'contractor', 'admin'] },
   { id: 'analytics', label: 'Аналитика', icon: 'BarChart3', path: '/analytics', roles: ['client', 'admin'] },
   { id: 'contractors', label: 'Подрядчики', icon: 'Users', path: '/contractors', roles: ['client', 'admin'] },
 ];

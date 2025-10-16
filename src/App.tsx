@@ -33,6 +33,7 @@ import WorkTemplates from "./pages/WorkTemplates";
 import Admin from "./pages/Admin";
 import Pricing from "./pages/Pricing";
 import WorkTypes from "./pages/WorkTypes";
+import Documents from "./pages/Documents";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -81,6 +82,7 @@ const App = () => (
               <Route path="/journal-entry/:entryId" element={<ProtectedRoute><JournalEntryDetail /></ProtectedRoute>} />
               <Route path="/defect-report/:reportId" element={<ProtectedRoute><DefectReportDetail /></ProtectedRoute>} />
               <Route path="/defects" element={<ProtectedRoute><Defects /></ProtectedRoute>} />
+              <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
               <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
               <Route path="/contractors" element={<ProtectedRoute><Contractors /></ProtectedRoute>} />
               <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
