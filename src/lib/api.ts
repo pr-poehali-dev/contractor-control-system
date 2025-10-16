@@ -173,20 +173,29 @@ export const api = {
   },
 
   async deleteItem(token: string, type: string, id: number): Promise<any> {
-    const response = await fetch(`${API_BASE_URL}/${UPDATE_API}`, {
+    const url = `${API_BASE_URL}/${UPDATE_API}`;
+    const payload = { type, id };
+    console.log('API: DELETE request', { url, method: 'DELETE', payload });
+    
+    const response = await fetch(url, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
         'X-Auth-Token': token,
       },
-      body: JSON.stringify({ type, id }),
+      body: JSON.stringify(payload),
     });
+
+    console.log('API: DELETE response', { status: response.status, ok: response.ok });
 
     if (!response.ok) {
       const error = await response.json();
+      console.error('API: DELETE error', error);
       throw new Error(error.error || 'Failed to delete item');
     }
 
-    return response.json();
+    const result = await response.json();
+    console.log('API: DELETE success', result);
+    return result;
   },
 };

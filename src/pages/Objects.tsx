@@ -25,18 +25,25 @@ export default function Objects() {
 
   const handleDeleteObject = async (objectId: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!confirm('Удалить объект? Это действие нельзя отменить.')) return;
+    console.log('DELETE: Starting delete for object', objectId);
+    if (!confirm('Удалить объект? Это действие нельзя отменить.')) {
+      console.log('DELETE: User cancelled');
+      return;
+    }
     try {
-      await api.deleteItem(token!, 'object', objectId);
+      console.log('DELETE: Calling api.deleteItem', { token: !!token, objectId });
+      const result = await api.deleteItem(token!, 'object', objectId);
+      console.log('DELETE: Success', result);
       if (token) {
         const refreshed = await api.getUserData(token);
         setUserData(refreshed);
       }
       toast({ title: 'Объект удалён' });
     } catch (error) {
+      console.error('DELETE: Error', error);
       toast({ 
         title: 'Ошибка', 
-        description: 'Не удалось удалить',
+        description: error instanceof Error ? error.message : 'Не удалось удалить',
         variant: 'destructive'
       });
     }
