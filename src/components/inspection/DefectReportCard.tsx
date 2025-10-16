@@ -45,14 +45,24 @@ export default function DefectReportCard({
                   <Icon name="Calendar" size={16} />
                   <span>Сформирован: {new Date(defectReport.created_at).toLocaleString('ru-RU')}</span>
                 </div>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => navigate(`/defect-report/${defectReport.id}`)}
-                >
-                  <Icon name="Eye" size={16} className="mr-2" />
-                  Просмотреть акт
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => navigate(`/defect-report/${defectReport.id}`)}
+                  >
+                    <Icon name="Eye" size={16} className="mr-2" />
+                    Просмотреть акт
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => navigate('/documents')}
+                  >
+                    <Icon name="FolderOpen" size={16} className="mr-2" />
+                    Все документы
+                  </Button>
+                </div>
               </div>
             ) : (
               <div className="space-y-3">

@@ -172,9 +172,11 @@ export function useInspectionActions(
       const report = await response.json();
       setDefectReport(report);
       
+      await loadUserData();
+      
       toast({ 
-        title: 'Акт сформирован', 
-        description: `Номер акта: ${report.report_number}` 
+        title: 'Акт успешно сформирован!', 
+        description: `Акт №${report.report_number} доступен в разделе "Документы"`
       });
     } catch (error: any) {
       console.error('Error creating report:', error);

@@ -280,19 +280,29 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             elif inspection_id:
                 # Get report by inspection
-                cur.execute(f"""
+                try:
+                    inspection_id_int = int(inspection_id)
+                except (ValueError, TypeError):
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Invalid inspection_id'}),
+                        'isBase64Encoded': False
+                    }
+                
+                cur.execute("""
                     SELECT dr.id, dr.inspection_id, dr.report_number, dr.work_id, dr.object_id,
                            dr.created_by, dr.created_at, dr.status, dr.total_defects, 
                            dr.critical_defects, dr.report_data, dr.notes,
-                           u.full_name as created_by_name,
+                           u.name as created_by_name,
                            w.title as work_title,
                            o.title as object_title
                     FROM defect_reports dr
                     JOIN users u ON dr.created_by = u.id
                     JOIN works w ON dr.work_id = w.id
                     JOIN objects o ON dr.object_id = o.id
-                    WHERE dr.inspection_id = {inspection_id}
-                """)
+                    WHERE dr.inspection_id = %s
+                """, (inspection_id_int,))
                 
                 report_row = cur.fetchone()
                 report = None
