@@ -165,7 +165,7 @@ const Dashboard = () => {
   const filteredFeed = feed.filter(event => {
     const typeMatch = filter === 'all' || 
       (filter === 'work_logs' && event.type === 'work_log') ||
-      (filter === 'inspections' && (event.type === 'inspection' || event.type === 'planned_inspection')) ||
+      (filter === 'inspections' && (event.type === 'inspection' || event.type === 'planned_inspection' || event.type === 'inspection_scheduled' || event.type === 'inspection_started' || event.type === 'inspection_completed')) ||
       (filter === 'info_posts' && event.type === 'info_post');
 
     if (!typeMatch) return false;
@@ -379,7 +379,7 @@ const Dashboard = () => {
                       }
                     }}
                     onInspectionClick={(event) => {
-                      const inspectionId = event.id.replace('inspection_', '').replace('planned_inspection_', '');
+                      const inspectionId = event.inspectionId || event.id.replace('inspection_event_', '').replace('inspection_', '').replace('planned_inspection_', '');
                       navigate(`/inspection/${inspectionId}`);
                     }}
                     onStartInspection={(event) => {

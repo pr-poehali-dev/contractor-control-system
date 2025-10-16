@@ -12,9 +12,10 @@ import {
 
 interface FeedEvent {
   id: string;
-  type: 'work_log' | 'inspection' | 'info_post';
+  type: 'work_log' | 'inspection' | 'inspection_scheduled' | 'inspection_started' | 'inspection_completed' | 'info_post';
   inspectionType?: 'scheduled' | 'unscheduled';
   inspectionNumber?: string;
+  inspectionId?: number;
   title: string;
   description: string;
   timestamp: string;
@@ -48,6 +49,9 @@ const getEventIcon = (type: string) => {
   switch(type) {
     case 'work_log': return 'FileText';
     case 'inspection': return 'ClipboardCheck';
+    case 'inspection_scheduled': return 'Calendar';
+    case 'inspection_started': return 'PlayCircle';
+    case 'inspection_completed': return 'CheckCircle';
     case 'info_post': return 'Bell';
     default: return 'Activity';
   }
@@ -57,6 +61,9 @@ const getEventLabel = (type: string) => {
   switch(type) {
     case 'work_log': return 'Запись в журнале';
     case 'inspection': return 'Проверка';
+    case 'inspection_scheduled': return 'Запланирована проверка';
+    case 'inspection_started': return 'Начата проверка';
+    case 'inspection_completed': return 'Проверка завершена';
     case 'info_post': return 'Инфо-пост';
     default: return type;
   }
@@ -66,6 +73,9 @@ const getEventBadgeColor = (type: string) => {
   switch(type) {
     case 'work_log': return 'bg-blue-100 text-blue-700 border-blue-200';
     case 'inspection': return 'bg-purple-100 text-purple-700 border-purple-200';
+    case 'inspection_scheduled': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+    case 'inspection_started': return 'bg-orange-100 text-orange-700 border-orange-200';
+    case 'inspection_completed': return 'bg-green-100 text-green-700 border-green-200';
     case 'info_post': return 'bg-orange-100 text-orange-700 border-orange-200';
     default: return 'bg-slate-100 text-slate-700';
   }
@@ -93,6 +103,9 @@ const getEventBgColor = (type: string) => {
   switch(type) {
     case 'work_log': return 'bg-blue-50/50';
     case 'inspection': return 'bg-purple-50/50';
+    case 'inspection_scheduled': return 'bg-yellow-50/50';
+    case 'inspection_started': return 'bg-orange-50/50';
+    case 'inspection_completed': return 'bg-green-50/50';
     case 'info_post': return 'bg-orange-50/50';
     default: return 'bg-white';
   }
@@ -189,16 +202,15 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
           </div>
         )}
 
-        {event.type === 'inspection' && event.inspectionNumber && (
+        {(event.type === 'inspection' || event.type === 'inspection_scheduled' || event.type === 'inspection_started' || event.type === 'inspection_completed') && event.inspectionNumber && (
           <div className="mb-3">
             <p className="text-sm text-slate-600">
               Проверка <span className="font-mono font-medium text-purple-600">№{event.inspectionNumber}</span>
-              {event.description && ` • ${event.description}`}
             </p>
           </div>
         )}
 
-        {event.type === 'work_log' && event.description && (
+        {(event.type === 'work_log' || event.type === 'inspection_scheduled' || event.type === 'inspection_started' || event.type === 'inspection_completed') && event.description && (
           <div className="mb-3">
             <p className="text-sm text-slate-600 break-words">{event.description}</p>
           </div>
@@ -313,71 +325,23 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
           </div>
         )}
 
-        {event.type === 'inspection' && (
+        {(event.type === 'inspection_scheduled' || event.type === 'inspection_started' || event.type === 'inspection_completed') && (
           <div className="mt-3 pt-3 border-t border-slate-100">
-            {event.status === 'pending' && event.scheduledDate && (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <Icon name="Clock" size={16} className="text-slate-500" />
-                  <span>Запланирована на {new Date(event.scheduledDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}</span>
-                </div>
-                {userRole === 'client' && (
-                  <Button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onStartInspection?.(event);
-                    }}
-                    className="w-full bg-blue-600 hover:bg-blue-700"
-                    size="sm"
-                  >
-                    <Icon name="Play" size={16} className="mr-2" />
-                    Начать проверку
-                  </Button>
-                )}
-              </div>
-            )}
-            {event.status === 'active' && (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm font-medium text-blue-600">
-                  <Icon name="Activity" size={16} />
-                  <span>Заказчик начал проверку</span>
-                </div>
-                <Button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onInspectionClick?.(event);
-                  }}
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                  size="sm"
-                >
-                  <Icon name="ArrowRight" size={16} className="mr-2" />
-                  Перейти к проверке
-                </Button>
-              </div>
-            )}
-            {event.status === 'completed' && (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm font-medium text-green-600">
-                  <Icon name="CheckCircle" size={16} />
-                  <span>Проверка завершена</span>
-                  {event.defectsCount && event.defectsCount > 0 && (
-                    <Badge variant="outline" className="ml-auto bg-red-50 text-red-700 border-red-200">
-                      {event.defectsCount} {event.defectsCount === 1 ? 'замечание' : event.defectsCount < 5 ? 'замечания' : 'замечаний'}
-                    </Badge>
-                  )}
-                </div>
-                <Button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onInspectionClick?.(event);
-                  }}
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                  size="sm"
-                >
-                  <Icon name="Eye" size={16} className="mr-2" />
-                  Перейти к результатам
-                </Button>
-              </div>
+            {event.type === 'inspection_completed' && (
+              <Button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const inspectionId = event.inspectionId || event.id.replace('inspection_event_', '');
+                  if (onInspectionClick) {
+                    onInspectionClick({ ...event, id: inspectionId.toString() });
+                  }
+                }}
+                className="w-full bg-purple-600 hover:bg-purple-700"
+                size="sm"
+              >
+                <Icon name="Eye" size={16} className="mr-2" />
+                Перейти к результатам
+              </Button>
             )}
           </div>
         )}

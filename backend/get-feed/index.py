@@ -209,11 +209,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'photoUrls': photo_urls
         })
     
-    # Get inspections
+    # Get inspection events (not inspections directly)
     if user_role == 'contractor':
-        inspections_query = f'''
+        inspection_events_query = f'''
             SELECT 
-                i.id,
+                ie.id,
+                ie.inspection_id,
+                ie.event_type,
+                ie.created_at,
+                ie.created_by,
+                ie.metadata,
                 i.work_id,
                 i.inspection_number,
                 i.type,
@@ -222,29 +227,34 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 i.defects,
                 i.scheduled_date,
                 i.photo_urls,
-                i.created_at,
-                i.updated_at,
                 w.title as work_title,
                 w.object_id,
                 o.title as object_title,
                 o.project_id,
                 p.title as project_title,
-                u.name as author_name
-            FROM inspections i
+                u.name as author_name,
+                u.role as author_role
+            FROM inspection_events ie
+            JOIN inspections i ON ie.inspection_id = i.id
             JOIN works w ON i.work_id = w.id
             JOIN objects o ON w.object_id = o.id
             JOIN projects p ON o.project_id = p.id
-            JOIN users u ON i.created_by = u.id
+            JOIN users u ON ie.created_by = u.id
             WHERE w.contractor_id = (
                 SELECT contractor_id FROM users WHERE id = {user_id}
             )
-            ORDER BY i.created_at DESC
-            LIMIT 10
+            ORDER BY ie.created_at DESC
+            LIMIT 20
         '''
     elif user_role == 'admin':
-        inspections_query = '''
+        inspection_events_query = '''
             SELECT 
-                i.id,
+                ie.id,
+                ie.inspection_id,
+                ie.event_type,
+                ie.created_at,
+                ie.created_by,
+                ie.metadata,
                 i.work_id,
                 i.inspection_number,
                 i.type,
@@ -253,26 +263,31 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 i.defects,
                 i.scheduled_date,
                 i.photo_urls,
-                i.created_at,
-                i.updated_at,
                 w.title as work_title,
                 w.object_id,
                 o.title as object_title,
                 o.project_id,
                 p.title as project_title,
-                u.name as author_name
-            FROM inspections i
+                u.name as author_name,
+                u.role as author_role
+            FROM inspection_events ie
+            JOIN inspections i ON ie.inspection_id = i.id
             JOIN works w ON i.work_id = w.id
             JOIN objects o ON w.object_id = o.id
             JOIN projects p ON o.project_id = p.id
-            JOIN users u ON i.created_by = u.id
-            ORDER BY i.created_at DESC
-            LIMIT 15
+            JOIN users u ON ie.created_by = u.id
+            ORDER BY ie.created_at DESC
+            LIMIT 30
         '''
     else:
-        inspections_query = f'''
+        inspection_events_query = f'''
             SELECT 
-                i.id,
+                ie.id,
+                ie.inspection_id,
+                ie.event_type,
+                ie.created_at,
+                ie.created_by,
+                ie.metadata,
                 i.work_id,
                 i.inspection_number,
                 i.type,
@@ -281,31 +296,31 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 i.defects,
                 i.scheduled_date,
                 i.photo_urls,
-                i.created_at,
-                i.updated_at,
                 w.title as work_title,
                 w.object_id,
                 o.title as object_title,
                 o.project_id,
                 p.title as project_title,
-                u.name as author_name
-            FROM inspections i
+                u.name as author_name,
+                u.role as author_role
+            FROM inspection_events ie
+            JOIN inspections i ON ie.inspection_id = i.id
             JOIN works w ON i.work_id = w.id
             JOIN objects o ON w.object_id = o.id
             JOIN projects p ON o.project_id = p.id
-            JOIN users u ON i.created_by = u.id
+            JOIN users u ON ie.created_by = u.id
             WHERE p.client_id = {user_id}
-            ORDER BY i.created_at DESC
-            LIMIT 10
+            ORDER BY ie.created_at DESC
+            LIMIT 20
         '''
     
-    cur.execute(inspections_query)
-    inspections = cur.fetchall()
+    cur.execute(inspection_events_query)
+    inspection_events = cur.fetchall()
     
-    for insp in inspections:
+    for ie in inspection_events:
         photo_urls = []
-        if insp['photo_urls']:
-            photo_url_str = insp['photo_urls']
+        if ie['photo_urls']:
+            photo_url_str = ie['photo_urls']
             if isinstance(photo_url_str, str):
                 if photo_url_str.startswith('['):
                     try:
@@ -318,41 +333,65 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 photo_urls = photo_url_str
         
         defects_count = 0
-        if insp['defects']:
+        if ie['defects']:
             try:
-                defects_array = json.loads(insp['defects']) if isinstance(insp['defects'], str) else insp['defects']
+                defects_array = json.loads(ie['defects']) if isinstance(ie['defects'], str) else ie['defects']
                 defects_count = len(defects_array) if isinstance(defects_array, list) else 0
             except Exception:
                 defects_count = 0
         
-        # Use updated_at for timestamp when available, otherwise created_at
-        timestamp_value = insp.get('updated_at') or insp['created_at']
-        timestamp_str = timestamp_value.isoformat() if hasattr(timestamp_value, 'isoformat') else str(timestamp_value)
+        # Parse metadata
+        metadata = {}
+        if ie.get('metadata'):
+            try:
+                metadata = json.loads(ie['metadata']) if isinstance(ie['metadata'], str) else ie['metadata']
+            except Exception:
+                metadata = {}
         
-        # Handle scheduled_date
+        # Generate content based on event type
+        content = ''
+        if ie['event_type'] == 'scheduled':
+            scheduled_date = metadata.get('scheduled_date') or ie.get('scheduled_date')
+            if scheduled_date:
+                try:
+                    date_obj = datetime.fromisoformat(str(scheduled_date).replace('Z', '+00:00'))
+                    content = f"Проверка запланирована на {date_obj.strftime('%d.%m.%Y')}"
+                except:
+                    content = 'Проверка запланирована'
+            else:
+                content = 'Проверка запланирована'
+        elif ie['event_type'] == 'started':
+            content = 'Заказчик начал проверку'
+        elif ie['event_type'] == 'completed':
+            defects_from_meta = metadata.get('defects_count', defects_count)
+            content = f"Проверка завершена. Замечаний: {defects_from_meta}"
+        
+        timestamp_str = ie['created_at'].isoformat() if hasattr(ie['created_at'], 'isoformat') else str(ie['created_at'])
+        
         scheduled_date_str = None
-        if insp.get('scheduled_date'):
-            scheduled_date_str = insp['scheduled_date'].isoformat() if hasattr(insp['scheduled_date'], 'isoformat') else str(insp['scheduled_date'])
+        if ie.get('scheduled_date'):
+            scheduled_date_str = ie['scheduled_date'].isoformat() if hasattr(ie['scheduled_date'], 'isoformat') else str(ie['scheduled_date'])
         
         events.append({
-            'id': f"inspection_{insp['id']}",
-            'type': 'inspection',
-            'title': f"Проверка №{insp['inspection_number']}",
-            'description': insp.get('description', ''),
+            'id': f"inspection_event_{ie['id']}",
+            'type': f"inspection_{ie['event_type']}",
+            'title': f"Проверка №{ie['inspection_number']}",
+            'description': content,
             'timestamp': timestamp_str,
-            'status': insp['status'],
-            'inspectionNumber': insp['inspection_number'],
-            'inspectionType': insp.get('type', 'scheduled'),
-            'workId': insp['work_id'],
-            'objectId': insp['object_id'],
-            'projectId': insp['project_id'],
-            'objectTitle': insp['object_title'],
-            'projectTitle': insp['project_title'],
-            'workTitle': insp['work_title'],
-            'author': insp['author_name'],
+            'status': ie['status'],
+            'inspectionId': ie['inspection_id'],
+            'inspectionNumber': ie['inspection_number'],
+            'inspectionType': ie.get('type', 'scheduled'),
+            'workId': ie['work_id'],
+            'objectId': ie['object_id'],
+            'projectId': ie['project_id'],
+            'objectTitle': ie['object_title'],
+            'projectTitle': ie['project_title'],
+            'workTitle': ie['work_title'],
+            'author': ie['author_name'],
             'photoUrls': photo_urls,
-            'defects': insp['defects'],
-            'defectsCount': defects_count,
+            'defects': ie['defects'],
+            'defectsCount': metadata.get('defects_count', defects_count),
             'scheduledDate': scheduled_date_str
         })
     
