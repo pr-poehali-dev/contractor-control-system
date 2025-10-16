@@ -171,20 +171,24 @@ const InspectionDetail = () => {
           />
         </div>
 
-        <CommonDefectsSection
-          onSelectDefect={(description) => {
-            handleDefectChange('description', description);
-            setTimeout(() => {
-              defectsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 100);
-          }}
-        />
+        {inspection.status !== 'completed' && (
+          <>
+            <CommonDefectsSection
+              onSelectDefect={(description) => {
+                handleDefectChange('description', description);
+                setTimeout(() => {
+                  defectsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+              }}
+            />
 
-        <ControlPointsSection
-          controlPoints={controlPoints}
-          checkedPoints={checkedPoints}
-          onControlPointClick={handleControlPointClick}
-        />
+            <ControlPointsSection
+              controlPoints={controlPoints}
+              checkedPoints={checkedPoints}
+              onControlPointClick={handleControlPointClick}
+            />
+          </>
+        )}
 
         {inspection.status === 'completed' && defects.length > 0 && (
           <DefectReportCard

@@ -144,7 +144,7 @@ export function useInspectionActions(
   };
 
   const handleCreateDefectReport = async () => {
-    if (!token || !user?.id || defects.length === 0) return;
+    if (!token || !user?.id || defects.length === 0 || !inspection?.id) return;
     
     setLoadingReport(true);
     try {
@@ -157,14 +157,16 @@ export function useInspectionActions(
             'X-User-Id': user.id.toString(),
           },
           body: JSON.stringify({
-            inspection_id: inspection.id,
+            inspection_id: parseInt(inspection.id.toString()),
             notes: ''
           })
         }
       );
       
       if (!response.ok) {
-        throw new Error('Failed to create report');
+        const errorText = await response.text();
+        console.error('Failed to create report:', errorText);
+        throw new Error(`Failed to create report: ${response.status}`);
       }
       
       const report = await response.json();
@@ -174,10 +176,11 @@ export function useInspectionActions(
         title: 'Акт сформирован', 
         description: `Номер акта: ${report.report_number}` 
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error creating report:', error);
       toast({ 
         title: 'Ошибка', 
-        description: 'Не удалось сформировать акт',
+        description: error.message || 'Не удалось сформировать акт',
         variant: 'destructive'
       });
     } finally {
