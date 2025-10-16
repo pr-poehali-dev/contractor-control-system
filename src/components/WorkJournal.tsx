@@ -181,7 +181,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
   const inspectionEvents: JournalEvent[] = inspections
     .filter(insp => insp.work_id === selectedWork)
     .map(insp => {
-      const isCreatedStatus = insp.status === 'draft' || insp.status === 'active';
+      const isCreatedStatus = insp.status === 'draft';
       const defectsArray = insp.defects ? JSON.parse(insp.defects) : [];
       return {
         id: insp.id,
