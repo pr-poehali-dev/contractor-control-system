@@ -295,12 +295,20 @@ def handler(event, context):
                 """)
                 result = cur.fetchone()
                 
-                # Create inspection event for scheduled inspections
+                # Create inspection event based on type
                 if inspection_type == 'scheduled' and scheduled_date:
+                    # For scheduled inspections - create 'scheduled' event
                     metadata = json.dumps({'scheduled_date': scheduled_date})
                     cur.execute(f"""
                         INSERT INTO inspection_events (inspection_id, event_type, created_by, metadata)
                         VALUES ({result['id']}, 'scheduled', {user_id_int}, '{metadata}')
+                    """)
+                elif inspection_type == 'unscheduled' and status == 'active':
+                    # For unscheduled inspections - create 'started' event
+                    metadata = json.dumps({})
+                    cur.execute(f"""
+                        INSERT INTO inspection_events (inspection_id, event_type, created_by, metadata)
+                        VALUES ({result['id']}, 'started', {user_id_int}, '{metadata}')
                     """)
                 
                 conn.commit()
