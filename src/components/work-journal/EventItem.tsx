@@ -112,15 +112,16 @@ export default function EventItem({
               {event.inspection_data?.status && (
                 <Badge 
                   variant={
-                    event.inspection_data.status === 'approved' ? 'default' : 
-                    event.inspection_data.status === 'rejected' ? 'destructive' : 
+                    event.inspection_data.status === 'completed' ? 'default' : 
+                    event.inspection_data.status === 'on_rework' ? 'destructive' : 
                     'outline'
                   }
                   className="text-[10px] md:text-xs"
                 >
-                  {event.inspection_data.status === 'approved' ? 'Одобрено' : 
-                   event.inspection_data.status === 'rejected' ? 'Не одобрено' : 
-                   'На проверке'}
+                  {event.inspection_data.status === 'completed' ? 'Завершена' : 
+                   event.inspection_data.status === 'active' ? 'На проверке' :
+                   event.inspection_data.status === 'on_rework' ? 'На доработке' : 
+                   'Черновик'}
                 </Badge>
               )}
             </div>
