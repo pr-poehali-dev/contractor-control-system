@@ -25,6 +25,7 @@ import Profile from "./pages/Profile";
 import PublicObject from "./pages/PublicObject";
 import JournalEntryDetail from "./pages/JournalEntryDetail";
 import InspectionDetail from "./pages/InspectionDetail";
+import DefectReportDetail from "./pages/DefectReportDetail";
 import CreateObject from "./pages/CreateObject";
 import EditObject from "./pages/EditObject";
 import CreateWork from "./pages/CreateWork";
@@ -78,6 +79,7 @@ const App = () => (
               <Route path="/inspection/:inspectionId" element={<ProtectedRoute><InspectionDetail /></ProtectedRoute>} />
               <Route path="/inspections/:inspectionId" element={<ProtectedRoute><InspectionDetail /></ProtectedRoute>} />
               <Route path="/journal-entry/:entryId" element={<ProtectedRoute><JournalEntryDetail /></ProtectedRoute>} />
+              <Route path="/defect-report/:reportId" element={<ProtectedRoute><DefectReportDetail /></ProtectedRoute>} />
               <Route path="/defects" element={<ProtectedRoute><Defects /></ProtectedRoute>} />
               <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
               <Route path="/contractors" element={<ProtectedRoute><Contractors /></ProtectedRoute>} />

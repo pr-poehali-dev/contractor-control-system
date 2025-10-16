@@ -1,0 +1,32 @@
+{
+  "tests": [
+    {
+      "name": "Get remediations for contractor",
+      "method": "GET",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "expectedStatus": 200,
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Update remediation status",
+      "method": "PUT",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "body": {
+        "remediation_id": 1,
+        "status": "in_progress",
+        "remediation_description": "Working on it"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "status": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

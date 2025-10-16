@@ -1,4 +1,6 @@
 {
+  "defect-reports": "https://functions.poehali.dev/d230b3d9-8dbd-410c-b023-9c021131a15b",
+  "defect-remediation": "https://functions.poehali.dev/ef8edfd4-ef48-48a9-95fb-78f5a4982949",
   "inspection-event": "https://functions.poehali.dev/0b3a32ce-bc6d-455c-a189-7cd294c69c95",
   "mark-seen": "https://functions.poehali.dev/e9dd5b4f-67a6-44f8-9e1a-9108341f41df",
   "work-status": "https://functions.poehali.dev/ce0181f5-d513-442e-a0ae-fbfb21271c60",

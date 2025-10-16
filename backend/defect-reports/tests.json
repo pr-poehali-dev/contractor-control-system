@@ -1,0 +1,33 @@
+{
+  "tests": [
+    {
+      "name": "Create defect report",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "body": {
+        "inspection_id": 1,
+        "notes": "Test report"
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "id": "number",
+        "report_number": "string",
+        "status": "active"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get report by inspection",
+      "method": "GET",
+      "path": "/?inspection_id=1",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "expectedStatus": 200,
+      "bodyMatcher": "partial"
+    }
+  ]
+}

@@ -34,6 +34,8 @@ const InspectionDetail = () => {
   const [controlPoints, setControlPoints] = useState<ControlPoint[]>([]);
   const [checkedPoints, setCheckedPoints] = useState<Set<string>>(new Set());
   const defectsRef = useRef<HTMLDivElement>(null);
+  const [defectReport, setDefectReport] = useState<any>(null);
+  const [loadingReport, setLoadingReport] = useState(false);
 
   useEffect(() => {
     if (userData?.inspections) {
@@ -49,6 +51,10 @@ const InspectionDetail = () => {
         }
         
         loadControlPointsForWork(found.work_id);
+        
+        if (found.status === 'completed') {
+          loadDefectReport(found.id);
+        }
       }
     }
   }, [userData, inspectionId]);
@@ -98,6 +104,70 @@ const InspectionDetail = () => {
       console.log('Loaded control points:', mockPoints.length);
     } catch (error) {
       console.error('Failed to load control points:', error);
+    }
+  };
+
+  const loadDefectReport = async (inspectionId: number) => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(
+        `https://functions.poehali.dev/d230b3d9-8dbd-410c-b023-9c021131a15b?inspection_id=${inspectionId}`,
+        {
+          headers: {
+            'X-User-Id': user?.id?.toString() || '',
+          }
+        }
+      );
+      
+      if (response.ok) {
+        const report = await response.json();
+        setDefectReport(report);
+      }
+    } catch (error) {
+      console.error('Failed to load defect report:', error);
+    }
+  };
+
+  const handleCreateDefectReport = async () => {
+    if (!token || !user?.id || defects.length === 0) return;
+    
+    setLoadingReport(true);
+    try {
+      const response = await fetch(
+        'https://functions.poehali.dev/d230b3d9-8dbd-410c-b023-9c021131a15b',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': user.id.toString(),
+          },
+          body: JSON.stringify({
+            inspection_id: inspection.id,
+            notes: ''
+          })
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to create report');
+      }
+      
+      const report = await response.json();
+      setDefectReport(report);
+      
+      toast({ 
+        title: 'Акт сформирован', 
+        description: `Номер акта: ${report.report_number}` 
+      });
+    } catch (error) {
+      toast({ 
+        title: 'Ошибка', 
+        description: 'Не удалось сформировать акт',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoadingReport(false);
     }
   };
 
@@ -420,6 +490,75 @@ const InspectionDetail = () => {
           checkedPoints={checkedPoints}
           onControlPointClick={handleControlPointClick}
         />
+
+        {inspection.status === 'completed' && defects.length > 0 && (
+          <Card className="mt-6">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="bg-blue-100 rounded-full p-3">
+                  <Icon name="FileText" size={24} className="text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg mb-2">Акт об обнаружении дефектов</h3>
+                  {defectReport ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm text-slate-600">
+                        <Icon name="Hash" size={16} />
+                        <span className="font-medium">Номер акта:</span>
+                        <span>{defectReport.report_number}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-slate-600">
+                        <Icon name="AlertCircle" size={16} />
+                        <span>Всего замечаний: {defectReport.total_defects}</span>
+                        {defectReport.critical_defects > 0 && (
+                          <span className="text-red-600 font-medium">
+                            (критических: {defectReport.critical_defects})
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-slate-600">
+                        <Icon name="Calendar" size={16} />
+                        <span>Сформирован: {new Date(defectReport.created_at).toLocaleString('ru-RU')}</span>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => navigate(`/defect-report/${defectReport.id}`)}
+                      >
+                        <Icon name="Eye" size={16} className="mr-2" />
+                        Просмотреть акт
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <p className="text-sm text-slate-600">
+                        Проверка завершена с {defects.length} замечаниями. 
+                        Необходимо сформировать акт об обнаружении дефектов.
+                      </p>
+                      <Button 
+                        onClick={handleCreateDefectReport}
+                        disabled={loadingReport}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        {loadingReport ? (
+                          <>
+                            <Icon name="Loader2" size={16} className="mr-2 animate-spin" />
+                            Формирование...
+                          </>
+                        ) : (
+                          <>
+                            <Icon name="FilePlus" size={16} className="mr-2" />
+                            Сформировать акт
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {canEdit && isClient && (
           <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-20">
