@@ -11,7 +11,7 @@ import FeedFilters from '@/components/dashboard/FeedFilters';
 import FeedEventCard from '@/components/dashboard/FeedEventCard';
 import CreateActionButton from '@/components/dashboard/CreateActionButton';
 import JournalEntryModal from '@/components/dashboard/JournalEntryModal';
-import InspectionModal from '@/components/dashboard/InspectionModal';
+import CreateInspectionWithWorkSelect from '@/components/dashboard/CreateInspectionWithWorkSelect';
 import InfoPostModal from '@/components/dashboard/InfoPostModal';
 import NotificationsSummary from '@/components/work-journal/NotificationsSummary';
 
@@ -67,12 +67,7 @@ const Dashboard = () => {
     photoUrls: [] as string[]
   });
 
-  const [inspectionForm, setInspectionForm] = useState({
-    objectId: '',
-    workId: '',
-    scheduledDate: '',
-    notes: ''
-  });
+
 
   const [infoPostForm, setInfoPostForm] = useState({
     title: '',
@@ -238,47 +233,7 @@ const Dashboard = () => {
     }
   };
 
-  const handleScheduleInspection = async () => {
-    if (!inspectionForm.objectId || !inspectionForm.workId || !inspectionForm.scheduledDate) {
-      toast({
-        title: 'Ошибка',
-        description: 'Заполните все обязательные поля',
-        variant: 'destructive'
-      });
-      return;
-    }
 
-    try {
-      await api.createItem(token!, 'inspection', {
-        work_id: Number(inspectionForm.workId),
-        scheduled_date: inspectionForm.scheduledDate,
-        notes: inspectionForm.notes || null,
-        status: 'draft'
-      });
-
-      toast({
-        title: 'Проверка запланирована',
-        description: `Проверка назначена на ${new Date(inspectionForm.scheduledDate).toLocaleDateString('ru-RU')}`
-      });
-
-      setShowInspectionModal(false);
-      setInspectionForm({
-        objectId: '',
-        workId: '',
-        scheduledDate: '',
-        notes: ''
-      });
-      
-      await loadUserData();
-      loadFeed();
-    } catch (error) {
-      toast({
-        title: 'Ошибка',
-        description: 'Не удалось запланировать проверку',
-        variant: 'destructive'
-      });
-    }
-  };
 
   const handleCreateInfoPost = async () => {
     if (!infoPostForm.title || !infoPostForm.content) {
@@ -430,14 +385,9 @@ const Dashboard = () => {
         onSubmit={handleCreateJournalEntry}
       />
 
-      <InspectionModal
-        open={showInspectionModal}
-        onOpenChange={setShowInspectionModal}
-        form={inspectionForm}
-        onFormChange={setInspectionForm}
-        objects={objects}
-        works={works}
-        onSubmit={handleScheduleInspection}
+      <CreateInspectionWithWorkSelect
+        isOpen={showInspectionModal}
+        onClose={() => setShowInspectionModal(false)}
       />
 
       <InfoPostModal
