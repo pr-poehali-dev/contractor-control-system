@@ -18,8 +18,6 @@ const InspectionDetail = () => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const fromPage = sessionStorage.getItem('inspectionFromPage') || '/defects';
-  
   const [inspection, setInspection] = useState<any>(null);
   const [defects, setDefects] = useState<Defect[]>([]);
   const [newDefect, setNewDefect] = useState<Defect>({
@@ -339,7 +337,12 @@ const InspectionDetail = () => {
 
   const handleBack = () => {
     sessionStorage.removeItem('inspectionFromPage');
-    navigate(fromPage);
+    // Always return to work journal page for the specific work
+    if (inspection?.work_id) {
+      navigate(`/journal?work=${inspection.work_id}`);
+    } else {
+      navigate('/dashboard');
+    }
   };
 
   return (
