@@ -148,13 +148,13 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
             <Badge variant="outline" className={`text-[10px] font-normal px-1.5 py-0 ${getEventBadgeColor(event.type)}`}>
               {getEventLabel(event.type)}
             </Badge>
-            {event.scheduledDate && event.type === 'planned_inspection' && (
+            {(event.scheduledDate || event.inspectionType === 'scheduled') && (event.type === 'inspection' || event.type === 'planned_inspection') && (
               <Badge variant="outline" className="text-[10px] font-normal px-1.5 py-0 bg-blue-50 text-blue-700 border-blue-200">
                 <Icon name="Calendar" size={10} className="mr-1" />
                 Запланированная
               </Badge>
             )}
-            {!event.scheduledDate && (event.type === 'inspection' || event.type === 'planned_inspection') && (
+            {!event.scheduledDate && event.inspectionType === 'unscheduled' && (event.type === 'inspection' || event.type === 'planned_inspection') && (
               <Badge variant="outline" className="text-[10px] font-normal px-1.5 py-0 bg-orange-50 text-orange-700 border-orange-200">
                 <Icon name="Zap" size={10} className="mr-1" />
                 Внеплановая

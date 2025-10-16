@@ -229,7 +229,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             WHERE w.contractor_id = (
                 SELECT contractor_id FROM users WHERE id = {user_id}
             )
-            AND i.status != 'draft'
+            AND i.status IN ('completed', 'on_rework')
             ORDER BY i.created_at DESC
             LIMIT 10
         '''
@@ -255,7 +255,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             JOIN objects o ON w.object_id = o.id
             JOIN projects p ON o.project_id = p.id
             JOIN users u ON i.created_by = u.id
-            WHERE i.status != 'draft'
+            WHERE i.status IN ('completed', 'on_rework')
             ORDER BY i.created_at DESC
             LIMIT 15
         '''
@@ -282,7 +282,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             JOIN projects p ON o.project_id = p.id
             JOIN users u ON i.created_by = u.id
             WHERE p.client_id = {user_id}
-            AND i.status != 'draft'
+            AND i.status IN ('completed', 'on_rework')
             ORDER BY i.created_at DESC
             LIMIT 10
         '''
@@ -339,9 +339,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             SELECT 
                 i.id,
                 i.work_id,
+                i.type,
                 i.scheduled_date,
                 i.notes,
                 i.defects,
+                i.created_at,
                 w.title as work_title,
                 w.object_id,
                 o.title as object_title,
@@ -365,9 +367,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             SELECT 
                 i.id,
                 i.work_id,
+                i.type,
                 i.scheduled_date,
                 i.notes,
                 i.defects,
+                i.created_at,
                 w.title as work_title,
                 w.object_id,
                 o.title as object_title,
@@ -388,9 +392,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             SELECT 
                 i.id,
                 i.work_id,
+                i.type,
                 i.scheduled_date,
                 i.notes,
                 i.defects,
+                i.created_at,
                 w.title as work_title,
                 w.object_id,
                 o.title as object_title,
@@ -404,7 +410,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             JOIN users u ON i.created_by = u.id
             WHERE p.client_id = {user_id}
             AND i.status IN ('draft', 'active')
-            ORDER BY i.scheduled_date ASC
+            ORDER BY i.created_at DESC
             LIMIT 10
         '''
     
@@ -426,13 +432,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         if planned['scheduled_date']:
             scheduled_date_str = planned['scheduled_date'].isoformat() if hasattr(planned['scheduled_date'], 'isoformat') else str(planned['scheduled_date'])
         
+        # Determine timestamp - use created_at for unscheduled, scheduled_date for scheduled
+        timestamp_str = scheduled_date_str
+        if planned.get('type') == 'unscheduled' or not scheduled_date_str:
+            if planned.get('created_at'):
+                timestamp_str = planned['created_at'].isoformat() if hasattr(planned['created_at'], 'isoformat') else str(planned['created_at'])
+        
         events.append({
-            'id': f"planned_inspection_{planned['id']}",
-            'type': 'planned_inspection',
+            'id': f"inspection_{planned['id']}",
+            'type': 'inspection',
+            'inspectionType': planned.get('type', 'scheduled'),
             'title': f"\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 {planned['work_title']}",
             'description': planned['notes'] or '\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0437\u0430\u043f\u043b\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u043d\u0430',
-            'timestamp': scheduled_date_str,
-            'scheduledDate': scheduled_date_str,
+            'timestamp': timestamp_str,
+            'scheduledDate': scheduled_date_str if planned.get('type') == 'scheduled' else None,
             'status': 'draft',
             'workId': planned['work_id'],
             'objectId': planned['object_id'],
