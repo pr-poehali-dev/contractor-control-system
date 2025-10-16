@@ -2,7 +2,7 @@ export type EventType =
   | 'work_entry'
   | 'work_start'
   | 'inspection'
-  | 'inspection_created' 
+  | 'inspection_scheduled'
   | 'inspection_started'
   | 'inspection_completed'
   | 'defect_added' 

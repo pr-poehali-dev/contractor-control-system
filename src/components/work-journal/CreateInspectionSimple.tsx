@@ -24,7 +24,7 @@ export default function CreateInspectionSimple({ isOpen, onClose, workId }: Crea
   const [scheduledDate, setScheduledDate] = useState('');
 
   const handleCreate = async () => {
-    if (!token) return;
+    if (!token || !userData?.id) return;
     
     setLoading(true);
     try {
@@ -35,6 +35,24 @@ export default function CreateInspectionSimple({ isOpen, onClose, workId }: Crea
         scheduled_date: scheduledDate || undefined,
         status: scheduledDate ? 'draft' : 'active'
       });
+      
+      if (result?.id) {
+        if (scheduledDate) {
+          await api.createInspectionEvent(token, {
+            inspection_id: result.id,
+            event_type: 'scheduled',
+            created_by: userData.id,
+            metadata: { scheduled_date: scheduledDate }
+          });
+        } else {
+          await api.createInspectionEvent(token, {
+            inspection_id: result.id,
+            event_type: 'started',
+            created_by: userData.id,
+            metadata: {}
+          });
+        }
+      }
       
       await loadUserData();
       

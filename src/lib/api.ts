@@ -4,6 +4,7 @@ const AUTH_API = 'b9d6731e-788e-476b-bad5-047bd3d6adc1';
 const DATA_API = 'c30e1bf9-0423-48e8-b295-07120e205fa7';
 const CREATE_API = '8d57b03e-49c5-4589-abfb-691e6e084c6a';
 const UPDATE_API = 'b69598bf-df90-4a71-93a1-6108c6c39317';
+const INSPECTION_EVENT_API = '0b3a32ce-bc6d-455c-a189-7cd294c69c95';
 
 export interface User {
   id: number;
@@ -90,6 +91,17 @@ export interface Contractor {
   phone?: string;
   email?: string;
   organization?: string;
+}
+
+export interface InspectionEvent {
+  id: number;
+  inspection_id: number;
+  event_type: 'scheduled' | 'started' | 'completed';
+  created_at: string;
+  created_by: number;
+  metadata: Record<string, any>;
+  author_name?: string;
+  author_role?: string;
 }
 
 export interface UserData {
@@ -197,5 +209,46 @@ export const api = {
     const result = await response.json();
     console.log('API: DELETE success', result);
     return result;
+  },
+
+  async getInspectionEvents(token: string, inspectionId?: number): Promise<InspectionEvent[]> {
+    const url = inspectionId 
+      ? `${API_BASE_URL}/${INSPECTION_EVENT_API}?inspection_id=${inspectionId}`
+      : `${API_BASE_URL}/${INSPECTION_EVENT_API}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'X-Auth-Token': token,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch inspection events');
+    }
+
+    return response.json();
+  },
+
+  async createInspectionEvent(token: string, data: {
+    inspection_id: number;
+    event_type: 'scheduled' | 'started' | 'completed';
+    created_by: number;
+    metadata?: Record<string, any>;
+  }): Promise<InspectionEvent> {
+    const response = await fetch(`${API_BASE_URL}/${INSPECTION_EVENT_API}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Auth-Token': token,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create inspection event');
+    }
+
+    return response.json();
   },
 };

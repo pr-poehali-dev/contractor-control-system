@@ -192,7 +192,7 @@ const InspectionDetail = () => {
   };
 
   const handleCompleteInspection = async () => {
-    if (!token) return;
+    if (!token || !user?.id) return;
     
     setLoading(true);
     try {
@@ -200,6 +200,13 @@ const InspectionDetail = () => {
         status: 'completed',
         defects: JSON.stringify(defects),
         completed_at: new Date().toISOString()
+      });
+      
+      await api.createInspectionEvent(token, {
+        inspection_id: inspection.id,
+        event_type: 'completed',
+        created_by: user.id,
+        metadata: { defects_count: defects.length }
       });
       
       await loadUserData();
@@ -241,7 +248,7 @@ const InspectionDetail = () => {
   };
 
   const handleStartInspection = async () => {
-    if (!token) return;
+    if (!token || !user?.id) return;
     
     setLoading(true);
     try {
@@ -250,13 +257,20 @@ const InspectionDetail = () => {
         defects: JSON.stringify(defects)
       });
       
+      await api.createInspectionEvent(token, {
+        inspection_id: inspection.id,
+        event_type: 'started',
+        created_by: user.id,
+        metadata: {}
+      });
+      
       await loadUserData();
       
-      toast({ title: 'Проверка переведена в статус "На проверке"' });
+      toast({ title: 'Проверка начата' });
     } catch (error) {
       toast({ 
         title: 'Ошибка', 
-        description: 'Не удалось обновить статус',
+        description: 'Не удалось начать проверку',
         variant: 'destructive'
       });
     } finally {

@@ -1,0 +1,11 @@
+{
+  "tests": [
+    {
+      "name": "Get all inspection events",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "bodyMatcher": "partial"
+    }
+  ]
+}

@@ -156,8 +156,7 @@ export default function EventItem({
           </>
         );
 
-      case 'inspection_created':
-        const isPlanned = event.inspection_data?.scheduled_date;
+      case 'inspection_scheduled':
         return (
           <div className="space-y-3">
             <div className="flex items-start gap-3">
@@ -175,25 +174,18 @@ export default function EventItem({
                     <Icon name="ClipboardCheck" size={12} className="mr-1" />
                     Проверка
                   </Badge>
-                  {isPlanned ? (
-                    <Badge variant="outline" className="text-[10px] bg-blue-50 text-blue-700 border-blue-200">
-                      <Icon name="Calendar" size={12} className="mr-1" />
-                      Запланированная
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline" className="text-[10px] bg-orange-50 text-orange-700 border-orange-200">
-                      <Icon name="Zap" size={12} className="mr-1" />
-                      Внеплановая
-                    </Badge>
-                  )}
+                  <Badge variant="outline" className="text-[10px] bg-blue-50 text-blue-700 border-blue-200">
+                    <Icon name="Calendar" size={12} className="mr-1" />
+                    Запланированная
+                  </Badge>
                 </div>
                 
                 <div className="flex items-center gap-1.5 text-xs text-slate-600">
-                  <Icon name={event.inspection_data?.scheduled_date ? "Calendar" : "Clock"} size={14} className="text-slate-500" />
+                  <Icon name="Calendar" size={14} className="text-slate-500" />
                   <span>
                     {event.inspection_data?.scheduled_date 
                       ? `Запланирована на ${new Date(event.inspection_data.scheduled_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}`
-                      : `Создана ${new Date(event.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}`
+                      : event.content
                     }
                   </span>
                 </div>
@@ -268,8 +260,8 @@ export default function EventItem({
                   className="w-full bg-purple-600 hover:bg-purple-700 mt-3"
                   size="sm"
                 >
-                  <Icon name="ArrowRight" size={16} className="mr-1.5" />
-                  Перейти к проверке
+                  <Icon name="FileText" size={16} className="mr-1.5" />
+                  Перейти к результатам
                 </Button>
               </div>
             </div>
