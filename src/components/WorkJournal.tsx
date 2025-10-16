@@ -103,7 +103,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
 
   const selectedWorkData = works.find(w => w.id === selectedWork);
   const workEntries = workLogs
-    .filter(log => log.work_id === selectedWork)
+    .filter(log => log.work_id === selectedWork && !log.is_inspection_start && !log.is_inspection_completed)
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   const formatTime = (timestamp: string) => {
