@@ -323,7 +323,7 @@ export default function EventItem({
   if (isSystemEvent) {
     return (
       <div className="flex justify-center">
-        <Card className="max-w-[96%] sm:max-w-lg border border-slate-200 bg-gradient-to-br from-slate-50 to-white shadow-sm">
+        <Card className="w-full max-w-[96%] sm:max-w-md border border-slate-200 bg-gradient-to-br from-slate-50 to-white shadow-sm">
           <CardContent className="p-4 sm:p-5">
             {renderEventContent()}
             <p className="text-[10px] sm:text-xs text-slate-400 mt-3 text-right">
