@@ -55,7 +55,7 @@ const ObjectDetail = () => {
       const priorityOrder = { 
         awaiting_start: 0, 
         delayed: 1, 
-        in_progress: 2, 
+        active: 2, 
         awaiting_acceptance: 3, 
         completed: 4, 
         planned: 5 
@@ -178,7 +178,7 @@ const ObjectDetail = () => {
               <SelectItem value="all">Все работы</SelectItem>
               <SelectItem value="planned">Плановые</SelectItem>
               <SelectItem value="awaiting_start">Требуется подтверждение</SelectItem>
-              <SelectItem value="in_progress">В процессе</SelectItem>
+              <SelectItem value="active">В процессе</SelectItem>
               <SelectItem value="awaiting_acceptance">Готово к приемке</SelectItem>
               <SelectItem value="delayed">С задержкой</SelectItem>
             </SelectContent>

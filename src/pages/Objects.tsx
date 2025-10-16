@@ -98,7 +98,7 @@ export default function Objects() {
   const statusOptions = [
     { value: 'all', label: 'Все статусы' },
     { value: 'planning', label: 'Запланировано' },
-    { value: 'in_progress', label: 'Работы начаты' },
+    { value: 'active', label: 'Работы начаты' },
     { value: 'completed', label: 'Работы завершены' }
   ];
 

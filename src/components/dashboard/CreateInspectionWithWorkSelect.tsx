@@ -47,7 +47,7 @@ export default function CreateInspectionWithWorkSelect({ isOpen, onClose }: Crea
         type: scheduledDate ? 'scheduled' : 'unscheduled',
         title: 'Проверка',
         scheduled_date: scheduledDate || undefined,
-        status: scheduledDate ? 'draft' : 'in_progress'
+        status: scheduledDate ? 'draft' : 'active'
       });
       
       await loadUserData();

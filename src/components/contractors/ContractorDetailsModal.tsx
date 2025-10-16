@@ -82,7 +82,7 @@ const ContractorDetailsModal = ({
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
       pending: { label: 'Ожидает', variant: 'secondary' },
-      in_progress: { label: 'В работе', variant: 'default' },
+      active: { label: 'В работе', variant: 'default' },
       completed: { label: 'Завершено', variant: 'outline' },
       cancelled: { label: 'Отменено', variant: 'destructive' },
     };

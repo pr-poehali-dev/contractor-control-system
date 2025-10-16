@@ -246,7 +246,7 @@ const InspectionDetail = () => {
     setLoading(true);
     try {
       await api.updateItem(token, 'inspection', inspection.id, {
-        status: 'in_progress',
+        status: 'active',
         defects: JSON.stringify(defects)
       });
       
@@ -310,7 +310,7 @@ const InspectionDetail = () => {
     return scheduledDate <= today;
   };
   
-  const canEdit = (inspection.status === 'draft' || inspection.status === 'in_progress') && (inspection.type === 'unscheduled' || isScheduledForToday());
+  const canEdit = (inspection.status === 'draft' || inspection.status === 'active') && (inspection.type === 'unscheduled' || isScheduledForToday());
   
   const workInspections = userData?.inspections?.filter((i: any) => i.work_id === inspection.work_id) || [];
   const inspectionIndex = workInspections.findIndex((i: any) => i.id === inspection.id) + 1;
@@ -415,7 +415,7 @@ const InspectionDetail = () => {
                   Начать проверку
                 </Button>
               )}
-              {inspection.status === 'in_progress' && (
+              {inspection.status === 'active' && (
                 <Button
                   onClick={handleCompleteInspection}
                   className="flex-1 bg-green-600 hover:bg-green-700"

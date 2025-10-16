@@ -32,7 +32,7 @@ export default function InspectionHeader({
           label: 'Запланирована',
           className: 'bg-blue-100 text-blue-700 border-blue-200'
         };
-      case 'in_progress':
+      case 'active':
         return {
           label: 'На проверке',
           className: 'bg-amber-100 text-amber-700 border-amber-200'
