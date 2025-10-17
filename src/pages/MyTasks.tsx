@@ -30,28 +30,42 @@ const MyTasks = () => {
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed' | 'verified'>('all');
 
   useEffect(() => {
-    loadTasks();
-  }, [token]);
+    if (user?.role === 'contractor' && user?.id && token) {
+      loadTasks();
+    }
+  }, [user?.id, user?.role, token]);
 
   const loadTasks = async () => {
-    if (!token || user?.role !== 'contractor') return;
+    console.log('[MyTasks] loadTasks called', { token: !!token, role: user?.role, userId: user?.id });
+    
+    if (!token || user?.role !== 'contractor') {
+      console.log('[MyTasks] Skipping - no token or not contractor');
+      return;
+    }
     
     setLoading(true);
     try {
-      const response = await fetch(
-        `https://functions.poehali.dev/facbe7eb-8f9d-4e2a-840a-9404ec0c5715?contractor_id=${user.id}`,
-        {
-          headers: {
-            'X-User-Id': user?.id?.toString() || '',
-          }
+      const url = `https://functions.poehali.dev/facbe7eb-8f9d-4e2a-840a-9404ec0c5715?contractor_id=${user.id}`;
+      console.log('[MyTasks] Fetching tasks from:', url);
+      
+      const response = await fetch(url, {
+        headers: {
+          'X-User-Id': user?.id?.toString() || '',
         }
-      );
+      });
+      
+      console.log('[MyTasks] Response status:', response.status);
       
       if (response.ok) {
         const data = await response.json();
+        console.log('[MyTasks] Received tasks:', data);
         setTasks(data.tasks || []);
+      } else {
+        const errorText = await response.text();
+        console.error('[MyTasks] Error response:', errorText);
       }
     } catch (error) {
+      console.error('[MyTasks] Fetch error:', error);
       toast({
         title: 'Ошибка',
         description: 'Не удалось загрузить задачи',
