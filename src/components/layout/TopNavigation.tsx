@@ -22,7 +22,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { id: 'dashboard', label: 'Лента событий', icon: 'LayoutDashboard', path: '/dashboard', roles: ['client', 'contractor', 'admin'] },
-  { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects', roles: ['client', 'admin'] },
+  { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects', roles: ['client', 'contractor', 'admin'] },
   { id: 'my-tasks', label: 'Мои задачи', icon: 'ClipboardCheck', path: '/my-tasks', roles: ['contractor'] },
   { id: 'admin', label: 'Админ-панель', icon: 'Shield', path: '/admin', roles: ['admin'] },
   { id: 'work-templates', label: 'Справочник', icon: 'BookOpen', path: '/work-templates', roles: ['client', 'contractor', 'admin'] },
