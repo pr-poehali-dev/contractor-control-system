@@ -71,11 +71,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             i.work_id,
             w.title as work_title,
             o.title as object_title
-        FROM defect_remediations r
-        JOIN defect_reports dr ON r.defect_report_id = dr.id
-        JOIN inspections i ON dr.inspection_id = i.id
-        JOIN works w ON i.work_id = w.id
-        JOIN objects o ON w.object_id = o.id
+        FROM t_p8942561_contractor_control_s.defect_remediations r
+        JOIN t_p8942561_contractor_control_s.defect_reports dr ON r.defect_report_id = dr.id
+        JOIN t_p8942561_contractor_control_s.inspections i ON dr.inspection_id = i.id
+        JOIN t_p8942561_contractor_control_s.works w ON i.work_id = w.id
+        JOIN t_p8942561_contractor_control_s.objects o ON w.object_id = o.id
         WHERE r.contractor_id = ''' + contractor_id + '''
         ORDER BY 
             CASE r.status 

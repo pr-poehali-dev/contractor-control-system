@@ -195,14 +195,15 @@ const DefectItem = ({
       {remediation && (
         <div className="space-y-3">
           {remediation.status === 'pending' && isContractor && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4">
               {!isEditing ? (
                 <Button 
                   onClick={() => setIsEditing(true)}
-                  className="w-full"
+                  className="w-full text-sm md:text-base"
                 >
                   <Icon name="CheckCircle" size={16} className="mr-2" />
-                  Отметить как устраненное
+                  <span className="hidden sm:inline">Отметить как устранённое</span>
+                  <span className="sm:hidden">Устранено</span>
                 </Button>
               ) : (
                 <div className="space-y-3">
