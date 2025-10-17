@@ -14,7 +14,7 @@ interface NavItem {
 
 const mobileNavItems: NavItem[] = [
   { id: 'dashboard', label: 'Главная', icon: 'Home', path: '/dashboard' },
-  { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects', roles: ['client', 'admin'] },
+  { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects', roles: ['client', 'contractor', 'admin'] },
   { id: 'my-tasks', label: 'Мои задачи', icon: 'ClipboardCheck', path: '/my-tasks', roles: ['contractor'] },
   { id: 'defects', label: 'Проверки', icon: 'ClipboardCheck', path: '/defects', roles: ['client', 'admin'] },
 ];
