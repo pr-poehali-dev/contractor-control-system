@@ -206,17 +206,20 @@ const DefectItem = ({
                   <span className="sm:hidden">Устранено</span>
                 </Button>
               ) : (
-                <div className="space-y-3">
-                  <Label>Описание выполненных работ *</Label>
-                  <Textarea
-                    placeholder="Опишите как было устранено замечание..."
-                    value={remediationText}
-                    onChange={(e) => setRemediationText(e.target.value)}
-                    rows={4}
-                  />
+                <div className="space-y-3 md:space-y-4">
+                  <div>
+                    <Label className="text-sm md:text-base">Описание выполненных работ *</Label>
+                    <Textarea
+                      placeholder="Опишите как было устранено замечание..."
+                      value={remediationText}
+                      onChange={(e) => setRemediationText(e.target.value)}
+                      rows={4}
+                      className="mt-1.5 text-sm md:text-base"
+                    />
+                  </div>
 
                   <div>
-                    <Label className="mb-2 block">Фотографии после устранения</Label>
+                    <Label className="mb-2 block text-sm md:text-base">Фотографии после устранения</Label>
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -230,6 +233,7 @@ const DefectItem = ({
                       variant="outline"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={uploadingPhotos}
+                      className="w-full sm:w-auto text-sm md:text-base"
                     >
                       {uploadingPhotos ? (
                         <>
@@ -251,13 +255,13 @@ const DefectItem = ({
                             <img
                               src={photoUrl}
                               alt={`Фото ${idx + 1}`}
-                              className="w-full h-24 object-cover rounded border"
+                              className="w-full h-20 sm:h-24 object-cover rounded border"
                             />
                             <button
                               onClick={() => handleRemovePhoto(photoUrl)}
-                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-lg"
                             >
-                              <Icon name="X" size={14} />
+                              <Icon name="X" size={12} />
                             </button>
                           </div>
                         ))}
@@ -265,11 +269,11 @@ const DefectItem = ({
                     )}
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Button
                       onClick={handleSubmit}
                       disabled={submitting || !remediationText.trim()}
-                      className="flex-1"
+                      className="flex-1 text-sm md:text-base"
                     >
                       {submitting ? (
                         <>
@@ -279,13 +283,15 @@ const DefectItem = ({
                       ) : (
                         <>
                           <Icon name="Send" size={16} className="mr-2" />
-                          Отправить на проверку
+                          <span className="hidden sm:inline">Отправить на проверку</span>
+                          <span className="sm:hidden">Отправить</span>
                         </>
                       )}
                     </Button>
                     <Button
                       variant="outline"
                       onClick={handleCancel}
+                      className="flex-1 sm:flex-initial text-sm md:text-base"
                     >
                       Отмена
                     </Button>
