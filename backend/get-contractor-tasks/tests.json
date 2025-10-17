@@ -1,0 +1,20 @@
+{
+  "tests": [
+    {
+      "name": "Get contractor tasks returns array",
+      "method": "GET",
+      "path": "/?contractor_id=1",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Missing contractor_id",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

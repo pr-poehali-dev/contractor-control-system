@@ -1,4 +1,5 @@
 {
+  "get-contractor-tasks": "https://functions.poehali.dev/facbe7eb-8f9d-4e2a-840a-9404ec0c5715",
   "defect-reports": "https://functions.poehali.dev/d230b3d9-8dbd-410c-b023-9c021131a15b",
   "defect-remediation": "https://functions.poehali.dev/ef8edfd4-ef48-48a9-95fb-78f5a4982949",
   "inspection-event": "https://functions.poehali.dev/0b3a32ce-bc6d-455c-a189-7cd294c69c95",

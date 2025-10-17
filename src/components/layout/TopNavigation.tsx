@@ -22,10 +22,11 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { id: 'dashboard', label: 'Лента событий', icon: 'LayoutDashboard', path: '/dashboard', roles: ['client', 'contractor', 'admin'] },
-  { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects', roles: ['client', 'contractor', 'admin'] },
+  { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects', roles: ['client', 'admin'] },
+  { id: 'my-tasks', label: 'Мои задачи', icon: 'ClipboardCheck', path: '/my-tasks', roles: ['contractor'] },
   { id: 'admin', label: 'Админ-панель', icon: 'Shield', path: '/admin', roles: ['admin'] },
   { id: 'work-templates', label: 'Справочник', icon: 'BookOpen', path: '/work-templates', roles: ['client', 'contractor', 'admin'] },
-  { id: 'defects', label: 'Проверки', icon: 'ClipboardCheck', path: '/defects', roles: ['client', 'contractor', 'admin'] },
+  { id: 'defects', label: 'Проверки', icon: 'ClipboardCheck', path: '/defects', roles: ['client', 'admin'] },
   { id: 'documents', label: 'Документы', icon: 'FileText', path: '/documents', roles: ['client', 'contractor', 'admin'] },
   { id: 'analytics', label: 'Аналитика', icon: 'BarChart3', path: '/analytics', roles: ['client', 'admin'] },
   { id: 'contractors', label: 'Подрядчики', icon: 'Users', path: '/contractors', roles: ['client', 'admin'] },
