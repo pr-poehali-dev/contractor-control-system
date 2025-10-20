@@ -198,6 +198,10 @@ export const loadUserData = createAsyncThunk(
 
       const data = response.data as UserData;
       
+      console.log('📊 loadUserData response.data:', data);
+      console.log('📦 Objects count:', data.objects?.length || 0);
+      console.log('⚒️ Works count:', data.works?.length || 0);
+      
       // Динамически импортируем slices и обновляем данные
       try {
         const { setObjects } = await import('./objectsSlice');
