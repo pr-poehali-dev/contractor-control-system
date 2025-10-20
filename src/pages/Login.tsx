@@ -57,12 +57,12 @@ const Login = () => {
 
       const data = await response.json();
 
-      if (response.ok) {
+      if (response.ok && data.success) {
         setIsCodeSent(true);
-        setDevCode(data.dev_code);
+        setDevCode(data.data.dev_code);
         toast({
           title: 'Код отправлен',
-          description: `Код для разработки: ${data.dev_code}`,
+          description: `Код для разработки: ${data.data.dev_code}`,
         });
       } else {
         throw new Error(data.error || 'Ошибка отправки кода');
