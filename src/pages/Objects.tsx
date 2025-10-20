@@ -10,6 +10,7 @@ import ObjectsGridView from '@/components/objects/ObjectsGridView';
 import ObjectsTableView from '@/components/objects/ObjectsTableView';
 import ObjectsEmptyState from '@/components/objects/ObjectsEmptyState';
 import { getObjectStatusInfo } from '@/utils/workStatus';
+import { safeDateCompare } from '@/utils/dateValidation';
 
 type ViewMode = 'grid' | 'table';
 
@@ -98,7 +99,7 @@ export default function Objects() {
     filteredObjects = [...filteredObjects].sort((a, b) => b.worksCount - a.worksCount);
   } else {
     filteredObjects = [...filteredObjects].sort((a, b) => 
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      safeDateCompare(a.created_at, b.created_at)
     );
   }
 

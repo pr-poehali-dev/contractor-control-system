@@ -26,6 +26,19 @@ export default function CreateInspectionSimple({ isOpen, onClose, workId }: Crea
   const handleCreate = async () => {
     if (!token || !user?.id) return;
     
+    if (scheduledDate) {
+      const date = new Date(scheduledDate);
+      const year = date.getFullYear();
+      if (year < 1900 || year > 2100) {
+        toast({ 
+          title: 'Некорректная дата', 
+          description: 'Пожалуйста, выберите дату между 1900 и 2100 годом',
+          variant: 'destructive'
+        });
+        return;
+      }
+    }
+    
     setLoading(true);
     try {
       const result = await api.createItem(token, 'inspection', {

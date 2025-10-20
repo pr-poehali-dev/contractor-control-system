@@ -83,6 +83,12 @@ const getEventBadgeColor = (type: string) => {
 
 const formatTimeAgo = (timestamp: string) => {
   const date = new Date(timestamp);
+  
+  if (isNaN(date.getTime())) return 'Неизвестная дата';
+  
+  const year = date.getFullYear();
+  if (year < 1900 || year > 2100) return 'Некорректная дата';
+  
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));

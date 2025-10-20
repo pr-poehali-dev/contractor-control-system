@@ -1,6 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
+import { safeDateCompare, isValidDate } from '@/utils/dateValidation';
 
 const Activity = () => {
   const { userData } = useAuth();
@@ -39,9 +40,11 @@ const Activity = () => {
       user: 'Инспектор',
       inspectionId: rem.inspection_id,
     })),
-  ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  ].sort((a, b) => safeDateCompare(a.timestamp, b.timestamp));
 
   const formatTimestamp = (timestamp: string) => {
+    if (!isValidDate(timestamp)) return 'Неизвестная дата';
+    
     const date = new Date(timestamp);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();

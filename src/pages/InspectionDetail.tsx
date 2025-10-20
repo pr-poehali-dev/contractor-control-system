@@ -110,7 +110,13 @@ const InspectionDetail = () => {
   
   const isScheduledForToday = () => {
     if (!inspection.scheduled_date) return false;
+    
     const scheduledDate = new Date(inspection.scheduled_date);
+    if (isNaN(scheduledDate.getTime())) return false;
+    
+    const year = scheduledDate.getFullYear();
+    if (year < 1900 || year > 2100) return false;
+    
     const today = new Date();
     scheduledDate.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);

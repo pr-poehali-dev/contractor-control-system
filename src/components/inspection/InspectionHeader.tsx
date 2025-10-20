@@ -1,5 +1,6 @@
 import Icon from '@/components/ui/icon';
 import { Badge } from '@/components/ui/badge';
+import { safeFormatDate } from '@/utils/dateValidation';
 
 interface InspectionHeaderProps {
   inspectionNumber: string;
@@ -18,11 +19,7 @@ export default function InspectionHeader({
 }: InspectionHeaderProps) {
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
-    return new Date(dateString).toLocaleDateString('ru-RU', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
+    return safeFormatDate(dateString);
   };
 
   const getStatusConfig = (status: string) => {
