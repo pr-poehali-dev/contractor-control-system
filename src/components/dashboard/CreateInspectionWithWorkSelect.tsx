@@ -43,10 +43,12 @@ export default function CreateInspectionWithWorkSelect({ isOpen, onClose }: Crea
     if (scheduledDate) {
       const date = new Date(scheduledDate);
       const year = date.getFullYear();
-      if (year < 1900 || year > 2100) {
+      const currentYear = new Date().getFullYear();
+      
+      if (year !== currentYear) {
         toast({ 
           title: 'Некорректная дата', 
-          description: 'Пожалуйста, выберите дату между 1900 и 2100 годом',
+          description: 'Проверки можно планировать только в текущем году',
           variant: 'destructive'
         });
         return;
@@ -150,10 +152,11 @@ export default function CreateInspectionWithWorkSelect({ isOpen, onClose }: Crea
               value={scheduledDate}
               onChange={(e) => setScheduledDate(e.target.value)}
               min={new Date().toISOString().split('T')[0]}
+              max={`${new Date().getFullYear()}-12-31`}
               className="h-10"
             />
             <p className="text-xs text-slate-500">
-              Оставьте пустым для внеплановой проверки
+              Только в текущем году. Оставьте пустым для внеплановой проверки
             </p>
           </div>
 
