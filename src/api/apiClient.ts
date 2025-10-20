@@ -10,6 +10,11 @@ interface ApiResponse<T = any> {
   code?: string;
 }
 
+/**
+ * HTTP клиент для взаимодействия с backend API
+ * Автоматически добавляет токен авторизации и обрабатывает ошибки
+ * @class ApiClient
+ */
 class ApiClient {
   private instance: AxiosInstance;
 
@@ -25,7 +30,12 @@ class ApiClient {
     this.setupInterceptors();
   }
 
+  /**
+   * Настройка interceptors для добавления токена и обработки ошибок
+   * @private
+   */
   private setupInterceptors(): void {
+    // Request interceptor - добавление токена
     this.instance.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
         const token = localStorage.getItem('auth_token');
@@ -37,15 +47,18 @@ class ApiClient {
         return config;
       },
       (error: AxiosError) => {
+        console.error('Request interceptor error:', error);
         return Promise.reject(error);
       }
     );
 
+    // Response interceptor - обработка 401/403 ошибок
     this.instance.interceptors.response.use(
       (response: AxiosResponse) => {
         return response;
       },
       (error: AxiosError) => {
+        // При 401/403 очищаем токен и редиректим на login
         if (error.response?.status === 401 || error.response?.status === 403) {
           localStorage.removeItem('auth_token');
           localStorage.removeItem('user');
@@ -55,11 +68,26 @@ class ApiClient {
           }
         }
 
+        console.error('Response interceptor error:', {
+          status: error.response?.status,
+          data: error.response?.data,
+          message: error.message
+        });
+
         return Promise.reject(error);
       }
     );
   }
 
+  /**
+   * GET запрос
+   * @template T - Тип возвращаемых данных
+   * @param {string} url - URL endpoint
+   * @param {object} config - Дополнительная конфигурация Axios
+   * @returns {Promise<ApiResponse<T>>} Нормализованный ответ сервера
+   * @example
+   * const response = await apiClient.get('/user-data');
+   */
   async get<T = any>(url: string, config = {}): Promise<ApiResponse<T>> {
     try {
       const response = await this.instance.get<T>(url, config);
@@ -69,6 +97,16 @@ class ApiClient {
     }
   }
 
+  /**
+   * POST запрос
+   * @template T - Тип возвращаемых данных
+   * @param {string} url - URL endpoint
+   * @param {object} data - Данные для отправки
+   * @param {object} config - Дополнительная конфигурация Axios
+   * @returns {Promise<ApiResponse<T>>} Нормализованный ответ сервера
+   * @example
+   * const response = await apiClient.post('/auth/login', { email, password });
+   */
   async post<T = any>(url: string, data = {}, config = {}): Promise<ApiResponse<T>> {
     try {
       const response = await this.instance.post<T>(url, data, config);
@@ -78,6 +116,16 @@ class ApiClient {
     }
   }
 
+  /**
+   * PUT запрос
+   * @template T - Тип возвращаемых данных
+   * @param {string} url - URL endpoint
+   * @param {object} data - Данные для обновления
+   * @param {object} config - Дополнительная конфигурация Axios
+   * @returns {Promise<ApiResponse<T>>} Нормализованный ответ сервера
+   * @example
+   * const response = await apiClient.put('/update-data', { type: 'object', id: 1, data: { title: 'New' } });
+   */
   async put<T = any>(url: string, data = {}, config = {}): Promise<ApiResponse<T>> {
     try {
       const response = await this.instance.put<T>(url, data, config);
@@ -87,6 +135,15 @@ class ApiClient {
     }
   }
 
+  /**
+   * DELETE запрос
+   * @template T - Тип возвращаемых данных
+   * @param {string} url - URL endpoint
+   * @param {object} config - Дополнительная конфигурация Axios (может содержать data)
+   * @returns {Promise<ApiResponse<T>>} Нормализованный ответ сервера
+   * @example
+   * const response = await apiClient.delete('/delete-data', { data: { type: 'object', id: 1 } });
+   */
   async delete<T = any>(url: string, config = {}): Promise<ApiResponse<T>> {
     try {
       const response = await this.instance.delete<T>(url, config);
@@ -96,37 +153,69 @@ class ApiClient {
     }
   }
 
+  /**
+   * Нормализация ответа от сервера к единому формату
+   * @private
+   * @template T - Тип данных
+   * @param {AxiosResponse<T>} response - Ответ Axios
+   * @returns {ApiResponse<T>} Нормализованный ответ
+   */
   private normalizeResponse<T>(response: AxiosResponse<T>): ApiResponse<T> {
     const data = response.data;
 
+    // Если ответ уже в нужном формате
     if (typeof data === 'object' && data !== null && 'success' in data) {
       return data as ApiResponse<T>;
     }
 
+    // Оборачиваем в стандартный формат
     return {
       success: true,
       data: data,
-      message: null,
     };
   }
 
+  /**
+   * Обработка ошибок и преобразование в читаемый формат
+   * @private
+   * @param {unknown} error - Ошибка от Axios или другая
+   * @returns {Error} Нормализованная ошибка
+   */
   private handleError(error: unknown): Error {
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError<ApiResponse>;
       
+      // Если есть данные ошибки от сервера
       if (axiosError.response?.data) {
         const errorData = axiosError.response.data;
-        return new Error(errorData.error || errorData.message || 'Произошла ошибка');
+        const message = errorData.error || errorData.message || 'Произошла ошибка';
+        console.error('API error:', { status: axiosError.response.status, message, data: errorData });
+        return new Error(message);
       }
       
+      // Если запрос был отправлен, но нет ответа
       if (axiosError.request) {
+        console.error('No response from server:', axiosError.request);
         return new Error('Нет ответа от сервера. Проверьте интернет-соединение.');
       }
+
+      // Ошибка при настройке запроса
+      console.error('Request setup error:', axiosError.message);
+      return new Error(axiosError.message || 'Ошибка настройки запроса');
     }
 
+    // Неизвестная ошибка
+    console.error('Unknown error:', error);
     return new Error('Произошла неизвестная ошибка');
   }
 }
 
+/**
+ * Singleton instance API клиента
+ * Используйте этот экземпляр для всех HTTP запросов
+ * @example
+ * import { apiClient } from '@/api/apiClient';
+ * const response = await apiClient.get('/user-data');
+ */
 export const apiClient = new ApiClient();
 export type { ApiResponse };

@@ -45,7 +45,7 @@ export default function Objects() {
 
   const objects = useAppSelector((state) => state.objects.items);
   const works = useAppSelector((state) => state.works.items);
-  const unreadCounts = {}; // TODO: implement unread counts in Redux
+  const unreadCounts = {};
 
   const objectData = objects.map(obj => {
     const objectWorks = works.filter(w => w.object_id === obj.id);

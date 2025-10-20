@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { apiClient } from '@/api/apiClient';
 import { ENDPOINTS } from '@/api/endpoints';
 
@@ -25,6 +25,13 @@ const initialState: ObjectsState = {
   error: null,
 };
 
+/**
+ * Создание нового объекта строительства
+ * @param {Partial<ObjectEntity>} data - Данные объекта (title, address, description и т.д.)
+ * @returns {Promise<ObjectEntity>} Созданный объект
+ * @example
+ * dispatch(createObject({ title: 'Дом Пушкина', address: 'ул. Пушкина, д. 10' }))
+ */
 export const createObject = createAsyncThunk(
   'objects/create',
   async (data: Partial<ObjectEntity>, { rejectWithValue }) => {
@@ -40,11 +47,21 @@ export const createObject = createAsyncThunk(
 
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      console.error('Create object error:', error);
+      return rejectWithValue(error.message || 'Failed to create object');
     }
   }
 );
 
+/**
+ * Обновление существующего объекта
+ * @param {Object} params - Параметры обновления
+ * @param {number} params.id - ID объекта
+ * @param {Partial<ObjectEntity>} params.data - Новые данные объекта
+ * @returns {Promise<ObjectEntity>} Обновленный объект
+ * @example
+ * dispatch(updateObject({ id: 1, data: { title: 'Новое название' } }))
+ */
 export const updateObject = createAsyncThunk(
   'objects/update',
   async ({ id, data }: { id: number; data: Partial<ObjectEntity> }, { rejectWithValue }) => {
@@ -61,11 +78,19 @@ export const updateObject = createAsyncThunk(
 
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      console.error('Update object error:', error);
+      return rejectWithValue(error.message || 'Failed to update object');
     }
   }
 );
 
+/**
+ * Удаление объекта
+ * @param {number} id - ID объекта для удаления
+ * @returns {Promise<number>} ID удаленного объекта
+ * @example
+ * dispatch(deleteObject(123))
+ */
 export const deleteObject = createAsyncThunk(
   'objects/delete',
   async (id: number, { rejectWithValue }) => {
@@ -80,7 +105,8 @@ export const deleteObject = createAsyncThunk(
 
       return id;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      console.error('Delete object error:', error);
+      return rejectWithValue(error.message || 'Failed to delete object');
     }
   }
 );
@@ -89,15 +115,24 @@ const objectsSlice = createSlice({
   name: 'objects',
   initialState,
   reducers: {
-    setObjects(state, action) {
+    /**
+     * Установка списка объектов (используется при загрузке данных пользователя)
+     * @param {ObjectEntity[]} payload - Массив объектов
+     */
+    setObjects(state, action: PayloadAction<ObjectEntity[]>) {
       state.items = action.payload;
     },
+    
+    /**
+     * Очистка ошибки
+     */
     clearObjectsError(state) {
       state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
+      // Create object
       .addCase(createObject.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -113,6 +148,7 @@ const objectsSlice = createSlice({
         state.error = action.payload as string;
       })
 
+      // Update object
       .addCase(updateObject.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -131,6 +167,7 @@ const objectsSlice = createSlice({
         state.error = action.payload as string;
       })
 
+      // Delete object
       .addCase(deleteObject.pending, (state) => {
         state.loading = true;
         state.error = null;

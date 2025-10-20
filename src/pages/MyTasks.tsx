@@ -36,17 +36,13 @@ const MyTasks = () => {
   }, [user?.id, user?.role, token]);
 
   const loadTasks = async () => {
-    console.log('[MyTasks] loadTasks called', { token: !!token, role: user?.role, userId: user?.id });
-    
     if (!token || user?.role !== 'contractor') {
-      console.log('[MyTasks] Skipping - no token or not contractor');
       return;
     }
     
     setLoading(true);
     try {
       const url = `https://functions.poehali.dev/facbe7eb-8f9d-4e2a-840a-9404ec0c5715?contractor_id=${user.id}`;
-      console.log('[MyTasks] Fetching tasks from:', url);
       
       const response = await fetch(url, {
         headers: {
@@ -54,11 +50,8 @@ const MyTasks = () => {
         }
       });
       
-      console.log('[MyTasks] Response status:', response.status);
-      
       if (response.ok) {
         const data = await response.json();
-        console.log('[MyTasks] Received tasks:', data);
         setTasks(data.tasks || []);
       } else {
         const errorText = await response.text();

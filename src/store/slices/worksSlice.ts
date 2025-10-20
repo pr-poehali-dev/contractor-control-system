@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { apiClient } from '@/api/apiClient';
 import { ENDPOINTS } from '@/api/endpoints';
 
@@ -31,32 +31,69 @@ const initialState: WorksState = {
   error: null,
 };
 
+/**
+ * Создание новой работы на объекте
+ * @param {Partial<WorkEntity>} data - Данные работы (title, object_id, contractor_id и т.д.)
+ * @returns {Promise<WorkEntity>} Созданная работа
+ * @example
+ * dispatch(createWork({ 
+ *   title: 'Монтаж вентиляции', 
+ *   object_id: 123,
+ *   contractor_id: 456
+ * }))
+ */
 export const createWork = createAsyncThunk(
   'works/create',
   async (data: Partial<WorkEntity>, { rejectWithValue }) => {
     try {
       const response = await apiClient.post(ENDPOINTS.ENTITIES.CREATE, { type: 'work', data });
-      if (!response.success) throw new Error(response.error || 'Failed to create work');
+      
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to create work');
+      }
+      
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      console.error('Create work error:', error);
+      return rejectWithValue(error.message || 'Failed to create work');
     }
   }
 );
 
+/**
+ * Обновление существующей работы
+ * @param {Object} params - Параметры обновления
+ * @param {number} params.id - ID работы
+ * @param {Partial<WorkEntity>} params.data - Новые данные работы
+ * @returns {Promise<WorkEntity>} Обновленная работа
+ * @example
+ * dispatch(updateWork({ id: 1, data: { status: 'completed', completion_percentage: 100 } }))
+ */
 export const updateWork = createAsyncThunk(
   'works/update',
   async ({ id, data }: { id: number; data: Partial<WorkEntity> }, { rejectWithValue }) => {
     try {
       const response = await apiClient.put(ENDPOINTS.ENTITIES.UPDATE, { type: 'work', id, data });
-      if (!response.success) throw new Error(response.error || 'Failed to update work');
+      
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to update work');
+      }
+      
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      console.error('Update work error:', error);
+      return rejectWithValue(error.message || 'Failed to update work');
     }
   }
 );
 
+/**
+ * Удаление работы
+ * @param {number} id - ID работы для удаления
+ * @returns {Promise<number>} ID удаленной работы
+ * @example
+ * dispatch(deleteWork(123))
+ */
 export const deleteWork = createAsyncThunk(
   'works/delete',
   async (id: number, { rejectWithValue }) => {
@@ -64,10 +101,15 @@ export const deleteWork = createAsyncThunk(
       const response = await apiClient.delete(ENDPOINTS.ENTITIES.DELETE, {
         data: { type: 'work', id },
       });
-      if (!response.success) throw new Error(response.error || 'Failed to delete work');
+      
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to delete work');
+      }
+      
       return id;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      console.error('Delete work error:', error);
+      return rejectWithValue(error.message || 'Failed to delete work');
     }
   }
 );
@@ -76,30 +118,49 @@ const worksSlice = createSlice({
   name: 'works',
   initialState,
   reducers: {
-    setWorks(state, action) {
+    /**
+     * Установка списка работ (используется при загрузке данных пользователя)
+     * @param {WorkEntity[]} payload - Массив работ
+     */
+    setWorks(state, action: PayloadAction<WorkEntity[]>) {
       state.items = action.payload;
     },
+    
+    /**
+     * Очистка ошибки
+     */
     clearWorksError(state) {
       state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
+      // Create work
       .addCase(createWork.fulfilled, (state, action) => {
-        if (action.payload?.data) state.items.push(action.payload.data);
-        state.loading = false;
-      })
-      .addCase(updateWork.fulfilled, (state, action) => {
         if (action.payload?.data) {
-          const index = state.items.findIndex((w) => w.id === action.payload.data.id);
-          if (index !== -1) state.items[index] = action.payload.data;
+          state.items.push(action.payload.data);
         }
         state.loading = false;
       })
+      
+      // Update work
+      .addCase(updateWork.fulfilled, (state, action) => {
+        if (action.payload?.data) {
+          const index = state.items.findIndex((w) => w.id === action.payload.data.id);
+          if (index !== -1) {
+            state.items[index] = action.payload.data;
+          }
+        }
+        state.loading = false;
+      })
+      
+      // Delete work
       .addCase(deleteWork.fulfilled, (state, action) => {
         state.items = state.items.filter((w) => w.id !== action.payload);
         state.loading = false;
       })
+      
+      // Общий обработчик pending для всех async actions
       .addMatcher(
         (action) => action.type.startsWith('works/') && action.type.endsWith('/pending'),
         (state) => {
@@ -107,6 +168,8 @@ const worksSlice = createSlice({
           state.error = null;
         }
       )
+      
+      // Общий обработчик rejected для всех async actions
       .addMatcher(
         (action) => action.type.startsWith('works/') && action.type.endsWith('/rejected'),
         (state, action: any) => {

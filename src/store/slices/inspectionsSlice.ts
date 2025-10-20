@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { apiClient } from '@/api/apiClient';
 import { ENDPOINTS } from '@/api/endpoints';
 
@@ -34,28 +34,58 @@ const initialState: InspectionsState = {
   error: null,
 };
 
+/**
+ * Создание новой проверки работы
+ * @param {Partial<Inspection>} data - Данные проверки (title, work_id, type и т.д.)
+ * @returns {Promise<Inspection>} Созданная проверка
+ * @example
+ * dispatch(createInspection({ 
+ *   title: 'Проверка монтажа', 
+ *   work_id: 123,
+ *   type: 'scheduled'
+ * }))
+ */
 export const createInspection = createAsyncThunk(
   'inspections/create',
   async (data: Partial<Inspection>, { rejectWithValue }) => {
     try {
       const response = await apiClient.post(ENDPOINTS.ENTITIES.CREATE, { type: 'inspection', data });
-      if (!response.success) throw new Error(response.error || 'Failed to create inspection');
+      
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to create inspection');
+      }
+      
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      console.error('Create inspection error:', error);
+      return rejectWithValue(error.message || 'Failed to create inspection');
     }
   }
 );
 
+/**
+ * Обновление существующей проверки
+ * @param {Object} params - Параметры обновления
+ * @param {number} params.id - ID проверки
+ * @param {Partial<Inspection>} params.data - Новые данные проверки
+ * @returns {Promise<Inspection>} Обновленная проверка
+ * @example
+ * dispatch(updateInspection({ id: 1, data: { status: 'completed', notes: 'Все хорошо' } }))
+ */
 export const updateInspection = createAsyncThunk(
   'inspections/update',
   async ({ id, data }: { id: number; data: Partial<Inspection> }, { rejectWithValue }) => {
     try {
       const response = await apiClient.put(ENDPOINTS.ENTITIES.UPDATE, { type: 'inspection', id, data });
-      if (!response.success) throw new Error(response.error || 'Failed to update inspection');
+      
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to update inspection');
+      }
+      
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      console.error('Update inspection error:', error);
+      return rejectWithValue(error.message || 'Failed to update inspection');
     }
   }
 );
@@ -64,9 +94,17 @@ const inspectionsSlice = createSlice({
   name: 'inspections',
   initialState,
   reducers: {
-    setInspections(state, action) {
+    /**
+     * Установка списка проверок (используется при загрузке данных пользователя)
+     * @param {Inspection[]} payload - Массив проверок
+     */
+    setInspections(state, action: PayloadAction<Inspection[]>) {
       state.items = action.payload;
     },
+    
+    /**
+     * Очистка ошибки
+     */
     clearInspectionsError(state) {
       state.error = null;
     },

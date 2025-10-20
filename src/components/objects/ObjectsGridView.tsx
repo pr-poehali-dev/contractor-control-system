@@ -51,7 +51,6 @@ export default function ObjectsGridView({
   onDeleteSite,
 }: ObjectsGridViewProps) {
   const handleDelete = (siteId: number, e: React.MouseEvent) => {
-    console.log('GridView: Delete button clicked for site', siteId);
     e.stopPropagation();
     onDeleteSite(siteId, e);
   };

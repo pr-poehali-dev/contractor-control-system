@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { useAppSelector } from '@/store/hooks';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
@@ -39,16 +39,6 @@ interface FeedEvent {
   scheduledDate?: string;
 }
 
-interface ObjectData {
-  id: number;
-  title: string;
-}
-
-interface WorkData {
-  id: number;
-  title: string;
-}
-
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, userData, loadUserData, token } = useAuth();
@@ -82,11 +72,11 @@ const Dashboard = () => {
 
   const objects = useAppSelector((state) => state.objects.items);
   const works = useAppSelector((state) => state.works.items);
-  const unreadCounts = {}; // TODO: implement unread counts in Redux
+  const unreadCounts = {};
   
-  const totalMessages = 0; // TODO: implement in Redux
-  const totalLogs = 0; // TODO: implement in Redux
-  const totalInspections = 0; // TODO: implement in Redux
+  const totalMessages = 0;
+  const totalLogs = 0;
+  const totalInspections = 0;
 
   useEffect(() => {
     loadFeed();
@@ -110,10 +100,8 @@ const Dashboard = () => {
     
     setLoading(true);
     try {
-      console.log('Loading feed for user:', user.id);
       const response = await fetch(`https://functions.poehali.dev/f38edb91-216d-4887-b091-ef224db01905?user_id=${user.id}`);
       const data = await response.json();
-      console.log('Feed response:', data);
       
       if (data.success) {
         const normalizedEvents = data.events.map((event: any) => {
@@ -126,8 +114,6 @@ const Dashboard = () => {
           }
           return event;
         });
-        console.log('Setting feed with', normalizedEvents.length, 'events');
-        console.log('Event types:', normalizedEvents.map((e: any) => e.type));
         setFeed(normalizedEvents);
       }
     } catch (error) {

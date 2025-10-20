@@ -51,10 +51,6 @@ export default function CreateInspectionSimple({ isOpen, onClose, workId }: Crea
         status: scheduledDate ? 'draft' : 'active'
       });
       
-      console.log('Created inspection:', result);
-      
-      // Event is created automatically by backend
-      // Backend returns {success: true, data: {id, ...}}
       const inspectionId = result?.data?.id;
       
       if (!inspectionId) {

@@ -47,15 +47,10 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
   useEffect(() => {
     const loadInspectionEvents = async () => {
       const token = localStorage.getItem('auth_token');
-      if (!token) {
-        console.log('No token for inspection events');
-        return;
-      }
+      if (!token) return;
       
       try {
-        console.log('Loading inspection events...');
         const events = await api.getInspectionEvents(token);
-        console.log('Loaded inspection events:', events);
         setInspectionEvents(events);
       } catch (error) {
         console.error('Failed to load inspection events:', error);

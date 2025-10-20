@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { apiClient } from '@/api/apiClient';
 import { ENDPOINTS } from '@/api/endpoints';
 
@@ -23,15 +23,32 @@ const initialState: ContractorsState = {
   error: null,
 };
 
+/**
+ * Приглашение подрядчика в систему
+ * @param {Object} data - Данные приглашения
+ * @param {string} data.phone - Телефон подрядчика
+ * @param {string} data.name - Имя подрядчика
+ * @returns {Promise<any>} Результат приглашения
+ * @example
+ * dispatch(inviteContractor({ 
+ *   phone: '+79001234567', 
+ *   name: 'Иван Иванов'
+ * }))
+ */
 export const inviteContractor = createAsyncThunk(
   'contractors/invite',
   async (data: { phone: string; name: string }, { rejectWithValue }) => {
     try {
       const response = await apiClient.post(ENDPOINTS.CONTRACTORS.INVITE, data);
-      if (!response.success) throw new Error(response.error || 'Failed to invite contractor');
+      
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to invite contractor');
+      }
+      
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      console.error('Invite contractor error:', error);
+      return rejectWithValue(error.message || 'Failed to invite contractor');
     }
   }
 );
@@ -40,9 +57,17 @@ const contractorsSlice = createSlice({
   name: 'contractors',
   initialState,
   reducers: {
-    setContractors(state, action) {
+    /**
+     * Установка списка подрядчиков (используется при загрузке данных пользователя)
+     * @param {Contractor[]} payload - Массив подрядчиков
+     */
+    setContractors(state, action: PayloadAction<Contractor[]>) {
       state.items = action.payload;
     },
+    
+    /**
+     * Очистка ошибки
+     */
     clearContractorsError(state) {
       state.error = null;
     },

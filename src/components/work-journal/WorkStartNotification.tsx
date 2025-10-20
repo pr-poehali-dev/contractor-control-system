@@ -37,8 +37,6 @@ export default function WorkStartNotification({ work, onNotified }: WorkStartNot
         }
       };
       
-      console.log('Sending update request:', updatePayload);
-      
       const updateResponse = await fetch('https://functions.poehali.dev/b69598bf-df90-4a71-93a1-6108c6c39317', {
         method: 'PUT',
         headers: { 
@@ -49,7 +47,6 @@ export default function WorkStartNotification({ work, onNotified }: WorkStartNot
       });
 
       const updateResult = await updateResponse.json();
-      console.log('Update response:', updateResponse.status, updateResult);
 
       if (!updateResponse.ok) {
         console.error('Update failed:', updateResult);

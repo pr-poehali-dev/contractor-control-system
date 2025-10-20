@@ -5,7 +5,7 @@ import {
   loginWithPhone as loginWithPhoneAction,
   registerUser,
   verifyToken as verifyTokenAction,
-  logoutUser,
+  logout as logoutUser,
   fetchUserData
 } from '@/store/slices/userSlice';
 
@@ -85,15 +85,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     objects: state.objects.items,
     works: state.works.items,
     inspections: state.inspections.items,
-    remarks: [], // TODO: add remarks slice if needed
+    remarks: [],
     workLogs: state.workLogs.items,
-    checkpoints: [], // TODO: add checkpoints slice if needed
+    checkpoints: [],
     contractors: state.contractors.items,
-    chatMessages: [], // TODO: add chat slice if needed
-    unreadCounts: {}, // TODO: add unread counts to slices
-    defect_reports: [], // TODO: add defect reports slice if needed
+    chatMessages: [],
+    unreadCounts: {},
+    defect_reports: [],
   }));
 
+  /**
+   * Загрузка данных пользователя из backend
+   * Автоматически распределяет данные по Redux slices
+   */
   const loadUserData = async () => {
     if (token) {
       await dispatch(fetchUserData());
@@ -104,6 +108,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     console.warn('setUserData is deprecated, use Redux actions instead');
   };
 
+  /**
+   * Авторизация через email и пароль
+   * @param {string} email - Email пользователя
+   * @param {string} password - Пароль
+   * @throws {Error} Если авторизация не удалась
+   */
   const login = async (email: string, password: string) => {
     const result = await dispatch(loginUser({ email, password }));
     if (loginUser.fulfilled.match(result)) {
@@ -113,6 +123,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  /**
+   * Авторизация через номер телефона и код подтверждения
+   * @param {string} phone - Номер телефона
+   * @param {string} code - Код подтверждения из SMS
+   * @throws {Error} Если авторизация не удалась
+   */
   const loginWithPhone = async (phone: string, code: string) => {
     const result = await dispatch(loginWithPhoneAction({ phone, code }));
     if (loginWithPhoneAction.fulfilled.match(result)) {
@@ -122,6 +138,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  /**
+   * Регистрация нового пользователя
+   * @param {RegisterData} registerData - Данные для регистрации (name, email/phone, password, role)
+   * @throws {Error} Если регистрация не удалась
+   */
   const register = async (registerData: RegisterData) => {
     const result = await dispatch(registerUser(registerData));
     if (registerUser.fulfilled.match(result)) {
@@ -131,6 +152,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  /**
+   * Проверка валидности токена авторизации
+   * При успехе загружает данные пользователя
+   * @returns {Promise<boolean>} true если токен валиден
+   */
   const verifyToken = async (): Promise<boolean> => {
     const result = await dispatch(verifyTokenAction());
     if (verifyTokenAction.fulfilled.match(result)) {
@@ -140,6 +166,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return false;
   };
 
+  /**
+   * Выход из системы
+   * Очищает все данные пользователя и токен
+   */
   const logout = () => {
     dispatch(logoutUser());
   };
@@ -168,6 +198,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+/**
+ * Hook для получения контекста авторизации
+ * @throws {Error} Если используется вне AuthProvider
+ * @returns {AuthContextType} Контекст авторизации с методами login, logout, register и т.д.
+ * @example
+ * const { user, login, logout } = useAuth();
+ */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

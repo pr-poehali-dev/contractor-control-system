@@ -53,8 +53,13 @@ interface UserState {
 
 const initialState: UserState = {
   user: (() => {
-    const stored = localStorage.getItem('user');
-    return stored ? JSON.parse(stored) : null;
+    try {
+      const stored = localStorage.getItem('user');
+      return stored ? JSON.parse(stored) : null;
+    } catch (error) {
+      console.error('Failed to parse user from localStorage:', error);
+      return null;
+    }
   })(),
   token: localStorage.getItem('auth_token'),
   userData: null,
@@ -63,6 +68,13 @@ const initialState: UserState = {
   error: null,
 };
 
+/**
+ * Авторизация пользователя через email и пароль
+ * @param {Object} credentials - Учетные данные
+ * @param {string} credentials.email - Email пользователя
+ * @param {string} credentials.password - Пароль
+ * @returns {Promise<{token: string, user: User}>} Токен и данные пользователя
+ */
 export const login = createAsyncThunk(
   'user/login',
   async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
@@ -75,16 +87,28 @@ export const login = createAsyncThunk(
 
       const { token, user } = response.data as any;
       
+      if (!token || !user) {
+        throw new Error('Invalid response from server');
+      }
+
       localStorage.setItem('auth_token', token);
       localStorage.setItem('user', JSON.stringify(user));
 
       return { token, user };
     } catch (error: any) {
+      console.error('Login error:', error);
       return rejectWithValue(error.message || 'Login failed');
     }
   }
 );
 
+/**
+ * Авторизация пользователя через телефон и код подтверждения
+ * @param {Object} credentials - Учетные данные
+ * @param {string} credentials.phone - Номер телефона
+ * @param {string} credentials.code - Код подтверждения
+ * @returns {Promise<{token: string, user: User}>} Токен и данные пользователя
+ */
 export const loginWithPhone = createAsyncThunk(
   'user/loginWithPhone',
   async ({ phone, code }: { phone: string; code: string }, { rejectWithValue }) => {
@@ -97,16 +121,32 @@ export const loginWithPhone = createAsyncThunk(
 
       const { token, user } = response.data as any;
       
+      if (!token || !user) {
+        throw new Error('Invalid response from server');
+      }
+
       localStorage.setItem('auth_token', token);
       localStorage.setItem('user', JSON.stringify(user));
 
       return { token, user };
     } catch (error: any) {
+      console.error('Login with phone error:', error);
       return rejectWithValue(error.message || 'Login failed');
     }
   }
 );
 
+/**
+ * Регистрация нового пользователя
+ * @param {Object} data - Данные для регистрации
+ * @param {string} [data.email] - Email (опционально)
+ * @param {string} [data.phone] - Телефон (опционально)
+ * @param {string} data.password - Пароль
+ * @param {string} data.name - Имя пользователя
+ * @param {string} [data.role] - Роль пользователя (client или contractor)
+ * @param {string} [data.organization] - Название организации
+ * @returns {Promise<{token: string, user: User}>} Токен и данные пользователя
+ */
 export const register = createAsyncThunk(
   'user/register',
   async (data: {
@@ -126,16 +166,26 @@ export const register = createAsyncThunk(
 
       const { token, user } = response.data as any;
       
+      if (!token || !user) {
+        throw new Error('Invalid response from server');
+      }
+
       localStorage.setItem('auth_token', token);
       localStorage.setItem('user', JSON.stringify(user));
 
       return { token, user };
     } catch (error: any) {
+      console.error('Registration error:', error);
       return rejectWithValue(error.message || 'Registration failed');
     }
   }
 );
 
+/**
+ * Загрузка данных пользователя (объекты, работы, проверки и т.д.)
+ * Автоматически распределяет данные по соответствующим slices
+ * @returns {Promise<UserData>} Данные пользователя
+ */
 export const loadUserData = createAsyncThunk(
   'user/loadUserData',
   async (_, { dispatch, rejectWithValue }) => {
@@ -148,25 +198,36 @@ export const loadUserData = createAsyncThunk(
 
       const data = response.data as UserData;
       
-      const { setObjects } = await import('./objectsSlice');
-      const { setWorks } = await import('./worksSlice');
-      const { setWorkLogs } = await import('./workLogsSlice');
-      const { setInspections } = await import('./inspectionsSlice');
-      const { setContractors } = await import('./contractorsSlice');
-      
-      dispatch(setObjects(data.objects || []));
-      dispatch(setWorks(data.works || []));
-      dispatch(setWorkLogs(data.workLogs || []));
-      dispatch(setInspections(data.inspections || []));
-      dispatch(setContractors(data.contractors || []));
+      // Динамически импортируем slices и обновляем данные
+      try {
+        const { setObjects } = await import('./objectsSlice');
+        const { setWorks } = await import('./worksSlice');
+        const { setWorkLogs } = await import('./workLogsSlice');
+        const { setInspections } = await import('./inspectionsSlice');
+        const { setContractors } = await import('./contractorsSlice');
+        
+        dispatch(setObjects(data.objects || []));
+        dispatch(setWorks(data.works || []));
+        dispatch(setWorkLogs(data.workLogs || []));
+        dispatch(setInspections(data.inspections || []));
+        dispatch(setContractors(data.contractors || []));
+      } catch (importError) {
+        console.error('Failed to import slices:', importError);
+      }
 
       return data;
     } catch (error: any) {
+      console.error('Load user data error:', error);
       return rejectWithValue(error.message || 'Failed to load user data');
     }
   }
 );
 
+/**
+ * Проверка валидности токена авторизации
+ * При неудаче автоматически очищает localStorage
+ * @returns {Promise<boolean>} true если токен валиден
+ */
 export const verifyToken = createAsyncThunk(
   'user/verifyToken',
   async (_, { rejectWithValue }) => {
@@ -184,6 +245,7 @@ export const verifyToken = createAsyncThunk(
 
       return true;
     } catch (error: any) {
+      console.error('Token verification error:', error);
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user');
       return rejectWithValue(error.message || 'Token verification failed');
@@ -195,6 +257,10 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
+    /**
+     * Выход пользователя из системы
+     * Очищает состояние и localStorage
+     */
     logout(state) {
       state.user = null;
       state.token = null;
@@ -205,15 +271,25 @@ const userSlice = createSlice({
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user');
     },
+    
+    /**
+     * Установка данных пользователя вручную
+     * @param {UserData} payload - Данные пользователя
+     */
     setUserData(state, action: PayloadAction<UserData>) {
       state.userData = action.payload;
     },
+    
+    /**
+     * Очистка ошибки
+     */
     clearError(state) {
       state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
+      // Login
       .addCase(login.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -231,6 +307,7 @@ const userSlice = createSlice({
         state.isAuthenticated = false;
       })
 
+      // Login with phone
       .addCase(loginWithPhone.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -248,6 +325,7 @@ const userSlice = createSlice({
         state.isAuthenticated = false;
       })
 
+      // Register
       .addCase(register.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -265,6 +343,7 @@ const userSlice = createSlice({
         state.isAuthenticated = false;
       })
 
+      // Load user data
       .addCase(loadUserData.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -279,12 +358,14 @@ const userSlice = createSlice({
         state.error = action.payload as string;
       })
 
+      // Verify token
       .addCase(verifyToken.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(verifyToken.fulfilled, (state) => {
         state.isLoading = false;
         state.isAuthenticated = true;
+        state.error = null;
       })
       .addCase(verifyToken.rejected, (state) => {
         state.isLoading = false;
@@ -295,9 +376,11 @@ const userSlice = createSlice({
   },
 });
 
-export const { logout: logoutUser, clearError } = userSlice.actions;
+export const { logout, setUserData, clearError } = userSlice.actions;
+
+// Экспорт для обратной совместимости с AuthContext
 export const loginUser = login;
 export const registerUser = register;
 export const fetchUserData = loadUserData;
-export { verifyToken as verifyTokenAction };
+
 export default userSlice.reducer;
