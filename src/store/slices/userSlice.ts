@@ -256,6 +256,9 @@ export const verifyToken = createAsyncThunk(
       
       if (!response.success) {
         console.error('❌ verifyToken: Token invalid, response:', response);
+        // Если токен невалиден, удаляем его
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user');
         throw new Error(response.error || 'Token invalid');
       }
 
@@ -268,8 +271,14 @@ export const verifyToken = createAsyncThunk(
         status: error.response?.status,
         full: error
       });
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user');
+      
+      // Удаляем токен только при 401/403 (невалидный токен)
+      const status = error?.response?.status;
+      if (status === 401 || status === 403) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user');
+      }
+      
       return rejectWithValue(error.message || 'Token verification failed');
     }
   }
@@ -391,9 +400,17 @@ const userSlice = createSlice({
       })
       .addCase(verifyToken.rejected, (state) => {
         state.isLoading = false;
-        state.isAuthenticated = false;
-        state.user = null;
-        state.token = null;
+        // Проверяем, есть ли токен в localStorage
+        const hasToken = !!localStorage.getItem('auth_token');
+        if (hasToken) {
+          // Если токен есть, сохраняем состояние авторизации
+          state.isAuthenticated = true;
+        } else {
+          // Если токена нет, сбрасываем состояние
+          state.isAuthenticated = false;
+          state.user = null;
+          state.token = null;
+        }
       });
   },
 });
