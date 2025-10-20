@@ -14,13 +14,16 @@
       },
       "expectedStatus": 201,
       "expectedBody": {
-        "token": "string",
-        "user": {
-          "id": "number",
-          "email": "string",
-          "phone": "string",
-          "name": "string",
-          "role": "string"
+        "success": true,
+        "data": {
+          "token": "string",
+          "user": {
+            "id": "number",
+            "email": "string",
+            "phone": "string",
+            "name": "string",
+            "role": "string"
+          }
         }
       },
       "bodyMatcher": "partial"
@@ -35,9 +38,12 @@
       },
       "expectedStatus": 200,
       "expectedBody": {
-        "token": "string",
-        "user": {
-          "id": "number"
+        "success": true,
+        "data": {
+          "token": "string",
+          "user": {
+            "id": "number"
+          }
         }
       },
       "bodyMatcher": "partial"

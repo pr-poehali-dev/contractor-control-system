@@ -137,8 +137,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'statusCode': 201,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                 'body': json.dumps({
-                    'token': token,
-                    'user': user_data
+                    'success': True,
+                    'data': {
+                        'token': token,
+                        'user': user_data
+                    }
                 })
             }
         
@@ -223,8 +226,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'statusCode': 200,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                 'body': json.dumps({
-                    'token': token,
-                    'user': user_data
+                    'success': True,
+                    'data': {
+                        'token': token,
+                        'user': user_data
+                    }
                 })
             }
         
@@ -274,7 +280,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 200,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'user': user_data})
+                    'body': json.dumps({
+                        'success': True,
+                        'data': {'user': user_data}
+                    })
                 }
             
             except ValueError as e:
@@ -311,7 +320,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return {
                 'statusCode': 200,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'work_types': work_types_list})
+                'body': json.dumps({
+                    'success': True,
+                    'data': {'work_types': work_types_list}
+                })
             }
         
         elif method == 'POST' and path == 'work-types':
@@ -374,7 +386,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 201,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps(work_type_data)
+                    'body': json.dumps({
+                        'success': True,
+                        'data': work_type_data
+                    })
                 }
             
             except ValueError as e:
