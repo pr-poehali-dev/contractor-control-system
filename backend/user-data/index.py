@@ -385,7 +385,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             },
-            'body': json.dumps(response_data, default=str)
+            'body': json.dumps({
+                'success': True,
+                'data': response_data
+            }, default=str)
         }
         
     except Exception as e:
