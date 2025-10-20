@@ -50,7 +50,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 400,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'INN is required'})
+                        'body': json.dumps({'success': False, 'error': 'INN is required'})
                     }
                 
                 cur.execute(
@@ -92,7 +92,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 200,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps(contractor_data)
+                    'body': json.dumps({'success': True, 'data': contractor_data})
                 }
             
             elif action == 'invite':
@@ -107,7 +107,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 400,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'client_id, inn, and name are required'})
+                        'body': json.dumps({'success': False, 'error': 'client_id, inn, and name are required'})
                     }
                 
                 cur.execute("SELECT id, user_id FROM t_p8942561_contractor_control_s.contractors WHERE inn = %s", (inn,))
@@ -135,10 +135,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'statusCode': 200,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                         'body': json.dumps({
-                            'status': 'added',
-                            'message': 'Contractor already exists and has been added to your list',
-                            'contractor_id': contractor_id,
-                            'newly_added': result is not None
+                            'success': True,
+                            'data': {
+                                'status': 'added',
+                                'message': 'Contractor already exists and has been added to your list',
+                                'contractor_id': contractor_id,
+                                'newly_added': result is not None
+                            }
                         })
                     }
                 else:
@@ -193,14 +196,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'statusCode': 201,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                         'body': json.dumps({
-                            'status': 'created',
-                            'message': 'New contractor created and invited',
-                            'contractor_id': contractor_id,
-                            'user_id': user_id,
-                            'invite_id': invite_id,
-                            'temp_password': temp_password,
-                            'email': email,
-                            'phone': phone
+                            'success': True,
+                            'data': {
+                                'status': 'created',
+                                'message': 'New contractor created and invited',
+                                'contractor_id': contractor_id,
+                                'user_id': user_id,
+                                'invite_id': invite_id,
+                                'temp_password': temp_password,
+                                'email': email,
+                                'phone': phone
+                            }
                         })
                     }
         
@@ -251,14 +257,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 200,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'assignments': assignments})
+                    'body': json.dumps({'success': True, 'data': {'assignments': assignments}})
                 }
             
             if not client_id:
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'client_id is required'})
+                    'body': json.dumps({'success': False, 'error': 'client_id is required'})
                 }
             
             cur.execute(
@@ -296,19 +302,19 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return {
                 'statusCode': 200,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'contractors': contractors_list})
+                'body': json.dumps({'success': True, 'data': {'contractors': contractors_list}})
             }
         
         else:
             return {
                 'statusCode': 405,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Method not allowed'})
+                'body': json.dumps({'success': False, 'error': 'Method not allowed'})
             }
     
     except Exception as e:
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': str(e)})
+            'body': json.dumps({'success': False, 'error': str(e)})
         }

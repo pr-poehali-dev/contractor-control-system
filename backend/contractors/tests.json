@@ -9,8 +9,11 @@
       },
       "expectedStatus": 200,
       "expectedBody": {
-        "exists": false,
-        "inn": "string"
+        "success": true,
+        "data": {
+          "exists": false,
+          "inn": "string"
+        }
       },
       "bodyMatcher": "partial"
     },
@@ -20,6 +23,7 @@
       "path": "/",
       "expectedStatus": 400,
       "expectedBody": {
+        "success": false,
         "error": "string"
       },
       "bodyMatcher": "partial"

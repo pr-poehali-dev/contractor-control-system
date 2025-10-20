@@ -137,18 +137,18 @@ const worksSlice = createSlice({
     builder
       // Create work
       .addCase(createWork.fulfilled, (state, action) => {
-        if (action.payload?.data) {
-          state.items.push(action.payload.data);
+        if (action.payload) {
+          state.items.push(action.payload);
         }
         state.loading = false;
       })
       
       // Update work
       .addCase(updateWork.fulfilled, (state, action) => {
-        if (action.payload?.data) {
-          const index = state.items.findIndex((w) => w.id === action.payload.data.id);
+        if (action.payload) {
+          const index = state.items.findIndex((w) => w.id === action.payload.id);
           if (index !== -1) {
-            state.items[index] = action.payload.data;
+            state.items[index] = action.payload;
           }
         }
         state.loading = false;

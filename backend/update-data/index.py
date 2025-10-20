@@ -41,7 +41,7 @@ def handler(event, context):
         return {
             'statusCode': 401,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Auth token required'})
+            'body': json.dumps({'success': False, 'error': 'Auth token required'})
         }
     
     try:
@@ -52,13 +52,13 @@ def handler(event, context):
         return {
             'statusCode': 401,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': str(e)})
+            'body': json.dumps({'success': False, 'error': str(e)})
         }
     except Exception as e:
         return {
             'statusCode': 401,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Invalid token'})
+            'body': json.dumps({'success': False, 'error': 'Invalid token'})
         }
     
     body = json.loads(event.get('body', '{}'))
@@ -69,7 +69,7 @@ def handler(event, context):
         return {
             'statusCode': 400,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Type and id required'})
+            'body': json.dumps({'success': False, 'error': 'Type and id required'})
         }
     
     dsn = os.environ.get('DATABASE_URL')
@@ -173,11 +173,11 @@ def handler(event, context):
                 return {
                     'statusCode': 400,
                     'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                    'body': json.dumps({'error': f'Unknown type: {item_type}'})
+                    'body': json.dumps({'success': False, 'error': f'Unknown type: {item_type}'})
                 }
             
             conn.commit()
-            result = {'success': True, 'deleted': cur.rowcount}
+            result = {'success': True, 'data': {'deleted': cur.rowcount}}
             
         elif method == 'PUT':
             data = body.get('data', {})
@@ -271,7 +271,7 @@ def handler(event, context):
                     return {
                         'statusCode': 400,
                         'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                        'body': json.dumps({'error': 'No fields to update'})
+                        'body': json.dumps({'success': False, 'error': 'No fields to update'})
                     }
                 
                 set_clause = ', '.join(set_parts)
@@ -344,7 +344,7 @@ def handler(event, context):
                     return {
                         'statusCode': 400,
                         'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                        'body': json.dumps({'error': 'No fields to update'})
+                        'body': json.dumps({'success': False, 'error': 'No fields to update'})
                     }
                 
                 set_clause = ', '.join(set_parts)
@@ -372,7 +372,7 @@ def handler(event, context):
                 return {
                     'statusCode': 400,
                     'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                    'body': json.dumps({'error': f'Unknown type: {item_type}'})
+                    'body': json.dumps({'success': False, 'error': f'Unknown type: {item_type}'})
                 }
             
             conn.commit()
@@ -401,5 +401,5 @@ def handler(event, context):
         return {
             'statusCode': 500,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': str(e)})
+            'body': json.dumps({'success': False, 'error': str(e)})
         }

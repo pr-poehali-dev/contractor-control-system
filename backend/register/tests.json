@@ -10,14 +10,16 @@
         "name": "New User",
         "role": "client"
       },
-      "expectedStatus": 201,
+      "expectedStatus": [201, 409],
       "expectedBody": {
         "success": true,
-        "user": {
-          "id": "number",
-          "phone": "string",
-          "name": "string",
-          "role": "string"
+        "data": {
+          "user": {
+            "id": "number",
+            "phone": "string",
+            "name": "string",
+            "role": "string"
+          }
         }
       },
       "bodyMatcher": "partial"

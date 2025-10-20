@@ -139,8 +139,8 @@ const objectsSlice = createSlice({
       })
       .addCase(createObject.fulfilled, (state, action) => {
         state.loading = false;
-        if (action.payload?.data) {
-          state.items.push(action.payload.data);
+        if (action.payload) {
+          state.items.push(action.payload);
         }
       })
       .addCase(createObject.rejected, (state, action) => {
@@ -155,10 +155,10 @@ const objectsSlice = createSlice({
       })
       .addCase(updateObject.fulfilled, (state, action) => {
         state.loading = false;
-        if (action.payload?.data) {
-          const index = state.items.findIndex((obj) => obj.id === action.payload.data.id);
+        if (action.payload) {
+          const index = state.items.findIndex((obj) => obj.id === action.payload.id);
           if (index !== -1) {
-            state.items[index] = action.payload.data;
+            state.items[index] = action.payload;
           }
         }
       })

@@ -18,7 +18,7 @@ def verify_user(event: Dict[str, Any]) -> tuple:
     auth_token = event.get('headers', {}).get('X-Auth-Token') or event.get('headers', {}).get('x-auth-token')
     
     if not auth_token:
-        return None, {'statusCode': 401, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'error': 'Authentication required'})}
+        return None, {'statusCode': 401, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'success': False, 'error': 'Authentication required'})}
     
     try:
         import jwt
@@ -26,7 +26,7 @@ def verify_user(event: Dict[str, Any]) -> tuple:
         payload = jwt.decode(auth_token, JWT_SECRET, algorithms=['HS256'])
         return payload, None
     except Exception as e:
-        return None, {'statusCode': 401, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'error': 'Invalid token'})}
+        return None, {'statusCode': 401, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'success': False, 'error': 'Invalid token'})}
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method = event.get('httpMethod', 'GET')
@@ -90,7 +90,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 200,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'objects': objects_list}),
+                    'body': json.dumps({'success': True, 'data': {'objects': objects_list}}),
                     'isBase64Encoded': False
                 }
             
@@ -111,7 +111,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 404,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Object not found'})
+                        'body': json.dumps({'success': False, 'error': 'Object not found'})
                     }
                 
                 object_data = {
@@ -130,7 +130,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 200,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps(object_data)
+                    'body': json.dumps({'success': True, 'data': object_data})
                 }
             elif project_id:
                 cur.execute(
@@ -163,13 +163,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 200,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'objects': objects_list})
+                    'body': json.dumps({'success': True, 'data': {'objects': objects_list}})
                 }
             else:
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'object_id or project_id is required'})
+                    'body': json.dumps({'success': False, 'error': 'object_id or project_id is required'})
                 }
         
         elif method == 'POST':
@@ -183,7 +183,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'project_id, title, and address are required'})
+                    'body': json.dumps({'success': False, 'error': 'project_id, title, and address are required'})
                 }
             
             cur.execute(
@@ -196,14 +196,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 404,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Project not found'})
+                    'body': json.dumps({'success': False, 'error': 'Project not found'})
                 }
             
             if project[0] != user_id and user_role != 'admin':
                 return {
                     'statusCode': 403,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Access denied'})
+                    'body': json.dumps({'success': False, 'error': 'Access denied'})
                 }
             
             cur.execute(
@@ -233,7 +233,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return {
                 'statusCode': 201,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps(object_data)
+                'body': json.dumps({'success': True, 'data': object_data})
             }
         
         elif method == 'PUT':
@@ -247,7 +247,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Object ID is required'})
+                    'body': json.dumps({'success': False, 'error': 'Object ID is required'})
                 }
             
             cur.execute(
@@ -265,14 +265,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 404,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Object not found'})
+                    'body': json.dumps({'success': False, 'error': 'Object not found'})
                 }
             
             if obj[0] != user_id and user_role != 'admin':
                 return {
                     'statusCode': 403,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Access denied'})
+                    'body': json.dumps({'success': False, 'error': 'Access denied'})
                 }
             
             updates = []
@@ -319,19 +319,19 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return {
                 'statusCode': 200,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps(object_data)
+                'body': json.dumps({'success': True, 'data': object_data})
             }
         
         else:
             return {
                 'statusCode': 405,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Method not allowed'})
+                'body': json.dumps({'success': False, 'error': 'Method not allowed'})
             }
     
     except Exception as e:
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': str(e)})
+            'body': json.dumps({'success': False, 'error': str(e)})
         }

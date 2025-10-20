@@ -33,14 +33,14 @@ def handler(event, context):
         return {
             'statusCode': 400,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Phone and name required'})
+            'body': json.dumps({'success': False, 'error': 'Phone and name required'})
         }
     
     if role not in ['client', 'contractor']:
         return {
             'statusCode': 400,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Role must be client or contractor'})
+            'body': json.dumps({'success': False, 'error': 'Role must be client or contractor'})
         }
     
     dsn = os.environ.get('DATABASE_URL')
@@ -58,7 +58,7 @@ def handler(event, context):
             return {
                 'statusCode': 409,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                'body': json.dumps({'error': 'User already exists'})
+                'body': json.dumps({'success': False, 'error': 'User already exists'})
             }
         
         name_escaped = name.replace("'", "''")
@@ -90,7 +90,7 @@ def handler(event, context):
         return {
             'statusCode': 201,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'success': True, 'user': result})
+            'body': json.dumps({'success': True, 'data': {'user': result}})
         }
         
     except Exception as e:
@@ -100,5 +100,5 @@ def handler(event, context):
         return {
             'statusCode': 500,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': str(e)})
+            'body': json.dumps({'success': False, 'error': str(e)})
         }

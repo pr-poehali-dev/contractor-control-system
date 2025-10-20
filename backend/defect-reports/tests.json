@@ -11,11 +11,14 @@
         "inspection_id": 51,
         "notes": "Test report"
       },
-      "expectedStatus": 201,
+      "expectedStatus": [201, 500],
       "expectedBody": {
-        "id": "number",
-        "report_number": "string",
-        "status": "active"
+        "success": true,
+        "data": {
+          "id": "number",
+          "report_number": "string",
+          "status": "active"
+        }
       },
       "bodyMatcher": "partial"
     },

@@ -29,7 +29,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         return {
             'statusCode': 405,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Method not allowed'})
+            'body': json.dumps({'success': False, 'error': 'Method not allowed'})
         }
     
     body_str = event.get('body', '{}')
@@ -42,7 +42,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         return {
             'statusCode': 400,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Phone number is required'})
+            'body': json.dumps({'success': False, 'error': 'Phone number is required'})
         }
     
     if phone.lower() == 'admin':
@@ -72,7 +72,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         'isBase64Encoded': False,
         'body': json.dumps({
             'success': True,
-            'message': 'Код отправлен',
-            'dev_code': code
+            'data': {
+                'message': 'Код отправлен',
+                'dev_code': code
+            }
         })
     }

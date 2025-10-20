@@ -45,7 +45,7 @@ def handler(event, context):
             return {
                 'statusCode': 401,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                'body': json.dumps({'error': 'Auth token required'})
+                'body': json.dumps({'success': False, 'error': 'Auth token required'})
             }
         
         try:
@@ -57,14 +57,14 @@ def handler(event, context):
             return {
                 'statusCode': 401,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                'body': json.dumps({'error': str(e)})
+                'body': json.dumps({'success': False, 'error': str(e)})
             }
         except Exception as e:
             print(f"DEBUG: Exception: {str(e)}, Type: {type(e)}")
             return {
                 'statusCode': 401,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                'body': json.dumps({'error': f'Invalid token: {str(e)}'})
+                'body': json.dumps({'success': False, 'error': f'Invalid token: {str(e)}'})
             }
         
         body = json.loads(event.get('body', '{}'))
@@ -77,7 +77,7 @@ def handler(event, context):
             return {
                 'statusCode': 400,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                'body': json.dumps({'error': 'Type and data required'})
+                'body': json.dumps({'success': False, 'error': 'Type and data required'})
             }
         
         dsn = os.environ.get('DATABASE_URL')
@@ -361,7 +361,7 @@ def handler(event, context):
                 return {
                     'statusCode': 400,
                     'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                    'body': json.dumps({'error': f'Unknown type: {item_type}'})
+                    'body': json.dumps({'success': False, 'error': f'Unknown type: {item_type}'})
                 }
             
             cur.close()
@@ -385,6 +385,7 @@ def handler(event, context):
             print(f"TRACEBACK: {trace}")
             
             error_details = {
+                'success': False,
                 'error': error_msg,
                 'traceback': trace,
                 'item_type': item_type
@@ -401,5 +402,5 @@ def handler(event, context):
     return {
         'statusCode': 405,
         'headers': {'Access-Control-Allow-Origin': '*'},
-        'body': json.dumps({'error': 'Method not allowed'})
+        'body': json.dumps({'success': False, 'error': 'Method not allowed'})
     }

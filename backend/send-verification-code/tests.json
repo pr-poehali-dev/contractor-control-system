@@ -10,8 +10,10 @@
       "expectedStatus": 200,
       "expectedBody": {
         "success": true,
-        "message": "string",
-        "dev_code": "string"
+        "data": {
+          "message": "string",
+          "dev_code": "string"
+        }
       },
       "bodyMatcher": "partial"
     },
@@ -22,8 +24,10 @@
       "body": {},
       "expectedStatus": 400,
       "expectedBody": {
+        "success": false,
         "error": "Phone number is required"
-      }
+      },
+      "bodyMatcher": "partial"
     }
   ]
 }
