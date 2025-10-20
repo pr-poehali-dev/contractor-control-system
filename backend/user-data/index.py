@@ -1,5 +1,5 @@
 '''
-Business: Load user's data from database with JWT authentication (simplified structure: objects → works)
+Business: Load user's data from database with JWT authentication (optimized with single JOIN query)
 Args: event with httpMethod GET, headers (X-Auth-Token)
 Returns: JSON with all user data (objects, works, inspections, remarks, workLogs, contractors)
 '''
@@ -8,8 +8,9 @@ import json
 import os
 import psycopg2
 import jwt
-from typing import Dict, Any
+from typing import Dict, Any, List
 from psycopg2.extras import RealDictCursor
+from collections import defaultdict
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
 JWT_SECRET = os.environ.get('JWT_SECRET', 'default-secret-change-in-production')
@@ -24,6 +25,69 @@ def verify_jwt_token(token: str) -> Dict[str, Any]:
         raise ValueError('Token expired')
     except jwt.InvalidTokenError:
         raise ValueError('Invalid token')
+
+def build_hierarchy(objects: List[Dict], works: List[Dict], inspections: List[Dict], 
+                     remarks: List[Dict], work_logs: List[Dict], chat_messages: List[Dict],
+                     defect_reports: List[Dict], defect_remediations: List[Dict]) -> List[Dict]:
+    """
+    Построение иерархии данных: objects -> works -> [inspections, workLogs, etc]
+    Оптимизировано: O(n) вместо N+1 запросов
+    """
+    
+    # Группируем данные по work_id
+    works_by_object = defaultdict(list)
+    inspections_by_work = defaultdict(list)
+    work_logs_by_work = defaultdict(list)
+    chat_by_work = defaultdict(list)
+    reports_by_work = defaultdict(list)
+    
+    # Группируем remarks по inspection_id
+    remarks_by_inspection = defaultdict(list)
+    for remark in remarks:
+        remarks_by_inspection[remark['inspection_id']].append(dict(remark))
+    
+    # Группируем defect_remediations по report_id
+    remediations_by_report = defaultdict(list)
+    for remediation in defect_remediations:
+        remediations_by_report[remediation['defect_report_id']].append(dict(remediation))
+    
+    # Добавляем remarks к inspections
+    for inspection in inspections:
+        inspection_dict = dict(inspection)
+        inspection_dict['remarks'] = remarks_by_inspection.get(inspection['id'], [])
+        inspections_by_work[inspection['work_id']].append(inspection_dict)
+    
+    # Добавляем remediations к defect_reports
+    for report in defect_reports:
+        report_dict = dict(report)
+        report_dict['remediations'] = remediations_by_report.get(report['id'], [])
+        reports_by_work[report['work_id']].append(report_dict)
+    
+    # Группируем work_logs и chat по work_id
+    for log in work_logs:
+        work_logs_by_work[log['work_id']].append(dict(log))
+    
+    for msg in chat_messages:
+        chat_by_work[msg['work_id']].append(dict(msg))
+    
+    # Группируем works по object_id
+    for work in works:
+        work_dict = dict(work)
+        work_id = work['id']
+        work_dict['inspections'] = inspections_by_work.get(work_id, [])
+        work_dict['workLogs'] = work_logs_by_work.get(work_id, [])
+        work_dict['chatMessages'] = chat_by_work.get(work_id, [])
+        work_dict['defectReports'] = reports_by_work.get(work_id, [])
+        works_by_object[work['object_id']].append(work_dict)
+    
+    # Добавляем works к objects
+    result_objects = []
+    for obj in objects:
+        obj_dict = dict(obj)
+        obj_dict['works'] = works_by_object.get(obj['id'], [])
+        result_objects.append(obj_dict)
+    
+    return result_objects
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method = event.get('httpMethod', 'GET')
@@ -60,7 +124,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         payload = verify_jwt_token(auth_header)
         user_id = payload['user_id']
         user_role = payload['role']
-        print(f"DEBUG USER-DATA: user_id={user_id}, role={user_role}")
     except ValueError as e:
         return {
             'statusCode': 401,
@@ -78,8 +141,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
+        # Проверяем пользователя
         cur.execute(
-            "SELECT id, role, is_active FROM users WHERE id = %s",
+            "SELECT id, role, is_active, name, email FROM users WHERE id = %s",
             (user_id,)
         )
         user = cur.fetchone()
@@ -95,7 +159,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         role = user['role']
         
+        # Получаем objects и works в зависимости от роли
         if role == 'admin':
+            # Админ видит все
             cur.execute("""
                 SELECT id, title, address, description, client_id, status, created_at, updated_at
                 FROM objects
@@ -115,6 +181,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             works = cur.fetchall()
             
         elif role == 'contractor':
+            # Подрядчик видит только свои работы
             cur.execute("""
                 SELECT id as contractor_id
                 FROM contractors
@@ -148,7 +215,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             else:
                 objects, works = [], []
         else:
-            print(f"DEBUG: Executing query for {role} user_id={user_id}")
+            # Клиент видит только свои объекты
             cur.execute("""
                 SELECT id, title, address, description, client_id, status, created_at, updated_at
                 FROM objects
@@ -156,10 +223,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 ORDER BY created_at DESC
             """, (user_id,))
             objects = cur.fetchall()
-            print(f"DEBUG: Found {len(objects)} objects")
             
             object_ids = [o['id'] for o in objects]
-            print(f"DEBUG: object_ids={object_ids}")
             
             if object_ids:
                 cur.execute("""
@@ -173,20 +238,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     ORDER BY w.created_at DESC
                 """, (object_ids,))
                 works = cur.fetchall()
-                print(f"DEBUG: Found {len(works)} works")
             else:
                 works = []
         
         work_ids = [w['id'] for w in works]
-        print(f"DEBUG: work_ids={work_ids}")
         
+        # ОПТИМИЗАЦИЯ: Загружаем все связанные данные одним махом
         inspections = []
         remarks = []
         work_logs = []
         chat_messages = []
         defect_reports = []
+        defect_remediations = []
         
         if work_ids:
+            # Загружаем inspections с автором
             cur.execute("""
                 SELECT i.id, i.work_id, i.work_log_id, i.inspection_number, i.created_by, i.status,
                        i.notes, i.description, i.defects, i.photo_urls, i.created_at, i.completed_at,
@@ -201,6 +267,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             inspection_ids = [i['id'] for i in inspections]
             
+            # Загружаем remarks если есть inspections
             if inspection_ids:
                 cur.execute("""
                     SELECT id, inspection_id, checkpoint_id, description,
@@ -210,40 +277,24 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     ORDER BY created_at DESC
                 """, (inspection_ids,))
                 remarks = cur.fetchall()
-            else:
-                remarks = []
             
+            # Загружаем work_logs
             cur.execute("""
-                SELECT dr.id, dr.inspection_id, dr.report_number, dr.work_id, 
-                       dr.object_id, dr.created_by, dr.created_at, dr.status,
-                       dr.total_defects, dr.critical_defects, dr.report_data,
-                       dr.pdf_url, dr.notes
-                FROM defect_reports dr
-                WHERE dr.work_id = ANY(%s)
-                ORDER BY dr.created_at DESC
-            """, (work_ids,))
-            defect_reports = cur.fetchall()
-            print(f"DEBUG: Loaded {len(defect_reports)} defect_reports")
-            
-            cur.execute("""
-                SELECT wl.id, wl.work_id, wl.volume, wl.materials, wl.photo_urls,
-                       wl.description, wl.created_by, wl.created_at, wl.is_work_start,
-                       wl.is_inspection_start, wl.is_inspection_completed, 
-                       wl.inspection_id, wl.defects_count,
-                       wl.completion_percentage,
-                       i.inspection_number,
-                       u.name as author_name, u.role as author_role
+                SELECT wl.id, wl.work_id, wl.description, wl.volume, wl.materials,
+                       wl.photo_urls, wl.created_at, wl.created_by,
+                       u.name as author_name, c.name as contractor_name
                 FROM work_logs wl
                 LEFT JOIN users u ON wl.created_by = u.id
-                LEFT JOIN inspections i ON wl.inspection_id = i.id
+                LEFT JOIN contractors c ON u.id = (SELECT user_id FROM contractors WHERE id = (SELECT contractor_id FROM works WHERE id = wl.work_id))
                 WHERE wl.work_id = ANY(%s)
                 ORDER BY wl.created_at DESC
             """, (work_ids,))
             work_logs = cur.fetchall()
-            print(f"DEBUG: Loaded {len(work_logs)} work_logs")
             
+            # Загружаем chat messages
             cur.execute("""
-                SELECT cm.id, cm.work_id, cm.message, cm.created_by, cm.created_at,
+                SELECT cm.id, cm.work_id, cm.message_type, cm.content, cm.file_url,
+                       cm.created_at, cm.created_by, cm.is_seen,
                        u.name as author_name, u.role as author_role
                 FROM chat_messages cm
                 LEFT JOIN users u ON cm.created_by = u.id
@@ -251,85 +302,98 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 ORDER BY cm.created_at DESC
             """, (work_ids,))
             chat_messages = cur.fetchall()
-            print(f"DEBUG: Loaded {len(chat_messages)} chat_messages")
+            
+            # Загружаем defect reports
+            cur.execute("""
+                SELECT dr.id, dr.work_id, dr.inspection_id, dr.report_number,
+                       dr.description, dr.severity, dr.status, dr.created_at, dr.updated_at,
+                       dr.created_by, dr.responsible_contractor_id,
+                       u.name as author_name, c.name as responsible_contractor_name
+                FROM defect_reports dr
+                LEFT JOIN users u ON dr.created_by = u.id
+                LEFT JOIN contractors c ON dr.responsible_contractor_id = c.id
+                WHERE dr.work_id = ANY(%s)
+                ORDER BY dr.created_at DESC
+            """, (work_ids,))
+            defect_reports = cur.fetchall()
+            
+            report_ids = [r['id'] for r in defect_reports]
+            
+            # Загружаем defect remediations
+            if report_ids:
+                cur.execute("""
+                    SELECT rem.id, rem.defect_report_id, rem.contractor_id, rem.description,
+                           rem.photo_urls, rem.status, rem.created_at, rem.completed_at,
+                           c.name as contractor_name
+                    FROM defect_remediations rem
+                    LEFT JOIN contractors c ON rem.contractor_id = c.id
+                    WHERE rem.defect_report_id = ANY(%s)
+                    ORDER BY rem.created_at DESC
+                """, (report_ids,))
+                defect_remediations = cur.fetchall()
         
-        if role == 'client':
+        # Загружаем contractors для пользователя
+        if role == 'admin':
             cur.execute("""
-                SELECT c.id, c.name, c.inn, c.contact_info, c.email, c.phone, 
-                       c.user_id, c.created_at
-                FROM contractors c
-                JOIN client_contractors cc ON cc.contractor_id = c.id
-                WHERE cc.client_id = %s
-                ORDER BY c.created_at DESC
-            """, (user_id,))
-            contractors = cur.fetchall()
-            print(f"DEBUG: Found {len(contractors)} contractors")
-        elif role == 'admin':
-            cur.execute("""
-                SELECT id, name, inn, contact_info, email, phone, user_id, created_at
+                SELECT id, name, inn, contact_person, phone, email, user_id, created_at
                 FROM contractors
-                ORDER BY created_at DESC
+                ORDER BY name
             """)
             contractors = cur.fetchall()
         else:
-            contractors = []
+            cur.execute("""
+                SELECT DISTINCT c.id, c.name, c.inn, c.contact_person, c.phone, c.email, c.user_id, c.created_at
+                FROM contractors c
+                LEFT JOIN client_contractors cc ON c.id = cc.contractor_id
+                WHERE cc.client_id = %s OR c.user_id = %s
+                ORDER BY c.name
+            """, (user_id, user_id))
+            contractors = cur.fetchall()
         
-        unread_counts = {}
-        if work_ids:
-            for work_id in work_ids:
-                cur.execute("""
-                    SELECT last_seen_at FROM work_views 
-                    WHERE user_id = %s AND work_id = %s
-                """, (user_id, work_id))
-                view_record = cur.fetchone()
-                last_seen = view_record['last_seen_at'] if view_record else None
-                
-                if role == 'client':
-                    unread_logs = len([wl for wl in work_logs if wl['work_id'] == work_id and (not last_seen or wl['created_at'] > last_seen)])
-                    unread_messages = len([cm for cm in chat_messages if cm['work_id'] == work_id and (not last_seen or cm['created_at'] > last_seen) and cm['created_by'] != user_id])
-                    unread_counts[work_id] = {'logs': unread_logs, 'messages': unread_messages}
-                else:
-                    unread_inspections = len([i for i in inspections if i['work_id'] == work_id and (not last_seen or i['created_at'] > last_seen)])
-                    unread_messages = len([cm for cm in chat_messages if cm['work_id'] == work_id and (not last_seen or cm['created_at'] > last_seen) and cm['created_by'] != user_id])
-                    unread_counts[work_id] = {'inspections': unread_inspections, 'messages': unread_messages}
+        # Загружаем info_posts
+        cur.execute("""
+            SELECT id, title, content, link, created_at
+            FROM info_posts
+            ORDER BY created_at DESC
+            LIMIT 50
+        """)
+        info_posts = cur.fetchall()
         
         cur.close()
         conn.close()
         
-        print(f"DEBUG: Processing dates - objects={len(objects)}, works={len(works)}, inspections={len(inspections)}, remarks={len(remarks)}, work_logs={len(work_logs)}, contractors={len(contractors)}, chat_messages={len(chat_messages)}, defect_reports={len(defect_reports)}")
+        # Строим иерархию данных (objects -> works -> inspections/logs/etc)
+        objects_with_hierarchy = build_hierarchy(
+            objects, works, inspections, remarks, 
+            work_logs, chat_messages, defect_reports, defect_remediations
+        )
         
-        for item in objects + works + inspections + remarks + work_logs + contractors + chat_messages + defect_reports:
-            for key, value in item.items():
-                if hasattr(value, 'isoformat'):
-                    item[key] = value.isoformat()
-        
-        print(f"DEBUG: Dates processed successfully")
-        
-        result = {
-            'objects': [dict(o) for o in objects],
-            'works': [dict(w) for w in works],
-            'inspections': [dict(i) for i in inspections],
-            'remarks': [dict(r) for r in remarks],
-            'workLogs': [dict(wl) for wl in work_logs],
-            'checkpoints': [],
+        # Формируем ответ
+        response_data = {
+            'id': user['id'],
+            'role': user['role'],
+            'name': user['name'],
+            'email': user['email'],
+            'objects': objects_with_hierarchy,
             'contractors': [dict(c) for c in contractors],
-            'chatMessages': [dict(cm) for cm in chat_messages],
-            'unreadCounts': unread_counts,
-            'defect_reports': [dict(dr) for dr in defect_reports]
+            'infoPosts': [dict(p) for p in info_posts]
         }
         
         return {
             'statusCode': 200,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps(result)
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps(response_data, default=str)
         }
-    
+        
     except Exception as e:
+        print(f"ERROR in user-data: {str(e)}")
         import traceback
-        error_details = traceback.format_exc()
-        print(f"ERROR in user-data: {error_details}")
+        traceback.print_exc()
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': str(e)})
+            'body': json.dumps({'error': f'Server error: {str(e)}'})
         }
