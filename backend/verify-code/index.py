@@ -149,12 +149,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         'isBase64Encoded': False,
         'body': json.dumps({
             'success': True,
-            'token': token,
-            'user': {
-                'id': user_id,
-                'phone': user_phone,
-                'name': user_name,
-                'role': user_role
+            'data': {
+                'token': token,
+                'user': {
+                    'id': user_id,
+                    'phone': user_phone,
+                    'name': user_name,
+                    'role': user_role
+                }
             }
         })
     }
