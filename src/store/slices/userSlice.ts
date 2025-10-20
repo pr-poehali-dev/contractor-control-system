@@ -190,7 +190,10 @@ export const loadUserData = createAsyncThunk(
   'user/loadUserData',
   async (_, { dispatch, rejectWithValue }) => {
     try {
-      const response = await apiClient.get(ENDPOINTS.USER.DATA);
+      // Передаём skipAuthRedirect для loadUserData тоже
+      const response = await apiClient.get(ENDPOINTS.USER.DATA, {
+        skipAuthRedirect: true
+      } as any);
       
       if (!response.success) {
         throw new Error(response.error || 'Failed to load user data');
@@ -238,18 +241,33 @@ export const verifyToken = createAsyncThunk(
     try {
       const token = localStorage.getItem('auth_token');
       if (!token) {
+        console.log('❌ verifyToken: No token in localStorage');
         throw new Error('No token found');
       }
 
-      const response = await apiClient.get(ENDPOINTS.USER.DATA);
+      console.log('🔍 verifyToken: Checking token...');
+      
+      // Передаём skipAuthRedirect чтобы избежать автоматического редиректа
+      const response = await apiClient.get(ENDPOINTS.USER.DATA, {
+        skipAuthRedirect: true
+      } as any);
+      
+      console.log('📥 verifyToken response:', response);
       
       if (!response.success) {
-        throw new Error('Token invalid');
+        console.error('❌ verifyToken: Token invalid, response:', response);
+        throw new Error(response.error || 'Token invalid');
       }
 
+      console.log('✅ verifyToken: Token valid');
       return true;
     } catch (error: any) {
-      console.error('Token verification error:', error);
+      console.error('❌ Token verification error:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        full: error
+      });
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user');
       return rejectWithValue(error.message || 'Token verification failed');

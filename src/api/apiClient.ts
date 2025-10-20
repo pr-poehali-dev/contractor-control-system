@@ -59,7 +59,11 @@ class ApiClient {
       },
       (error: AxiosError) => {
         // При 401/403 очищаем токен и редиректим на login
-        if (error.response?.status === 401 || error.response?.status === 403) {
+        // ТОЛЬКО если не установлен флаг skipAuthRedirect
+        const config = error.config as any;
+        const skipRedirect = config?.skipAuthRedirect;
+        
+        if ((error.response?.status === 401 || error.response?.status === 403) && !skipRedirect) {
           localStorage.removeItem('auth_token');
           localStorage.removeItem('user');
           
