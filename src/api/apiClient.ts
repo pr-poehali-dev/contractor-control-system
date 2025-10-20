@@ -163,12 +163,22 @@ class ApiClient {
   private normalizeResponse<T>(response: AxiosResponse<T>): ApiResponse<T> {
     const data = response.data;
 
-    // Если ответ уже в нужном формате
+    // Если ответ уже в нужном формате { success, data, ... }
     if (typeof data === 'object' && data !== null && 'success' in data) {
       return data as ApiResponse<T>;
     }
 
-    // Оборачиваем в стандартный формат
+    // Если ответ содержит error (формат ошибки backend)
+    if (typeof data === 'object' && data !== null && 'error' in data) {
+      return {
+        success: false,
+        error: (data as any).error,
+        data: undefined,
+      };
+    }
+
+    // Оборачиваем в стандартный формат (успешный ответ без обёртки)
+    // Backend auth возвращает { token, user } напрямую
     return {
       success: true,
       data: data,
