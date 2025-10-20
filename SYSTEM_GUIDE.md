@@ -25,11 +25,27 @@
 ### Стек технологий
 ```
 Frontend:  React 18 + TypeScript + Vite + Tailwind CSS + shadcn/ui
+           Redux Toolkit (управление состоянием)
+           Axios (HTTP клиент с interceptors)
 Backend:   Python 3.11 (Cloud Functions)
 Database:  PostgreSQL (Simple Query Protocol ONLY!)
-Auth:      JWT токены в localStorage
+Auth:      JWT токены в localStorage + Redux
 Icons:     lucide-react через компонент Icon
 ```
+
+### ⚠️ КРИТИЧНО: НОВАЯ АРХИТЕКТУРА (с 2025-10-20)
+
+**Управление состоянием: Redux Toolkit**
+- ❌ НЕ используй React.Context для данных (кроме AuthContext - временно для совместимости)
+- ✅ Все данные храни в Redux slices
+- ✅ Используй createAsyncThunk для API вызовов
+- ✅ Используй selectors для вычисляемых значений
+
+**HTTP клиент: Axios через apiClient**
+- ❌ НЕ используй fetch() напрямую
+- ✅ Всегда используй apiClient из src/api/apiClient.ts
+- ✅ Все эндпоинты определены в src/api/endpoints.ts
+- ✅ Авторизация добавляется автоматически через interceptor
 
 ---
 
@@ -179,8 +195,108 @@ DSN = os.environ.get('DATABASE_URL')
 
 ### Точки входа
 ```
-src/main.tsx → src/App.tsx → src/components/Layout.tsx
+src/main.tsx (Redux Provider) → src/App.tsx → src/components/Layout.tsx
 ```
+
+### ⚠️ КРИТИЧНО: Redux Toolkit Architecture
+
+**Store структура:**
+```typescript
+src/store/
+├── store.ts              // configureStore с Redux DevTools
+├── hooks.ts              // useAppDispatch, useAppSelector
+└── slices/
+    ├── userSlice.ts      // auth + userData
+    ├── objectsSlice.ts   // CRUD объектов
+    ├── worksSlice.ts     // CRUD работ
+    ├── workLogsSlice.ts  // журнал работ
+    ├── inspectionsSlice.ts  // проверки
+    └── contractorsSlice.ts  // подрядчики
+```
+
+**API Client:**
+```typescript
+src/api/
+├── apiClient.ts          // Axios instance с interceptors
+└── endpoints.ts          // Константы всех URL
+```
+
+**Правила работы с Redux:**
+
+1. **Доступ к данным:**
+```typescript
+// ❌ НЕ используй Context
+const { user } = useAuth(); // старый способ
+
+// ✅ Используй Redux
+import { useAppSelector } from '@/store/hooks';
+const user = useAppSelector((state) => state.user.user);
+```
+
+2. **Изменение данных:**
+```typescript
+// ❌ НЕ вызывай API напрямую
+await fetch('/api/objects', { method: 'POST', body: ... });
+
+// ✅ Используй Redux thunks
+import { useAppDispatch } from '@/store/hooks';
+import { createObject } from '@/store/slices/objectsSlice';
+
+const dispatch = useAppDispatch();
+await dispatch(createObject({ title: 'Новый объект', ... }));
+```
+
+3. **Получение списков:**
+```typescript
+// ❌ НЕ используй userData.objects
+const objects = userData?.objects || [];
+
+// ✅ Используй slice напрямую
+const objects = useAppSelector((state) => state.objects.items);
+```
+
+4. **Создание селекторов:**
+```typescript
+// Для вычисляемых значений создавай selectors
+// src/store/slices/objectsSlice.ts
+export const selectActiveObjects = (state: RootState) => 
+  state.objects.items.filter(obj => obj.status === 'active');
+
+// Использование:
+const activeObjects = useAppSelector(selectActiveObjects);
+```
+
+5. **Loading состояния:**
+```typescript
+// Каждый slice имеет loading/error
+const { loading, error } = useAppSelector((state) => state.objects);
+
+if (loading) return <Skeleton />;
+if (error) return <ErrorMessage text={error} />;
+```
+
+**API Client использование:**
+
+```typescript
+// ❌ НЕ используй fetch
+const response = await fetch('/api/objects');
+
+// ✅ Используй apiClient
+import { apiClient } from '@/api/apiClient';
+import { ENDPOINTS } from '@/api/endpoints';
+
+const response = await apiClient.get(ENDPOINTS.USER.DATA);
+// или внутри thunk:
+const response = await apiClient.post(ENDPOINTS.ENTITIES.CREATE, { 
+  type: 'object', 
+  data: { title: 'Новый объект' }
+});
+```
+
+**Interceptors работают автоматически:**
+- Добавляют X-Auth-Token из localStorage
+- Перенаправляют на /login при 401/403
+- Нормализуют ответы в формат { success, data, error, code }
 
 ### Роутинг (src/App.tsx)
 ```
