@@ -138,7 +138,7 @@ export const register = createAsyncThunk(
 
 export const loadUserData = createAsyncThunk(
   'user/loadUserData',
-  async (_, { rejectWithValue }) => {
+  async (_, { dispatch, rejectWithValue }) => {
     try {
       const response = await apiClient.get(ENDPOINTS.USER.DATA);
       
@@ -146,7 +146,21 @@ export const loadUserData = createAsyncThunk(
         throw new Error(response.error || 'Failed to load user data');
       }
 
-      return response.data as UserData;
+      const data = response.data as UserData;
+      
+      const { setObjects } = await import('./objectsSlice');
+      const { setWorks } = await import('./worksSlice');
+      const { setWorkLogs } = await import('./workLogsSlice');
+      const { setInspections } = await import('./inspectionsSlice');
+      const { setContractors } = await import('./contractorsSlice');
+      
+      dispatch(setObjects(data.objects || []));
+      dispatch(setWorks(data.works || []));
+      dispatch(setWorkLogs(data.workLogs || []));
+      dispatch(setInspections(data.inspections || []));
+      dispatch(setContractors(data.contractors || []));
+
+      return data;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to load user data');
     }
@@ -281,5 +295,9 @@ const userSlice = createSlice({
   },
 });
 
-export const { logout, setUserData, clearError } = userSlice.actions;
+export const { logout: logoutUser, clearError } = userSlice.actions;
+export const loginUser = login;
+export const registerUser = register;
+export const fetchUserData = loadUserData;
+export { verifyToken as verifyTokenAction };
 export default userSlice.reducer;

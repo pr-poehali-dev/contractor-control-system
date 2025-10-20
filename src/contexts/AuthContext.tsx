@@ -1,9 +1,13 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-
-const API_BASE = 'https://functions.poehali.dev';
-const AUTH_API = `${API_BASE}/b9d6731e-788e-476b-bad5-047bd3d6adc1`;
-const USER_DATA_API = `${API_BASE}/bdee636b-a6c0-42d0-8f77-23c316751e34`;
-const VERIFY_CODE_API = `${API_BASE}/09b6a02f-8537-4a53-875d-3a46d3fdc278`;
+import { createContext, useContext, ReactNode, useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { 
+  loginUser, 
+  loginWithPhone as loginWithPhoneAction,
+  registerUser,
+  verifyToken as verifyTokenAction,
+  logoutUser,
+  fetchUserData
+} from '@/store/slices/userSlice';
 
 type UserRole = 'contractor' | 'client' | 'admin';
 
@@ -74,224 +78,70 @@ interface RegisterData {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    const storedUser = localStorage.getItem('user');
-    console.log('AuthProvider init: storedUser =', storedUser ? 'EXISTS' : 'NULL');
-    if (storedUser) {
-      try {
-        return JSON.parse(storedUser);
-      } catch (e) {
-        console.error('Failed to parse stored user', e);
-        return null;
-      }
-    }
-    return null;
-  });
-  const [token, setToken] = useState<string | null>(() => {
-    const storedToken = localStorage.getItem('auth_token');
-    console.log('AuthProvider init: storedToken =', storedToken ? storedToken.substring(0, 20) + '...' : 'NULL');
-    return storedToken;
-  });
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const saveAuth = (authToken: string, authUser: User) => {
-    setToken(authToken);
-    setUser(authUser);
-    localStorage.setItem('auth_token', authToken);
-    localStorage.setItem('user', JSON.stringify(authUser));
-  };
-
-  const loadUserDataInternal = async (authToken: string) => {
-    try {
-      console.log('Loading user data...');
-      const response = await fetch(USER_DATA_API, {
-        method: 'GET',
-        headers: {
-          'X-Auth-Token': authToken,
-        },
-      });
-
-      if (!response.ok) {
-        console.error('Failed to load user data:', response.status);
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
-        return;
-      }
-
-      const data = await response.json();
-      console.log('User data loaded:', data);
-      
-      const normalizedData = {
-        objects: Array.isArray(data.objects) ? data.objects : [],
-        works: Array.isArray(data.works) ? data.works : [],
-        inspections: Array.isArray(data.inspections) ? data.inspections : [],
-        remarks: Array.isArray(data.remarks) ? data.remarks : [],
-        workLogs: Array.isArray(data.workLogs) ? data.workLogs : [],
-        checkpoints: Array.isArray(data.checkpoints) ? data.checkpoints : [],
-        contractors: Array.isArray(data.contractors) ? data.contractors : [],
-        chatMessages: Array.isArray(data.chatMessages) ? data.chatMessages : [],
-        unreadCounts: data.unreadCounts || {},
-        defect_reports: Array.isArray(data.defect_reports) ? data.defect_reports : [],
-      };
-      
-      console.log('Normalized user data:', normalizedData);
-      setUserData(normalizedData);
-    } catch (error) {
-      console.error('Error loading user data:', error);
-    }
-  };
+  const dispatch = useAppDispatch();
+  const { user, token, isLoading } = useAppSelector((state) => state.user);
+  
+  const userData = useAppSelector((state) => ({
+    objects: state.objects.items,
+    works: state.works.items,
+    inspections: state.inspections.items,
+    remarks: [], // TODO: add remarks slice if needed
+    workLogs: state.workLogs.items,
+    checkpoints: [], // TODO: add checkpoints slice if needed
+    contractors: state.contractors.items,
+    chatMessages: [], // TODO: add chat slice if needed
+    unreadCounts: {}, // TODO: add unread counts to slices
+    defect_reports: [], // TODO: add defect reports slice if needed
+  }));
 
   const loadUserData = async () => {
-    if (!token) {
-      console.error('Cannot load user data: no token');
-      return;
+    if (token) {
+      await dispatch(fetchUserData());
     }
-    await loadUserDataInternal(token);
   };
 
-  const clearAuth = () => {
-    console.log('CLEARING AUTH - called from:', new Error().stack);
-    setToken(null);
-    setUser(null);
-    setUserData(null);
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user');
+  const setUserData = (data: UserData) => {
+    console.warn('setUserData is deprecated, use Redux actions instead');
   };
 
   const login = async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      console.log('Login attempt:', email);
-      const response = await fetch(`${AUTH_API}?action=login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-      console.log('Login response:', { status: response.status, hasToken: !!data.token, hasUser: !!data.user });
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Ошибка входа');
-      }
-
-      console.log('Saving auth, token:', data.token?.substring(0, 20) + '...');
-      saveAuth(data.token, data.user);
-      console.log('Token saved to localStorage:', localStorage.getItem('auth_token')?.substring(0, 20) + '...');
-      await loadUserDataInternal(data.token);
-    } catch (error) {
-      console.error('Login error:', error);
-      throw new Error(error instanceof Error ? error.message : 'Ошибка входа');
-    } finally {
-      setIsLoading(false);
+    const result = await dispatch(loginUser({ email, password }));
+    if (loginUser.fulfilled.match(result)) {
+      await dispatch(fetchUserData());
+    } else {
+      throw new Error(result.payload as string || 'Ошибка входа');
     }
   };
 
   const loginWithPhone = async (phone: string, code: string) => {
-    setIsLoading(true);
-    try {
-      console.log('Phone login attempt:', phone);
-      
-      const response = await fetch(VERIFY_CODE_API, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ phone, code }),
-      });
-
-      const data = await response.json();
-      console.log('Phone login response:', { status: response.status, hasToken: !!data.token, hasUser: !!data.user });
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Ошибка входа');
-      }
-
-      console.log('Saving auth, token:', data.token?.substring(0, 20) + '...');
-      saveAuth(data.token, data.user);
-      console.log('Token saved to localStorage:', localStorage.getItem('auth_token')?.substring(0, 20) + '...');
-      await loadUserDataInternal(data.token);
-    } catch (error) {
-      console.error('Phone login error:', error);
-      throw new Error(error instanceof Error ? error.message : 'Ошибка входа');
-    } finally {
-      setIsLoading(false);
+    const result = await dispatch(loginWithPhoneAction({ phone, code }));
+    if (loginWithPhoneAction.fulfilled.match(result)) {
+      await dispatch(fetchUserData());
+    } else {
+      throw new Error(result.payload as string || 'Ошибка входа');
     }
   };
 
   const register = async (registerData: RegisterData) => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`${AUTH_API}?action=register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(registerData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Ошибка регистрации');
-      }
-
-      saveAuth(data.token, data.user);
-      await loadUserDataInternal(data.token);
-    } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Ошибка регистрации');
-    } finally {
-      setIsLoading(false);
+    const result = await dispatch(registerUser(registerData));
+    if (registerUser.fulfilled.match(result)) {
+      await dispatch(fetchUserData());
+    } else {
+      throw new Error(result.payload as string || 'Ошибка регистрации');
     }
   };
 
   const verifyToken = async (): Promise<boolean> => {
-    const storedToken = localStorage.getItem('auth_token');
-    console.log('Verifying token...', storedToken ? 'Token exists' : 'No token');
-    
-    if (!storedToken) {
-      clearAuth();
-      setIsLoading(false);
-      return false;
-    }
-
-    try {
-      const response = await fetch(`${AUTH_API}?action=verify`, {
-        method: 'GET',
-        headers: {
-          'X-Auth-Token': storedToken,
-        },
-      });
-
-      if (!response.ok) {
-        console.log('Token verification failed:', response.status);
-        clearAuth();
-        setIsLoading(false);
-        return false;
-      }
-
-      const data = await response.json();
-      console.log('Token verified, user:', data.user);
-      setUser(data.user);
-      setToken(storedToken);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      await loadUserDataInternal(storedToken);
-      setIsLoading(false);
-      console.log('Auth flow complete');
+    const result = await dispatch(verifyTokenAction());
+    if (verifyTokenAction.fulfilled.match(result)) {
+      await dispatch(fetchUserData());
       return true;
-    } catch (error) {
-      console.error('Token verification failed:', error);
-      clearAuth();
-      setIsLoading(false);
-      return false;
     }
+    return false;
   };
 
   const logout = () => {
-    clearAuth();
+    dispatch(logoutUser());
   };
 
   useEffect(() => {

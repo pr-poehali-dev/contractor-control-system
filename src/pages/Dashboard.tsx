@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
@@ -79,13 +80,13 @@ const Dashboard = () => {
     link: ''
   });
 
-  const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
-  const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
-  const unreadCounts = userData?.unreadCounts || {};
+  const objects = useAppSelector((state) => state.objects.items);
+  const works = useAppSelector((state) => state.works.items);
+  const unreadCounts = {}; // TODO: implement unread counts in Redux
   
-  const totalMessages = Object.values(unreadCounts).reduce((sum, c: any) => sum + (c.messages || 0), 0);
-  const totalLogs = Object.values(unreadCounts).reduce((sum, c: any) => sum + (c.logs || 0), 0);
-  const totalInspections = Object.values(unreadCounts).reduce((sum, c: any) => sum + (c.inspections || 0), 0);
+  const totalMessages = 0; // TODO: implement in Redux
+  const totalLogs = 0; // TODO: implement in Redux
+  const totalInspections = 0; // TODO: implement in Redux
 
   useEffect(() => {
     loadFeed();

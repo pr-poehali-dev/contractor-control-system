@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAppSelector } from '@/store/hooks';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import WorkJournal from '@/components/WorkJournal';
@@ -7,23 +8,13 @@ import WorkJournal from '@/components/WorkJournal';
 const WorkDetail = () => {
   const { objectId, workId } = useParams();
   const navigate = useNavigate();
-  const { userData, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-slate-600">Загрузка...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const works = (userData?.works && Array.isArray(userData.works)) ? userData.works.filter(w => w.object_id === Number(objectId)) : [];
+  const { isLoading } = useAuth();
+  const works = useAppSelector((state) => 
+    state.works.items.filter(w => w.object_id === Number(objectId))
+  );
   const work = works.find(w => w.id === Number(workId));
 
-  if (!userData) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

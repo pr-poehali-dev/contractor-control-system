@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { api } from '@/lib/api';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { deleteObject } from '@/store/slices/objectsSlice';
 import { useToast } from '@/hooks/use-toast';
 import ObjectsMobileHeader from '@/components/objects/ObjectsMobileHeader';
 import ObjectsDesktopHeader from '@/components/objects/ObjectsDesktopHeader';
@@ -16,7 +17,8 @@ type ViewMode = 'grid' | 'table';
 
 export default function Objects() {
   const navigate = useNavigate();
-  const { user, token, userData, setUserData } = useAuth();
+  const { user } = useAuth();
+  const dispatch = useAppDispatch();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -26,22 +28,13 @@ export default function Objects() {
 
   const handleDeleteObject = async (objectId: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('DELETE: Starting delete for object', objectId);
     if (!confirm('Удалить объект? Это действие нельзя отменить.')) {
-      console.log('DELETE: User cancelled');
       return;
     }
     try {
-      console.log('DELETE: Calling api.deleteItem', { token: !!token, objectId });
-      const result = await api.deleteItem(token!, 'object', objectId);
-      console.log('DELETE: Success', result);
-      if (token) {
-        const refreshed = await api.getUserData(token);
-        setUserData(refreshed);
-      }
+      await dispatch(deleteObject(objectId)).unwrap();
       toast({ title: 'Объект удалён' });
     } catch (error) {
-      console.error('DELETE: Error', error);
       toast({ 
         title: 'Ошибка', 
         description: error instanceof Error ? error.message : 'Не удалось удалить',
@@ -50,9 +43,9 @@ export default function Objects() {
     }
   };
 
-  const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
-  const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
-  const unreadCounts = userData?.unreadCounts || {};
+  const objects = useAppSelector((state) => state.objects.items);
+  const works = useAppSelector((state) => state.works.items);
+  const unreadCounts = {}; // TODO: implement unread counts in Redux
 
   const objectData = objects.map(obj => {
     const objectWorks = works.filter(w => w.object_id === obj.id);
