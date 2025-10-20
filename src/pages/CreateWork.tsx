@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
+import { apiClient } from '@/api/apiClient';
+import { ENDPOINTS } from '@/api/endpoints';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -70,10 +72,13 @@ const CreateWork = () => {
     const loadTemplates = async () => {
       try {
         setIsLoadingTemplates(true);
-        const response = await fetch(
-          'https://functions.poehali.dev/f7c65aa6-e261-44c6-a6cb-65fd7bac3fdf'
-        );
-        const data = await response.json();
+        const response = await apiClient.get(ENDPOINTS.WORK.TYPES);
+        
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to load work templates');
+        }
+        
+        const data = response.data;
         
         const workTypes = data.work_types || [];
         if (Array.isArray(workTypes)) {

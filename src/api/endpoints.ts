@@ -51,6 +51,7 @@ export const ENDPOINTS = {
     LOGIN: '/0b65962d-5a9a-40b3-8108-41e8d32b4a76',
     USERS: '/3f6bb7ff-3e84-4770-8884-3e96062db7f2',
     WORK_TYPES: '/f7c65aa6-e261-44c6-a6cb-65fd7bac3fdf',
+    WORK_TYPES_CRUD: '/f9fe23c7-be87-4fc8-9d46-4c10f5930ee3',
   },
 
   MARK_SEEN: '/e9dd5b4f-67a6-44f8-9e1a-9108341f41df',

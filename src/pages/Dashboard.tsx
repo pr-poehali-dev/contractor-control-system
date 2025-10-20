@@ -7,6 +7,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { api, InspectionEvent as ApiInspectionEvent } from '@/lib/api';
 import Icon from '@/components/ui/icon';
+import { apiClient } from '@/api/apiClient';
+import { ENDPOINTS } from '@/api/endpoints';
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
 import FeedFilters from '@/components/dashboard/FeedFilters';
 import FeedEventCard from '@/components/dashboard/FeedEventCard';
@@ -100,11 +102,10 @@ const Dashboard = () => {
     
     setLoading(true);
     try {
-      const response = await fetch(`https://functions.poehali.dev/f38edb91-216d-4887-b091-ef224db01905?user_id=${user.id}`);
-      const data = await response.json();
+      const response = await apiClient.get(`${ENDPOINTS.FEED}?user_id=${user.id}`);
       
-      if (data.success) {
-        const normalizedEvents = data.events.map((event: any) => {
+      if (response.success) {
+        const normalizedEvents = response.data?.events?.map((event: any) => {
           if (event.photoUrls && typeof event.photoUrls === 'string') {
             try {
               event.photoUrls = JSON.parse(event.photoUrls);
@@ -113,7 +114,7 @@ const Dashboard = () => {
             }
           }
           return event;
-        });
+        }) || [];
         setFeed(normalizedEvents);
       }
     } catch (error) {

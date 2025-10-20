@@ -5,6 +5,8 @@ import { AdminAuthForm } from '@/components/admin/AdminAuthForm';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { UsersTable } from '@/components/admin/UsersTable';
 import { EditUserDialog } from '@/components/admin/EditUserDialog';
+import { apiClient } from '@/api/apiClient';
+import { ENDPOINTS } from '@/api/endpoints';
 
 interface AdminUser {
   id: number;
@@ -54,14 +56,13 @@ const Admin = () => {
   const loadUsers = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/3f6bb7ff-3e84-4770-8884-3e96062db7f2', {
+      const response = await apiClient.get(ENDPOINTS.ADMIN.USERS, {
         headers: { 'X-Admin-Key': 'admin123' },
       });
 
-      if (!response.ok) throw new Error('Failed to load users');
+      if (!response.success) throw new Error('Failed to load users');
 
-      const data = await response.json();
-      setUsers(data.users || []);
+      setUsers(response.data?.users || []);
     } catch (error) {
       toast({
         title: 'Ошибка',
@@ -85,18 +86,13 @@ const Admin = () => {
 
     setIsSendingInvite(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/5865695e-cb4a-4795-bc42-5465c2b7ad0b', {
-        method: 'POST',
+      const response = await apiClient.post(ENDPOINTS.CONTRACTORS.INVITE, inviteData, {
         headers: {
-          'Content-Type': 'application/json',
           'X-Admin-Key': 'admin123',
         },
-        body: JSON.stringify(inviteData),
       });
 
-      if (!response.ok) throw new Error('Failed to invite contractor');
-
-      const data = await response.json();
+      if (!response.success) throw new Error('Failed to invite contractor');
       
       toast({
         title: 'Успешно!',
@@ -133,19 +129,16 @@ const Admin = () => {
     if (!editingUser) return;
 
     try {
-      const response = await fetch('https://functions.poehali.dev/3f6bb7ff-3e84-4770-8884-3e96062db7f2', {
-        method: 'PUT',
+      const response = await apiClient.put(ENDPOINTS.ADMIN.USERS, {
+        user_id: editingUser.id,
+        ...editData,
+      }, {
         headers: {
-          'Content-Type': 'application/json',
           'X-Admin-Key': 'admin123',
         },
-        body: JSON.stringify({
-          user_id: editingUser.id,
-          ...editData,
-        }),
       });
 
-      if (!response.ok) throw new Error('Failed to update user');
+      if (!response.success) throw new Error('Failed to update user');
 
       toast({
         title: 'Успешно!',
@@ -167,26 +160,22 @@ const Admin = () => {
     if (!editingUser) return;
 
     try {
-      const response = await fetch('https://functions.poehali.dev/3f6bb7ff-3e84-4770-8884-3e96062db7f2', {
-        method: 'POST',
+      const response = await apiClient.post(ENDPOINTS.ADMIN.USERS, {
+        action: 'reset_password',
+        user_id: editingUser.id,
+      }, {
         headers: {
-          'Content-Type': 'application/json',
           'X-Admin-Key': 'admin123',
         },
-        body: JSON.stringify({
-          action: 'reset_password',
-          user_id: editingUser.id,
-        }),
       });
 
-      if (!response.ok) throw new Error('Failed to reset password');
+      if (!response.success) throw new Error('Failed to reset password');
 
-      const data = await response.json();
-      setNewPassword(data.password);
+      setNewPassword(response.data.password);
 
       toast({
         title: 'Пароль сброшен!',
-        description: `Новый пароль: ${data.password}`,
+        description: `Новый пароль: ${response.data.password}`,
       });
     } catch (error) {
       toast({
@@ -199,19 +188,16 @@ const Admin = () => {
 
   const handleToggleStatus = async (userId: number) => {
     try {
-      const response = await fetch('https://functions.poehali.dev/3f6bb7ff-3e84-4770-8884-3e96062db7f2', {
-        method: 'POST',
+      const response = await apiClient.post(ENDPOINTS.ADMIN.USERS, {
+        action: 'toggle_status',
+        user_id: userId,
+      }, {
         headers: {
-          'Content-Type': 'application/json',
           'X-Admin-Key': 'admin123',
         },
-        body: JSON.stringify({
-          action: 'toggle_status',
-          user_id: userId,
-        }),
       });
 
-      if (!response.ok) throw new Error('Failed to toggle status');
+      if (!response.success) throw new Error('Failed to toggle status');
 
       toast({
         title: 'Статус изменён',
@@ -233,19 +219,16 @@ const Admin = () => {
     }
 
     try {
-      const response = await fetch('https://functions.poehali.dev/3f6bb7ff-3e84-4770-8884-3e96062db7f2', {
-        method: 'POST',
+      const response = await apiClient.post(ENDPOINTS.ADMIN.USERS, {
+        action: 'delete_user',
+        user_id: userId,
+      }, {
         headers: {
-          'Content-Type': 'application/json',
           'X-Admin-Key': 'admin123',
         },
-        body: JSON.stringify({
-          action: 'delete_user',
-          user_id: userId,
-        }),
       });
 
-      if (!response.ok) throw new Error('Failed to delete user');
+      if (!response.success) throw new Error('Failed to delete user');
 
       toast({
         title: 'Пользователь удалён',

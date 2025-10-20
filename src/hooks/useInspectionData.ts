@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Defect } from '@/components/inspection/DefectsSection';
 import { ControlPoint } from '@/components/inspection/ControlPointsSection';
+import { apiClient } from '@/api/apiClient';
+import { ENDPOINTS } from '@/api/endpoints';
 
 export function useInspectionData(inspectionId: string | undefined) {
   const { userData, user, token } = useAuth();
@@ -85,18 +87,12 @@ export function useInspectionData(inspectionId: string | undefined) {
     if (!token) return;
     
     try {
-      const response = await fetch(
-        `https://functions.poehali.dev/d230b3d9-8dbd-410c-b023-9c021131a15b?inspection_id=${inspectionId}`,
-        {
-          headers: {
-            'X-User-Id': user?.id?.toString() || '',
-          }
-        }
+      const response = await apiClient.get(
+        `${ENDPOINTS.DEFECTS.REPORTS}?inspection_id=${inspectionId}`
       );
       
-      if (response.ok) {
-        const report = await response.json();
-        setDefectReport(report);
+      if (response.success && response.data) {
+        setDefectReport(response.data);
       }
     } catch (error) {
       console.error('Failed to load defect report:', error);

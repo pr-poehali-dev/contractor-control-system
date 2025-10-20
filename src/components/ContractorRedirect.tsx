@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import Icon from '@/components/ui/icon';
+import { apiClient } from '@/api/apiClient';
+import { ENDPOINTS } from '@/api/endpoints';
 
 const ContractorRedirect = () => {
   const { user } = useAuth();
@@ -16,10 +18,13 @@ const ContractorRedirect = () => {
       }
 
       try {
-        const response = await fetch(`https://functions.poehali.dev/354c1d24-5775-4678-ba82-bb1acd986337?contractor_id=${user.id}`);
-        const data = await response.json();
+        const response = await apiClient.get(`${ENDPOINTS.OBJECTS.LIST}?contractor_id=${user.id}`);
+        
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to load objects');
+        }
 
-        const objects = data.objects || [];
+        const objects = response.data?.objects || [];
 
         if (objects.length === 1) {
           const singleObject = objects[0];

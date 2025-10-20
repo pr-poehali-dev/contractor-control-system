@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 import { useNavigate } from 'react-router-dom';
+import { apiClient } from '@/api/apiClient';
+import { ENDPOINTS } from '@/api/endpoints';
 
 interface Assignment {
   object_id: number;
@@ -48,11 +50,12 @@ const ContractorDetailsModal = ({
 
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `https://functions.poehali.dev/4bcd4efc-3b22-4eea-9434-44cc201a86f8?contractor_id=${contractor.id}&with_assignments=true`
+      const response = await apiClient.get(
+        `${ENDPOINTS.CONTRACTORS.LIST}?contractor_id=${contractor.id}&with_assignments=true`
       );
-      const data = await response.json();
-      setAssignments(data.assignments || []);
+      if (response.success) {
+        setAssignments(response.data?.assignments || []);
+      }
     } catch (error) {
       console.error('Failed to load assignments:', error);
     } finally {

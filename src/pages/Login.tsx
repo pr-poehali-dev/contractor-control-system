@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import { apiClient } from '@/api/apiClient';
+import { ENDPOINTS } from '@/api/endpoints';
 
 const Login = () => {
   const [phone, setPhone] = useState('');
@@ -49,23 +51,17 @@ const Login = () => {
     
     setIsLoading(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/ff8b8a8a-815e-455b-a052-81b59ae4cab2', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone }),
-      });
+      const response = await apiClient.post(ENDPOINTS.AUTH.SEND_CODE, { phone });
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      if (response.success) {
         setIsCodeSent(true);
-        setDevCode(data.data.dev_code);
+        setDevCode(response.data?.dev_code);
         toast({
           title: 'Код отправлен',
-          description: `Код для разработки: ${data.data.dev_code}`,
+          description: `Код для разработки: ${response.data?.dev_code}`,
         });
       } else {
-        throw new Error(data.error || 'Ошибка отправки кода');
+        throw new Error(response.error || 'Ошибка отправки кода');
       }
     } catch (error) {
       toast({

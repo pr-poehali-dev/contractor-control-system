@@ -4,6 +4,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { api } from '@/lib/api';
 import { Defect } from '@/components/inspection/DefectsSection';
+import { apiClient } from '@/api/apiClient';
+import { ENDPOINTS } from '@/api/endpoints';
 
 export function useInspectionActions(
   inspection: any,
@@ -148,35 +150,23 @@ export function useInspectionActions(
     
     setLoadingReport(true);
     try {
-      const response = await fetch(
-        'https://functions.poehali.dev/d230b3d9-8dbd-410c-b023-9c021131a15b',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-User-Id': user.id.toString(),
-          },
-          body: JSON.stringify({
-            inspection_id: parseInt(inspection.id.toString()),
-            notes: ''
-          })
-        }
-      );
+      const response = await apiClient.post(ENDPOINTS.DEFECTS.REPORTS, {
+        inspection_id: parseInt(inspection.id.toString()),
+        notes: ''
+      });
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Failed to create report:', errorText);
-        throw new Error(`Failed to create report: ${response.status}`);
+      if (!response.success) {
+        console.error('Failed to create report:', response.error);
+        throw new Error(response.error || 'Failed to create report');
       }
       
-      const report = await response.json();
-      setDefectReport(report);
+      setDefectReport(response.data);
       
       await loadUserData();
       
       toast({ 
         title: 'Акт успешно сформирован!', 
-        description: `Акт №${report.report_number} доступен в разделе "Документы"`
+        description: `Акт №${response.data?.report_number} доступен в разделе "Документы"`
       });
     } catch (error: any) {
       console.error('Error creating report:', error);

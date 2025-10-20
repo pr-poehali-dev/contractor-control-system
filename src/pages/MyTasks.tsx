@@ -5,6 +5,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import { apiClient } from '@/api/apiClient';
+import { ENDPOINTS } from '@/api/endpoints';
 
 interface Task {
   id: number;
@@ -42,20 +44,14 @@ const MyTasks = () => {
     
     setLoading(true);
     try {
-      const url = `https://functions.poehali.dev/facbe7eb-8f9d-4e2a-840a-9404ec0c5715?contractor_id=${user.id}`;
+      const response = await apiClient.get(
+        `${ENDPOINTS.CONTRACTORS.TASKS}?contractor_id=${user.id}`
+      );
       
-      const response = await fetch(url, {
-        headers: {
-          'X-User-Id': user?.id?.toString() || '',
-        }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setTasks(data.tasks || []);
+      if (response.success) {
+        setTasks(response.data?.tasks || []);
       } else {
-        const errorText = await response.text();
-        console.error('[MyTasks] Error response:', errorText);
+        console.error('[MyTasks] Error response:', response.error);
       }
     } catch (error) {
       console.error('[MyTasks] Fetch error:', error);

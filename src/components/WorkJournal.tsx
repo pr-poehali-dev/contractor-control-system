@@ -7,6 +7,8 @@ import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { api, InspectionEvent as ApiInspectionEvent } from '@/lib/api';
+import { apiClient } from '@/api/apiClient';
+import { ENDPOINTS } from '@/api/endpoints';
 
 import WorksList from '@/components/work-journal/WorksList';
 import WorkHeader from '@/components/work-journal/WorkHeader';
@@ -65,15 +67,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
     if (selectedWork) {
       const markAsSeen = async () => {
         try {
-          const token = localStorage.getItem('auth_token');
-          await fetch('https://functions.poehali.dev/e9dd5b4f-67a6-44f8-9e1a-9108341f41df', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Auth-Token': token || ''
-            },
-            body: JSON.stringify({ work_id: selectedWork })
-          });
+          await apiClient.post(ENDPOINTS.MARK_SEEN, { work_id: selectedWork });
         } catch (error) {
           console.error('Failed to mark work as seen:', error);
         }
@@ -91,9 +85,10 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
   useEffect(() => {
     const loadWorkTemplates = async () => {
       try {
-        const response = await fetch('https://functions.poehali.dev/f7c65aa6-e261-44c6-a6cb-65fd7bac3fdf');
-        const data = await response.json();
-        setWorkTemplates(data.work_types || []);
+        const response = await apiClient.get(ENDPOINTS.WORK.TYPES);
+        if (response.success) {
+          setWorkTemplates(response.data?.work_types || []);
+        }
       } catch (error) {
         console.error('Failed to load work templates:', error);
       }

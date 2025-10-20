@@ -7,6 +7,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import type { Work } from '@/contexts/AuthContext';
 import { getWorkStatusInfo } from '@/utils/workStatus';
+import { apiClient } from '@/api/apiClient';
+import { ENDPOINTS } from '@/api/endpoints';
 
 interface WorkStartNotificationProps {
   work: Work;
@@ -27,30 +29,18 @@ export default function WorkStartNotification({ work, onNotified }: WorkStartNot
     setIsNotifying(true);
     
     try {
-      const token = localStorage.getItem('auth_token');
-      const updatePayload = {
+      const updateResponse = await apiClient.put(ENDPOINTS.ENTITIES.UPDATE, {
         type: 'work',
         id: work.id,
         data: {
           start_date: new Date().toISOString().split('T')[0],
           status: 'active'
         }
-      };
-      
-      const updateResponse = await fetch('https://functions.poehali.dev/b69598bf-df90-4a71-93a1-6108c6c39317', {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          'X-Auth-Token': token || ''
-        },
-        body: JSON.stringify(updatePayload)
       });
 
-      const updateResult = await updateResponse.json();
-
-      if (!updateResponse.ok) {
-        console.error('Update failed:', updateResult);
-        throw new Error('Failed to update work');
+      if (!updateResponse.success) {
+        console.error('Update failed:', updateResponse.error);
+        throw new Error(updateResponse.error || 'Failed to update work');
       }
 
       if (token) {
@@ -58,27 +48,20 @@ export default function WorkStartNotification({ work, onNotified }: WorkStartNot
         setUserData(refreshedData);
       }
 
-      const createLogResponse = await fetch('https://functions.poehali.dev/8d57b03e-49c5-4589-abfb-691e6e084c6a', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'X-Auth-Token': token || ''
-        },
-        body: JSON.stringify({
-          type: 'work_log',
-          data: {
-            work_id: work.id,
-            description: '🚀 Начало работ',
-            progress: 0,
-            volume: null,
-            materials: null,
-            photo_urls: null,
-            is_work_start: true
-          }
-        })
+      const createLogResponse = await apiClient.post(ENDPOINTS.ENTITIES.CREATE, {
+        type: 'work_log',
+        data: {
+          work_id: work.id,
+          description: '🚀 Начало работ',
+          progress: 0,
+          volume: null,
+          materials: null,
+          photo_urls: null,
+          is_work_start: true
+        }
       });
 
-      if (createLogResponse.ok) {
+      if (createLogResponse.success) {
         if (token) {
           const refreshedData = await api.getUserData(token);
           setUserData(refreshedData);

@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/ui/icon';
+import { apiClient } from '@/api/apiClient';
+import { ENDPOINTS } from '@/api/endpoints';
 import {
   Dialog,
   DialogContent,
@@ -45,11 +47,10 @@ const WorkTypes = () => {
   const loadWorkTypes = async () => {
     setLoading(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/f9fe23c7-be87-4fc8-9d46-4c10f5930ee3');
-      const data = await response.json();
+      const response = await apiClient.get(ENDPOINTS.ADMIN.WORK_TYPES_CRUD);
       
-      if (data.success) {
-        setWorkTypes(data.work_types || []);
+      if (response.success) {
+        setWorkTypes(response.data?.work_types || []);
       }
     } catch (error) {
       console.error('Failed to load work types:', error);
@@ -89,16 +90,14 @@ const WorkTypes = () => {
     }
 
     try {
-      const response = await fetch('https://functions.poehali.dev/f9fe23c7-be87-4fc8-9d46-4c10f5930ee3', {
-        method: editingType ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...(editingType && { id: editingType.id }),
-          ...formData,
-        }),
-      });
+      const response = editingType
+        ? await apiClient.put(ENDPOINTS.ADMIN.WORK_TYPES_CRUD, {
+            id: editingType.id,
+            ...formData,
+          })
+        : await apiClient.post(ENDPOINTS.ADMIN.WORK_TYPES_CRUD, formData);
 
-      if (!response.ok) throw new Error('Failed to save');
+      if (!response.success) throw new Error(response.error || 'Failed to save');
 
       toast({
         title: 'Успешно!',
@@ -120,13 +119,11 @@ const WorkTypes = () => {
     if (!confirm('Удалить этот вид работ?')) return;
 
     try {
-      const response = await fetch('https://functions.poehali.dev/f9fe23c7-be87-4fc8-9d46-4c10f5930ee3', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
+      const response = await apiClient.delete(ENDPOINTS.ADMIN.WORK_TYPES_CRUD, {
+        data: { id },
       });
 
-      if (!response.ok) throw new Error('Failed to delete');
+      if (!response.success) throw new Error(response.error || 'Failed to delete');
 
       toast({
         title: 'Удалено',

@@ -3,6 +3,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { apiClient } from '@/api/apiClient';
+import { ENDPOINTS } from '@/api/endpoints';
 import {
   WorkTemplate,
   WorkTemplateFormData,
@@ -47,22 +49,13 @@ const WorkTemplates = () => {
 
   const loadTemplates = async () => {
     try {
-      const response = await fetch(
-        'https://functions.poehali.dev/f7c65aa6-e261-44c6-a6cb-65fd7bac3fdf',
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await apiClient.get(ENDPOINTS.WORK.TYPES);
 
-      if (!response.ok) {
-        throw new Error('Failed to load templates');
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to load templates');
       }
 
-      const data = await response.json();
-      setTemplates(data.work_types || []);
+      setTemplates(response.data?.work_types || []);
     } catch (error) {
       console.error('Load templates error:', error);
       toast({
@@ -86,19 +79,10 @@ const WorkTemplates = () => {
     }
 
     try {
-      const response = await fetch(
-        'https://functions.poehali.dev/f7c65aa6-e261-44c6-a6cb-65fd7bac3fdf',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await apiClient.post(ENDPOINTS.WORK.TYPES, formData);
 
-      if (!response.ok) {
-        throw new Error('Failed to add template');
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to add template');
       }
 
       toast({
@@ -138,19 +122,13 @@ const WorkTemplates = () => {
     }
 
     try {
-      const response = await fetch(
-        `https://functions.poehali.dev/f7c65aa6-e261-44c6-a6cb-65fd7bac3fdf?id=${selectedTemplate.id}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        }
+      const response = await apiClient.put(
+        `${ENDPOINTS.WORK.TYPES}?id=${selectedTemplate.id}`,
+        formData
       );
 
-      if (!response.ok) {
-        throw new Error('Failed to update template');
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to update template');
       }
 
       toast({

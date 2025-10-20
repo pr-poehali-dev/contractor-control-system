@@ -8,8 +8,8 @@ import { useToast } from '@/hooks/use-toast';
 import AdminStats from '@/components/admin/AdminStats';
 import AdminUsers from '@/components/admin/AdminUsers';
 import AdminWorkTypes from '@/components/admin/AdminWorkTypes';
-
-const ADMIN_API = 'https://functions.poehali.dev/0b65962d-5a9a-40b3-8108-41e8d32b4a76';
+import { apiClient } from '@/api/apiClient';
+import { ENDPOINTS } from '@/api/endpoints';
 
 interface Stats {
   clients_count: number;
@@ -68,14 +68,11 @@ export default function AdminPanel() {
     
     setLoading(true);
     try {
-      const response = await fetch(`${ADMIN_API}?action=stats`, {
-        headers: { 'X-Auth-Token': token }
-      });
+      const response = await apiClient.get(ENDPOINTS.ADMIN.LOGIN + '?action=stats');
       
-      if (!response.ok) throw new Error('Failed to load stats');
+      if (!response.success) throw new Error('Failed to load stats');
       
-      const data = await response.json();
-      setStats(data);
+      setStats(response.data);
     } catch (error) {
       toast({
         title: 'Ошибка',
@@ -92,14 +89,11 @@ export default function AdminPanel() {
     
     setLoading(true);
     try {
-      const response = await fetch(`${ADMIN_API}?action=users`, {
-        headers: { 'X-Auth-Token': token }
-      });
+      const response = await apiClient.get(ENDPOINTS.ADMIN.LOGIN + '?action=users');
       
-      if (!response.ok) throw new Error('Failed to load users');
+      if (!response.success) throw new Error('Failed to load users');
       
-      const data = await response.json();
-      setUsers(data.users);
+      setUsers(response.data.users);
     } catch (error) {
       toast({
         title: 'Ошибка',
@@ -115,16 +109,12 @@ export default function AdminPanel() {
     if (!token) return;
     
     try {
-      const response = await fetch(`${ADMIN_API}?action=toggle-user`, {
-        method: 'PUT',
-        headers: {
-          'X-Auth-Token': token,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ user_id: userId, is_active: !isActive })
+      const response = await apiClient.put(ENDPOINTS.ADMIN.LOGIN + '?action=toggle-user', {
+        user_id: userId,
+        is_active: !isActive
       });
       
-      if (!response.ok) throw new Error('Failed to update user');
+      if (!response.success) throw new Error('Failed to update user');
       
       toast({
         title: 'Успешно',
@@ -146,14 +136,11 @@ export default function AdminPanel() {
     
     setLoading(true);
     try {
-      const response = await fetch(`${ADMIN_API}?action=work-types`, {
-        headers: { 'X-Auth-Token': token }
-      });
+      const response = await apiClient.get(ENDPOINTS.ADMIN.LOGIN + '?action=work-types');
       
-      if (!response.ok) throw new Error('Failed to load work types');
+      if (!response.success) throw new Error('Failed to load work types');
       
-      const data = await response.json();
-      setWorkTypes(data.work_types);
+      setWorkTypes(response.data.work_types);
     } catch (error) {
       toast({
         title: 'Ошибка',
@@ -176,16 +163,9 @@ export default function AdminPanel() {
     }
     
     try {
-      const response = await fetch(`${ADMIN_API}?action=add-work-type`, {
-        method: 'POST',
-        headers: {
-          'X-Auth-Token': token,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newWorkType)
-      });
+      const response = await apiClient.post(ENDPOINTS.ADMIN.LOGIN + '?action=add-work-type', newWorkType);
       
-      if (!response.ok) throw new Error('Failed to add work type');
+      if (!response.success) throw new Error('Failed to add work type');
       
       toast({
         title: 'Успешно',

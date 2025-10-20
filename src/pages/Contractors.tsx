@@ -11,6 +11,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import ContractorDetailsModal from '@/components/contractors/ContractorDetailsModal';
+import { apiClient } from '@/api/apiClient';
+import { ENDPOINTS } from '@/api/endpoints';
 
 const Contractors = () => {
   const { user, userData } = useAuth();
@@ -33,9 +35,8 @@ const Contractors = () => {
     
     setIsLoading(true);
     try {
-      const response = await fetch(`https://functions.poehali.dev/4bcd4efc-3b22-4eea-9434-44cc201a86f8?client_id=${user.id}`);
-      const data = await response.json();
-      setContractors(data.contractors || []);
+      const response = await apiClient.get(ENDPOINTS.CONTRACTORS.LIST + '?client_id=' + user.id);
+      setContractors(response.data?.contractors || []);
     } catch (error) {
       console.error('Failed to load contractors:', error);
     } finally {
@@ -66,19 +67,15 @@ const Contractors = () => {
     setExistingContractor(null);
 
     try {
-      const response = await fetch('https://functions.poehali.dev/5865695e-cb4a-4795-bc42-5465c2b7ad0b', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          inn: inviteData.inn,
-          name: inviteData.name,
-          email: inviteData.email,
-          phone: inviteData.phone,
-          client_id: user?.id,
-        }),
+      const response = await apiClient.post(ENDPOINTS.CONTRACTORS.INVITE, {
+        inn: inviteData.inn,
+        name: inviteData.name,
+        email: inviteData.email,
+        phone: inviteData.phone,
+        client_id: user?.id,
       });
 
-      const data = await response.json();
+      const data = response.data;
 
       if (data.exists && data.already_linked) {
         toast({
@@ -114,16 +111,12 @@ const Contractors = () => {
     if (!existingContractor) return;
 
     try {
-      const response = await fetch('https://functions.poehali.dev/f25f4572-bf91-47c2-aca5-059ebc3b870e', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          client_id: user?.id,
-          contractor_id: existingContractor.id,
-        }),
+      const response = await apiClient.post(ENDPOINTS.CONTRACTORS.LINK, {
+        client_id: user?.id,
+        contractor_id: existingContractor.id,
       });
 
-      if (response.ok) {
+      if (response.success) {
         toast({
           title: 'Подрядчик добавлен',
           description: `${existingContractor.name} добавлен в ваш список`,

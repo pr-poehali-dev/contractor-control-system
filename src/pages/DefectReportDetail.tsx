@@ -7,6 +7,8 @@ import { useToast } from '@/hooks/use-toast';
 import DefectReportHeader from '@/components/defect-report/DefectReportHeader';
 import DefectReportInfo from '@/components/defect-report/DefectReportInfo';
 import DefectItem from '@/components/defect-report/DefectItem';
+import { apiClient } from '@/api/apiClient';
+import { ENDPOINTS } from '@/api/endpoints';
 
 interface Defect {
   id: string;
@@ -51,8 +53,8 @@ const DefectReportDetail = () => {
     
     setLoading(true);
     try {
-      const response = await fetch(
-        `https://functions.poehali.dev/d230b3d9-8dbd-410c-b023-9c021131a15b?report_id=${reportId}`,
+      const response = await apiClient.get(
+        ENDPOINTS.DEFECTS.REPORTS + '?report_id=' + reportId,
         {
           headers: {
             'X-User-Id': user?.id?.toString() || '',
@@ -60,10 +62,9 @@ const DefectReportDetail = () => {
         }
       );
       
-      if (response.ok) {
-        const data = await response.json();
-        setReport(data);
-        setRemediations(data.remediations || []);
+      if (response.success && response.data) {
+        setReport(response.data);
+        setRemediations(response.data.remediations || []);
       }
     } catch (error) {
       toast({
@@ -86,24 +87,22 @@ const DefectReportDetail = () => {
     
     setSubmitting(true);
     try {
-      const response = await fetch(
-        'https://functions.poehali.dev/ef8edfd4-ef48-48a9-95fb-78f5a4982949',
+      const response = await apiClient.put(
+        ENDPOINTS.DEFECTS.REMEDIATION,
         {
-          method: 'PUT',
+          remediation_id: remediationId,
+          status: 'completed',
+          remediation_description: description,
+          remediation_photos: photos
+        },
+        {
           headers: {
-            'Content-Type': 'application/json',
             'X-User-Id': user?.id?.toString() || '',
-          },
-          body: JSON.stringify({
-            remediation_id: remediationId,
-            status: 'completed',
-            remediation_description: description,
-            remediation_photos: photos
-          })
+          }
         }
       );
       
-      if (response.ok) {
+      if (response.success) {
         toast({ 
           title: 'Замечание устранено', 
           description: 'Информация отправлена на проверку' 
@@ -130,24 +129,22 @@ const DefectReportDetail = () => {
     
     setSubmitting(true);
     try {
-      const response = await fetch(
-        'https://functions.poehali.dev/ef8edfd4-ef48-48a9-95fb-78f5a4982949',
+      const response = await apiClient.put(
+        ENDPOINTS.DEFECTS.REMEDIATION,
         {
-          method: 'PUT',
+          remediation_id: remediationId,
+          status: approved ? 'verified' : 'rejected',
+          verified_by: user?.id,
+          verification_notes: notes
+        },
+        {
           headers: {
-            'Content-Type': 'application/json',
             'X-User-Id': user?.id?.toString() || '',
-          },
-          body: JSON.stringify({
-            remediation_id: remediationId,
-            status: approved ? 'verified' : 'rejected',
-            verified_by: user?.id,
-            verification_notes: notes
-          })
+          }
         }
       );
       
-      if (response.ok) {
+      if (response.success) {
         toast({ 
           title: approved ? 'Устранение подтверждено' : 'Устранение отклонено',
           description: approved ? 'Замечание успешно закрыто' : 'Замечание возвращено на доработку'
