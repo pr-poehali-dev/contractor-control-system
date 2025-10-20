@@ -421,5 +421,6 @@ export const { logout, setUserData, clearError } = userSlice.actions;
 export const loginUser = login;
 export const registerUser = register;
 export const fetchUserData = loadUserData;
+export { loginWithPhone };
 
 export default userSlice.reducer;
