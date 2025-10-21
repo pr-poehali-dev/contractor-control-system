@@ -86,8 +86,8 @@ const CreateWork = () => {
         
         console.log('🔍 User data loaded!', result);
         
-        // Use fresh data from the result
-        const freshWorks = result?.works || [];
+        // Use fresh data from the result (unwrap the data object)
+        const freshWorks = result?.data?.works || [];
         const objectWorks = freshWorks.filter((work: any) => work.object_id === Number(objectId));
         
         console.log('🔍 Filtered works for object', objectId, ':', objectWorks);
