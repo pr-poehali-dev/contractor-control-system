@@ -5,6 +5,7 @@ import worksReducer from './slices/worksSlice';
 import workLogsReducer from './slices/workLogsSlice';
 import inspectionsReducer from './slices/inspectionsSlice';
 import contractorsReducer from './slices/contractorsSlice';
+import defectReportsReducer from './slices/defectReportsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     workLogs: workLogsReducer,
     inspections: inspectionsReducer,
     contractors: contractorsReducer,
+    defectReports: defectReportsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

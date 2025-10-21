@@ -212,12 +212,14 @@ export const loadUserData = createAsyncThunk(
         const { setWorkLogs } = await import('./workLogsSlice');
         const { setInspections } = await import('./inspectionsSlice');
         const { setContractors } = await import('./contractorsSlice');
+        const { setDefectReports } = await import('./defectReportsSlice');
         
         dispatch(setObjects(data.objects || []));
         dispatch(setWorks(data.works || []));
         dispatch(setWorkLogs(data.workLogs || []));
         dispatch(setInspections(data.inspections || []));
         dispatch(setContractors(data.contractors || []));
+        dispatch(setDefectReports(data.defect_reports || []));
       } catch (importError) {
         console.error('Failed to import slices:', importError);
       }

@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     contractors: state.contractors.items,
     chatMessages: [],
     unreadCounts: {},
-    defect_reports: [],
+    defect_reports: state.defectReports.items,
   }));
 
   /**
