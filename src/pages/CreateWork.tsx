@@ -109,33 +109,45 @@ const CreateWork = () => {
           </CardContent>
         </Card>
 
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Работы</h2>
+          <Button
+            type="button"
+            onClick={addWork}
+            size="sm"
+          >
+            <Icon name="Plus" size={16} className="mr-2" />
+            Добавить работу
+          </Button>
+        </div>
+
         <InfoSection />
 
         <form onSubmit={handleSubmit}>
-          <div className="space-y-3">
-            {works.map((work, index) => (
-              <WorkFormCard
-                key={work.id}
-                work={work}
-                index={index}
-                categories={categories}
-                workTemplates={workTemplates}
-                contractors={contractors}
-                onUpdate={updateWork}
-                onDuplicate={duplicateWork}
-                onRemove={removeWork}
-              />
-            ))}
-          </div>
-
-          {works.length === 0 && (
+          {works.length === 0 ? (
             <div className="text-center py-12 bg-slate-50 rounded-lg border border-dashed">
               <Icon name="Briefcase" size={48} className="mx-auto text-slate-300 mb-3" />
               <p className="text-slate-500 mb-4">У этого объекта пока нет работ</p>
-              <Button onClick={addWork}>
+              <Button type="button" onClick={addWork}>
                 <Icon name="Plus" size={16} className="mr-2" />
                 Добавить первую работу
               </Button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {works.map((work, index) => (
+                <WorkFormCard
+                  key={work.id}
+                  work={work}
+                  index={index}
+                  categories={categories}
+                  workTemplates={workTemplates}
+                  contractors={contractors}
+                  onUpdate={updateWork}
+                  onDuplicate={duplicateWork}
+                  onRemove={removeWork}
+                />
+              ))}
             </div>
           )}
 

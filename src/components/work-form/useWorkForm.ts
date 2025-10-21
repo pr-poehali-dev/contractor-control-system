@@ -88,7 +88,6 @@ export const useWorkForm = (objectId: string | undefined) => {
           planned_end_date: work.planned_end_date?.split('T')[0] || '',
           contractor_id: work.contractor_id ? String(work.contractor_id) : '',
           isExisting: true,
-          isCollapsed: true,
         };
       });
       
@@ -102,7 +101,7 @@ export const useWorkForm = (objectId: string | undefined) => {
   };
 
   const addWork = () => {
-    setWorks([...works, { ...emptyWork, id: crypto.randomUUID(), isCollapsed: false }]);
+    setWorks([...works, { ...emptyWork, id: crypto.randomUUID() }]);
   };
 
   const removeWork = (id: string) => {
