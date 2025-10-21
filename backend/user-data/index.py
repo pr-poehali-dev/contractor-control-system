@@ -359,6 +359,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         """)
         info_posts = cur.fetchall()
         
+        # Загружаем work_templates
+        cur.execute("""
+            SELECT id, title, category, description
+            FROM work_templates
+            ORDER BY category, title
+        """)
+        work_templates = cur.fetchall()
+        
         # Загружаем last_seen_at для каждой работы
         work_views = {}
         if work_ids:
@@ -437,6 +445,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'defect_reports': [dict(dr) for dr in defect_reports],
             'contractors': [dict(c) for c in contractors],
             'infoPosts': [dict(p) for p in info_posts],
+            'work_templates': [dict(wt) for wt in work_templates],
             'unreadCounts': unread_counts
         }
         
