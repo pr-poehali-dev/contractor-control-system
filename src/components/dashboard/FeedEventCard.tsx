@@ -345,7 +345,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
           </div>
         )}
         
-        <div className="flex items-center justify-end gap-1.5 text-xs text-slate-400 border-t border-slate-100 my-0 py-0">
+        <div className="flex items-center justify-end gap-1.5 text-xs text-slate-400 border-t border-slate-100 py-0 my-[5px]">
           <Icon name="Clock" size={12} />
           {formatTimeAgo(event.timestamp)}
         </div>
