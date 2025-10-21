@@ -141,28 +141,7 @@ const ObjectDetail = () => {
               <h1 className="text-lg font-bold text-slate-900 truncate">{object.title}</h1>
             </div>
           </div>
-
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => setShowActions(!showActions)}
-          >
-            <Icon name="Settings" size={20} />
-          </Button>
         </div>
-
-        {showActions && (
-          <div className="mt-4 flex gap-2">
-            <Button variant="outline" size="sm" className="flex-1" onClick={handleEdit}>
-              <Icon name="Edit" size={18} className="mr-1" />
-              Изменить
-            </Button>
-            <Button variant="outline" size="sm" className="flex-1" onClick={handleDelete}>
-              <Icon name="Trash2" size={16} className="mr-1" />
-              Удалить
-            </Button>
-          </div>
-        )}
 
         <div className="mt-3 space-y-2">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
