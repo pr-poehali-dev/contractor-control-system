@@ -84,29 +84,33 @@ export default function WorksList({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
                         <h4 className="font-semibold text-sm truncate">{work.title}</h4>
-                        {lastLog && (
+                        {lastLog && selectedWork !== work.id && (
                           <span className="text-xs text-slate-400 ml-2">{formatTime(lastLog.created_at)}</span>
                         )}
                       </div>
-                      {work.planned_start_date && (
-                        <div className="flex items-center gap-1 text-xs text-slate-500 mb-1.5">
-                          <Icon name="Calendar" size={11} />
-                          <span>{formatDateRange(work.planned_start_date, work.planned_end_date)}</span>
-                        </div>
+                      {selectedWork !== work.id && (
+                        <>
+                          {work.planned_start_date && (
+                            <div className="flex items-center gap-1 text-xs text-slate-500 mb-1.5">
+                              <Icon name="Calendar" size={11} />
+                              <span>{formatDateRange(work.planned_start_date, work.planned_end_date)}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-2 mt-2 flex-wrap">
+                            <Badge 
+                              variant="outline" 
+                              className={cn("text-xs font-medium px-2 py-0.5", getWorkStatusInfo(work).color)}
+                            >
+                              {getWorkStatusInfo(work).icon} {getWorkStatusInfo(work).message}
+                            </Badge>
+                            <NotificationGroup
+                              messages={unreadCounts[work.id]?.messages}
+                              logs={!isContractor ? unreadCounts[work.id]?.logs : undefined}
+                              inspections={isContractor ? unreadCounts[work.id]?.inspections : undefined}
+                            />
+                          </div>
+                        </>
                       )}
-                      <div className="flex items-center gap-2 mt-2 flex-wrap">
-                        <Badge 
-                          variant="outline" 
-                          className={cn("text-xs font-medium px-2 py-0.5", getWorkStatusInfo(work).color)}
-                        >
-                          {getWorkStatusInfo(work).icon} {getWorkStatusInfo(work).message}
-                        </Badge>
-                        <NotificationGroup
-                          messages={unreadCounts[work.id]?.messages}
-                          logs={!isContractor ? unreadCounts[work.id]?.logs : undefined}
-                          inspections={isContractor ? unreadCounts[work.id]?.inspections : undefined}
-                        />
-                      </div>
                     </div>
                   </div>
                 </button>
