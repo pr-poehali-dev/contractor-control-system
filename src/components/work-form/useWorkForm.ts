@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
@@ -16,6 +16,7 @@ export const useWorkForm = (objectId: string | undefined) => {
   const [works, setWorks] = useState<WorkForm[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const isInitialized = useRef(false);
 
   const contractors = userData?.contractors || [];
   const workTemplates = userData?.work_templates || [];
@@ -28,9 +29,10 @@ export const useWorkForm = (objectId: string | undefined) => {
       console.log('🔍 Loading user data...');
       setIsLoading(true);
       dispatch(loadUserData(token));
-    } else if (works.length === 0) {
+    } else if (!isInitialized.current) {
       console.log('🔍 User data already loaded, processing works...');
       processWorks();
+      isInitialized.current = true;
     }
   }, [objectId, token, userData]);
 
