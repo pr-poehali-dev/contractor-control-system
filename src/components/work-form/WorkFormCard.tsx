@@ -108,15 +108,16 @@ export const WorkFormCard = ({
 
           <div>
             <Label htmlFor={`title-${work.id}`} className="text-sm">
-              Название работы <span className="text-red-500">*</span>
+              Вид работ <span className="text-red-500">*</span>
             </Label>
-            {!work.isExisting && work.category ? (
+            {work.category ? (
               <Select
                 value={work.title}
                 onValueChange={(value) => onUpdate(work.id, 'title', value)}
+                disabled={work.isExisting}
               >
                 <SelectTrigger id={`title-${work.id}`} className={cn(!work.title && 'border-red-300', "h-9")}>
-                  <SelectValue placeholder="Выберите работу" />
+                  <SelectValue placeholder="Выберите вид работ" />
                 </SelectTrigger>
                 <SelectContent>
                   {workTemplates
@@ -128,14 +129,6 @@ export const WorkFormCard = ({
                     ))}
                 </SelectContent>
               </Select>
-            ) : work.isExisting ? (
-              <Input
-                id={`title-${work.id}`}
-                placeholder="Например: Монтаж вентиляционной системы"
-                value={work.title}
-                onChange={(e) => onUpdate(work.id, 'title', e.target.value)}
-                className={cn(!work.title && 'border-red-300', "h-9")}
-              />
             ) : (
               <div className="h-9 flex items-center px-3 text-sm text-slate-400 border border-slate-200 rounded-md bg-slate-50">
                 Сначала выберите категорию
