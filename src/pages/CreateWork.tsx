@@ -1,5 +1,9 @@
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import { useWorkForm } from '@/components/work-form/useWorkForm';
 import { WorkFormCard } from '@/components/work-form/WorkFormCard';
@@ -9,6 +13,7 @@ const CreateWork = () => {
   const { objectId } = useParams();
   const {
     works,
+    objectData,
     isLoading,
     isSubmitting,
     contractors,
@@ -18,6 +23,8 @@ const CreateWork = () => {
     removeWork,
     duplicateWork,
     updateWork,
+    updateObjectField,
+    saveObject,
     handleSubmit,
     handleCancel,
   } = useWorkForm(objectId);
@@ -42,9 +49,65 @@ const CreateWork = () => {
             К объекту
           </Button>
           
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">Управление работами</h1>
-          <p className="text-slate-600">Добавьте новые работы или отредактируйте существующие</p>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Управление объектом и работами</h1>
+          <p className="text-slate-600">Отредактируйте информацию об объекте и управляйте работами</p>
         </div>
+
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Icon name="Building2" size={20} />
+              Информация об объекте
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <Label htmlFor="object-name">Название объекта</Label>
+                <Input
+                  id="object-name"
+                  value={objectData.name}
+                  onChange={(e) => updateObjectField('name', e.target.value)}
+                  placeholder="Введите название объекта"
+                />
+              </div>
+              <div>
+                <Label htmlFor="object-address">Адрес</Label>
+                <Input
+                  id="object-address"
+                  value={objectData.address}
+                  onChange={(e) => updateObjectField('address', e.target.value)}
+                  placeholder="Адрес объекта"
+                />
+              </div>
+              <div>
+                <Label htmlFor="object-customer">Заказчик</Label>
+                <Input
+                  id="object-customer"
+                  value={objectData.customer}
+                  onChange={(e) => updateObjectField('customer', e.target.value)}
+                  placeholder="Название заказчика"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="object-description">Описание</Label>
+                <Textarea
+                  id="object-description"
+                  value={objectData.description}
+                  onChange={(e) => updateObjectField('description', e.target.value)}
+                  placeholder="Краткое описание объекта"
+                  rows={3}
+                />
+              </div>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <Button onClick={saveObject} variant="outline" disabled={isSubmitting}>
+                <Icon name="Save" size={16} className="mr-2" />
+                Сохранить объект
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         <InfoSection />
 
@@ -65,17 +128,16 @@ const CreateWork = () => {
             ))}
           </div>
 
-          <div className="mt-4 flex flex-col sm:flex-row gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={addWork}
-              className="w-full sm:w-auto"
-            >
-              <Icon name="Plus" size={18} className="mr-2" />
-              Добавить ещё работу
-            </Button>
-          </div>
+          {works.length === 0 && (
+            <div className="text-center py-12 bg-slate-50 rounded-lg border border-dashed">
+              <Icon name="Briefcase" size={48} className="mx-auto text-slate-300 mb-3" />
+              <p className="text-slate-500 mb-4">У этого объекта пока нет работ</p>
+              <Button onClick={addWork}>
+                <Icon name="Plus" size={16} className="mr-2" />
+                Добавить первую работу
+              </Button>
+            </div>
+          )}
 
           <div className="mt-6 flex flex-col-reverse sm:flex-row gap-3 justify-end border-t pt-6">
             <Button

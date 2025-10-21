@@ -7,6 +7,14 @@ import { api } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { WorkForm, emptyWork } from './types';
 
+interface ObjectData {
+  id: number | null;
+  name: string;
+  address: string;
+  customer: string;
+  description: string;
+}
+
 export const useWorkForm = (objectId: string | undefined) => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -14,6 +22,13 @@ export const useWorkForm = (objectId: string | undefined) => {
   const dispatch = useAppDispatch();
   const userData = useAppSelector((state) => state.user.userData);
   const [works, setWorks] = useState<WorkForm[]>([]);
+  const [objectData, setObjectData] = useState<ObjectData>({
+    id: null,
+    name: '',
+    address: '',
+    customer: '',
+    description: '',
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const isInitialized = useRef(false);
@@ -41,6 +56,19 @@ export const useWorkForm = (objectId: string | undefined) => {
     
     const freshWorks = userData.works || [];
     const freshTemplates = userData.work_templates || [];
+    const freshObjects = userData.objects || [];
+    const currentObject = freshObjects.find((obj: any) => obj.id === Number(objectId));
+    
+    if (currentObject) {
+      setObjectData({
+        id: currentObject.id,
+        name: currentObject.name || '',
+        address: currentObject.address || '',
+        customer: currentObject.customer || '',
+        description: currentObject.description || '',
+      });
+    }
+    
     const objectWorks = freshWorks.filter((work: any) => work.object_id === Number(objectId));
     
     console.log('🔍 Filtered works for object', objectId, ':', objectWorks);
@@ -49,7 +77,6 @@ export const useWorkForm = (objectId: string | undefined) => {
     if (objectWorks.length > 0) {
       const existingWorks = objectWorks.map((work: any) => {
         const template = freshTemplates.find((t: any) => t.title === work.title);
-        console.log(`🔍 Finding template for "${work.title}":`, template);
         return {
           id: `existing-${work.id}`,
           workId: work.id,
@@ -61,21 +88,21 @@ export const useWorkForm = (objectId: string | undefined) => {
           planned_end_date: work.planned_end_date?.split('T')[0] || '',
           contractor_id: work.contractor_id ? String(work.contractor_id) : '',
           isExisting: true,
+          isCollapsed: true,
         };
       });
       
       console.log('✅ Setting works with existing:', existingWorks);
-      setWorks([...existingWorks, { ...emptyWork, id: crypto.randomUUID() }]);
+      setWorks(existingWorks);
     } else {
-      console.log('ℹ️ No existing works for this object, setting empty work');
-      setWorks([{ ...emptyWork, id: crypto.randomUUID() }]);
+      setWorks([]);
     }
     
     setIsLoading(false);
   };
 
   const addWork = () => {
-    setWorks([...works, { ...emptyWork, id: crypto.randomUUID() }]);
+    setWorks([...works, { ...emptyWork, id: crypto.randomUUID(), isCollapsed: false }]);
   };
 
   const removeWork = (id: string) => {
@@ -85,16 +112,6 @@ export const useWorkForm = (objectId: string | undefined) => {
       toast({
         title: 'Нельзя удалить',
         description: 'Существующие работы нельзя удалить здесь. Перейдите в карточку работы.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const newWorks = works.filter(w => !w.isExisting);
-    if (newWorks.length === 1) {
-      toast({
-        title: 'Ошибка',
-        description: 'Должна быть хотя бы одна новая работа',
         variant: 'destructive',
       });
       return;
@@ -133,11 +150,53 @@ export const useWorkForm = (objectId: string | undefined) => {
     setWorks(updatedWorks);
   };
 
+  const updateObjectField = (field: keyof ObjectData, value: string) => {
+    setObjectData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const saveObject = async () => {
+    if (!objectData.id || !token) return;
+
+    setIsSubmitting(true);
+    try {
+      await api.updateItem(token, 'object', objectData.id, {
+        name: objectData.name,
+        address: objectData.address,
+        customer: objectData.customer,
+        description: objectData.description,
+      });
+
+      await dispatch(loadUserData(token)).unwrap();
+
+      toast({
+        title: 'Объект обновлён!',
+        description: 'Информация об объекте успешно сохранена',
+      });
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: error instanceof Error ? error.message : 'Не удалось сохранить объект',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const newWorks = works.filter(w => !w.isExisting);
     const existingWorks = works.filter(w => w.isExisting);
+
+    if (newWorks.length === 0 && existingWorks.length === 0) {
+      toast({
+        title: 'Нет работ',
+        description: 'Добавьте хотя бы одну работу',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     const invalidWorks = newWorks.filter(w => !w.category.trim() || !w.title.trim());
     if (invalidWorks.length > 0) {
@@ -202,6 +261,7 @@ export const useWorkForm = (objectId: string | undefined) => {
 
   return {
     works,
+    objectData,
     isLoading,
     isSubmitting,
     contractors,
@@ -211,6 +271,8 @@ export const useWorkForm = (objectId: string | undefined) => {
     removeWork,
     duplicateWork,
     updateWork,
+    updateObjectField,
+    saveObject,
     handleSubmit,
     handleCancel,
   };

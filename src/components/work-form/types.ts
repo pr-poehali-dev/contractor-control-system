@@ -9,6 +9,7 @@ export interface WorkForm {
   planned_end_date: string;
   contractor_id: string;
   isExisting: boolean;
+  isCollapsed?: boolean;
 }
 
 export const emptyWork: WorkForm = {
@@ -21,6 +22,7 @@ export const emptyWork: WorkForm = {
   planned_end_date: '',
   contractor_id: '',
   isExisting: false,
+  isCollapsed: false,
 };
 
 export const UNITS = [
