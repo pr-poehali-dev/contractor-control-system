@@ -308,17 +308,16 @@ const ObjectDetail = () => {
                   </div>
                 </div>
               ))}
-            </div>
 
-            {(user?.role === 'client' || user?.role === 'admin') && (
-              <Button
-                size="lg"
-                className="fixed bottom-20 right-4 h-14 w-14 rounded-full shadow-lg z-20"
-                onClick={() => navigate(`/objects/${objectId}/works/create`)}
-              >
-                <Icon name="Plus" size={24} />
-              </Button>
-            )}
+              {(user?.role === 'client' || user?.role === 'admin') && (
+                <button
+                  onClick={() => navigate(`/objects/${objectId}/works/create`)}
+                  className="w-full p-6 bg-white border-2 border-dashed border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-colors flex items-center justify-center text-slate-400"
+                >
+                  <Icon name="Plus" size={24} />
+                </button>
+              )}
+            </div>
           </>
         )}
       </div>
