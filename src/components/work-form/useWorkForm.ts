@@ -118,6 +118,7 @@ export const useWorkForm = (objectId: string | undefined) => {
   };
 
   const updateWork = (id: string, field: keyof WorkForm, value: string | boolean) => {
+    console.log(`🔄 Updating work ${id}, field: ${field}, value:`, value);
     setWorks(works.map(w => w.id === id ? { ...w, [field]: value } : w));
   };
 
