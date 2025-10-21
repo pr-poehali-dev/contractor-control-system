@@ -37,10 +37,6 @@ export default function InfoTab({
   return (
     <div className="flex-1 overflow-y-auto bg-slate-50 w-full overflow-x-hidden">
       <div className="px-3 py-4 md:p-8 lg:p-12 max-w-7xl mx-auto w-full">
-        <div className="flex items-center justify-between mb-5 md:mb-8 gap-2">
-          <h3 className="text-xl md:text-2xl lg:text-3xl font-bold">Информация</h3>
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 lg:gap-10">
           <Card>
             <CardContent className="p-3 md:p-6 lg:p-8">
