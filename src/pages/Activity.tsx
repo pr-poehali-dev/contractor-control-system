@@ -29,6 +29,15 @@ const Activity = () => {
   const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
   const contractors = (userData?.contractors && Array.isArray(userData.contractors)) ? userData.contractors : [];
 
+  console.log('🔍 Activity Debug:', {
+    workLogsCount: workLogs.length,
+    inspectionsCount: inspections.length,
+    remarksCount: remarks.length,
+    workLogs: workLogs.slice(0, 2),
+    inspections: inspections.slice(0, 2),
+    userData
+  });
+
   const getWorkById = (workId: number) => works.find(w => w.id === workId);
   const getObjectByWorkId = (workId: number) => {
     const work = getWorkById(workId);

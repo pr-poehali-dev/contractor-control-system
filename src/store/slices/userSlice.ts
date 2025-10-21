@@ -204,6 +204,9 @@ export const loadUserData = createAsyncThunk(
       console.log('📊 loadUserData response.data:', data);
       console.log('📦 Objects count:', data.objects?.length || 0);
       console.log('⚒️ Works count:', data.works?.length || 0);
+      console.log('📋 WorkLogs count:', data.workLogs?.length || 0);
+      console.log('🔍 Inspections count:', data.inspections?.length || 0);
+      console.log('📄 Defect reports count:', data.defect_reports?.length || 0);
       
       // Динамически импортируем slices и обновляем данные
       try {
@@ -214,12 +217,14 @@ export const loadUserData = createAsyncThunk(
         const { setContractors } = await import('./contractorsSlice');
         const { setDefectReports } = await import('./defectReportsSlice');
         
+        console.log('🚀 Dispatching to Redux...');
         dispatch(setObjects(data.objects || []));
         dispatch(setWorks(data.works || []));
         dispatch(setWorkLogs(data.workLogs || []));
         dispatch(setInspections(data.inspections || []));
         dispatch(setContractors(data.contractors || []));
         dispatch(setDefectReports(data.defect_reports || []));
+        console.log('✅ Dispatched successfully');
       } catch (importError) {
         console.error('Failed to import slices:', importError);
       }
