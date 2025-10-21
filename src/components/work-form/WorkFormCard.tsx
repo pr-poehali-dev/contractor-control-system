@@ -35,6 +35,8 @@ export const WorkFormCard = ({
   onDuplicate,
   onRemove,
 }: WorkFormCardProps) => {
+  console.log(`🎯 WorkFormCard render - Work ${index + 1}, category:`, work.category, 'title:', work.title);
+  
   return (
     <Card className={cn("relative", work.isExisting && "bg-slate-50")}>
       <div className={cn(
