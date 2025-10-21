@@ -233,7 +233,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
 
         {(event.type === 'inspection' || event.type === 'inspection_scheduled' || event.type === 'inspection_started' || event.type === 'inspection_completed') && event.inspectionNumber && (
           <div className="mb-2 pl-0.5">
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-slate-600 px-[18px]">
               Проверка <span className="font-mono font-medium text-purple-600">№{event.inspectionNumber}</span>
             </p>
           </div>
