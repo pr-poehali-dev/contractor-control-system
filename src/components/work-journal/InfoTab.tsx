@@ -80,24 +80,8 @@ export default function InfoTab({
             <CardContent className="p-3 md:p-5 lg:p-7">
               <h4 className="text-base md:text-lg font-semibold mb-3">История изменений</h4>
               <div className="space-y-3 md:space-y-4 max-h-[400px] md:max-h-[600px] overflow-y-auto pr-1">
-                <div className="flex gap-2 pb-3 border-b border-slate-100">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-1 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium">Работа создана</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{formatDate(selectedWorkData.created_at)} в {formatTime(selectedWorkData.created_at)}</p>
-                  </div>
-                </div>
-                {selectedWorkData?.start_date && (
-                  <div className="flex gap-2 pb-3 border-b border-slate-100">
-                    <div className="w-2 h-2 bg-amber-500 rounded-full mt-1 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium">🚀 Начало работ</p>
-                      <p className="text-xs text-slate-500 mt-0.5">{formatDate(selectedWorkData.start_date)} в {formatTime(selectedWorkData.start_date)}</p>
-                    </div>
-                  </div>
-                )}
                 {reportEntries.map((entry) => (
-                  <div key={entry.id} className="flex gap-2 pb-3 border-b border-slate-100 last:border-b-0">
+                  <div key={entry.id} className="flex gap-2 pb-3 border-b border-slate-100">
                     <div className="w-2 h-2 bg-green-500 rounded-full mt-1 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium">
@@ -114,6 +98,22 @@ export default function InfoTab({
                     </div>
                   </div>
                 ))}
+                {selectedWorkData?.start_date && (
+                  <div className="flex gap-2 pb-3 border-b border-slate-100">
+                    <div className="w-2 h-2 bg-amber-500 rounded-full mt-1 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium">🚀 Начало работ</p>
+                      <p className="text-xs text-slate-500 mt-0.5">{formatDate(selectedWorkData.start_date)} в {formatTime(selectedWorkData.start_date)}</p>
+                    </div>
+                  </div>
+                )}
+                <div className="flex gap-2 pb-3 border-b-0">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-1 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium">Работа создана</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{formatDate(selectedWorkData.created_at)} в {formatTime(selectedWorkData.created_at)}</p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
