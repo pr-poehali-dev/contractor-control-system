@@ -154,43 +154,41 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
     >
       <div className="p-4 sm:p-5 relative">
         <div className="space-y-2 mb-2.5">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
-              {event.objectTitle && (
-                <Badge 
-                  variant="outline" 
-                  className="text-xs font-medium px-2 py-0.5 bg-slate-50 text-slate-700 border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (event.objectId && onTagClick) {
-                      onTagClick(`object-${event.objectId}`, 'object');
-                    }
-                  }}
-                >
-                  <Icon name="Building2" size={13} className="mr-1 flex-shrink-0" />
-                  <span className="truncate max-w-[120px] sm:max-w-none">{event.objectTitle}</span>
-                </Badge>
-              )}
-              {event.author && (
-                <Badge 
-                  variant="outline" 
-                  className="text-xs font-medium px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200 cursor-pointer hover:bg-blue-100 transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (onTagClick) {
-                      onTagClick(`contractor-${event.author}`, 'contractor');
-                    }
-                  }}
-                >
-                  <Icon name="User" size={13} className="mr-1 flex-shrink-0" />
-                  <span className="truncate max-w-[100px] sm:max-w-none">{event.author}</span>
-                </Badge>
-              )}
-            </div>
-            <Badge variant="outline" className={`text-xs font-medium px-2 py-0.5 flex-shrink-0 ${getEventBadgeColor(event.type)}`}>
-              {getEventLabel(event.type)}
-            </Badge>
+          <div className="flex items-center gap-2 flex-wrap">
+            {event.objectTitle && (
+              <Badge 
+                variant="outline" 
+                className="text-xs font-medium px-2 py-0.5 bg-slate-50 text-slate-700 border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (event.objectId && onTagClick) {
+                    onTagClick(`object-${event.objectId}`, 'object');
+                  }
+                }}
+              >
+                <Icon name="Building2" size={13} className="mr-1 flex-shrink-0" />
+                <span className="truncate max-w-[160px]">{event.objectTitle}</span>
+              </Badge>
+            )}
+            {event.author && (
+              <Badge 
+                variant="outline" 
+                className="text-xs font-medium px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200 cursor-pointer hover:bg-blue-100 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onTagClick) {
+                    onTagClick(`contractor-${event.author}`, 'contractor');
+                  }
+                }}
+              >
+                <Icon name="User" size={13} className="mr-1 flex-shrink-0" />
+                <span className="truncate max-w-[130px]">{event.author}</span>
+              </Badge>
+            )}
           </div>
+          <Badge variant="outline" className={`text-xs font-medium px-2 py-0.5 w-fit ${getEventBadgeColor(event.type)}`}>
+            {getEventLabel(event.type)}
+          </Badge>
         </div>
         
         {((event.scheduledDate || event.inspectionType === 'scheduled' || event.inspectionType === 'unscheduled') || (event.defectsCount && event.defectsCount > 0)) && (
