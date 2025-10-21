@@ -340,7 +340,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
           </div>
         )}
         
-        <div className="flex items-center justify-between gap-2 mt-4 pt-3 border-t border-slate-100 px-[18px]">
+        <div className="flex items-center justify-between gap-2 border-t border-slate-100 px-[18px] my-0 py-1">
           <Badge variant="outline" className={`text-xs font-medium px-2.5 py-1 ${getEventBadgeColor(event.type)}`}>
             {getEventLabel(event.type)}
           </Badge>
