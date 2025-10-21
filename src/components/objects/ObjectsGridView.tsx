@@ -99,15 +99,9 @@ export default function ObjectsGridView({
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-sm text-slate-600 pt-4 border-t border-slate-100">
-              <span className="flex items-center gap-1.5">
-                <Icon name="Wrench" size={16} />
-                {site.worksCount} работ
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Icon name="CheckCircle2" size={16} />
-                {site.completedWorks} завершено
-              </span>
+            <div className="flex items-center gap-1.5 text-sm text-slate-600 pt-4 border-t border-slate-100">
+              <Icon name="Wrench" size={16} />
+              <span>Завершено {site.completedWorks}/{site.worksCount}</span>
             </div>
           </CardContent>
         </Card>
