@@ -1,243 +1,26 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { loadUserData } from '@/store/slices/userSlice';
-import { api } from '@/lib/api';
-import { Card, CardContent } from '@/components/ui/card';
+import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
-import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
-
-interface WorkForm {
-  id: string;
-  workId?: number;
-  category: string;
-  title: string;
-  volume: string;
-  unit: string;
-  planned_start_date: string;
-  planned_end_date: string;
-  contractor_id: string;
-  isExisting: boolean;
-}
-
-const emptyWork: WorkForm = {
-  id: '',
-  category: '',
-  title: '',
-  volume: '',
-  unit: 'м²',
-  planned_start_date: '',
-  planned_end_date: '',
-  contractor_id: '',
-  isExisting: false,
-};
-
-const UNITS = [
-  'м²',
-  'м³',
-  'м',
-  'пог.м',
-  'шт',
-  'кг',
-  'т',
-  'л',
-  'компл.',
-];
+import { useWorkForm } from '@/components/work-form/useWorkForm';
+import { WorkFormCard } from '@/components/work-form/WorkFormCard';
+import { InfoSection } from '@/components/work-form/InfoSection';
 
 const CreateWork = () => {
-  console.log('🚀 CreateWork component mounted!');
-  
   const { objectId } = useParams();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const { user, token } = useAuth();
-  const dispatch = useAppDispatch();
-  const userData = useAppSelector((state) => state.user.userData);
-  const allWorks = useAppSelector((state) => state.user.userData?.works || []);
-  const [works, setWorks] = useState<WorkForm[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isInitialized, setIsInitialized] = useState(false);
-
-  const contractors = userData?.contractors || [];
-  const workTemplates = userData?.work_templates || [];
-  const categories = Array.from(new Set(workTemplates.map((t: any) => t.category).filter(Boolean)));
-  
-  console.log('📍 CreateWork render - objectId:', objectId, 'isLoading:', isLoading, 'works:', works);
-
-  useEffect(() => {
-    if (!objectId || !token) return;
-    
-    if (!userData) {
-      console.log('🔍 Loading user data...');
-      setIsLoading(true);
-      dispatch(loadUserData(token));
-    } else {
-      console.log('🔍 User data already loaded, processing works...');
-      processWorks();
-    }
-  }, [objectId, token, userData]);
-
-  const processWorks = () => {
-    if (!userData || !objectId) return;
-    
-    const freshWorks = userData.works || [];
-    const objectWorks = freshWorks.filter((work: any) => work.object_id === Number(objectId));
-    
-    console.log('🔍 Filtered works for object', objectId, ':', objectWorks);
-    
-    if (objectWorks.length > 0) {
-      const existingWorks = objectWorks.map((work: any) => ({
-        id: `existing-${work.id}`,
-        workId: work.id,
-        category: '',
-        title: work.title || '',
-        volume: '',
-        unit: 'м²',
-        planned_start_date: work.planned_start_date?.split('T')[0] || '',
-        planned_end_date: work.planned_end_date?.split('T')[0] || '',
-        contractor_id: work.contractor_id ? String(work.contractor_id) : '',
-        isExisting: true,
-      }));
-      
-      console.log('✅ Setting works with existing:', existingWorks);
-      setWorks([...existingWorks, { ...emptyWork, id: crypto.randomUUID() }]);
-    } else {
-      console.log('ℹ️ No existing works for this object, setting empty work');
-      setWorks([{ ...emptyWork, id: crypto.randomUUID() }]);
-    }
-    
-    setIsLoading(false);
-  };
-
-  const addWork = () => {
-    setWorks([...works, { ...emptyWork, id: crypto.randomUUID() }]);
-  };
-
-  const removeWork = (id: string) => {
-    const work = works.find(w => w.id === id);
-    
-    if (work?.isExisting) {
-      toast({
-        title: 'Нельзя удалить',
-        description: 'Существующие работы нельзя удалить здесь. Перейдите в карточку работы.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const newWorks = works.filter(w => !w.isExisting);
-    if (newWorks.length === 1) {
-      toast({
-        title: 'Ошибка',
-        description: 'Должна быть хотя бы одна новая работа',
-        variant: 'destructive',
-      });
-      return;
-    }
-    
-    setWorks(works.filter(w => w.id !== id));
-  };
-
-  const duplicateWork = (id: string) => {
-    const work = works.find(w => w.id === id);
-    if (work) {
-      const newWork = { 
-        ...work, 
-        id: crypto.randomUUID(), 
-        isExisting: false,
-        workId: undefined,
-      };
-      const index = works.findIndex(w => w.id === id);
-      const newWorks = [...works];
-      newWorks.splice(index + 1, 0, newWork);
-      setWorks(newWorks);
-    }
-  };
-
-  const updateWork = (id: string, field: keyof WorkForm, value: string | boolean) => {
-    setWorks(works.map(w => w.id === id ? { ...w, [field]: value } : w));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const newWorks = works.filter(w => !w.isExisting);
-    const existingWorks = works.filter(w => w.isExisting);
-
-    const invalidWorks = newWorks.filter(w => !w.category.trim() || !w.title.trim());
-    if (invalidWorks.length > 0) {
-      toast({
-        title: 'Ошибка валидации',
-        description: 'Укажите категорию и название для всех новых работ',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (!user || !objectId || !token) return;
-
-    setIsSubmitting(true);
-
-    try {
-      for (const work of newWorks) {
-        await api.createItem(token, 'work', {
-          object_id: Number(objectId),
-          title: work.title,
-          contractor_id: work.contractor_id ? Number(work.contractor_id) : null,
-          status: 'active',
-          planned_start_date: work.planned_start_date || null,
-          planned_end_date: work.planned_end_date || null,
-        });
-      }
-
-      for (const work of existingWorks) {
-        if (work.workId) {
-          await api.updateItem(token, 'work', work.workId, {
-            title: work.title,
-            contractor_id: work.contractor_id ? Number(work.contractor_id) : null,
-            planned_start_date: work.planned_start_date || null,
-            planned_end_date: work.planned_end_date || null,
-          });
-        }
-      }
-
-      await dispatch(loadUserData(token)).unwrap();
-
-      toast({
-        title: 'Работы сохранены!',
-        description: `Добавлено новых работ: ${newWorks.length}, обновлено: ${existingWorks.length}`,
-      });
-
-      setTimeout(() => {
-        navigate(`/objects/${objectId}`);
-      }, 500);
-    } catch (error) {
-      toast({
-        title: 'Ошибка',
-        description: error instanceof Error ? error.message : 'Не удалось сохранить работы',
-        variant: 'destructive',
-      });
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleCancel = () => {
-    navigate(`/objects/${objectId}`);
-  };
+  const {
+    works,
+    isLoading,
+    isSubmitting,
+    contractors,
+    workTemplates,
+    categories,
+    addWork,
+    removeWork,
+    duplicateWork,
+    updateWork,
+    handleSubmit,
+    handleCancel,
+  } = useWorkForm(objectId);
 
   if (isLoading) {
     return (
@@ -263,231 +46,51 @@ const CreateWork = () => {
           <p className="text-slate-600">Добавьте новые работы или отредактируйте существующие</p>
         </div>
 
-        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <Icon name="Lightbulb" size={20} className="text-blue-600 mt-0.5 flex-shrink-0" />
-            <div className="space-y-2 text-sm">
-              <p className="font-semibold text-blue-900">💡 Советы по заполнению</p>
-              <ul className="space-y-1 text-blue-800">
-                <li>📋 <strong>Объём:</strong> Укажите количество работ для контроля выполнения</li>
-                <li>📅 <strong>Сроки:</strong> Учитывайте время на согласования и проверки</li>
-                <li>👷 <strong>Подрядчик:</strong> Можно назначить сразу или позже</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        <InfoSection />
 
         <form onSubmit={handleSubmit}>
           <div className="space-y-3">
             {works.map((work, index) => (
-              <Card key={work.id} className={cn("relative", work.isExisting && "bg-slate-50")}>
-                <div className={cn(
-                  "absolute left-0 top-0 bottom-0 w-1 rounded-l-lg",
-                  work.isExisting ? "bg-slate-400" : "bg-blue-500"
-                )} />
-                
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-base font-semibold">Работа {index + 1}</h3>
-                      {work.isExisting && (
-                        <Badge variant="outline" className="text-xs bg-slate-100">
-                          Добавленная
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => duplicateWork(work.id)}
-                        title="Дублировать"
-                      >
-                        <Icon name="Copy" size={16} />
-                      </Button>
-                      {!work.isExisting && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => removeWork(work.id)}
-                          title="Удалить"
-                        >
-                          <Icon name="Trash2" size={16} />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {!work.isExisting && (
-                      <div>
-                        <Label htmlFor={`category-${work.id}`} className="text-sm">
-                          Категория работ <span className="text-red-500">*</span>
-                        </Label>
-                        <Select
-                          value={work.category}
-                          onValueChange={(value) => {
-                            updateWork(work.id, 'category', value);
-                            updateWork(work.id, 'title', '');
-                          }}
-                        >
-                          <SelectTrigger id={`category-${work.id}`} className="h-9">
-                            <SelectValue placeholder="Выберите категорию" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {categories.map((cat) => (
-                              <SelectItem key={cat} value={cat}>
-                                {cat}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
-
-                    <div className={work.isExisting ? "md:col-span-2" : ""}>
-                      <Label htmlFor={`title-${work.id}`} className="text-sm">
-                        Название работы <span className="text-red-500">*</span>
-                      </Label>
-                      {!work.isExisting && work.category ? (
-                        <Select
-                          value={work.title}
-                          onValueChange={(value) => updateWork(work.id, 'title', value)}
-                        >
-                          <SelectTrigger id={`title-${work.id}`} className={cn(!work.title && 'border-red-300', "h-9")}>
-                            <SelectValue placeholder="Выберите работу" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {workTemplates
-                              .filter((t: any) => t.category === work.category)
-                              .map((template: any) => (
-                                <SelectItem key={template.id} value={template.title}>
-                                  {template.title}
-                                </SelectItem>
-                              ))}
-                          </SelectContent>
-                        </Select>
-                      ) : work.isExisting ? (
-                        <Input
-                          id={`title-${work.id}`}
-                          placeholder="Например: Монтаж вентиляционной системы"
-                          value={work.title}
-                          onChange={(e) => updateWork(work.id, 'title', e.target.value)}
-                          className={cn(!work.title && 'border-red-300', "h-9")}
-                        />
-                      ) : (
-                        <div className="h-9 flex items-center px-3 text-sm text-slate-400 border border-slate-200 rounded-md bg-slate-50">
-                          Сначала выберите категорию
-                        </div>
-                      )}
-                    </div>
-
-                    <div>
-                      <Label htmlFor={`volume-${work.id}`} className="text-sm">Объём работ</Label>
-                      <Input
-                        id={`volume-${work.id}`}
-                        type="number"
-                        placeholder="0"
-                        value={work.volume}
-                        onChange={(e) => updateWork(work.id, 'volume', e.target.value)}
-                        className="h-9"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor={`unit-${work.id}`} className="text-sm">Единица измерения</Label>
-                      <Select
-                        value={work.unit}
-                        onValueChange={(value) => updateWork(work.id, 'unit', value)}
-                      >
-                        <SelectTrigger id={`unit-${work.id}`} className="h-9">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {UNITS.map(unit => (
-                            <SelectItem key={unit} value={unit}>{unit}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor={`planned_start_date-${work.id}`} className="text-sm">Плановое начало</Label>
-                      <Input
-                        id={`planned_start_date-${work.id}`}
-                        type="date"
-                        value={work.planned_start_date}
-                        onChange={(e) => updateWork(work.id, 'planned_start_date', e.target.value)}
-                        className="h-9"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor={`planned_end_date-${work.id}`} className="text-sm">Плановое окончание</Label>
-                      <Input
-                        id={`planned_end_date-${work.id}`}
-                        type="date"
-                        value={work.planned_end_date}
-                        onChange={(e) => updateWork(work.id, 'planned_end_date', e.target.value)}
-                        className="h-9"
-                      />
-                    </div>
-
-                    <div className="md:col-span-2">
-                      <Label htmlFor={`contractor-${work.id}`} className="text-sm">Подрядчик</Label>
-                      <Select
-                        value={work.contractor_id}
-                        onValueChange={(value) => updateWork(work.id, 'contractor_id', value)}
-                      >
-                        <SelectTrigger id={`contractor-${work.id}`} className="h-9">
-                          <SelectValue placeholder="Без подрядчика" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {contractors.map((contractor: any) => (
-                            <SelectItem key={contractor.id} value={String(contractor.id)}>
-                              {contractor.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <WorkFormCard
+                key={work.id}
+                work={work}
+                index={index}
+                categories={categories}
+                workTemplates={workTemplates}
+                contractors={contractors}
+                onUpdate={updateWork}
+                onDuplicate={duplicateWork}
+                onRemove={removeWork}
+              />
             ))}
           </div>
 
-          <div className="mt-6 flex flex-col md:flex-row gap-3">
+          <div className="mt-4 flex flex-col sm:flex-row gap-3">
             <Button
               type="button"
               variant="outline"
               onClick={addWork}
-              className="w-full md:w-auto"
+              className="w-full sm:w-auto"
             >
               <Icon name="Plus" size={18} className="mr-2" />
-              Добавить работу
+              Добавить ещё работу
             </Button>
-            
-            <div className="flex-1" />
-            
+          </div>
+
+          <div className="mt-6 flex flex-col-reverse sm:flex-row gap-3 justify-end border-t pt-6">
             <Button
               type="button"
               variant="outline"
               onClick={handleCancel}
-              className="w-full md:w-auto"
               disabled={isSubmitting}
+              className="w-full sm:w-auto"
             >
               Отмена
             </Button>
-            
             <Button
               type="submit"
-              className="w-full md:w-auto"
               disabled={isSubmitting}
+              className="w-full sm:w-auto min-w-[200px]"
             >
               {isSubmitting ? (
                 <>
@@ -496,27 +99,13 @@ const CreateWork = () => {
                 </>
               ) : (
                 <>
-                  <Icon name="Save" size={18} className="mr-2" />
-                  Сохранить ({works.filter(w => !w.isExisting).length} новых)
+                  <Icon name="Check" size={18} className="mr-2" />
+                  Сохранить работы
                 </>
               )}
             </Button>
           </div>
         </form>
-
-        <div className="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <Icon name="Info" size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
-            <div className="space-y-2 text-sm">
-              <p className="font-semibold text-green-900">🚀 Что дальше?</p>
-              <ol className="space-y-1 text-green-800 list-decimal list-inside">
-                <li>Назначьте подрядчика на работу</li>
-                <li>Создайте первую запись в журнале работ</li>
-                <li>Отслеживайте прогресс и вносите замечания</li>
-              </ol>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
