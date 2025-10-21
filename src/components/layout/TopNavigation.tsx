@@ -94,10 +94,38 @@ export default function TopNavigation() {
         <div className="flex items-center gap-2">
           {user?.role === 'client' && <ProBadgeWithTimer />}
 
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="relative h-10 w-10 rounded-full p-0 hidden md:flex"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                  <Icon name="User" size={20} />
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem onClick={() => navigate('/profile')}>
+                <Icon name="User" size={16} className="mr-2" />
+                Профиль
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/settings')}>
+                <Icon name="Settings" size={16} className="mr-2" />
+                Настройки
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                <Icon name="LogOut" size={16} className="mr-2" />
+                Выход
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <Button
             variant="ghost"
             onClick={() => navigate('/profile')}
-            className="relative h-10 w-10 rounded-full p-0"
+            className="relative h-10 w-10 rounded-full p-0 md:hidden"
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white">
               <Icon name="User" size={20} />
