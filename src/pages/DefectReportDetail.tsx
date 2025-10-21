@@ -54,12 +54,7 @@ const DefectReportDetail = () => {
     setLoading(true);
     try {
       const response = await apiClient.get(
-        ENDPOINTS.DEFECTS.REPORTS + '?report_id=' + reportId,
-        {
-          headers: {
-            'X-User-Id': user?.id?.toString() || '',
-          }
-        }
+        ENDPOINTS.DEFECTS.REPORTS + '?report_id=' + reportId
       );
       
       if (response.success && response.data) {
@@ -94,11 +89,6 @@ const DefectReportDetail = () => {
           status: 'completed',
           remediation_description: description,
           remediation_photos: photos
-        },
-        {
-          headers: {
-            'X-User-Id': user?.id?.toString() || '',
-          }
         }
       );
       
@@ -136,11 +126,6 @@ const DefectReportDetail = () => {
           status: approved ? 'verified' : 'rejected',
           verified_by: user?.id,
           verification_notes: notes
-        },
-        {
-          headers: {
-            'X-User-Id': user?.id?.toString() || '',
-          }
         }
       );
       
