@@ -79,7 +79,7 @@ export default function InfoTab({
           <Card className="lg:row-span-2">
             <CardContent className="p-3 md:p-5 lg:p-7">
               <h4 className="text-base md:text-lg font-semibold mb-3">История изменений</h4>
-              <div className="space-y-3 md:space-y-4 max-h-[400px] md:max-h-[600px] overflow-y-auto pr-1">
+              <div className="space-y-3 md:space-y-4 max-h-[400px] lg:max-h-[450px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent hover:scrollbar-thumb-slate-400">
                 {reportEntries.map((entry) => (
                   <div key={entry.id} className="flex gap-2 pb-3 border-b border-slate-100">
                     <div className="w-2 h-2 bg-green-500 rounded-full mt-1 flex-shrink-0" />
