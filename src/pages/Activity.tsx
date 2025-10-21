@@ -7,7 +7,7 @@ import { safeDateCompare, isValidDate } from '@/utils/dateValidation';
 
 const Activity = () => {
   const { userData, user } = useAuth();
-  const [typeFilter, setTypeFilter] = useState<'all' | 'work' | 'check' | 'defect'>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'work' | 'check' | 'defect' | 'message'>('all');
   const [objectFilter, setObjectFilter] = useState<number | null>(null);
   const [workFilter, setWorkFilter] = useState<number | null>(null);
 
@@ -23,6 +23,7 @@ const Activity = () => {
   }
 
   const workLogs = (userData?.workLogs && Array.isArray(userData.workLogs)) ? userData.workLogs : [];
+  const chatMessages = (userData?.chatMessages && Array.isArray(userData.chatMessages)) ? userData.chatMessages : [];
   const inspections = (userData?.inspections && Array.isArray(userData.inspections)) ? userData.inspections : [];
   const remarks = (userData?.remarks && Array.isArray(userData.remarks)) ? userData.remarks : [];
   const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
@@ -31,10 +32,12 @@ const Activity = () => {
 
   console.log('🔍 Activity Debug:', {
     workLogsCount: workLogs.length,
+    chatMessagesCount: chatMessages.length,
     inspectionsCount: inspections.length,
     remarksCount: remarks.length,
-    allActivityCount: workLogs.length + inspections.length + remarks.length,
+    allActivityCount: workLogs.length + chatMessages.length + inspections.length + remarks.length,
     workLogs: workLogs.slice(0, 2),
+    chatMessages: chatMessages.slice(0, 2),
     inspections: inspections.slice(0, 2)
   });
 
@@ -50,11 +53,25 @@ const Activity = () => {
       return {
         id: `log-${log.id}`,
         type: 'work' as const,
-        title: 'Запись в журнале работ',
+        title: 'Отчёт о работе',
         description: log.description,
         timestamp: log.created_at,
         user: log.author_name,
         workId: log.work_id,
+        contractorId: work?.contractor_id,
+        objectId: work?.object_id,
+      };
+    }),
+    ...chatMessages.map(msg => {
+      const work = getWorkById(msg.work_id);
+      return {
+        id: `chat-${msg.id}`,
+        type: 'message' as const,
+        title: 'Сообщение в чате',
+        description: msg.message,
+        timestamp: msg.created_at,
+        user: msg.author_name || 'Пользователь',
+        workId: msg.work_id,
         contractorId: work?.contractor_id,
         objectId: work?.object_id,
       };
@@ -120,6 +137,7 @@ const Activity = () => {
       case 'check': return 'ClipboardCheck';
       case 'defect': return 'AlertCircle';
       case 'work': return 'Wrench';
+      case 'message': return 'MessageSquare';
       default: return 'Activity';
     }
   };
@@ -129,6 +147,7 @@ const Activity = () => {
       case 'check': return 'text-green-600 bg-green-100';
       case 'defect': return 'text-red-600 bg-red-100';
       case 'work': return 'text-blue-600 bg-blue-100';
+      case 'message': return 'text-purple-600 bg-purple-100';
       default: return 'text-slate-600 bg-slate-100';
     }
   };
@@ -186,6 +205,14 @@ const Activity = () => {
             >
               <Icon name="AlertCircle" size={16} className="mr-1" />
               Замечания
+            </Button>
+            <Button
+              variant={typeFilter === 'message' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setTypeFilter('message')}
+            >
+              <Icon name="MessageSquare" size={16} className="mr-1" />
+              Сообщения
             </Button>
           </div>
 
