@@ -241,7 +241,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
 
         {(event.type === 'work_log' || event.type === 'inspection_scheduled' || event.type === 'inspection_started' || event.type === 'inspection_completed') && event.description && (
           <div className="mb-2 pl-0.5">
-            <p className="text-sm text-slate-600 break-words">{event.description}</p>
+            <p className="text-sm text-slate-600 break-words px-[18px]">{event.description}</p>
           </div>
         )}
 
