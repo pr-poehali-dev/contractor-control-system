@@ -1,271 +1,128 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import Icon from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
-import { PlanFactComparison } from '@/types/journal';
+import Icon from '@/components/ui/icon';
 
 interface AnalyticsTabProps {
   workId: number;
 }
 
-const mockPlanFactData: PlanFactComparison[] = [
-  {
-    estimate_item_id: 1,
-    category: 'Материалы',
-    name: 'Кирпич керамический',
-    planned_quantity: 1000,
-    actual_quantity: 950,
-    planned_cost: 50000,
-    actual_cost: 47500,
-    deviation_percent: -5,
-    deviation_amount: -2500,
-    status: 'normal',
-  },
-  {
-    estimate_item_id: 2,
-    category: 'Материалы',
-    name: 'Цемент М500',
-    planned_quantity: 500,
-    actual_quantity: 580,
-    planned_cost: 25000,
-    actual_cost: 29000,
-    deviation_percent: 16,
-    deviation_amount: 4000,
-    status: 'critical',
-  },
-  {
-    estimate_item_id: 3,
-    category: 'Работа',
-    name: 'Кирпичная кладка',
-    planned_quantity: 100,
-    actual_quantity: 108,
-    planned_cost: 200000,
-    actual_cost: 216000,
-    deviation_percent: 8,
-    deviation_amount: 16000,
-    status: 'warning',
-  },
+interface MaterialItem {
+  id: number;
+  name: string;
+  planned: number;
+  actual: number;
+  deviation: number;
+  deviationPercent: number;
+}
+
+const mockMaterials: MaterialItem[] = [
+  { id: 1, name: 'Вода', id: 1, planned: 5900, actual: 0, deviation: 5900, deviationPercent: 100 },
+  { id: 2, name: 'Вывоз мусора', planned: 1180, actual: 1000, deviation: 180, deviationPercent: 15.25 },
+  { id: 3, name: 'Охрана помещений', planned: 5900, actual: 6000, deviation: -100, deviationPercent: -1.69 },
+  { id: 4, name: 'Прочие эксплуатационные расходы', planned: 4720, actual: 0, deviation: 4720, deviationPercent: 100 },
+  { id: 5, name: 'Текущий ремонт зданий и сооружений', planned: 29500, actual: 0, deviation: 29500, deviationPercent: 100 },
+  { id: 6, name: 'Текущий ремонт производственного оборудования', planned: 73750, actual: 10000, deviation: 63750, deviationPercent: 86.44 },
+  { id: 7, name: 'Сооружения', planned: 0, actual: 0, deviation: 0, deviationPercent: 0 },
+  { id: 8, name: 'Теплоэнергия', planned: 3540, actual: 3000, deviation: 540, deviationPercent: 15.25 },
+  { id: 9, name: 'Техническое обслуживание', planned: 14160, actual: 0, deviation: 14160, deviationPercent: 100 },
+  { id: 10, name: 'Уборка помещений', planned: 7080, actual: 6000, deviation: 1080, deviationPercent: 15.25 },
+  { id: 11, name: 'Электроэнергия', planned: 32450, actual: 3000, deviation: 29450, deviationPercent: 90.76 },
 ];
 
-const mockSummary = {
-  total_planned_budget: 275000,
-  total_actual_cost: 292500,
-  total_deviation: 17500,
-  total_deviation_percent: 6.4,
-  items_in_budget: 1,
-  items_warning: 1,
-  items_critical: 1,
+const summary = {
+  planned: 178180,
+  actual: 29000,
+  deviation: 149180,
+  deviationPercent: 83.72,
 };
 
 export default function AnalyticsTab({ workId }: AnalyticsTabProps) {
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'normal': return '🟢 В пределах нормы';
-      case 'warning': return '⚠️ Требует внимания';
-      case 'critical': return '❌ Критическое отклонение';
-      default: return status;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'normal': return 'text-green-600 bg-green-50 border-green-200';
-      case 'warning': return 'text-amber-600 bg-amber-50 border-amber-200';
-      case 'critical': return 'text-red-600 bg-red-50 border-red-200';
-      default: return 'text-slate-600 bg-slate-50 border-slate-200';
-    }
-  };
-
   return (
     <div className="flex-1 overflow-y-auto bg-slate-50 w-full overflow-x-hidden">
       <div className="px-3 py-4 md:p-8 lg:p-12 max-w-7xl mx-auto w-full">
-        <div className="flex items-center justify-between mb-10">
-          <h3 className="text-2xl md:text-3xl font-bold">Аналитика: План vs Факт</h3>
-          <Button variant="outline">
-            <Icon name="Download" size={18} className="mr-2" />
-            Экспорт отчёта
+        <div className="flex items-center justify-between mb-6 md:mb-8">
+          <h3 className="text-lg md:text-2xl font-bold">План-фактный анализ по материалам</h3>
+          <Button variant="outline" size="sm" className="md:h-10">
+            <Icon name="Download" size={16} className="md:mr-2" />
+            <span className="hidden md:inline">Экспорт</span>
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-5">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Icon name="Calculator" size={26} className="text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-600">Плановый бюджет</p>
-                  <p className="text-xl font-bold">{mockSummary.total_planned_budget.toLocaleString('ru-RU')} ₽</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-5">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Icon name="TrendingUp" size={26} className="text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-600">Фактические затраты</p>
-                  <p className="text-xl font-bold">{mockSummary.total_actual_cost.toLocaleString('ru-RU')} ₽</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-5">
-              <div className="flex items-center gap-4">
-                <div className={cn(
-                  'w-14 h-14 rounded-lg flex items-center justify-center',
-                  mockSummary.total_deviation >= 0 ? 'bg-red-100' : 'bg-green-100'
-                )}>
-                  <Icon 
-                    name={mockSummary.total_deviation >= 0 ? 'TrendingDown' : 'TrendingUp'} 
-                    size={26} 
-                    className={mockSummary.total_deviation >= 0 ? 'text-red-600' : 'text-green-600'} 
-                  />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-600">Отклонение</p>
-                  <p className={cn(
-                    'text-xl font-bold',
-                    mockSummary.total_deviation >= 0 ? 'text-red-600' : 'text-green-600'
-                  )}>
-                    {mockSummary.total_deviation >= 0 ? '+' : ''}{mockSummary.total_deviation.toLocaleString('ru-RU')} ₽
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-5">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-amber-100 rounded-lg flex items-center justify-center">
-                  <Icon name="Percent" size={26} className="text-amber-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-600">Отклонение, %</p>
-                  <p className={cn(
-                    'text-xl font-bold',
-                    mockSummary.total_deviation_percent > 5 ? 'text-amber-600' : 'text-green-600'
-                  )}>
-                    {mockSummary.total_deviation_percent >= 0 ? '+' : ''}{mockSummary.total_deviation_percent.toFixed(1)}%
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="bg-white rounded-lg p-5 mb-8 border border-slate-200">
-          <div className="flex items-center justify-between">
-            <h4 className="font-semibold text-base">Цветовая индикация отклонений:</h4>
-            <div className="flex gap-6">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-slate-600">≤ 5% — норма</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-amber-500 rounded-full"></div>
-                <span className="text-sm text-slate-600">5–15% — предупреждение</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-red-500 rounded-full"></div>
-                <span className="text-sm text-slate-600">&gt; 15% — критично</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Детализация по позициям сметы</CardTitle>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-slate-50 border-b border-slate-200">
+              <table className="w-full text-xs md:text-sm">
+                <thead className="bg-amber-50 border-b-2 border-amber-200">
                   <tr>
-                    <th className="text-left p-5 text-base font-semibold text-slate-700">Категория</th>
-                    <th className="text-left p-5 text-base font-semibold text-slate-700">Наименование</th>
-                    <th className="text-right p-5 text-base font-semibold text-slate-700">План (кол.)</th>
-                    <th className="text-right p-5 text-base font-semibold text-slate-700">Факт (кол.)</th>
-                    <th className="text-right p-5 text-base font-semibold text-slate-700">План (₽)</th>
-                    <th className="text-right p-5 text-base font-semibold text-slate-700">Факт (₽)</th>
-                    <th className="text-right p-5 text-base font-semibold text-slate-700">Откл. (%)</th>
-                    <th className="text-left p-5 text-base font-semibold text-slate-700">Статус</th>
+                    <th className="text-left p-2 md:p-4 font-semibold text-slate-700 sticky left-0 bg-amber-50 z-10">
+                      Материал
+                    </th>
+                    <th className="text-right p-2 md:p-4 font-semibold text-slate-700 whitespace-nowrap">
+                      ПЛАН
+                    </th>
+                    <th className="text-right p-2 md:p-4 font-semibold text-slate-700 whitespace-nowrap">
+                      ФАКТ
+                    </th>
+                    <th className="text-right p-2 md:p-4 font-semibold text-slate-700 whitespace-nowrap">
+                      Откл. (абс.)
+                    </th>
+                    <th className="text-right p-2 md:p-4 font-semibold text-slate-700 whitespace-nowrap">
+                      Откл. (%)
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {mockPlanFactData.map((item) => (
-                    <tr key={item.estimate_item_id} className="border-b border-slate-100 hover:bg-slate-50">
-                      <td className="p-5">
-                        <Badge variant="outline" className="text-base">{item.category}</Badge>
+                  {mockMaterials.map((item) => (
+                    <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
+                      <td className="p-2 md:p-4 sticky left-0 bg-white hover:bg-slate-50 z-10">
+                        {item.name}
                       </td>
-                      <td className="p-5 text-lg">{item.name}</td>
-                      <td className="p-5 text-lg text-right text-slate-600">{item.planned_quantity}</td>
-                      <td className="p-5 text-lg text-right font-semibold">{item.actual_quantity}</td>
-                      <td className="p-5 text-lg text-right text-slate-600">
-                        {item.planned_cost.toLocaleString('ru-RU')}
+                      <td className="p-2 md:p-4 text-right font-medium whitespace-nowrap">
+                        {item.planned.toLocaleString('ru-RU')}
                       </td>
-                      <td className="p-4 text-base text-right font-semibold">
-                        {item.actual_cost.toLocaleString('ru-RU')}
+                      <td className="p-2 md:p-4 text-right font-medium whitespace-nowrap">
+                        {item.actual.toLocaleString('ru-RU')}
                       </td>
-                      <td className="p-4 text-base text-right">
-                        <span className={cn(
-                          'font-semibold',
-                          item.status === 'normal' && 'text-green-600',
-                          item.status === 'warning' && 'text-amber-600',
-                          item.status === 'critical' && 'text-red-600'
-                        )}>
-                          {item.deviation_percent >= 0 ? '+' : ''}{item.deviation_percent}%
-                        </span>
+                      <td className={cn(
+                        'p-2 md:p-4 text-right font-semibold whitespace-nowrap',
+                        item.deviation > 0 ? 'text-slate-600' : 'text-red-600'
+                      )}>
+                        {item.deviation.toLocaleString('ru-RU')}
                       </td>
-                      <td className="p-4">
-                        <Badge className={cn('text-sm border', getStatusColor(item.status))}>
-                          {getStatusLabel(item.status)}
-                        </Badge>
+                      <td className={cn(
+                        'p-2 md:p-4 text-right font-semibold whitespace-nowrap',
+                        item.deviationPercent === 100 ? 'text-slate-600' :
+                        item.deviationPercent > 0 ? 'text-slate-600' : 'text-red-600'
+                      )}>
+                        {item.deviationPercent.toFixed(2).replace('.', ',')}
                       </td>
                     </tr>
                   ))}
                 </tbody>
-                <tfoot className="bg-slate-50 border-t-2 border-slate-300">
+                <tfoot className="bg-amber-50 border-t-2 border-amber-300">
                   <tr>
-                    <td colSpan={4} className="p-3 text-sm font-semibold">Итого:</td>
-                    <td className="p-3 text-sm font-semibold text-right">
-                      {mockSummary.total_planned_budget.toLocaleString('ru-RU')} ₽
+                    <td className="p-2 md:p-4 font-bold text-base sticky left-0 bg-amber-50 z-10">
+                      Итого
                     </td>
-                    <td className="p-3 text-sm font-semibold text-right">
-                      {mockSummary.total_actual_cost.toLocaleString('ru-RU')} ₽
+                    <td className="p-2 md:p-4 text-right font-bold text-base whitespace-nowrap">
+                      {summary.planned.toLocaleString('ru-RU')}
                     </td>
-                    <td className="p-3 text-sm font-semibold text-right">
-                      <span className={cn(
-                        mockSummary.total_deviation_percent <= 5 && 'text-green-600',
-                        mockSummary.total_deviation_percent > 5 && mockSummary.total_deviation_percent <= 15 && 'text-amber-600',
-                        mockSummary.total_deviation_percent > 15 && 'text-red-600'
-                      )}>
-                        {mockSummary.total_deviation_percent >= 0 ? '+' : ''}{mockSummary.total_deviation_percent.toFixed(1)}%
-                      </span>
+                    <td className="p-2 md:p-4 text-right font-bold text-base whitespace-nowrap">
+                      {summary.actual.toLocaleString('ru-RU')}
                     </td>
-                    <td></td>
+                    <td className="p-2 md:p-4 text-right font-bold text-base text-slate-700 whitespace-nowrap">
+                      {summary.deviation.toLocaleString('ru-RU')}
+                    </td>
+                    <td className="p-2 md:p-4 text-right font-bold text-base text-slate-700 whitespace-nowrap">
+                      {summary.deviationPercent.toFixed(2).replace('.', ',')}
+                    </td>
                   </tr>
                 </tfoot>
               </table>
             </div>
           </CardContent>
         </Card>
-
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-sm text-blue-900">
-            💡 <strong>Будущие функции (январь 2025):</strong> Фильтрация по дате, объекту, видам работ, материалам. Экспорт в PDF/XLSX.
-          </p>
-        </div>
       </div>
     </div>
   );
