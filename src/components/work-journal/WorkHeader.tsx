@@ -213,12 +213,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
                   ? 'text-blue-600 bg-gradient-to-b from-blue-50/50 to-transparent'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
               }`}
-            >
-              Документация
-              {activeTab === 'description' && (
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-lg" />
-              )}
-            </button>
+            >Регламенты</button>
             <button
               onClick={() => setActiveTab('estimate')}
               className={`pb-3 px-4 text-[15px] font-semibold transition-all relative whitespace-nowrap rounded-t-xl ${
