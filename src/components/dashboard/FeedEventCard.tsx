@@ -153,12 +153,12 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
       style={{ animationDelay: `${index * 0.05}s` }}
     >
       <div className="p-4 sm:p-5 relative">
-        <div className="flex items-start gap-2.5 mb-2.5">
-          <div className="flex items-center gap-2 flex-wrap flex-1">
+        <div className="flex flex-col sm:flex-row sm:items-start gap-2 mb-2.5">
+          <div className="flex items-center gap-2 flex-wrap flex-1 order-2 sm:order-1">
             {event.objectTitle && (
               <Badge 
                 variant="outline" 
-                className="text-xs font-medium px-2 py-0.5 bg-slate-50 text-slate-700 border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors"
+                className="text-xs font-medium px-2 py-0.5 bg-slate-50 text-slate-700 border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors max-w-[140px] sm:max-w-none"
                 onClick={(e) => {
                   e.stopPropagation();
                   if (event.objectId && onTagClick) {
@@ -166,14 +166,14 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
                   }
                 }}
               >
-                <Icon name="Building2" size={13} className="mr-1.5" />
-                {event.objectTitle}
+                <Icon name="Building2" size={13} className="mr-1 flex-shrink-0" />
+                <span className="truncate">{event.objectTitle}</span>
               </Badge>
             )}
             {event.author && (
               <Badge 
                 variant="outline" 
-                className="text-xs font-medium px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200 cursor-pointer hover:bg-blue-100 transition-colors"
+                className="text-xs font-medium px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200 cursor-pointer hover:bg-blue-100 transition-colors max-w-[140px] sm:max-w-none"
                 onClick={(e) => {
                   e.stopPropagation();
                   if (onTagClick) {
@@ -181,12 +181,12 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
                   }
                 }}
               >
-                <Icon name="User" size={13} className="mr-1.5" />
-                {event.author}
+                <Icon name="User" size={13} className="mr-1 flex-shrink-0" />
+                <span className="truncate">{event.author}</span>
               </Badge>
             )}
           </div>
-          <Badge variant="outline" className={`text-xs font-medium px-2 py-0.5 flex-shrink-0 ${getEventBadgeColor(event.type)}`}>
+          <Badge variant="outline" className={`text-xs font-medium px-2 py-0.5 flex-shrink-0 self-end sm:self-auto order-1 sm:order-2 ${getEventBadgeColor(event.type)}`}>
             {getEventLabel(event.type)}
           </Badge>
         </div>
@@ -215,7 +215,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
         )}
 
         {event.type !== 'info_post' && event.workTitle && (
-          <div className="mb-2">
+          <div className="mb-2 pl-0.5">
             <h3 
               className="font-semibold text-slate-900 text-base leading-snug cursor-pointer hover:text-blue-600 transition-colors break-words"
               onClick={(e) => {
@@ -231,13 +231,13 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
         )}
 
         {event.type === 'info_post' && (
-          <div className="mb-2">
+          <div className="mb-2 pl-0.5">
             <h3 className="font-semibold text-slate-900 text-base leading-snug break-words">{event.title}</h3>
           </div>
         )}
 
         {(event.type === 'inspection' || event.type === 'inspection_scheduled' || event.type === 'inspection_started' || event.type === 'inspection_completed') && event.inspectionNumber && (
-          <div className="mb-2">
+          <div className="mb-2 pl-0.5">
             <p className="text-sm text-slate-600">
               Проверка <span className="font-mono font-medium text-purple-600">№{event.inspectionNumber}</span>
             </p>
@@ -245,7 +245,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
         )}
 
         {(event.type === 'work_log' || event.type === 'inspection_scheduled' || event.type === 'inspection_started' || event.type === 'inspection_completed') && event.description && (
-          <div className="mb-2">
+          <div className="mb-2 pl-0.5">
             <p className="text-sm text-slate-600 break-words">{event.description}</p>
           </div>
         )}
