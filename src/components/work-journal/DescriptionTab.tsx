@@ -86,20 +86,6 @@ export default function DescriptionTab({ selectedWorkData }: DescriptionTabProps
             </Card>
           ))}
         </div>
-
-        <Card className="mt-5 md:mt-6 bg-amber-50 border-amber-200">
-          <CardContent className="p-3 md:p-5">
-            <div className="flex items-start gap-2">
-              <Icon name="Info" size={16} className="text-amber-600 mt-0.5 flex-shrink-0" />
-              <div className="min-w-0 flex-1">
-                <h5 className="font-semibold text-amber-900 mb-1 text-sm">Важно</h5>
-                <p className="text-xs md:text-sm text-amber-800 leading-relaxed">
-                  Все работы должны выполняться в строгом соответствии с указанными нормативными документами.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
