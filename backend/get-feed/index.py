@@ -424,7 +424,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             ip.created_at,
             u.name as author_name
         FROM t_p8942561_contractor_control_s.info_posts ip
-        JOIN users u ON ip.created_by = u.id
+        JOIN t_p8942561_contractor_control_s.users u ON ip.created_by = u.id
         ORDER BY ip.created_at DESC
         LIMIT 5
     '''
