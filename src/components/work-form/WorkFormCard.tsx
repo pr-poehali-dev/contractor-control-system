@@ -107,7 +107,7 @@ export const WorkFormCard = ({
             </Select>
           </div>
 
-          <div>
+          <div key={`title-container-${work.id}-${work.category}`}>
             <Label htmlFor={`title-${work.id}`} className="text-sm">
               Вид работ <span className="text-red-500">*</span>
             </Label>
