@@ -16,7 +16,7 @@ interface FeedFiltersProps {
   onFilterChange: (filter: 'all' | 'work_logs' | 'inspections' | 'info_posts') => void;
   selectedTags: string[];
   onTagsChange: (tags: string[]) => void;
-  availableTags: Array<{ id: string; label: string; type: 'object' | 'work' | 'contractor' }>;
+  availableTags: Array<{ id: string; label: string; type: 'object' | 'work' | 'contractor'; workIds?: number[] }>;
   feed: any[];
   works: any[];
 }
@@ -60,12 +60,17 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
     // Проверяем, есть ли в feed события, которые совместимы с этим тегом
     const hasCompatibleEvents = feed.some(event => {
       const eventObjectId = `object-${event.objectId}`;
-      const eventWorkId = `work-${event.workId}`;
       const eventContractor = `contractor-${event.author}`;
+      
+      // Для работы находим тег с workIds
+      const eventWorkTag = availableTags.find(t => 
+        t.type === 'work' && t.workIds?.includes(event.workId)
+      );
+      const eventWorkId = eventWorkTag?.id;
 
       // Проверяем совместимость с текущими выборами
       const objectMatch = selectedObjects.length === 0 || selectedObjects.includes(eventObjectId);
-      const workMatch = selectedWorks.length === 0 || selectedWorks.includes(eventWorkId);
+      const workMatch = selectedWorks.length === 0 || (eventWorkId && selectedWorks.includes(eventWorkId));
       const contractorMatch = selectedContractors.length === 0 || selectedContractors.includes(eventContractor);
 
       // Проверяем, подходит ли событие к новому тегу

@@ -153,15 +153,26 @@ const Dashboard = () => {
 
   const uniqueContractors = Array.from(new Set(feed.map(e => e.author).filter(Boolean)));
   
+  // Группируем работы по названию (уникальные названия)
+  const uniqueWorkTitles = Array.from(new Set(works.map(w => w.title)));
+  const worksByTitle = uniqueWorkTitles.map(title => {
+    const worksWithTitle = works.filter(w => w.title === title);
+    return {
+      title,
+      workIds: worksWithTitle.map(w => w.id)
+    };
+  });
+  
   const availableTags = [
     ...objects.map(obj => ({ 
       id: `object-${obj.id}`, 
       label: obj.title, 
       type: 'object' as const 
     })),
-    ...works.map(work => ({ 
-      id: `work-${work.id}`, 
-      label: work.title, 
+    ...worksByTitle.map(workGroup => ({ 
+      id: `work-${workGroup.title}`, 
+      label: workGroup.title,
+      workIds: workGroup.workIds,
       type: 'work' as const 
     })),
     ...uniqueContractors.map(contractor => ({
@@ -170,9 +181,6 @@ const Dashboard = () => {
       type: 'contractor' as const
     }))
   ];
-
-  console.log('📋 Available tags:', availableTags);
-  console.log('🔧 Works from Redux:', works);
 
   const filteredFeed = feed.filter(event => {
     const typeMatch = filter === 'all' || 
@@ -196,8 +204,11 @@ const Dashboard = () => {
     });
 
     const workMatch = workTags.length === 0 || workTags.some(tag => {
-      const workId = parseInt(tag.replace('work-', ''));
-      return event.workId === workId;
+      const workTitle = tag.replace('work-', '');
+      // Находим группу работ по названию
+      const workGroup = worksByTitle.find(g => g.title === workTitle);
+      // Проверяем, входит ли workId события в эту группу
+      return workGroup?.workIds.includes(event.workId);
     });
 
     const contractorMatch = contractorTags.length === 0 || contractorTags.some(tag => {
