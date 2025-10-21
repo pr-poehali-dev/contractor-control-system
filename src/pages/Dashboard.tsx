@@ -344,14 +344,6 @@ const Dashboard = () => {
           </div>
 
         <div className="space-y-4">
-            <NotificationsSummary
-              totalMessages={totalMessages}
-              totalLogs={user?.role === 'client' ? totalLogs : undefined}
-              totalInspections={user?.role === 'contractor' ? totalInspections : undefined}
-              userRole={user?.role || 'contractor'}
-              className="mx-0 mt-0"
-            />
-            
             <FeedFilters 
               filter={filter} 
               onFilterChange={setFilter}
