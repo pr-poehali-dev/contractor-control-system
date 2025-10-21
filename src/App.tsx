@@ -29,6 +29,7 @@ import DefectReportDetail from "./pages/DefectReportDetail";
 import CreateObject from "./pages/CreateObject";
 import EditObject from "./pages/EditObject";
 import CreateWork from "./pages/CreateWork";
+import ManageWorks from "./pages/ManageWorks";
 import WorkTemplates from "./pages/WorkTemplates";
 import Admin from "./pages/Admin";
 import Pricing from "./pages/Pricing";
@@ -74,6 +75,7 @@ const App = () => (
               <Route path="/objects/:objectId/edit" element={<ProtectedRoute><EditObject /></ProtectedRoute>} />
               <Route path="/objects/:objectId" element={<ProtectedRoute><ObjectDetail /></ProtectedRoute>} />
               <Route path="/objects/:objectId/works/create" element={<ProtectedRoute><CreateWork /></ProtectedRoute>} />
+              <Route path="/objects/:objectId/works/manage" element={<ProtectedRoute><ManageWorks /></ProtectedRoute>} />
               <Route path="/objects/:objectId/works/:workId" element={<ProtectedRoute><WorkDetail /></ProtectedRoute>} />
               <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
               <Route path="/my-works" element={<ProtectedRoute><MyWorks /></ProtectedRoute>} />
