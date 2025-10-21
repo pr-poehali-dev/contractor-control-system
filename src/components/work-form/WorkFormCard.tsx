@@ -79,33 +79,34 @@ export const WorkFormCard = ({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {!work.isExisting && (
-            <div>
-              <Label htmlFor={`category-${work.id}`} className="text-sm">
-                Категория работ <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                value={work.category}
-                onValueChange={(value) => {
-                  onUpdate(work.id, 'category', value);
+          <div>
+            <Label htmlFor={`category-${work.id}`} className="text-sm">
+              Категория работ <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              value={work.category}
+              onValueChange={(value) => {
+                onUpdate(work.id, 'category', value);
+                if (!work.isExisting) {
                   onUpdate(work.id, 'title', '');
-                }}
-              >
-                <SelectTrigger id={`category-${work.id}`} className="h-9">
-                  <SelectValue placeholder="Выберите категорию" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+                }
+              }}
+              disabled={work.isExisting}
+            >
+              <SelectTrigger id={`category-${work.id}`} className="h-9">
+                <SelectValue placeholder="Выберите категорию" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-          <div className={work.isExisting ? "md:col-span-2" : ""}>
+          <div>
             <Label htmlFor={`title-${work.id}`} className="text-sm">
               Название работы <span className="text-red-500">*</span>
             </Label>

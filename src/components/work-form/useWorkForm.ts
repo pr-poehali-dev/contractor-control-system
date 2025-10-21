@@ -43,18 +43,21 @@ export const useWorkForm = (objectId: string | undefined) => {
     console.log('🔍 Filtered works for object', objectId, ':', objectWorks);
     
     if (objectWorks.length > 0) {
-      const existingWorks = objectWorks.map((work: any) => ({
-        id: `existing-${work.id}`,
-        workId: work.id,
-        category: '',
-        title: work.title || '',
-        volume: '',
-        unit: 'м²',
-        planned_start_date: work.planned_start_date?.split('T')[0] || '',
-        planned_end_date: work.planned_end_date?.split('T')[0] || '',
-        contractor_id: work.contractor_id ? String(work.contractor_id) : '',
-        isExisting: true,
-      }));
+      const existingWorks = objectWorks.map((work: any) => {
+        const template = workTemplates.find((t: any) => t.title === work.title);
+        return {
+          id: `existing-${work.id}`,
+          workId: work.id,
+          category: template?.category || '',
+          title: work.title || '',
+          volume: '',
+          unit: 'м²',
+          planned_start_date: work.planned_start_date?.split('T')[0] || '',
+          planned_end_date: work.planned_end_date?.split('T')[0] || '',
+          contractor_id: work.contractor_id ? String(work.contractor_id) : '',
+          isExisting: true,
+        };
+      });
       
       console.log('✅ Setting works with existing:', existingWorks);
       setWorks([...existingWorks, { ...emptyWork, id: crypto.randomUUID() }]);
