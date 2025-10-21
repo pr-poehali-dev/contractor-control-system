@@ -171,6 +171,9 @@ const Dashboard = () => {
     }))
   ];
 
+  console.log('📋 Available tags:', availableTags);
+  console.log('🔧 Works from Redux:', works);
+
   const filteredFeed = feed.filter(event => {
     const typeMatch = filter === 'all' || 
       (filter === 'work_logs' && event.type === 'work_log') ||
