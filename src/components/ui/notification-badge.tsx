@@ -50,14 +50,14 @@ export function NotificationGroup({ messages, logs, inspections, className, size
   
   return (
     <div className={cn('flex items-center gap-1.5', className)}>
-      {messages && messages > 0 && (
-        <NotificationBadge count={messages} icon="MessageCircle" size={size} />
+      {(messages ?? 0) > 0 && (
+        <NotificationBadge count={messages!} icon="MessageCircle" size={size} />
       )}
-      {logs && logs > 0 && (
-        <NotificationBadge count={logs} icon="FileText" size={size} />
+      {(logs ?? 0) > 0 && (
+        <NotificationBadge count={logs!} icon="FileText" size={size} />
       )}
-      {inspections && inspections > 0 && (
-        <NotificationBadge count={inspections} icon="ClipboardCheck" size={size} />
+      {(inspections ?? 0) > 0 && (
+        <NotificationBadge count={inspections!} icon="ClipboardCheck" size={size} />
       )}
     </div>
   );

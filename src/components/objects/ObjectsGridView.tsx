@@ -92,11 +92,13 @@ export default function ObjectsGridView({
                 <Icon name="Wrench" size={16} />
                 <span>Завершено {site.completedWorks}/{site.worksCount}</span>
               </div>
-              <NotificationGroup
-                messages={site.unreadMessages}
-                logs={!isContractor ? site.unreadLogs : undefined}
-                inspections={isContractor ? site.unreadInspections : undefined}
-              />
+              <div>
+                <NotificationGroup
+                  messages={site.unreadMessages}
+                  logs={!isContractor ? site.unreadLogs : undefined}
+                  inspections={isContractor ? site.unreadInspections : undefined}
+                />
+              </div>
             </div>
           </CardContent>
         </Card>
