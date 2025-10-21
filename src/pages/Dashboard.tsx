@@ -98,11 +98,19 @@ const Dashboard = () => {
   };
 
   const loadFeed = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('⚠️ loadFeed: No user, skipping');
+      return;
+    }
     
+    console.log('🔄 loadFeed: Starting...', { userId: user.id });
     setLoading(true);
     try {
-      const response = await apiClient.get(`${ENDPOINTS.FEED}?user_id=${user.id}`);
+      const url = `${ENDPOINTS.FEED}?user_id=${user.id}`;
+      console.log('📡 loadFeed: Fetching from', url);
+      const response = await apiClient.get(url);
+      
+      console.log('📥 loadFeed: Response received', response);
       
       if (response.success) {
         const normalizedEvents = response.data?.events?.map((event: any) => {
@@ -115,10 +123,13 @@ const Dashboard = () => {
           }
           return event;
         }) || [];
+        console.log('✅ loadFeed: Loaded events', normalizedEvents.length);
         setFeed(normalizedEvents);
+      } else {
+        console.warn('⚠️ loadFeed: Response not successful', response);
       }
     } catch (error) {
-      console.error('Failed to load feed:', error);
+      console.error('❌ loadFeed: Error', error);
     } finally {
       setLoading(false);
     }
