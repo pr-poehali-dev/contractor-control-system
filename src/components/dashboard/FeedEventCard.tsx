@@ -153,7 +153,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
       style={{ animationDelay: `${index * 0.05}s` }}
     >
       <div className="p-4 sm:p-5 relative">
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide px-[18px] my-0">
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide mb-3">
           {event.objectTitle && (
             <Badge 
               variant="outline" 
@@ -181,7 +181,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
               }}
             >
               <Icon name="User" size={13} className="mr-1 flex-shrink-0" />
-              <span className="truncate max-w-[120px] sm:max-w-none">{event.author}</span>
+              <span className="truncate max-w-[120px] sm:max-w-[180px]">{event.author}</span>
             </Badge>
           )}
         </div>
@@ -212,7 +212,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
         {event.type !== 'info_post' && event.workTitle && (
           <div className="mb-2 pl-0.5">
             <h3 
-              className="font-semibold text-slate-900 text-base leading-snug cursor-pointer hover:text-blue-600 transition-colors break-words px-[18px]"
+              className="font-semibold text-slate-900 text-base leading-snug cursor-pointer hover:text-blue-600 transition-colors break-words"
               onClick={(e) => {
                 e.stopPropagation();
                 if (event.workId && onTagClick) {
@@ -233,7 +233,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
 
         {(event.type === 'inspection' || event.type === 'inspection_scheduled' || event.type === 'inspection_started' || event.type === 'inspection_completed') && event.inspectionNumber && (
           <div className="mb-2 pl-0.5">
-            <p className="text-sm text-slate-600 px-[18px]">
+            <p className="text-sm text-slate-600">
               Проверка <span className="font-mono font-medium text-purple-600">№{event.inspectionNumber}</span>
             </p>
           </div>
@@ -241,7 +241,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
 
         {(event.type === 'work_log' || event.type === 'inspection_scheduled' || event.type === 'inspection_started' || event.type === 'inspection_completed') && event.description && (
           <div className="mb-2 pl-0.5">
-            <p className="text-sm text-slate-600 break-words px-[18px]">{event.description}</p>
+            <p className="text-sm text-slate-600 break-words">{event.description}</p>
           </div>
         )}
 
@@ -340,8 +340,8 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
           </div>
         )}
         
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-4 pt-3 border-t border-slate-100">
-          <Badge variant="outline" className={`text-xs font-medium px-2.5 py-1 w-fit ${getEventBadgeColor(event.type)}`}>
+        <div className="flex items-center justify-between gap-2 mt-3">
+          <Badge variant="outline" className={`text-xs font-medium px-2.5 py-1 ${getEventBadgeColor(event.type)}`}>
             {getEventLabel(event.type)}
           </Badge>
           <div className="flex items-center gap-1.5 text-xs text-slate-400">
