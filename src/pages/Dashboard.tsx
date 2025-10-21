@@ -111,11 +111,11 @@ const Dashboard = () => {
       const response = await apiClient.get(url);
       
       console.log('📥 loadFeed: Response received', response);
-      console.log('📦 loadFeed: response.data', response.data);
-      console.log('📦 loadFeed: response.data.events', response.data?.events);
       
       if (response.success) {
-        const rawEvents = response.data?.events || [];
+        // Backend возвращает { success: true, events: [...] }
+        // apiClient.normalizeResponse возвращает это как есть
+        const rawEvents = (response as any).events || [];
         console.log('📦 loadFeed: rawEvents count', rawEvents.length);
         console.log('📦 loadFeed: rawEvents sample', rawEvents.slice(0, 2));
         
