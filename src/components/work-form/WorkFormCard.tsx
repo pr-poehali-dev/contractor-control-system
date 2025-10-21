@@ -89,10 +89,10 @@ export const WorkFormCard = ({
               key={`category-${work.id}-${work.category}`}
               value={work.category || undefined}
               onValueChange={(value) => {
-                onUpdate(work.id, 'category', value);
-                if (!work.isExisting) {
+                if (!work.isExisting && work.category && work.category !== value) {
                   onUpdate(work.id, 'title', '');
                 }
+                onUpdate(work.id, 'category', value);
               }}
               disabled={work.isExisting}
             >
