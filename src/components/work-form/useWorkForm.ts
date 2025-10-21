@@ -119,7 +119,16 @@ export const useWorkForm = (objectId: string | undefined) => {
 
   const updateWork = (id: string, field: keyof WorkForm, value: string | boolean) => {
     console.log(`🔄 Updating work ${id}, field: ${field}, value:`, value);
-    setWorks(works.map(w => w.id === id ? { ...w, [field]: value } : w));
+    const updatedWorks = works.map(w => {
+      if (w.id === id) {
+        const updated = { ...w, [field]: value };
+        console.log(`✅ Updated work:`, updated);
+        return updated;
+      }
+      return w;
+    });
+    console.log(`📋 All works after update:`, updatedWorks);
+    setWorks(updatedWorks);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
