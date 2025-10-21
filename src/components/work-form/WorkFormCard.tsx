@@ -198,14 +198,14 @@ export const WorkFormCard = ({
           <div className="md:col-span-2">
             <Label htmlFor={`contractor-${work.id}`} className="text-sm">Подрядчик</Label>
             <Select
-              value={work.contractor_id}
-              onValueChange={(value) => onUpdate(work.id, 'contractor_id', value)}
+              value={work.contractor_id || 'none'}
+              onValueChange={(value) => onUpdate(work.id, 'contractor_id', value === 'none' ? '' : value)}
             >
               <SelectTrigger id={`contractor-${work.id}`} className="h-9">
                 <SelectValue placeholder="Не выбран" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Не выбран</SelectItem>
+                <SelectItem value="none">Не выбран</SelectItem>
                 {contractors.map((contractor: any) => (
                   <SelectItem key={contractor.id} value={String(contractor.id)}>
                     {contractor.name}
