@@ -66,7 +66,7 @@ export const useWorkForm = (objectId: string | undefined) => {
     if (currentObject) {
       const newObjectData = {
         id: currentObject.id,
-        name: currentObject.name || '',
+        name: currentObject.title || currentObject.name || '',
         address: currentObject.address || '',
         customer: currentObject.customer || '',
         description: currentObject.description || '',
@@ -165,7 +165,7 @@ export const useWorkForm = (objectId: string | undefined) => {
     setIsSubmitting(true);
     try {
       await api.updateItem(token, 'object', objectData.id, {
-        name: objectData.name,
+        title: objectData.name,
         address: objectData.address,
         customer: objectData.customer,
         description: objectData.description,
