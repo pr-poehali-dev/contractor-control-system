@@ -62,10 +62,11 @@ const CreateWork = () => {
   const { user, token } = useAuth();
   const dispatch = useAppDispatch();
   const userData = useAppSelector((state) => state.user.userData);
-  const allWorks = useAppSelector((state) => state.user.works);
+  const allWorks = useAppSelector((state) => state.user.userData?.works || []);
   const [works, setWorks] = useState<WorkForm[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const contractors = userData?.contractors || [];
 
@@ -90,46 +91,37 @@ const CreateWork = () => {
   };
 
   useEffect(() => {
-    console.log('🔍 CreateWork useEffect triggered');
-    console.log('🔍 Object ID:', objectId);
-    console.log('🔍 allWorks:', allWorks);
-    console.log('🔍 allWorks type:', typeof allWorks);
-    console.log('🔍 allWorks is array?', Array.isArray(allWorks));
-    
-    if (!allWorks) {
-      console.log('⚠️ No allWorks, setting empty work');
-      setWorks([{ ...emptyWork, id: crypto.randomUUID() }]);
-      return;
-    }
-    
-    if (!objectId) {
-      console.log('⚠️ No objectId');
-      return;
-    }
-    
-    const objectWorks = allWorks.filter((work: any) => work.object_id === Number(objectId));
-    console.log('🔍 Filtered works for object', objectId, ':', objectWorks);
-    
-    if (objectWorks.length > 0) {
-      const existingWorks = objectWorks.map((work: any) => ({
-        id: `existing-${work.id}`,
-        workId: work.id,
-        title: work.title || '',
-        volume: '',
-        unit: 'м²',
-        planned_start_date: work.planned_start_date?.split('T')[0] || '',
-        planned_end_date: work.planned_end_date?.split('T')[0] || '',
-        contractor_id: work.contractor_id ? String(work.contractor_id) : '',
-        isExisting: true,
-      }));
+    if (!isLoading && !isInitialized && objectId) {
+      console.log('🔍 CreateWork initialization');
+      console.log('🔍 Object ID:', objectId);
+      console.log('🔍 allWorks:', allWorks);
       
-      console.log('✅ Setting works with existing:', existingWorks);
-      setWorks([...existingWorks, { ...emptyWork, id: crypto.randomUUID() }]);
-    } else {
-      console.log('ℹ️ No existing works, setting empty work');
-      setWorks([{ ...emptyWork, id: crypto.randomUUID() }]);
+      const objectWorks = allWorks.filter((work: any) => work.object_id === Number(objectId));
+      console.log('🔍 Filtered works for object', objectId, ':', objectWorks);
+      
+      if (objectWorks.length > 0) {
+        const existingWorks = objectWorks.map((work: any) => ({
+          id: `existing-${work.id}`,
+          workId: work.id,
+          title: work.title || '',
+          volume: '',
+          unit: 'м²',
+          planned_start_date: work.planned_start_date?.split('T')[0] || '',
+          planned_end_date: work.planned_end_date?.split('T')[0] || '',
+          contractor_id: work.contractor_id ? String(work.contractor_id) : '',
+          isExisting: true,
+        }));
+        
+        console.log('✅ Setting works with existing:', existingWorks);
+        setWorks([...existingWorks, { ...emptyWork, id: crypto.randomUUID() }]);
+      } else {
+        console.log('ℹ️ No existing works, setting empty work');
+        setWorks([{ ...emptyWork, id: crypto.randomUUID() }]);
+      }
+      
+      setIsInitialized(true);
     }
-  }, [allWorks, objectId]);
+  }, [allWorks, objectId, isLoading, isInitialized]);
 
   const addWork = () => {
     setWorks([...works, { ...emptyWork, id: crypto.randomUUID() }]);
