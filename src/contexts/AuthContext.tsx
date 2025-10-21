@@ -1,9 +1,9 @@
 import { createContext, useContext, ReactNode, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { 
-  loginUser, 
+  login as loginUser, 
   loginWithPhone as loginWithPhoneAction,
-  registerUser,
+  register as registerUser,
   verifyToken as verifyTokenAction,
   logout as logoutUser,
   fetchUserData
