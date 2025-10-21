@@ -57,16 +57,8 @@ const CreateWork = () => {
           isSubmitting={isSubmitting}
         />
 
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4">
           <h2 className="text-xl font-semibold">Работы</h2>
-          <Button
-            type="button"
-            onClick={addWork}
-            size="sm"
-          >
-            <Icon name="Plus" size={16} className="mr-2" />
-            Добавить работу
-          </Button>
         </div>
 
         <InfoSection />
@@ -96,6 +88,14 @@ const CreateWork = () => {
                   onRemove={removeWork}
                 />
               ))}
+
+              <button
+                type="button"
+                onClick={addWork}
+                className="w-full p-6 bg-white border-2 border-dashed border-slate-200 rounded-lg hover:border-slate-300 hover:bg-slate-50 transition-colors flex items-center justify-center text-slate-400 hover:text-slate-600"
+              >
+                <Icon name="Plus" size={24} />
+              </button>
             </div>
           )}
 
