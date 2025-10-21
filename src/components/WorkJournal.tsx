@@ -182,12 +182,12 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
   const chatEvents: JournalEvent[] = chatMessages
     .filter(msg => msg.work_id === selectedWork)
     .map(msg => ({
-      id: `chat-${msg.id}`,
+      id: msg.id,
       type: 'chat_message' as const,
       work_id: msg.work_id,
-      created_by: msg.created_by,
-      author_name: msg.author_name,
-      author_role: (msg.author_role || 'contractor') as UserRole,
+      created_by: msg.user_id,
+      author_name: msg.user_name || 'Пользователь',
+      author_role: (msg.user_role || 'contractor') as UserRole,
       created_at: msg.created_at,
       content: msg.message,
     }));

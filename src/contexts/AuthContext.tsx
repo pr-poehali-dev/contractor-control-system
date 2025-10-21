@@ -87,6 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const workLogs = useAppSelector((state) => state.workLogs.items);
   const contractors = useAppSelector((state) => state.contractors.items);
   const defectReports = useAppSelector((state) => state.defectReports.items);
+  const chatMessages = useAppSelector((state) => state.chatMessages.items);
 
   const userData = useMemo(() => ({
     objects,
@@ -96,10 +97,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     workLogs,
     checkpoints: [],
     contractors,
-    chatMessages: [],
+    chatMessages,
     unreadCounts: {},
     defect_reports: defectReports,
-  }), [objects, works, inspections, workLogs, contractors, defectReports]);
+  }), [objects, works, inspections, workLogs, contractors, defectReports, chatMessages]);
 
   /**
    * Загрузка данных пользователя из backend

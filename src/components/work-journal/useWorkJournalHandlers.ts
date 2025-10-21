@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { useAppDispatch } from '@/store/hooks';
+import { createChatMessage } from '@/store/slices/chatMessagesSlice';
 import { createWorkLog } from '@/store/slices/workLogsSlice';
 import { fetchUserData } from '@/store/slices/userSlice';
 
@@ -35,16 +36,16 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
     setIsSubmitting(true);
 
     try {
-      await dispatch(createWorkLog({
+      await dispatch(createChatMessage({
         work_id: selectedWork,
-        description: newMessage,
+        message: newMessage,
       })).unwrap();
 
       await dispatch(fetchUserData());
 
       toast({
         title: 'Сообщение отправлено',
-        description: 'Ваше сообщение добавлено в журнал',
+        description: 'Ваше сообщение добавлено в чат',
       });
 
       setNewMessage('');

@@ -6,6 +6,7 @@ import workLogsReducer from './slices/workLogsSlice';
 import inspectionsReducer from './slices/inspectionsSlice';
 import contractorsReducer from './slices/contractorsSlice';
 import defectReportsReducer from './slices/defectReportsSlice';
+import chatMessagesReducer from './slices/chatMessagesSlice';
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     inspections: inspectionsReducer,
     contractors: contractorsReducer,
     defectReports: defectReportsReducer,
+    chatMessages: chatMessagesReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
