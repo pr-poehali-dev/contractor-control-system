@@ -45,10 +45,7 @@ export default function ObjectsDesktopHeader({
     <div className="bg-white border-b border-slate-200 p-6">
       <div className="max-w-[1600px] mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Мои объекты</h1>
-            <p className="text-lg text-slate-600">Управление строительными объектами</p>
-          </div>
+          <h1 className="text-3xl font-bold text-slate-900">Мои объекты</h1>
           {!isContractor && (
             <Button size="lg" onClick={onCreateClick} data-tour="create-object-btn">
               <Icon name="Plus" size={20} className="mr-2" />
