@@ -84,6 +84,7 @@ export const WorkFormCard = ({
               Категория работ <span className="text-red-500">*</span>
             </Label>
             <Select
+              key={`category-${work.id}-${work.category}`}
               value={work.category}
               onValueChange={(value) => {
                 onUpdate(work.id, 'category', value);
@@ -112,6 +113,7 @@ export const WorkFormCard = ({
             </Label>
             {work.category ? (
               <Select
+                key={`title-${work.id}-${work.title}`}
                 value={work.title}
                 onValueChange={(value) => onUpdate(work.id, 'title', value)}
                 disabled={work.isExisting}
