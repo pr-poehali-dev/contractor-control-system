@@ -7,7 +7,7 @@ import { safeDateCompare, isValidDate } from '@/utils/dateValidation';
 
 const Activity = () => {
   const { userData, user } = useAuth();
-  const [typeFilter, setTypeFilter] = useState<'all' | 'work' | 'check' | 'defect' | 'message'>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'work' | 'check' | 'info'>('all');
   const [objectFilter, setObjectFilter] = useState<number | null>(null);
   const [workFilter, setWorkFilter] = useState<number | null>(null);
 
@@ -23,22 +23,20 @@ const Activity = () => {
   }
 
   const workLogs = (userData?.workLogs && Array.isArray(userData.workLogs)) ? userData.workLogs : [];
-  const chatMessages = (userData?.chatMessages && Array.isArray(userData.chatMessages)) ? userData.chatMessages : [];
   const inspections = (userData?.inspections && Array.isArray(userData.inspections)) ? userData.inspections : [];
-  const remarks = (userData?.remarks && Array.isArray(userData.remarks)) ? userData.remarks : [];
+  const infoPosts = (userData?.infoPosts && Array.isArray(userData.infoPosts)) ? userData.infoPosts : [];
   const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
   const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
   const contractors = (userData?.contractors && Array.isArray(userData.contractors)) ? userData.contractors : [];
 
   console.log('🔍 Activity Debug:', {
     workLogsCount: workLogs.length,
-    chatMessagesCount: chatMessages.length,
     inspectionsCount: inspections.length,
-    remarksCount: remarks.length,
-    allActivityCount: workLogs.length + chatMessages.length + inspections.length + remarks.length,
+    infoPostsCount: infoPosts.length,
+    allActivityCount: workLogs.length + inspections.length + infoPosts.length,
     workLogs: workLogs.slice(0, 2),
-    chatMessages: chatMessages.slice(0, 2),
-    inspections: inspections.slice(0, 2)
+    inspections: inspections.slice(0, 2),
+    infoPosts: infoPosts.slice(0, 2)
   });
 
   const getWorkById = (workId: number) => works.find(w => w.id === workId);
@@ -62,20 +60,6 @@ const Activity = () => {
         objectId: work?.object_id,
       };
     }),
-    ...chatMessages.map(msg => {
-      const work = getWorkById(msg.work_id);
-      return {
-        id: `chat-${msg.id}`,
-        type: 'message' as const,
-        title: 'Сообщение в чате',
-        description: msg.message,
-        timestamp: msg.created_at,
-        user: msg.author_name || 'Пользователь',
-        workId: msg.work_id,
-        contractorId: work?.contractor_id,
-        objectId: work?.object_id,
-      };
-    }),
     ...inspections.map(insp => {
       const work = getWorkById(insp.work_id);
       return {
@@ -90,20 +74,16 @@ const Activity = () => {
         objectId: work?.object_id,
       };
     }),
-    ...remarks.map(rem => {
-      const inspection = inspections.find(i => i.id === rem.inspection_id);
-      const work = inspection ? getWorkById(inspection.work_id) : null;
+    ...infoPosts.map(post => {
+      const object = objects.find(o => o.id === post.object_id);
       return {
-        id: `rem-${rem.id}`,
-        type: 'defect' as const,
-        title: 'Замечание',
-        description: rem.description,
-        timestamp: rem.created_at,
-        user: 'Инспектор',
-        inspectionId: rem.inspection_id,
-        workId: inspection?.work_id,
-        contractorId: work?.contractor_id,
-        objectId: work?.object_id,
+        id: `info-${post.id}`,
+        type: 'info' as const,
+        title: post.title || 'Информация',
+        description: post.content,
+        timestamp: post.created_at,
+        user: post.author_name || 'Администратор',
+        objectId: post.object_id,
       };
     }),
   ].sort((a, b) => safeDateCompare(a.timestamp, b.timestamp));
@@ -135,9 +115,8 @@ const Activity = () => {
   const getIcon = (type: string) => {
     switch (type) {
       case 'check': return 'ClipboardCheck';
-      case 'defect': return 'AlertCircle';
       case 'work': return 'Wrench';
-      case 'message': return 'MessageSquare';
+      case 'info': return 'Info';
       default: return 'Activity';
     }
   };
@@ -145,9 +124,8 @@ const Activity = () => {
   const getIconColor = (type: string) => {
     switch (type) {
       case 'check': return 'text-green-600 bg-green-100';
-      case 'defect': return 'text-red-600 bg-red-100';
       case 'work': return 'text-blue-600 bg-blue-100';
-      case 'message': return 'text-purple-600 bg-purple-100';
+      case 'info': return 'text-purple-600 bg-purple-100';
       default: return 'text-slate-600 bg-slate-100';
     }
   };
@@ -199,20 +177,12 @@ const Activity = () => {
               Проверки
             </Button>
             <Button
-              variant={typeFilter === 'defect' ? 'default' : 'outline'}
+              variant={typeFilter === 'info' ? 'default' : 'outline'}
               size="sm"
-              onClick={() => setTypeFilter('defect')}
+              onClick={() => setTypeFilter('info')}
             >
-              <Icon name="AlertCircle" size={16} className="mr-1" />
-              Замечания
-            </Button>
-            <Button
-              variant={typeFilter === 'message' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setTypeFilter('message')}
-            >
-              <Icon name="MessageSquare" size={16} className="mr-1" />
-              Сообщения
+              <Icon name="Info" size={16} className="mr-1" />
+              Информация
             </Button>
           </div>
 
