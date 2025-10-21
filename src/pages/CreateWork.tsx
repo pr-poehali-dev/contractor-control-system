@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { loadUserData } from '@/store/slices/userSlice';
 import { api } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -57,7 +59,10 @@ const CreateWork = () => {
   const { objectId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, token, setUserData, userData } = useAuth();
+  const { user, token } = useAuth();
+  const dispatch = useAppDispatch();
+  const userData = useAppSelector((state) => state.user.userData);
+  const allWorks = useAppSelector((state) => state.user.works);
   const [works, setWorks] = useState<WorkForm[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -74,28 +79,8 @@ const CreateWork = () => {
     try {
       setIsLoading(true);
       
-      const freshUserData = await api.getUserData(token);
-      setUserData(freshUserData);
+      await dispatch(loadUserData(token)).unwrap();
       
-      const objectWorks = freshUserData?.works?.filter((work: any) => work.object_id === Number(objectId)) || [];
-      
-      if (objectWorks.length > 0) {
-        const existingWorks = objectWorks.map((work: any) => ({
-          id: `existing-${work.id}`,
-          workId: work.id,
-          title: work.title || '',
-          volume: '',
-          unit: 'м²',
-          planned_start_date: work.planned_start_date?.split('T')[0] || '',
-          planned_end_date: work.planned_end_date?.split('T')[0] || '',
-          contractor_id: work.contractor_id ? String(work.contractor_id) : '',
-          isExisting: true,
-        }));
-        
-        setWorks([...existingWorks, { ...emptyWork, id: crypto.randomUUID() }]);
-      } else {
-        setWorks([{ ...emptyWork, id: crypto.randomUUID() }]);
-      }
     } catch (error) {
       console.error('Failed to load works:', error);
       setWorks([{ ...emptyWork, id: crypto.randomUUID() }]);
@@ -103,6 +88,48 @@ const CreateWork = () => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    console.log('🔍 CreateWork useEffect triggered');
+    console.log('🔍 Object ID:', objectId);
+    console.log('🔍 allWorks:', allWorks);
+    console.log('🔍 allWorks type:', typeof allWorks);
+    console.log('🔍 allWorks is array?', Array.isArray(allWorks));
+    
+    if (!allWorks) {
+      console.log('⚠️ No allWorks, setting empty work');
+      setWorks([{ ...emptyWork, id: crypto.randomUUID() }]);
+      return;
+    }
+    
+    if (!objectId) {
+      console.log('⚠️ No objectId');
+      return;
+    }
+    
+    const objectWorks = allWorks.filter((work: any) => work.object_id === Number(objectId));
+    console.log('🔍 Filtered works for object', objectId, ':', objectWorks);
+    
+    if (objectWorks.length > 0) {
+      const existingWorks = objectWorks.map((work: any) => ({
+        id: `existing-${work.id}`,
+        workId: work.id,
+        title: work.title || '',
+        volume: '',
+        unit: 'м²',
+        planned_start_date: work.planned_start_date?.split('T')[0] || '',
+        planned_end_date: work.planned_end_date?.split('T')[0] || '',
+        contractor_id: work.contractor_id ? String(work.contractor_id) : '',
+        isExisting: true,
+      }));
+      
+      console.log('✅ Setting works with existing:', existingWorks);
+      setWorks([...existingWorks, { ...emptyWork, id: crypto.randomUUID() }]);
+    } else {
+      console.log('ℹ️ No existing works, setting empty work');
+      setWorks([{ ...emptyWork, id: crypto.randomUUID() }]);
+    }
+  }, [allWorks, objectId]);
 
   const addWork = () => {
     setWorks([...works, { ...emptyWork, id: crypto.randomUUID() }]);
@@ -196,8 +223,7 @@ const CreateWork = () => {
         }
       }
 
-      const refreshedData = await api.getUserData(token);
-      setUserData(refreshedData);
+      await dispatch(loadUserData(token)).unwrap();
 
       toast({
         title: 'Работы сохранены!',
