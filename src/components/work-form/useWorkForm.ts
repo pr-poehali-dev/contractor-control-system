@@ -38,13 +38,16 @@ export const useWorkForm = (objectId: string | undefined) => {
     if (!userData || !objectId) return;
     
     const freshWorks = userData.works || [];
+    const freshTemplates = userData.work_templates || [];
     const objectWorks = freshWorks.filter((work: any) => work.object_id === Number(objectId));
     
     console.log('🔍 Filtered works for object', objectId, ':', objectWorks);
+    console.log('🔍 Available templates:', freshTemplates.length);
     
     if (objectWorks.length > 0) {
       const existingWorks = objectWorks.map((work: any) => {
-        const template = workTemplates.find((t: any) => t.title === work.title);
+        const template = freshTemplates.find((t: any) => t.title === work.title);
+        console.log(`🔍 Finding template for "${work.title}":`, template);
         return {
           id: `existing-${work.id}`,
           workId: work.id,
