@@ -65,11 +65,11 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
             />
           </div>
 
-          {(userRole === 'client' || userRole === 'admin') && onEdit && (
+          {(userRole === 'client' || userRole === 'admin') && (
             <Button 
               variant="ghost" 
               size="icon"
-              onClick={onEdit}
+              onClick={() => navigate(`/objects/${objectId}/works/create`)}
               className="h-8 w-8 flex-shrink-0"
             >
               <Icon name="Settings" size={16} />
@@ -169,10 +169,10 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {(userRole === 'client' || userRole === 'admin') && onEdit && (
-              <Button variant="outline" size="default" onClick={onEdit} className="shadow-sm">
-                <Icon name="Settings" size={16} className="mr-2" />
-                Настройки
+            {(userRole === 'client' || userRole === 'admin') && (
+              <Button variant="outline" size="default" onClick={() => navigate(`/objects/${objectId}/works/create`)} className="shadow-sm">
+                <Icon name="Edit" size={16} className="mr-2" />
+                Управление
               </Button>
             )}
           </div>
