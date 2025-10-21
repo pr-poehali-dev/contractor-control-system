@@ -331,33 +331,28 @@ const ObjectDetail = () => {
               {object.title} • {objectWorks.length} {objectWorks.length === 1 ? 'работа' : objectWorks.length < 5 ? 'работы' : 'работ'}
             </p>
           </div>
-          {objectWorks.length > 0 && (
-            <Button onClick={() => navigate(`/objects/${objectId}/works/create`)}>
-              <Icon name="Plus" size={18} className="mr-2" />
-              Добавить
-            </Button>
-          )}
+
         </div>
 
-        {objectWorks.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <Icon name="Briefcase" size={48} className="text-slate-300 mb-4" />
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                Пока нет работ
-              </h3>
-              <p className="text-sm text-slate-600 mb-6 text-center max-w-md">
-                Создайте первую работу для этого объекта, чтобы начать отслеживать прогресс
-              </p>
-              <Button onClick={() => navigate(`/objects/${objectId}/works/create`)}>
-                <Icon name="Plus" size={18} className="mr-2" />
-                Создать работу
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {objectWorks.map((work) => (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {objectWorks.length === 0 ? (
+            <Card className="md:col-span-2 lg:col-span-3">
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <Icon name="Briefcase" size={48} className="text-slate-300 mb-4" />
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                  Пока нет работ
+                </h3>
+                <p className="text-sm text-slate-600 mb-6 text-center max-w-md">
+                  Создайте первую работу для этого объекта, чтобы начать отслеживать прогресс
+                </p>
+                <Button onClick={() => navigate(`/objects/${objectId}/works/create`)}>
+                  <Icon name="Plus" size={18} className="mr-2" />
+                  Создать работу
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            objectWorks.map((work) => (
               <Card 
                 key={work.id}
                 className="cursor-pointer hover:shadow-lg transition-shadow"
@@ -388,9 +383,18 @@ const ObjectDetail = () => {
                   )}
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+
+          {(user?.role === 'client' || user?.role === 'admin') && objectWorks.length > 0 && (
+            <button
+              onClick={() => navigate(`/objects/${objectId}/works/create`)}
+              className="h-full min-h-[180px] p-6 bg-white border-2 border-dashed border-slate-200 rounded-lg hover:border-slate-300 hover:bg-slate-50 transition-colors flex items-center justify-center text-slate-400 hover:text-slate-600"
+            >
+              <Icon name="Plus" size={32} />
+            </button>
+          )}
+        </div>
       </div>
 
       {objectWorks.length > 0 && (
