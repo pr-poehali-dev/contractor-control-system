@@ -89,24 +89,24 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
     return hasCompatibleEvents;
   };
 
-  const objectTags = availableTags
-    .filter(t => t.type === 'object')
+  const allObjectTags = availableTags.filter(t => t.type === 'object');
+  const objectTags = allObjectTags
     .filter(t => t.label.toLowerCase().includes(objectSearch.toLowerCase()))
     .map(tag => ({
       ...tag,
       disabled: !isTagAvailable(tag.id, 'object')
     }));
-    
-  const workTags = availableTags
-    .filter(t => t.type === 'work')
+  
+  const allWorkTags = availableTags.filter(t => t.type === 'work');
+  const workTags = allWorkTags
     .filter(t => t.label.toLowerCase().includes(workSearch.toLowerCase()))
     .map(tag => ({
       ...tag,
       disabled: !isTagAvailable(tag.id, 'work')
     }));
-    
-  const contractorTags = availableTags
-    .filter(t => t.type === 'contractor')
+  
+  const allContractorTags = availableTags.filter(t => t.type === 'contractor');
+  const contractorTags = allContractorTags
     .filter(t => t.label.toLowerCase().includes(contractorSearch.toLowerCase()))
     .map(tag => ({
       ...tag,
@@ -170,7 +170,7 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
 
         {availableTags.length > 0 && (
           <>
-          {objectTags.length > 0 && (
+          {allObjectTags.length > 0 && (
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm" className="h-9 flex-shrink-0">
@@ -224,7 +224,7 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
             </Popover>
             )}
 
-            {workTags.length > 0 && (
+            {allWorkTags.length > 0 && (
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm" className="h-9 flex-shrink-0">
@@ -278,7 +278,7 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
             </Popover>
             )}
 
-            {contractorTags.length > 0 && (
+            {allContractorTags.length > 0 && (
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm" className="h-9 flex-shrink-0">
