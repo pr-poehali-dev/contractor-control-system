@@ -19,7 +19,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'headers': {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, X-User-Id',
+                'Access-Control-Allow-Headers': 'Content-Type, X-User-Id, X-Auth-Token',
                 'Access-Control-Max-Age': '86400'
             },
             'body': '',
@@ -37,8 +37,24 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
     
-    params = event.get('queryStringParameters', {}) or {}
-    user_id = params.get('user_id')
+    # Extract user_id from X-Auth-Token or fallback to query parameter for backward compatibility
+    headers = event.get('headers', {})
+    auth_token = headers.get('X-Auth-Token') or headers.get('x-auth-token')
+    
+    user_id = None
+    if auth_token:
+        # Format: {random}.{user_id}
+        try:
+            parts = auth_token.split('.')
+            if len(parts) == 2:
+                user_id = parts[1]
+        except Exception:
+            pass
+    
+    # Fallback to query parameter for backward compatibility
+    if not user_id:
+        params = event.get('queryStringParameters', {}) or {}
+        user_id = params.get('user_id')
     
     if not user_id:
         return {

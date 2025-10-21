@@ -30,7 +30,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'headers': {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, X-User-Id',
+                'Access-Control-Allow-Headers': 'Content-Type, X-Auth-Token',
                 'Access-Control-Max-Age': '86400'
             },
             'body': '',
@@ -38,7 +38,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     headers = event.get('headers', {})
-    user_id = headers.get('X-User-Id') or headers.get('x-user-id')
+    auth_token = headers.get('X-Auth-Token') or headers.get('x-auth-token')
+    
+    # Get user_id from auth token (токен содержит user_id после .)
+    user_id = None
+    if auth_token:
+        try:
+            # Токен формата: {random_string}.{user_id}
+            user_id = auth_token.split('.')[1] if '.' in auth_token else None
+        except (IndexError, AttributeError):
+            pass
     
     if not user_id:
         return {

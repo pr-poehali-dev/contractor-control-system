@@ -5,13 +5,13 @@
       "method": "POST",
       "path": "/",
       "headers": {
-        "X-User-Id": "1"
+        "X-Auth-Token": "test-token.1"
       },
       "body": {
         "inspection_id": 51,
         "notes": "Test report"
       },
-      "expectedStatus": [201, 500],
+      "expectedStatus": 201,
       "expectedBody": {
         "success": true,
         "data": {
@@ -27,7 +27,7 @@
       "method": "GET",
       "path": "/?inspection_id=51",
       "headers": {
-        "X-User-Id": "1"
+        "X-Auth-Token": "test-token.1"
       },
       "expectedStatus": 200,
       "bodyMatcher": "partial"

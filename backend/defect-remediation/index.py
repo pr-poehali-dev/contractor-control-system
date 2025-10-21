@@ -25,7 +25,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'headers': {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, X-User-Id',
+                'Access-Control-Allow-Headers': 'Content-Type, X-User-Id, X-Auth-Token',
                 'Access-Control-Max-Age': '86400'
             },
             'body': '',
@@ -33,7 +33,23 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     headers = event.get('headers', {})
-    user_id = headers.get('X-User-Id') or headers.get('x-user-id')
+    
+    # Extract user_id from X-Auth-Token or fallback to X-User-Id for backward compatibility
+    auth_token = headers.get('X-Auth-Token') or headers.get('x-auth-token')
+    user_id = None
+    
+    if auth_token:
+        # Format: {random}.{user_id}
+        try:
+            parts = auth_token.split('.')
+            if len(parts) == 2:
+                user_id = parts[1]
+        except Exception:
+            pass
+    
+    # Fallback to X-User-Id for backward compatibility
+    if not user_id:
+        user_id = headers.get('X-User-Id') or headers.get('x-user-id')
     
     if not user_id:
         return {
