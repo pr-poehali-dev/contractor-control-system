@@ -36,7 +36,7 @@ export const WorkFormCard = ({
   onDuplicate,
   onRemove,
 }: WorkFormCardProps) => {
-  const [isCollapsed, setIsCollapsed] = useState(work.isCollapsed ?? false);
+  const [isCollapsed, setIsCollapsed] = useState(work.isExisting);
   
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
@@ -76,10 +76,15 @@ export const WorkFormCard = ({
             />
             <div className="flex-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-base font-semibold">{work.title || `Работа ${index + 1}`}</h3>
+                <h3 className="text-base font-semibold">{work.title || 'Новая работа'}</h3>
                 {work.isExisting && (
                   <Badge variant="outline" className="text-xs bg-slate-100">
                     Добавленная
+                  </Badge>
+                )}
+                {!work.isExisting && !work.title && (
+                  <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700">
+                    Новая
                   </Badge>
                 )}
                 {work.category && (

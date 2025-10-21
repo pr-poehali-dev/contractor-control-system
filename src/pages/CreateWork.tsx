@@ -1,13 +1,10 @@
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import { useWorkForm } from '@/components/work-form/useWorkForm';
 import { WorkFormCard } from '@/components/work-form/WorkFormCard';
 import { InfoSection } from '@/components/work-form/InfoSection';
+import { ObjectInfoSection } from '@/components/work-form/ObjectInfoSection';
 
 const CreateWork = () => {
   const { objectId } = useParams();
@@ -49,65 +46,16 @@ const CreateWork = () => {
             К объекту
           </Button>
           
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">Управление объектом и работами</h1>
-          <p className="text-slate-600">Отредактируйте информацию об объекте и управляйте работами</p>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">{objectData?.name || 'Управление объектом и работами'}</h1>
+          <p className="text-slate-600">Управление работами на объекте</p>
         </div>
 
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Icon name="Building2" size={20} />
-              Информация об объекте
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="md:col-span-2">
-                <Label htmlFor="object-name">Название объекта</Label>
-                <Input
-                  id="object-name"
-                  value={objectData.name}
-                  onChange={(e) => updateObjectField('name', e.target.value)}
-                  placeholder="Введите название объекта"
-                />
-              </div>
-              <div>
-                <Label htmlFor="object-address">Адрес</Label>
-                <Input
-                  id="object-address"
-                  value={objectData.address}
-                  onChange={(e) => updateObjectField('address', e.target.value)}
-                  placeholder="Адрес объекта"
-                />
-              </div>
-              <div>
-                <Label htmlFor="object-customer">Заказчик</Label>
-                <Input
-                  id="object-customer"
-                  value={objectData.customer}
-                  onChange={(e) => updateObjectField('customer', e.target.value)}
-                  placeholder="Название заказчика"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <Label htmlFor="object-description">Описание</Label>
-                <Textarea
-                  id="object-description"
-                  value={objectData.description}
-                  onChange={(e) => updateObjectField('description', e.target.value)}
-                  placeholder="Краткое описание объекта"
-                  rows={3}
-                />
-              </div>
-            </div>
-            <div className="mt-4 flex justify-end">
-              <Button onClick={saveObject} variant="outline" disabled={isSubmitting}>
-                <Icon name="Save" size={16} className="mr-2" />
-                Сохранить объект
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <ObjectInfoSection 
+          objectData={objectData}
+          updateObjectField={updateObjectField}
+          saveObject={saveObject}
+          isSubmitting={isSubmitting}
+        />
 
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold">Работы</h2>
