@@ -185,9 +185,9 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
       id: msg.id,
       type: 'chat_message' as const,
       work_id: msg.work_id,
-      created_by: msg.user_id,
-      author_name: msg.user_name || 'Пользователь',
-      author_role: (msg.user_role || 'contractor') as UserRole,
+      created_by: msg.created_by,
+      author_name: msg.author_name || 'Пользователь',
+      author_role: (msg.author_role || 'contractor') as UserRole,
       created_at: msg.created_at,
       content: msg.message,
     }));

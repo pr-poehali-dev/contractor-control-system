@@ -5,10 +5,12 @@ import { ENDPOINTS } from '@/api/endpoints';
 export interface ChatMessage {
   id: number;
   work_id: number;
-  user_id: number;
-  user_name?: string;
-  user_role?: 'contractor' | 'client';
+  created_by: number;
+  author_name?: string;
+  author_role?: 'contractor' | 'client';
   message: string;
+  message_type?: string;
+  photo_urls?: string;
   created_at: string;
 }
 
