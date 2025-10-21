@@ -176,9 +176,6 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
               </Button>
             )}
             <Button variant="ghost" size="icon" className="h-10 w-10">
-              <Icon name="Star" size={18} />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-10 w-10">
               <Icon name="MoreVertical" size={18} />
             </Button>
           </div>
