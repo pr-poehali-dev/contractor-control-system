@@ -26,9 +26,9 @@ const Activity = () => {
       id: `insp-${insp.id}`,
       type: 'check' as const,
       title: `Проверка №${insp.inspection_number}`,
-      description: insp.notes || 'Проверка выполнена',
+      description: insp.notes || insp.description || 'Проверка выполнена',
       timestamp: insp.created_at,
-      user: insp.inspector_name,
+      user: insp.author_name || 'Инспектор',
       workId: insp.work_id,
     })),
     ...remarks.map(rem => ({
