@@ -49,6 +49,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'work_logs' | 'inspections' | 'info_posts'>('all');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [inspectionEvents, setInspectionEvents] = useState<ApiInspectionEvent[]>([]);
 
   const [showJournalModal, setShowJournalModal] = useState(false);
@@ -189,6 +190,21 @@ const Dashboard = () => {
       (filter === 'info_posts' && event.type === 'info_post');
 
     if (!typeMatch) return false;
+
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const searchableText = [
+        event.title,
+        event.description,
+        event.workTitle,
+        event.objectTitle,
+        event.author,
+        event.materials,
+        event.volume
+      ].filter(Boolean).join(' ').toLowerCase();
+      
+      if (!searchableText.includes(query)) return false;
+    }
 
     if (selectedTags.length === 0) return true;
 
@@ -352,6 +368,8 @@ const Dashboard = () => {
               availableTags={availableTags}
               feed={feed}
               works={works}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
             />
 
             <div className="space-y-4">

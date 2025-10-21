@@ -19,6 +19,8 @@ interface FeedFiltersProps {
   availableTags: Array<{ id: string; label: string; type: 'object' | 'work' | 'contractor'; workIds?: number[] }>;
   feed: any[];
   works: any[];
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
 }
 
 const filterOptions = [
@@ -28,7 +30,7 @@ const filterOptions = [
   { value: 'info_posts', label: 'Инфо', icon: 'Bell' },
 ];
 
-const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, availableTags, feed, works }: FeedFiltersProps) => {
+const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, availableTags, feed, works, searchQuery, onSearchChange }: FeedFiltersProps) => {
   const [objectSearch, setObjectSearch] = useState('');
   const [workSearch, setWorkSearch] = useState('');
   const [contractorSearch, setContractorSearch] = useState('');
@@ -119,6 +121,27 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
 
   return (
     <div className="space-y-3">
+      <div className="relative">
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <Input
+          type="text"
+          placeholder="Поиск по событиям..."
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="pl-9 h-10"
+        />
+        {searchQuery && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+            onClick={() => onSearchChange('')}
+          >
+            <X size={16} />
+          </Button>
+        )}
+      </div>
+      
       <div className="flex flex-wrap gap-2">
         <Popover>
           <PopoverTrigger asChild>

@@ -152,13 +152,39 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
       className={`overflow-hidden hover:shadow-md transition-shadow animate-fade-in ${getEventBgColor(event.type)}`}
       style={{ animationDelay: `${index * 0.05}s` }}
     >
-      <div className="p-4 sm:p-5">
+      <div className="p-4 sm:p-5 relative">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-xs text-slate-500">
-              {formatTimeAgo(event.timestamp)}
-            </p>
-            <span className="text-slate-300">·</span>
+            {event.objectTitle && (
+              <Badge 
+                variant="outline" 
+                className="text-xs font-normal px-2 py-0.5 bg-slate-100 text-slate-700 border-slate-300 cursor-pointer hover:bg-slate-200"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (event.objectId && onTagClick) {
+                    onTagClick(`object-${event.objectId}`, 'object');
+                  }
+                }}
+              >
+                <Icon name="Building2" size={12} className="mr-1" />
+                {event.objectTitle}
+              </Badge>
+            )}
+            {event.author && (
+              <Badge 
+                variant="outline" 
+                className="text-xs font-normal px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200 cursor-pointer hover:bg-blue-100"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onTagClick) {
+                    onTagClick(`contractor-${event.author}`, 'contractor');
+                  }
+                }}
+              >
+                <Icon name="User" size={12} className="mr-1" />
+                {event.author}
+              </Badge>
+            )}
             <Badge variant="outline" className={`text-[10px] font-normal px-1.5 py-0 ${getEventBadgeColor(event.type)}`}>
               {getEventLabel(event.type)}
             </Badge>
@@ -219,40 +245,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
           </div>
         )}
 
-        {event.type !== 'info_post' && (event.objectTitle || event.author) && (
-          <div className="flex gap-2 mb-3 overflow-hidden">
-            {event.objectTitle && (
-              <Badge 
-                variant="outline" 
-                className="text-xs px-2.5 py-1 font-normal cursor-pointer hover:bg-slate-100 transition-colors flex items-center gap-1 max-w-[200px] flex-shrink-0"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (event.objectId && onTagClick) {
-                    onTagClick(`object-${event.objectId}`, 'object');
-                  }
-                }}
-              >
-                <Icon name="Building2" size={12} className="flex-shrink-0" />
-                <span className="truncate">{event.objectTitle}</span>
-              </Badge>
-            )}
-            {event.author && (
-              <Badge 
-                variant="outline" 
-                className="text-xs px-2.5 py-1 font-normal flex items-center gap-1 max-w-[180px] md:max-w-none flex-shrink-0 cursor-pointer hover:bg-slate-100 transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (event.author && onTagClick) {
-                    onTagClick(`contractor-${event.author}`, 'contractor');
-                  }
-                }}
-              >
-                <Icon name="User" size={12} className="flex-shrink-0" />
-                <span className="truncate">{event.author}</span>
-              </Badge>
-            )}
-          </div>
-        )}
+
 
         {photos.length > 0 && (
         <div className="relative bg-black group mb-3 rounded-lg overflow-hidden">
@@ -348,6 +341,10 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
             )}
           </div>
         )}
+        
+        <div className="text-xs text-slate-400 text-right mt-3">
+          {formatTimeAgo(event.timestamp)}
+        </div>
       </div>
     </Card>
 
