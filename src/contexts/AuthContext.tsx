@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode, useEffect } from 'react';
+import { createContext, useContext, ReactNode, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { 
   login as loginUser, 
@@ -81,18 +81,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const dispatch = useAppDispatch();
   const { user, token, isLoading } = useAppSelector((state) => state.user);
   
-  const userData = useAppSelector((state) => ({
-    objects: state.objects.items,
-    works: state.works.items,
-    inspections: state.inspections.items,
+  const objects = useAppSelector((state) => state.objects.items);
+  const works = useAppSelector((state) => state.works.items);
+  const inspections = useAppSelector((state) => state.inspections.items);
+  const workLogs = useAppSelector((state) => state.workLogs.items);
+  const contractors = useAppSelector((state) => state.contractors.items);
+  const defectReports = useAppSelector((state) => state.defectReports.items);
+
+  const userData = useMemo(() => ({
+    objects,
+    works,
+    inspections,
     remarks: [],
-    workLogs: state.workLogs.items,
+    workLogs,
     checkpoints: [],
-    contractors: state.contractors.items,
+    contractors,
     chatMessages: [],
     unreadCounts: {},
-    defect_reports: state.defectReports.items,
-  }));
+    defect_reports: defectReports,
+  }), [objects, works, inspections, workLogs, contractors, defectReports]);
 
   /**
    * Загрузка данных пользователя из backend
