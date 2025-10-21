@@ -85,7 +85,7 @@ export const WorkFormCard = ({
             </Label>
             <Select
               key={`category-${work.id}-${work.category}`}
-              value={work.category}
+              value={work.category || undefined}
               onValueChange={(value) => {
                 onUpdate(work.id, 'category', value);
                 if (!work.isExisting) {
@@ -114,7 +114,7 @@ export const WorkFormCard = ({
             {work.category ? (
               <Select
                 key={`title-${work.id}-${work.title}`}
-                value={work.title}
+                value={work.title || undefined}
                 onValueChange={(value) => onUpdate(work.id, 'title', value)}
                 disabled={work.isExisting}
               >
