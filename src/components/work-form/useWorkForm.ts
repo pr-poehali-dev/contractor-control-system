@@ -28,7 +28,7 @@ export const useWorkForm = (objectId: string | undefined) => {
       console.log('🔍 Loading user data...');
       setIsLoading(true);
       dispatch(loadUserData(token));
-    } else {
+    } else if (works.length === 0) {
       console.log('🔍 User data already loaded, processing works...');
       processWorks();
     }
