@@ -65,14 +65,9 @@ export default function ObjectsGridView({
           onClick={() => onSiteClick(site.id)}
         >
           <CardContent className="p-6">
-            <div className="mb-4">
-              <h3 className="font-bold text-lg text-slate-900 group-hover:text-blue-600 transition-colors mb-2">
-                {site.title}
-              </h3>
-              <Badge className={site.statusColor || 'bg-slate-100 text-slate-700'}>
-                {site.statusIcon} {site.statusMessage || 'Запланировано'}
-              </Badge>
-            </div>
+            <h3 className="font-bold text-lg text-slate-900 group-hover:text-blue-600 transition-colors mb-4">
+              {site.title}
+            </h3>
 
             <div className="flex items-center gap-2 text-sm text-slate-600 mb-4">
               <Icon name="MapPin" size={16} />
@@ -99,9 +94,14 @@ export default function ObjectsGridView({
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 text-sm text-slate-600 pt-4 border-t border-slate-100">
-              <Icon name="Wrench" size={16} />
-              <span>Завершено {site.completedWorks}/{site.worksCount}</span>
+            <div className="flex items-center justify-between gap-2 pt-4 border-t border-slate-100">
+              <div className="flex items-center gap-1.5 text-sm text-slate-600">
+                <Icon name="Wrench" size={16} />
+                <span>Завершено {site.completedWorks}/{site.worksCount}</span>
+              </div>
+              <Badge className={site.statusColor || 'bg-slate-100 text-slate-700'}>
+                {site.statusIcon} {site.statusMessage || 'Запланировано'}
+              </Badge>
             </div>
           </CardContent>
         </Card>
