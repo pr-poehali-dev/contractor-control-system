@@ -335,14 +335,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         # Загружаем contractors для пользователя
         if role == 'admin':
             cur.execute("""
-                SELECT id, name, inn, contact_person, phone, email, user_id, created_at
+                SELECT id, name, inn, contact_info, phone, email, user_id, created_at
                 FROM contractors
                 ORDER BY name
             """)
             contractors = cur.fetchall()
         else:
             cur.execute("""
-                SELECT DISTINCT c.id, c.name, c.inn, c.contact_person, c.phone, c.email, c.user_id, c.created_at
+                SELECT DISTINCT c.id, c.name, c.inn, c.contact_info, c.phone, c.email, c.user_id, c.created_at
                 FROM contractors c
                 LEFT JOIN client_contractors cc ON c.id = cc.contractor_id
                 WHERE cc.client_id = %s OR c.user_id = %s
@@ -362,19 +362,19 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur.close()
         conn.close()
         
-        # Строим иерархию данных (objects -> works -> inspections/logs/etc)
-        objects_with_hierarchy = build_hierarchy(
-            objects, works, inspections, remarks, 
-            work_logs, chat_messages, defect_reports, defect_remediations
-        )
-        
-        # Формируем ответ
+        # Формируем ответ с плоскими списками для Redux
         response_data = {
             'id': user['id'],
             'role': user['role'],
             'name': user['name'],
-            'email': user['email'],
-            'objects': objects_with_hierarchy,
+            'email': user.get('email'),
+            'objects': [dict(o) for o in objects],
+            'works': [dict(w) for w in works],
+            'inspections': [dict(i) for i in inspections],
+            'remarks': [dict(r) for r in remarks],
+            'workLogs': [dict(wl) for wl in work_logs],
+            'chatMessages': [dict(cm) for cm in chat_messages],
+            'defect_reports': [dict(dr) for dr in defect_reports],
             'contractors': [dict(c) for c in contractors],
             'infoPosts': [dict(p) for p in info_posts]
         }
