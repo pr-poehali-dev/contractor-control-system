@@ -46,8 +46,8 @@ const CreateWork = () => {
             К объекту
           </Button>
           
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">{objectData?.name || 'Управление объектом и работами'}</h1>
-          <p className="text-slate-600">Управление работами на объекте</p>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">{objectData.name || 'Загрузка...'}</h1>
+          <p className="text-slate-600">Управление объектом и работами</p>
         </div>
 
         <ObjectInfoSection 

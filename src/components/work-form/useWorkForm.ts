@@ -59,14 +59,20 @@ export const useWorkForm = (objectId: string | undefined) => {
     const freshObjects = userData.objects || [];
     const currentObject = freshObjects.find((obj: any) => obj.id === Number(objectId));
     
+    console.log('🏢 Current object:', currentObject);
+    console.log('🏢 Object ID:', objectId, 'Type:', typeof objectId);
+    console.log('🏢 Available objects:', freshObjects.map((o: any) => ({ id: o.id, name: o.name })));
+    
     if (currentObject) {
-      setObjectData({
+      const newObjectData = {
         id: currentObject.id,
         name: currentObject.name || '',
         address: currentObject.address || '',
         customer: currentObject.customer || '',
         description: currentObject.description || '',
-      });
+      };
+      console.log('✅ Setting object data:', newObjectData);
+      setObjectData(newObjectData);
     }
     
     const objectWorks = freshWorks.filter((work: any) => work.object_id === Number(objectId));
