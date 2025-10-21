@@ -401,10 +401,23 @@ const userSlice = createSlice({
       .addCase(verifyToken.rejected, (state) => {
         state.isLoading = false;
         // Проверяем, есть ли токен в localStorage
-        const hasToken = !!localStorage.getItem('auth_token');
-        if (hasToken) {
-          // Если токен есть, сохраняем состояние авторизации
-          state.isAuthenticated = true;
+        const token = localStorage.getItem('auth_token');
+        const userStr = localStorage.getItem('user');
+        
+        if (token && userStr) {
+          // Если токен и user есть, восстанавливаем состояние авторизации
+          try {
+            state.token = token;
+            state.user = JSON.parse(userStr);
+            state.isAuthenticated = true;
+          } catch (error) {
+            // Если не удалось распарсить user, сбрасываем состояние
+            state.isAuthenticated = false;
+            state.user = null;
+            state.token = null;
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user');
+          }
         } else {
           // Если токена нет, сбрасываем состояние
           state.isAuthenticated = false;
