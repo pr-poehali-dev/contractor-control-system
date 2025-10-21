@@ -181,7 +181,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
               }}
             >
               <Icon name="User" size={13} className="mr-1 flex-shrink-0" />
-              <span className="truncate max-w-[120px] sm:max-w-[180px]">{event.author}</span>
+              <span className="truncate max-w-[120px] sm:max-w-none">{event.author}</span>
             </Badge>
           )}
         </div>
@@ -340,7 +340,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
           </div>
         )}
         
-        <div className="flex items-center justify-between gap-2 mt-3">
+        <div className="flex items-center justify-between gap-2 mt-4 pt-3 border-t border-slate-100">
           <Badge variant="outline" className={`text-xs font-medium px-2.5 py-1 ${getEventBadgeColor(event.type)}`}>
             {getEventLabel(event.type)}
           </Badge>
