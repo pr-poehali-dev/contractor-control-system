@@ -152,13 +152,13 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
       className={`overflow-hidden hover:shadow-md transition-shadow animate-fade-in ${getEventBgColor(event.type)}`}
       style={{ animationDelay: `${index * 0.05}s` }}
     >
-      <div className="p-5 sm:p-6 relative">
-        <div className="flex items-start gap-3 mb-4">
+      <div className="p-4 sm:p-5 relative">
+        <div className="flex items-start gap-2.5 mb-2.5">
           <div className="flex items-center gap-2 flex-wrap flex-1">
             {event.objectTitle && (
               <Badge 
                 variant="outline" 
-                className="text-xs font-medium px-2.5 py-1 bg-slate-50 text-slate-700 border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors"
+                className="text-xs font-medium px-2 py-0.5 bg-slate-50 text-slate-700 border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   if (event.objectId && onTagClick) {
@@ -173,7 +173,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
             {event.author && (
               <Badge 
                 variant="outline" 
-                className="text-xs font-medium px-2.5 py-1 bg-blue-50 text-blue-700 border-blue-200 cursor-pointer hover:bg-blue-100 transition-colors"
+                className="text-xs font-medium px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200 cursor-pointer hover:bg-blue-100 transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   if (onTagClick) {
@@ -186,13 +186,13 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
               </Badge>
             )}
           </div>
-          <Badge variant="outline" className={`text-xs font-medium px-2.5 py-1 flex-shrink-0 ${getEventBadgeColor(event.type)}`}>
+          <Badge variant="outline" className={`text-xs font-medium px-2 py-0.5 flex-shrink-0 ${getEventBadgeColor(event.type)}`}>
             {getEventLabel(event.type)}
           </Badge>
         </div>
         
         {((event.scheduledDate || event.inspectionType === 'scheduled' || event.inspectionType === 'unscheduled') || (event.defectsCount && event.defectsCount > 0)) && (
-          <div className="flex items-center gap-2 flex-wrap mb-3">
+          <div className="flex items-center gap-2 flex-wrap mb-2.5">
             {(event.scheduledDate || event.inspectionType === 'scheduled') && event.type === 'inspection' && (
               <Badge variant="outline" className="text-xs font-normal px-2 py-0.5 bg-blue-50 text-blue-600 border-blue-200">
                 <Icon name="Calendar" size={12} className="mr-1" />
@@ -215,7 +215,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
         )}
 
         {event.type !== 'info_post' && event.workTitle && (
-          <div className="mb-3">
+          <div className="mb-2">
             <h3 
               className="font-semibold text-slate-900 text-base leading-snug cursor-pointer hover:text-blue-600 transition-colors break-words"
               onClick={(e) => {
@@ -232,12 +232,12 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
 
         {event.type === 'info_post' && (
           <div className="mb-2">
-            <h3 className="font-semibold text-slate-900 text-lg leading-snug break-words">{event.title}</h3>
+            <h3 className="font-semibold text-slate-900 text-base leading-snug break-words">{event.title}</h3>
           </div>
         )}
 
         {(event.type === 'inspection' || event.type === 'inspection_scheduled' || event.type === 'inspection_started' || event.type === 'inspection_completed') && event.inspectionNumber && (
-          <div className="mb-3">
+          <div className="mb-2">
             <p className="text-sm text-slate-600">
               Проверка <span className="font-mono font-medium text-purple-600">№{event.inspectionNumber}</span>
             </p>
@@ -245,15 +245,13 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
         )}
 
         {(event.type === 'work_log' || event.type === 'inspection_scheduled' || event.type === 'inspection_started' || event.type === 'inspection_completed') && event.description && (
-          <div className="mb-3">
+          <div className="mb-2">
             <p className="text-sm text-slate-600 break-words">{event.description}</p>
           </div>
         )}
 
-
-
         {photos.length > 0 && (
-        <div className="relative bg-black group mb-3 rounded-lg overflow-hidden">
+        <div className="relative bg-black group mb-2 rounded-lg overflow-hidden">
           <div className="relative aspect-[4/3] md:aspect-video cursor-pointer" onClick={handleImageClick}>
             <img 
               src={photos[currentImageIndex]} 
@@ -308,7 +306,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
       )}
 
         {(event.volume || event.materials) && (
-          <div className="flex flex-wrap gap-3 mt-3 p-3 bg-slate-50 rounded-lg">
+          <div className="flex flex-wrap gap-3 mt-2 p-2.5 bg-slate-50 rounded-lg">
             {event.volume && (
               <div className="flex items-center gap-2 text-xs text-slate-700">
                 <Icon name="Package" size={14} className="text-slate-500" />
@@ -327,7 +325,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
         )}
 
         {(event.type === 'inspection_scheduled' || event.type === 'inspection_started' || event.type === 'inspection_completed') && (
-          <div className="mt-3 pt-3 border-t border-slate-100">
+          <div className="mt-2 pt-2 border-t border-slate-100">
             {event.type === 'inspection_completed' && (
               <Button 
                 onClick={(e) => {
@@ -347,7 +345,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
           </div>
         )}
         
-        <div className="flex items-center justify-end gap-1.5 text-xs text-slate-400 mt-4 pt-3 border-t border-slate-100">
+        <div className="flex items-center justify-end gap-1.5 text-xs text-slate-400 mt-3 pt-2 border-t border-slate-100">
           <Icon name="Clock" size={12} />
           {formatTimeAgo(event.timestamp)}
         </div>
