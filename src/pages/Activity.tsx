@@ -33,9 +33,9 @@ const Activity = () => {
     workLogsCount: workLogs.length,
     inspectionsCount: inspections.length,
     remarksCount: remarks.length,
+    allActivityCount: workLogs.length + inspections.length + remarks.length,
     workLogs: workLogs.slice(0, 2),
-    inspections: inspections.slice(0, 2),
-    userData
+    inspections: inspections.slice(0, 2)
   });
 
   const getWorkById = (workId: number) => works.find(w => w.id === workId);

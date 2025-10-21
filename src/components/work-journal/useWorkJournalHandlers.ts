@@ -2,10 +2,14 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { useAppDispatch } from '@/store/hooks';
+import { createWorkLog } from '@/store/slices/workLogsSlice';
+import { fetchUserData } from '@/store/slices/userSlice';
 
 export function useWorkJournalHandlers(selectedWork: number | null) {
   const { user, token, setUserData } = useAuth();
   const { toast } = useToast();
+  const dispatch = useAppDispatch();
 
   const [newMessage, setNewMessage] = useState('');
   const [progress, setProgress] = useState('0');
@@ -31,23 +35,21 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
     setIsSubmitting(true);
 
     try {
-      await api.createItem(token!, 'chat_message', {
+      await dispatch(createWorkLog({
         work_id: selectedWork,
-        message: newMessage,
-      });
+        description: newMessage,
+      })).unwrap();
 
-      if (token) {
-        const refreshedData = await api.getUserData(token);
-        setUserData(refreshedData);
-      }
+      await dispatch(fetchUserData());
 
       toast({
         title: 'Сообщение отправлено',
-        description: 'Ваше сообщение добавлено в чат',
+        description: 'Ваше сообщение добавлено в журнал',
       });
 
       setNewMessage('');
     } catch (error) {
+      console.error('Send message error:', error);
       toast({
         title: 'Ошибка',
         description: 'Не удалось отправить сообщение',
