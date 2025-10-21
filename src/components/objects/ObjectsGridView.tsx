@@ -65,18 +65,15 @@ export default function ObjectsGridView({
           onClick={() => onSiteClick(site.id)}
         >
           <CardContent className="p-6">
-            <div className="flex items-start justify-between gap-2 mb-4">
-              <h3 className="font-bold text-lg text-slate-900 group-hover:text-blue-600 transition-colors flex-1">
-                {site.title}
-              </h3>
-              <div className="flex items-center gap-2">
-                <Badge className={site.statusColor || 'bg-slate-100 text-slate-700'}>
-                  {site.statusIcon} {site.statusMessage || 'Запланировано'}
-                </Badge>
+            <div className="mb-4">
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <h3 className="font-bold text-lg text-slate-900 group-hover:text-blue-600 transition-colors flex-1">
+                  {site.title}
+                </h3>
                 {!isContractor && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 flex-shrink-0">
                         <Icon name="MoreVertical" size={16} />
                       </Button>
                     </DropdownMenuTrigger>
@@ -92,6 +89,9 @@ export default function ObjectsGridView({
                   </DropdownMenu>
                 )}
               </div>
+              <Badge className={site.statusColor || 'bg-slate-100 text-slate-700'}>
+                {site.statusIcon} {site.statusMessage || 'Запланировано'}
+              </Badge>
             </div>
 
             <div className="flex items-center gap-2 text-sm text-slate-600 mb-4">
