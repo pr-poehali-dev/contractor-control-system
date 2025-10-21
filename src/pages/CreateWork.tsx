@@ -23,6 +23,7 @@ import { cn } from '@/lib/utils';
 interface WorkForm {
   id: string;
   workId?: number;
+  category: string;
   title: string;
   volume: string;
   unit: string;
@@ -34,6 +35,7 @@ interface WorkForm {
 
 const emptyWork: WorkForm = {
   id: '',
+  category: '',
   title: '',
   volume: '',
   unit: 'м²',
@@ -71,6 +73,8 @@ const CreateWork = () => {
   const [isInitialized, setIsInitialized] = useState(false);
 
   const contractors = userData?.contractors || [];
+  const workTemplates = userData?.work_templates || [];
+  const categories = Array.from(new Set(workTemplates.map((t: any) => t.category).filter(Boolean)));
   
   console.log('📍 CreateWork render - objectId:', objectId, 'isLoading:', isLoading, 'works:', works);
 
@@ -99,6 +103,7 @@ const CreateWork = () => {
       const existingWorks = objectWorks.map((work: any) => ({
         id: `existing-${work.id}`,
         workId: work.id,
+        category: '',
         title: work.title || '',
         volume: '',
         unit: 'м²',
@@ -173,11 +178,11 @@ const CreateWork = () => {
     const newWorks = works.filter(w => !w.isExisting);
     const existingWorks = works.filter(w => w.isExisting);
 
-    const invalidWorks = newWorks.filter(w => !w.title.trim());
+    const invalidWorks = newWorks.filter(w => !w.category.trim() || !w.title.trim());
     if (invalidWorks.length > 0) {
       toast({
         title: 'Ошибка валидации',
-        description: 'Укажите название для всех новых работ',
+        description: 'Укажите категорию и название для всех новых работ',
         variant: 'destructive',
       });
       return;
@@ -318,17 +323,67 @@ const CreateWork = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="md:col-span-2">
+                    {!work.isExisting && (
+                      <div>
+                        <Label htmlFor={`category-${work.id}`} className="text-sm">
+                          Категория работ <span className="text-red-500">*</span>
+                        </Label>
+                        <Select
+                          value={work.category}
+                          onValueChange={(value) => {
+                            updateWork(work.id, 'category', value);
+                            updateWork(work.id, 'title', '');
+                          }}
+                        >
+                          <SelectTrigger id={`category-${work.id}`} className="h-9">
+                            <SelectValue placeholder="Выберите категорию" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories.map((cat) => (
+                              <SelectItem key={cat} value={cat}>
+                                {cat}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+
+                    <div className={work.isExisting ? "md:col-span-2" : ""}>
                       <Label htmlFor={`title-${work.id}`} className="text-sm">
                         Название работы <span className="text-red-500">*</span>
                       </Label>
-                      <Input
-                        id={`title-${work.id}`}
-                        placeholder="Например: Монтаж вентиляционной системы"
-                        value={work.title}
-                        onChange={(e) => updateWork(work.id, 'title', e.target.value)}
-                        className={cn(!work.title && !work.isExisting && 'border-red-300', "h-9")}
-                      />
+                      {!work.isExisting && work.category ? (
+                        <Select
+                          value={work.title}
+                          onValueChange={(value) => updateWork(work.id, 'title', value)}
+                        >
+                          <SelectTrigger id={`title-${work.id}`} className={cn(!work.title && 'border-red-300', "h-9")}>
+                            <SelectValue placeholder="Выберите работу" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {workTemplates
+                              .filter((t: any) => t.category === work.category)
+                              .map((template: any) => (
+                                <SelectItem key={template.id} value={template.title}>
+                                  {template.title}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      ) : work.isExisting ? (
+                        <Input
+                          id={`title-${work.id}`}
+                          placeholder="Например: Монтаж вентиляционной системы"
+                          value={work.title}
+                          onChange={(e) => updateWork(work.id, 'title', e.target.value)}
+                          className={cn(!work.title && 'border-red-300', "h-9")}
+                        />
+                      ) : (
+                        <div className="h-9 flex items-center px-3 text-sm text-slate-400 border border-slate-200 rounded-md bg-slate-50">
+                          Сначала выберите категорию
+                        </div>
+                      )}
                     </div>
 
                     <div>
