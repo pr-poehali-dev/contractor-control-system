@@ -63,24 +63,17 @@ export default function ObjectsMobileList({
                 </p>
               )}
               
-              <div className="flex items-center gap-2.5 mb-3">
-                <Badge 
-                  className={`${site.statusColor || 'bg-slate-100 text-slate-700'} text-xs px-2.5 py-1 font-medium`}
-                >
-                  {site.statusIcon && <span className="mr-1">{site.statusIcon}</span>}
-                  {site.statusMessage || 'Запланировано'}
-                </Badge>
+              <div className="flex items-center justify-between gap-2.5">
                 <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                  <Icon name="ClipboardList" size={15} />
-                  <span className="font-medium">{site.completedWorks}/{site.worksCount}</span>
+                  <Icon name="Wrench" size={15} />
+                  <span className="font-medium">Завершено {site.completedWorks}/{site.worksCount}</span>
                 </div>
+                <NotificationGroup
+                  messages={site.unreadMessages}
+                  logs={site.unreadLogs}
+                  inspections={site.unreadInspections}
+                />
               </div>
-              
-              <NotificationGroup
-                messages={site.unreadMessages}
-                logs={site.unreadLogs}
-                inspections={site.unreadInspections}
-              />
             </div>
           </div>
         </div>

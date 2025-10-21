@@ -73,13 +73,6 @@ export default function ObjectsGridView({
               <Icon name="MapPin" size={16} />
               <span className="truncate">{site.address}</span>
             </div>
-            
-            <NotificationGroup
-              messages={site.unreadMessages}
-              logs={!isContractor ? site.unreadLogs : undefined}
-              inspections={isContractor ? site.unreadInspections : undefined}
-              className="mb-4"
-            />
 
             <div className="space-y-2 mb-4">
               <div className="flex items-center justify-between text-sm">
@@ -99,9 +92,11 @@ export default function ObjectsGridView({
                 <Icon name="Wrench" size={16} />
                 <span>Завершено {site.completedWorks}/{site.worksCount}</span>
               </div>
-              <Badge className={site.statusColor || 'bg-slate-100 text-slate-700'}>
-                {site.statusIcon} {site.statusMessage || 'Запланировано'}
-              </Badge>
+              <NotificationGroup
+                messages={site.unreadMessages}
+                logs={!isContractor ? site.unreadLogs : undefined}
+                inspections={isContractor ? site.unreadInspections : undefined}
+              />
             </div>
           </CardContent>
         </Card>

@@ -359,6 +359,66 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         """)
         info_posts = cur.fetchall()
         
+        # Загружаем last_seen_at для каждой работы
+        work_views = {}
+        if work_ids:
+            cur.execute("""
+                SELECT work_id, last_seen_at
+                FROM work_views
+                WHERE user_id = %s AND work_id = ANY(%s)
+            """, (user_id, work_ids))
+            views_result = cur.fetchall()
+            for view in views_result:
+                work_views[view['work_id']] = view['last_seen_at']
+        
+        # Подсчёт непрочитанных по work_id
+        unread_counts = {}
+        
+        for work in works:
+            work_id = work['id']
+            last_seen = work_views.get(work_id)
+            
+            # Считаем сообщения созданные после last_seen
+            unread_messages = 0
+            if last_seen:
+                unread_messages = len([
+                    msg for msg in chat_messages 
+                    if msg['work_id'] == work_id and msg.get('created_at') and msg['created_at'] > last_seen
+                ])
+            else:
+                unread_messages = len([msg for msg in chat_messages if msg['work_id'] == work_id])
+            
+            # Считаем логи созданные после last_seen
+            unread_logs = 0
+            if last_seen:
+                unread_logs = len([
+                    log for log in work_logs 
+                    if log['work_id'] == work_id and log.get('created_at') and log['created_at'] > last_seen
+                ])
+            else:
+                unread_logs = len([log for log in work_logs if log['work_id'] == work_id])
+            
+            # Считаем проверки созданные после last_seen (только активные)
+            unread_inspections = 0
+            if last_seen:
+                unread_inspections = len([
+                    insp for insp in inspections 
+                    if insp['work_id'] == work_id and insp.get('created_at') and insp['created_at'] > last_seen and insp.get('status') in ['active', 'pending']
+                ])
+            else:
+                unread_inspections = len([
+                    insp for insp in inspections 
+                    if insp['work_id'] == work_id and insp.get('status') in ['active', 'pending']
+                ])
+            
+            # Добавляем только если есть непрочитанные
+            if unread_messages > 0 or unread_logs > 0 or unread_inspections > 0:
+                unread_counts[work_id] = {
+                    'messages': unread_messages,
+                    'logs': unread_logs,
+                    'inspections': unread_inspections
+                }
+        
         cur.close()
         conn.close()
         
@@ -376,7 +436,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'chatMessages': [dict(cm) for cm in chat_messages],
             'defect_reports': [dict(dr) for dr in defect_reports],
             'contractors': [dict(c) for c in contractors],
-            'infoPosts': [dict(p) for p in info_posts]
+            'infoPosts': [dict(p) for p in info_posts],
+            'unreadCounts': unread_counts
         }
         
         return {
