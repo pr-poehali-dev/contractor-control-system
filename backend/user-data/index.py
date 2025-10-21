@@ -283,10 +283,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.execute("""
                 SELECT wl.id, wl.work_id, wl.description, wl.volume, wl.materials,
                        wl.photo_urls, wl.created_at, wl.created_by,
-                       u.name as author_name, c.name as contractor_name
+                       u.name as author_name
                 FROM work_logs wl
                 LEFT JOIN users u ON wl.created_by = u.id
-                LEFT JOIN contractors c ON u.id = (SELECT user_id FROM contractors WHERE id = (SELECT contractor_id FROM works WHERE id = wl.work_id))
                 WHERE wl.work_id = ANY(%s)
                 ORDER BY wl.created_at DESC
             """, (work_ids,))
@@ -294,8 +293,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             # Загружаем chat messages
             cur.execute("""
-                SELECT cm.id, cm.work_id, cm.message_type, cm.content, cm.file_url,
-                       cm.created_at, cm.created_by, cm.is_seen,
+                SELECT cm.id, cm.work_id, cm.message_type, cm.message, cm.photo_urls,
+                       cm.created_at, cm.created_by,
                        u.name as author_name, u.role as author_role
                 FROM chat_messages cm
                 LEFT JOIN users u ON cm.created_by = u.id
@@ -306,13 +305,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             # Загружаем defect reports
             cur.execute("""
-                SELECT dr.id, dr.work_id, dr.inspection_id, dr.report_number,
-                       dr.description, dr.severity, dr.status, dr.created_at, dr.updated_at,
-                       dr.created_by, dr.responsible_contractor_id,
-                       u.name as author_name, c.name as responsible_contractor_name
+                SELECT dr.id, dr.work_id, dr.object_id, dr.inspection_id, dr.report_number,
+                       dr.status, dr.created_at, dr.created_by, dr.total_defects, dr.critical_defects,
+                       dr.report_data, dr.pdf_url, dr.notes,
+                       u.name as author_name
                 FROM defect_reports dr
                 LEFT JOIN users u ON dr.created_by = u.id
-                LEFT JOIN contractors c ON dr.responsible_contractor_id = c.id
                 WHERE dr.work_id = ANY(%s)
                 ORDER BY dr.created_at DESC
             """, (work_ids,))
@@ -323,8 +321,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             # Загружаем defect remediations
             if report_ids:
                 cur.execute("""
-                    SELECT rem.id, rem.defect_report_id, rem.contractor_id, rem.description,
-                           rem.photo_urls, rem.status, rem.created_at, rem.completed_at,
+                    SELECT rem.id, rem.defect_report_id, rem.defect_id, rem.contractor_id,
+                           rem.remediation_description, rem.remediation_photos, rem.status,
+                           rem.created_at, rem.completed_at, rem.verified_at, rem.verified_by,
                            c.name as contractor_name
                     FROM defect_remediations rem
                     LEFT JOIN contractors c ON rem.contractor_id = c.id
