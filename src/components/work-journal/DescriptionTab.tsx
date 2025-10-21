@@ -43,22 +43,6 @@ export default function DescriptionTab({ selectedWorkData }: DescriptionTabProps
   return (
     <div className="flex-1 overflow-y-auto bg-slate-50 w-full overflow-x-hidden">
       <div className="px-3 py-4 md:p-8 lg:p-12 max-w-7xl mx-auto w-full">
-        <Card className="mb-4 md:mb-6 bg-blue-50 border-blue-100">
-          <CardContent className="p-3 md:p-5">
-            <div className="flex items-start gap-2.5">
-              <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
-                <Icon name="FileText" size={18} className="text-blue-600" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <h4 className="text-sm md:text-lg font-semibold mb-1 leading-snug">{selectedWorkData.title}</h4>
-                <p className="text-xs md:text-sm text-slate-600">
-                  Применимые стандарты, нормы и правила
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         <div className="space-y-3 md:space-y-4">
           {regulatoryDocs.map((doc, index) => (
             <Card key={index} className="hover:shadow-md transition-shadow">
