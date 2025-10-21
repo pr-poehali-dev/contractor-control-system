@@ -111,9 +111,15 @@ const Dashboard = () => {
       const response = await apiClient.get(url);
       
       console.log('📥 loadFeed: Response received', response);
+      console.log('📦 loadFeed: response.data', response.data);
+      console.log('📦 loadFeed: response.data.events', response.data?.events);
       
       if (response.success) {
-        const normalizedEvents = response.data?.events?.map((event: any) => {
+        const rawEvents = response.data?.events || [];
+        console.log('📦 loadFeed: rawEvents count', rawEvents.length);
+        console.log('📦 loadFeed: rawEvents sample', rawEvents.slice(0, 2));
+        
+        const normalizedEvents = rawEvents.map((event: any) => {
           if (event.photoUrls && typeof event.photoUrls === 'string') {
             try {
               event.photoUrls = JSON.parse(event.photoUrls);
