@@ -75,53 +75,48 @@ const CreateWork = () => {
   console.log('📍 CreateWork render - objectId:', objectId, 'isLoading:', isLoading, 'works:', works);
 
   useEffect(() => {
-    const initializeWorks = async () => {
-      if (!objectId || !token) return;
-
-      try {
-        setIsLoading(true);
-        console.log('🔍 Loading user data...');
-        
-        const result = await dispatch(loadUserData(token)).unwrap();
-        
-        console.log('🔍 User data loaded!', result);
-        
-        // Use fresh data from the result (unwrap the data object)
-        const freshWorks = result?.data?.works || [];
-        const objectWorks = freshWorks.filter((work: any) => work.object_id === Number(objectId));
-        
-        console.log('🔍 Filtered works for object', objectId, ':', objectWorks);
-        
-        if (objectWorks.length > 0) {
-          const existingWorks = objectWorks.map((work: any) => ({
-            id: `existing-${work.id}`,
-            workId: work.id,
-            title: work.title || '',
-            volume: '',
-            unit: 'м²',
-            planned_start_date: work.planned_start_date?.split('T')[0] || '',
-            planned_end_date: work.planned_end_date?.split('T')[0] || '',
-            contractor_id: work.contractor_id ? String(work.contractor_id) : '',
-            isExisting: true,
-          }));
-          
-          console.log('✅ Setting works with existing:', existingWorks);
-          setWorks([...existingWorks, { ...emptyWork, id: crypto.randomUUID() }]);
-        } else {
-          console.log('ℹ️ No existing works for this object, setting empty work');
-          setWorks([{ ...emptyWork, id: crypto.randomUUID() }]);
-        }
-        
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Failed to load works:', error);
-        setWorks([{ ...emptyWork, id: crypto.randomUUID() }]);
-        setIsLoading(false);
-      }
-    };
+    if (!objectId || !token) return;
     
-    initializeWorks();
-  }, [objectId, token]);
+    if (!userData) {
+      console.log('🔍 Loading user data...');
+      setIsLoading(true);
+      dispatch(loadUserData(token));
+    } else {
+      console.log('🔍 User data already loaded, processing works...');
+      processWorks();
+    }
+  }, [objectId, token, userData]);
+
+  const processWorks = () => {
+    if (!userData || !objectId) return;
+    
+    const freshWorks = userData.works || [];
+    const objectWorks = freshWorks.filter((work: any) => work.object_id === Number(objectId));
+    
+    console.log('🔍 Filtered works for object', objectId, ':', objectWorks);
+    
+    if (objectWorks.length > 0) {
+      const existingWorks = objectWorks.map((work: any) => ({
+        id: `existing-${work.id}`,
+        workId: work.id,
+        title: work.title || '',
+        volume: '',
+        unit: 'м²',
+        planned_start_date: work.planned_start_date?.split('T')[0] || '',
+        planned_end_date: work.planned_end_date?.split('T')[0] || '',
+        contractor_id: work.contractor_id ? String(work.contractor_id) : '',
+        isExisting: true,
+      }));
+      
+      console.log('✅ Setting works with existing:', existingWorks);
+      setWorks([...existingWorks, { ...emptyWork, id: crypto.randomUUID() }]);
+    } else {
+      console.log('ℹ️ No existing works for this object, setting empty work');
+      setWorks([{ ...emptyWork, id: crypto.randomUUID() }]);
+    }
+    
+    setIsLoading(false);
+  };
 
   const addWork = () => {
     setWorks([...works, { ...emptyWork, id: crypto.randomUUID() }]);
