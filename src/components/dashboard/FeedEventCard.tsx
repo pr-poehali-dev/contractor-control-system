@@ -153,7 +153,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
       style={{ animationDelay: `${index * 0.05}s` }}
     >
       <div className="p-4 sm:p-5 relative">
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide mb-3 px-[18px]">
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide px-[18px] my-0">
           {event.objectTitle && (
             <Badge 
               variant="outline" 
