@@ -40,10 +40,7 @@ export default function WorksList({
           <Button
             size="sm"
             onClick={() => navigate(`/objects/${objectId}/works/create`)}
-          >
-            <Icon name="Plus" size={16} className="mr-1" />
-            Добавить
-          </Button>
+          >Управление +</Button>
         </div>
       </div>
 
