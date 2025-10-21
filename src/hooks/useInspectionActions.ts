@@ -146,14 +146,33 @@ export function useInspectionActions(
   };
 
   const handleCreateDefectReport = async () => {
-    if (!token || !user?.id || defects.length === 0 || !inspection?.id) return;
+    console.log('🔍 handleCreateDefectReport called', {
+      hasToken: !!token,
+      hasUserId: !!user?.id,
+      defectsCount: defects.length,
+      hasInspectionId: !!inspection?.id,
+      inspection,
+      defects
+    });
+    
+    if (!token || !user?.id || defects.length === 0 || !inspection?.id) {
+      console.warn('❌ handleCreateDefectReport aborted:', {
+        token: !!token,
+        userId: user?.id,
+        defectsLength: defects.length,
+        inspectionId: inspection?.id
+      });
+      return;
+    }
     
     setLoadingReport(true);
     try {
+      console.log('📤 Sending POST request to create report...');
       const response = await apiClient.post(ENDPOINTS.DEFECTS.REPORTS, {
         inspection_id: parseInt(inspection.id.toString()),
         notes: ''
       });
+      console.log('📥 Response received:', response);
       
       if (!response.success) {
         console.error('Failed to create report:', response.error);
