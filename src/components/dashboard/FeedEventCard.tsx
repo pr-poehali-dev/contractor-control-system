@@ -181,7 +181,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
               }}
             >
               <Icon name="User" size={13} className="mr-1 flex-shrink-0" />
-              <span className="truncate max-w-[120px] sm:max-w-[180px]">{event.author}</span>
+              <span className="truncate max-w-[120px] sm:max-w-none">{event.author}</span>
             </Badge>
           )}
         </div>
