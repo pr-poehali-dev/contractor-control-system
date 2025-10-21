@@ -98,13 +98,6 @@ export default function ObjectsGridView({
               <Icon name="MapPin" size={16} />
               <span className="truncate">{site.address}</span>
             </div>
-
-            {!isContractor && site.works[0]?.contractor_name && (
-              <div className="flex items-center gap-2 text-sm text-slate-600 mb-4">
-                <Icon name="User" size={16} />
-                <span>{site.works[0].contractor_name}</span>
-              </div>
-            )}
             
             <NotificationGroup
               messages={site.unreadMessages}
