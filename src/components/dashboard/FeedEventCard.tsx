@@ -212,7 +212,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
         {event.type !== 'info_post' && event.workTitle && (
           <div className="mb-2 pl-0.5">
             <h3 
-              className="font-semibold text-slate-900 text-base leading-snug cursor-pointer hover:text-blue-600 transition-colors break-words"
+              className="font-semibold text-slate-900 text-base leading-snug cursor-pointer hover:text-blue-600 transition-colors break-words px-[18px]"
               onClick={(e) => {
                 e.stopPropagation();
                 if (event.workId && onTagClick) {
