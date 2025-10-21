@@ -82,12 +82,12 @@ const CreateWork = () => {
         setIsLoading(true);
         console.log('🔍 Loading user data...');
         
-        await dispatch(loadUserData(token)).unwrap();
+        const result = await dispatch(loadUserData(token)).unwrap();
         
-        console.log('🔍 User data loaded!');
+        console.log('🔍 User data loaded!', result);
         
-        // Process works immediately after loading
-        const freshWorks = allWorks;
+        // Use fresh data from the result
+        const freshWorks = result?.works || [];
         const objectWorks = freshWorks.filter((work: any) => work.object_id === Number(objectId));
         
         console.log('🔍 Filtered works for object', objectId, ':', objectWorks);
@@ -112,16 +112,16 @@ const CreateWork = () => {
           setWorks([{ ...emptyWork, id: crypto.randomUUID() }]);
         }
         
+        setIsLoading(false);
       } catch (error) {
         console.error('Failed to load works:', error);
         setWorks([{ ...emptyWork, id: crypto.randomUUID() }]);
-      } finally {
         setIsLoading(false);
       }
     };
     
     initializeWorks();
-  }, []);
+  }, [objectId, token]);
 
   const addWork = () => {
     setWorks([...works, { ...emptyWork, id: crypto.randomUUID() }]);
