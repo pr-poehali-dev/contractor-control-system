@@ -81,28 +81,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const dispatch = useAppDispatch();
   const { user, token, isLoading } = useAppSelector((state) => state.user);
   
-  const userData = useAppSelector((state) => {
-    const data = {
-      objects: state.objects.items,
-      works: state.works.items,
-      inspections: state.inspections.items,
-      remarks: [],
-      workLogs: state.workLogs.items,
-      checkpoints: [],
-      contractors: state.contractors.items,
-      chatMessages: [],
-      unreadCounts: {},
-      defect_reports: state.defectReports.items,
-    };
-    console.log('🔄 AuthContext userData selector:', {
-      objectsCount: data.objects.length,
-      worksCount: data.works.length,
-      workLogsCount: data.workLogs.length,
-      inspectionsCount: data.inspections.length,
-      defectReportsCount: data.defect_reports.length
-    });
-    return data;
-  });
+  const userData = useAppSelector((state) => ({
+    objects: state.objects.items,
+    works: state.works.items,
+    inspections: state.inspections.items,
+    remarks: [],
+    workLogs: state.workLogs.items,
+    checkpoints: [],
+    contractors: state.contractors.items,
+    chatMessages: [],
+    unreadCounts: {},
+    defect_reports: state.defectReports.items,
+  }));
 
   /**
    * Загрузка данных пользователя из backend

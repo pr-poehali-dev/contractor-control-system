@@ -99,6 +99,7 @@ const inspectionsSlice = createSlice({
      * @param {Inspection[]} payload - Массив проверок
      */
     setInspections(state, action: PayloadAction<Inspection[]>) {
+      console.log('✅ inspectionsSlice.setInspections called with:', action.payload.length, 'items');
       state.items = action.payload;
     },
     

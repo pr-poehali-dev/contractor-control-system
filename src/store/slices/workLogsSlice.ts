@@ -73,6 +73,7 @@ const workLogsSlice = createSlice({
      * @param {WorkLog[]} payload - Массив журналов работ
      */
     setWorkLogs(state, action: PayloadAction<WorkLog[]>) {
+      console.log('✅ workLogsSlice.setWorkLogs called with:', action.payload.length, 'items');
       state.items = action.payload;
     },
     
