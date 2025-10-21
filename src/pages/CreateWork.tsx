@@ -73,7 +73,12 @@ const CreateWork = () => {
 
     try {
       setIsLoading(true);
-      const objectData = userData?.objects?.find((obj: any) => obj.id === Number(objectId));
+      
+      // Refresh user data first to get latest works
+      const freshUserData = await api.getUserData(token);
+      setUserData(freshUserData);
+      
+      const objectData = freshUserData?.objects?.find((obj: any) => obj.id === Number(objectId));
       
       if (objectData?.works && objectData.works.length > 0) {
         const existingWorks = objectData.works.map((work: any) => ({
