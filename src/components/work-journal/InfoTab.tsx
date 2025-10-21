@@ -32,7 +32,9 @@ export default function InfoTab({
   };
 
   const statusInfo = getStatusInfo();
-  const reportEntries = workEntries.filter(entry => !entry.is_work_start && (entry.volume || entry.materials || entry.photo_urls));
+  const reportEntries = workEntries
+    .filter(entry => !entry.is_work_start && (entry.volume || entry.materials || entry.photo_urls))
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   return (
     <div className="flex-1 overflow-y-auto bg-slate-50 w-full overflow-x-hidden">
