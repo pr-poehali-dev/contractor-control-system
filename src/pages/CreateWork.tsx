@@ -56,6 +56,8 @@ const UNITS = [
 ];
 
 const CreateWork = () => {
+  console.log('🚀 CreateWork component mounted!');
+  
   const { objectId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -69,59 +71,57 @@ const CreateWork = () => {
   const [isInitialized, setIsInitialized] = useState(false);
 
   const contractors = userData?.contractors || [];
+  
+  console.log('📍 CreateWork render - objectId:', objectId, 'isLoading:', isLoading, 'works:', works);
 
   useEffect(() => {
-    loadExistingWorks();
-  }, [objectId, token]);
+    const initializeWorks = async () => {
+      if (!objectId || !token) return;
 
-  const loadExistingWorks = async () => {
-    if (!objectId || !token) return;
-
-    try {
-      setIsLoading(true);
-      
-      await dispatch(loadUserData(token)).unwrap();
-      
-    } catch (error) {
-      console.error('Failed to load works:', error);
-      setWorks([{ ...emptyWork, id: crypto.randomUUID() }]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!isLoading && !isInitialized && objectId) {
-      console.log('🔍 CreateWork initialization');
-      console.log('🔍 Object ID:', objectId);
-      console.log('🔍 allWorks:', allWorks);
-      
-      const objectWorks = allWorks.filter((work: any) => work.object_id === Number(objectId));
-      console.log('🔍 Filtered works for object', objectId, ':', objectWorks);
-      
-      if (objectWorks.length > 0) {
-        const existingWorks = objectWorks.map((work: any) => ({
-          id: `existing-${work.id}`,
-          workId: work.id,
-          title: work.title || '',
-          volume: '',
-          unit: 'м²',
-          planned_start_date: work.planned_start_date?.split('T')[0] || '',
-          planned_end_date: work.planned_end_date?.split('T')[0] || '',
-          contractor_id: work.contractor_id ? String(work.contractor_id) : '',
-          isExisting: true,
-        }));
+      try {
+        setIsLoading(true);
+        console.log('🔍 Loading user data...');
         
-        console.log('✅ Setting works with existing:', existingWorks);
-        setWorks([...existingWorks, { ...emptyWork, id: crypto.randomUUID() }]);
-      } else {
-        console.log('ℹ️ No existing works, setting empty work');
+        await dispatch(loadUserData(token)).unwrap();
+        
+        console.log('🔍 User data loaded!');
+        
+        // Process works immediately after loading
+        const freshWorks = allWorks;
+        const objectWorks = freshWorks.filter((work: any) => work.object_id === Number(objectId));
+        
+        console.log('🔍 Filtered works for object', objectId, ':', objectWorks);
+        
+        if (objectWorks.length > 0) {
+          const existingWorks = objectWorks.map((work: any) => ({
+            id: `existing-${work.id}`,
+            workId: work.id,
+            title: work.title || '',
+            volume: '',
+            unit: 'м²',
+            planned_start_date: work.planned_start_date?.split('T')[0] || '',
+            planned_end_date: work.planned_end_date?.split('T')[0] || '',
+            contractor_id: work.contractor_id ? String(work.contractor_id) : '',
+            isExisting: true,
+          }));
+          
+          console.log('✅ Setting works with existing:', existingWorks);
+          setWorks([...existingWorks, { ...emptyWork, id: crypto.randomUUID() }]);
+        } else {
+          console.log('ℹ️ No existing works for this object, setting empty work');
+          setWorks([{ ...emptyWork, id: crypto.randomUUID() }]);
+        }
+        
+      } catch (error) {
+        console.error('Failed to load works:', error);
         setWorks([{ ...emptyWork, id: crypto.randomUUID() }]);
+      } finally {
+        setIsLoading(false);
       }
-      
-      setIsInitialized(true);
-    }
-  }, [allWorks, objectId, isLoading, isInitialized]);
+    };
+    
+    initializeWorks();
+  }, []);
 
   const addWork = () => {
     setWorks([...works, { ...emptyWork, id: crypto.randomUUID() }]);
