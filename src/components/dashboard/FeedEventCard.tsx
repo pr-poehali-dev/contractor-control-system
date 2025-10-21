@@ -181,9 +181,6 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
               </Badge>
             )}
           </div>
-          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full flex-shrink-0">
-            <Icon name="MoreHorizontal" size={18} />
-          </Button>
         </div>
 
         {event.type !== 'info_post' && event.workTitle && (
