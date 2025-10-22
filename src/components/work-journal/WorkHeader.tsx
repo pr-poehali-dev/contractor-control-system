@@ -87,58 +87,53 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
         <div className="grid grid-cols-5 gap-1">
           <button
             onClick={() => setActiveTab('journal')}
-            className={`pt-1 pb-0.5 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
+            className={`py-2 transition-all relative flex items-center justify-center rounded-lg ${
               activeTab === 'journal'
-                ? 'text-blue-600 bg-blue-50'
-                : 'text-slate-600'
+                ? 'text-blue-600 bg-blue-50 font-semibold'
+                : 'text-slate-600 font-medium'
             }`}
           >
-            <Icon name="MessageSquare" size={18} />
-            <span className="text-[10px] font-medium">Журнал</span>
+            <span className="text-[12px]">Журнал</span>
           </button>
           <button
             onClick={() => setActiveTab('info')}
-            className={`pt-1 pb-0.5 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
+            className={`py-2 transition-all relative flex items-center justify-center rounded-lg ${
               activeTab === 'info'
-                ? 'text-blue-600 bg-blue-50'
-                : 'text-slate-600'
+                ? 'text-blue-600 bg-blue-50 font-semibold'
+                : 'text-slate-600 font-medium'
             }`}
           >
-            <Icon name="Info" size={18} />
-            <span className="text-[10px] font-medium">Инфо</span>
+            <span className="text-[12px]">Инфо</span>
           </button>
           <button
             onClick={() => setActiveTab('description')}
-            className={`pt-1 pb-0.5 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
+            className={`py-2 transition-all relative flex items-center justify-center rounded-lg ${
               activeTab === 'description'
-                ? 'text-blue-600 bg-blue-50'
-                : 'text-slate-600'
+                ? 'text-blue-600 bg-blue-50 font-semibold'
+                : 'text-slate-600 font-medium'
             }`}
           >
-            <Icon name="FileText" size={18} />
-            <span className="text-[10px] font-medium">Докум.</span>
+            <span className="text-[12px]">Докум.</span>
           </button>
           <button
             onClick={() => setActiveTab('estimate')}
-            className={`pt-1 pb-0.5 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
+            className={`py-2 transition-all relative flex items-center justify-center rounded-lg ${
               activeTab === 'estimate'
-                ? 'text-blue-600 bg-blue-50'
-                : 'text-slate-600'
+                ? 'text-blue-600 bg-blue-50 font-semibold'
+                : 'text-slate-600 font-medium'
             }`}
           >
-            <Icon name="Calculator" size={18} />
-            <span className="text-[10px] font-medium">Смета</span>
+            <span className="text-[12px]">Смета</span>
           </button>
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`pt-1 pb-0.5 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
+            className={`py-2 transition-all relative flex items-center justify-center rounded-lg ${
               activeTab === 'analytics'
-                ? 'text-blue-600 bg-blue-50'
-                : 'text-slate-600'
+                ? 'text-blue-600 bg-blue-50 font-semibold'
+                : 'text-slate-600 font-medium'
             }`}
           >
-            <Icon name="BarChart" size={18} />
-            <span className="text-[10px] font-medium">Данные</span>
+            <span className="text-[12px]">Данные</span>
           </button>
         </div>
         </div>
