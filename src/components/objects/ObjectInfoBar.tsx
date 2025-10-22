@@ -62,11 +62,19 @@ const ObjectInfoBar = ({ object, className = '', compact = false, onBack, onSett
               </div>
             )}
           </div>
-
-          <div className="flex-shrink-0">
-            <Icon name="ExternalLink" size={16} className="text-slate-400" />
-          </div>
         </button>
+
+        {onSettings && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onSettings();
+            }}
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded-lg transition-colors"
+          >
+            <Icon name="Settings" size={16} className="text-slate-400" />
+          </button>
+        )}
       </div>
     );
   }
