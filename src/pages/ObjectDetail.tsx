@@ -130,6 +130,7 @@ const ObjectDetail = () => {
             object={object} 
             compact 
             onBack={() => navigate('/objects')}
+            onSettings={() => navigate(`/objects/${objectId}/works/create`)}
           />
         </div>
 
@@ -310,17 +311,7 @@ const ObjectDetail = () => {
         </div>
       </div>
 
-      {objectWorks.length > 0 && (
-        <div className="md:hidden fixed bottom-20 right-4 z-20">
-          <Button
-            size="lg"
-            className="h-14 w-14 rounded-full shadow-lg p-0"
-            onClick={() => navigate(`/objects/${objectId}/works/create`)}
-          >
-            <Icon name="Settings" size={20} />
-          </Button>
-        </div>
-      )}
+
     </div>
   );
 };
