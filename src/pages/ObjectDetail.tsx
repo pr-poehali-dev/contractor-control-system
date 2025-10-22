@@ -314,11 +314,10 @@ const ObjectDetail = () => {
         <div className="md:hidden fixed bottom-20 right-4 z-20">
           <Button
             size="lg"
-            className="h-14 px-6 rounded-full shadow-lg"
+            className="h-14 w-14 rounded-full shadow-lg p-0"
             onClick={() => navigate(`/objects/${objectId}/works/create`)}
           >
-            <Icon name="Settings" size={20} className="mr-2" />
-            Редактировать
+            <Icon name="Settings" size={20} />
           </Button>
         </div>
       )}
