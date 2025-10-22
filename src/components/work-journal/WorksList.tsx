@@ -45,7 +45,7 @@ export default function WorksList({
         />
       )}
       
-      <div className="border-b border-slate-200" />
+      <div className="border-b border-slate-100" />
 
       <div className="flex-1 overflow-y-auto flex flex-col">
         {works.length === 0 ? (
