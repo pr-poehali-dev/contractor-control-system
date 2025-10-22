@@ -12,7 +12,9 @@ interface ScheduleTabProps {
 
 const ScheduleTab = ({ works, onRefresh, isRefreshing }: ScheduleTabProps) => {
   const [scheduleView, setScheduleView] = useState<'list' | 'gantt'>('list');
-  const worksWithDates = works.filter(w => w.start_date && w.end_date);
+  const worksWithDates = works.filter(w => 
+    (w.start_date && w.end_date) || (w.planned_start_date && w.planned_end_date)
+  );
 
   return (
     <div className="space-y-4">
@@ -84,12 +86,12 @@ const ScheduleTab = ({ works, onRefresh, isRefreshing }: ScheduleTabProps) => {
                         <div className="flex items-center gap-1.5 text-slate-600">
                           <Icon name="CalendarDays" size={16} className="text-green-600" />
                           <span className="font-medium">Начало:</span>
-                          <span>{new Date(work.start_date!).toLocaleDateString('ru-RU')}</span>
+                          <span>{new Date(work.start_date || work.planned_start_date!).toLocaleDateString('ru-RU')}</span>
                         </div>
                         <div className="flex items-center gap-1.5 text-slate-600">
                           <Icon name="CalendarCheck" size={16} className="text-blue-600" />
                           <span className="font-medium">Окончание:</span>
-                          <span>{new Date(work.end_date!).toLocaleDateString('ru-RU')}</span>
+                          <span>{new Date(work.end_date || work.planned_end_date!).toLocaleDateString('ru-RU')}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -97,12 +99,12 @@ const ScheduleTab = ({ works, onRefresh, isRefreshing }: ScheduleTabProps) => {
                           <div 
                             className="h-full bg-blue-600 rounded-full transition-all"
                             style={{
-                              width: `${parseFloat(work.progress) || 0}%`
+                              width: `${work.completion_percentage || parseFloat(work.progress || '0') || 0}%`
                             }}
                           />
                         </div>
                         <span className="text-xs font-semibold text-slate-700 min-w-[45px] text-right">
-                          {Math.round(parseFloat(work.progress) || 0)}%
+                          {Math.round(work.completion_percentage || parseFloat(work.progress || '0') || 0)}%
                         </span>
                       </div>
                     </div>

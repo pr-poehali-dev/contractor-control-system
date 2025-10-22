@@ -6,12 +6,12 @@ interface GanttChartProps {
 
 const GanttChart = ({ works }: GanttChartProps) => {
   const sortedWorks = [...works].sort((a, b) => 
-    new Date(a.start_date!).getTime() - new Date(b.start_date!).getTime()
+    new Date(a.start_date || a.planned_start_date!).getTime() - new Date(b.start_date || b.planned_start_date!).getTime()
   );
 
   const allDates = sortedWorks.flatMap(w => [
-    new Date(w.start_date!).getTime(),
-    new Date(w.end_date!).getTime()
+    new Date(w.start_date || w.planned_start_date!).getTime(),
+    new Date(w.end_date || w.planned_end_date!).getTime()
   ]);
   const minDate = Math.min(...allDates);
   const maxDate = Math.max(...allDates);
@@ -62,8 +62,8 @@ const GanttChart = ({ works }: GanttChartProps) => {
       </div>
 
       {sortedWorks.map((work) => {
-        const workStart = new Date(work.start_date!).getTime();
-        const workEnd = new Date(work.end_date!).getTime();
+        const workStart = new Date(work.start_date || work.planned_start_date!).getTime();
+        const workEnd = new Date(work.end_date || work.planned_end_date!).getTime();
         const offsetDays = Math.ceil((workStart - minDate) / (1000 * 60 * 60 * 24));
         const durationDays = Math.ceil((workEnd - workStart) / (1000 * 60 * 60 * 24)) + 1;
         const leftPercent = (offsetDays / totalDays) * 100;

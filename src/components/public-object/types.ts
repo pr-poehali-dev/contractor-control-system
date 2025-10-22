@@ -7,6 +7,10 @@ export interface Work {
   contractor_name?: string;
   start_date?: string;
   end_date?: string;
+  planned_start_date?: string;
+  planned_end_date?: string;
+  completion_percentage?: number;
+  progress?: string;
 }
 
 export interface BuildingObject {
