@@ -85,7 +85,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
         </div>
 
         {/* Mobile tabs */}
-        <div className="border-t border-slate-200 pt-2 mt-0.5">
+        <div className="border-t border-slate-200 my-0 py-0.5">
         <div className="grid grid-cols-5 gap-1 py-0">
           <button
             onClick={() => setActiveTab('journal')}
