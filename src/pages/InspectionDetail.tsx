@@ -3,8 +3,8 @@ import { useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
-import InspectionHeader from '@/components/inspection/InspectionHeader';
-import DefectsSection, { Defect } from '@/components/inspection/DefectsSection';
+import { InspectionInfoCard } from '@/components/inspection/InspectionInfoCard';
+import DefectsSectionNew, { Defect } from '@/components/inspection/DefectsSectionNew';
 import ControlPointsSection, { ControlPoint } from '@/components/inspection/ControlPointsSection';
 import CommonDefectsSection from '@/components/inspection/CommonDefectsSection';
 import InspectionActions from '@/components/inspection/InspectionActions';
@@ -50,6 +50,7 @@ const InspectionDetail = () => {
     deadline: ''
   });
   const [checkedPoints, setCheckedPoints] = useState<Set<string>>(new Set());
+  const [infoCollapsed, setInfoCollapsed] = useState(false);
   const defectsRef = useRef<HTMLDivElement>(null);
 
   const handleDefectChange = (field: keyof Defect, value: string) => {
@@ -132,28 +133,31 @@ const InspectionDetail = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="sticky top-0 bg-white border-b z-10 shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={handleBack}>
-            <Icon name="ChevronLeft" size={20} />
-          </Button>
-          <div className="flex-1 min-w-0">
-            <h1 className="font-semibold text-lg truncate">
+      <div className="max-w-5xl mx-auto px-4 py-4 md:py-8">
+        <div className="mb-6">
+          <div className="flex items-center gap-2 md:gap-3 mb-2">
+            <button 
+              onClick={handleBack}
+              className="flex-shrink-0 h-8 w-8 md:h-9 md:w-9 flex items-center justify-center hover:bg-slate-100 rounded-lg transition-colors"
+            >
+              <Icon name="ArrowLeft" size={20} className="text-slate-600" />
+            </button>
+            <h1 className="text-xl md:text-3xl font-bold flex-1 min-w-0 truncate">
               Проверка №{inspectionIndex}
             </h1>
           </div>
+          <p className="text-sm md:text-base text-slate-600 ml-10 md:ml-12">Управление проверкой</p>
         </div>
-      </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-6">
-
-        <InspectionHeader
-          inspectionNumber={inspection.inspection_number}
+        <InspectionInfoCard
+          inspectionNumber={inspectionIndex}
           status={inspection.status}
           type={inspection.type}
           workTitle={work?.title}
           objectTitle={object?.title}
           scheduledDate={inspection.scheduled_date}
+          isCollapsed={infoCollapsed}
+          onToggle={() => setInfoCollapsed(!infoCollapsed)}
         />
 
         {!canEdit && inspection.type === 'scheduled' && !isScheduledForToday() && (
@@ -161,7 +165,7 @@ const InspectionDetail = () => {
         )}
 
         <div ref={defectsRef}>
-          <DefectsSection
+          <DefectsSectionNew
             defects={defects}
             newDefect={newDefect}
             newDefectPhotos={newDefectPhotos}

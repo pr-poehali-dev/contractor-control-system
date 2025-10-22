@@ -210,7 +210,6 @@ export default function DefectsSection({
               variant="outline" 
               onClick={() => {
                 setShowForm(false);
-                setShowCommonDefects(false);
                 onDefectChange('description', '');
               }} 
               className="flex-1"
