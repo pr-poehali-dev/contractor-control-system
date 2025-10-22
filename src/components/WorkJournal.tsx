@@ -271,7 +271,6 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 organizationName={currentObject?.title}
-                objectAddress={currentObject?.address}
                 userRole={userRole}
                 onEdit={() => handlers.handleEditClick(selectedWorkData)}
                 unreadMessages={unreadCounts[selectedWork]?.messages}
