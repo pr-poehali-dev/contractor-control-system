@@ -62,8 +62,7 @@ const Defects = () => {
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
       <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Проверки</h1>
-        <p className="text-slate-600">Все проверки качества работ</p>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Проверки</h1>
       </div>
 
       <div className="mb-6 flex flex-col md:flex-row gap-4 items-stretch md:items-center md:justify-between">
