@@ -8,9 +8,10 @@ interface ObjectInfoBarProps {
   className?: string;
   compact?: boolean;
   onBack?: () => void;
+  onSettings?: () => void;
 }
 
-const ObjectInfoBar = ({ object, className = '', compact = false, onBack }: ObjectInfoBarProps) => {
+const ObjectInfoBar = ({ object, className = '', compact = false, onBack, onSettings }: ObjectInfoBarProps) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -71,15 +72,24 @@ const ObjectInfoBar = ({ object, className = '', compact = false, onBack }: Obje
   }
 
   return (
-    <button
-      onClick={handleClick}
-      className={`w-full bg-gradient-to-b from-white to-slate-50/50 border-b border-white px-4 py-[18px] flex items-center gap-4 hover:bg-slate-50 transition-all cursor-pointer text-left ${className}`}
-    >
-      <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md">
-        <Icon name="Building2" size={18} className="text-white" />
-      </div>
+    <div className={`w-full bg-gradient-to-b from-white to-slate-50/50 border-b border-white px-4 py-[18px] flex items-center gap-4 ${className}`}>
+      {onBack ? (
+        <button
+          onClick={onBack}
+          className="flex-shrink-0 w-10 h-10 flex items-center justify-center hover:bg-slate-100 rounded-xl transition-colors"
+        >
+          <Icon name="ChevronLeft" size={20} className="text-slate-600" />
+        </button>
+      ) : (
+        <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md">
+          <Icon name="Building2" size={18} className="text-white" />
+        </div>
+      )}
 
-      <div className="flex-1 min-w-0">
+      <button
+        onClick={handleClick}
+        className="flex-1 min-w-0 hover:opacity-80 transition-opacity text-left"
+      >
         <div className="flex items-center gap-2 mb-1">
           <h3 className="text-base font-bold text-slate-900 truncate">
             {object.title}
@@ -92,12 +102,20 @@ const ObjectInfoBar = ({ object, className = '', compact = false, onBack }: Obje
             <span className="truncate">{object.address}</span>
           </div>
         )}
-      </div>
+      </button>
 
-      <div className="flex-shrink-0">
-        <Icon name="ExternalLink" size={16} className="text-slate-400" />
-      </div>
-    </button>
+      {onSettings && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onSettings();
+          }}
+          className="flex-shrink-0 w-10 h-10 flex items-center justify-center hover:bg-slate-100 rounded-xl transition-colors"
+        >
+          <Icon name="Settings" size={18} className="text-slate-600" />
+        </button>
+      )}
+    </div>
   );
 };
 

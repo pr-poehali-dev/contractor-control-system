@@ -37,11 +37,13 @@ export default function WorksList({
   const isContractor = user?.role === 'contractor';
   return (
     <div className="hidden md:block w-96 bg-white border-r border-slate-200 flex-col">
-      <div className="p-4 border-b border-slate-200 py-[17px]">
-        {currentObject && (
-          <ObjectInfoBar object={currentObject} />
-        )}
-      </div>
+      {currentObject && (
+        <ObjectInfoBar 
+          object={currentObject} 
+          onBack={() => navigate('/objects')}
+          onSettings={() => navigate(`/objects/${objectId}/works/create`)}
+        />
+      )}
 
       <div className="flex-1 overflow-y-auto flex flex-col">
         {works.length === 0 ? (
@@ -114,16 +116,7 @@ export default function WorksList({
               );
             })}
           </div>
-          <div className="p-4 border-t border-slate-200">
-            <Button
-              className="w-full"
-              variant="outline"
-              onClick={() => navigate(`/objects/${objectId}/works/create`)}
-            >
-              <Icon name="Settings" size={16} className="mr-2" />
-              Редактировать
-            </Button>
-          </div>
+
         </>
         )}
       </div>
