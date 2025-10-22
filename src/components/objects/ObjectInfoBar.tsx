@@ -7,9 +7,10 @@ interface ObjectInfoBarProps {
   object: ObjectData;
   className?: string;
   compact?: boolean;
+  onBack?: () => void;
 }
 
-const ObjectInfoBar = ({ object, className = '', compact = false }: ObjectInfoBarProps) => {
+const ObjectInfoBar = ({ object, className = '', compact = false, onBack }: ObjectInfoBarProps) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -29,33 +30,43 @@ const ObjectInfoBar = ({ object, className = '', compact = false }: ObjectInfoBa
 
   if (compact) {
     return (
-      <button
-        onClick={handleClick}
-        className={`w-full bg-white border border-slate-200 rounded-lg p-2.5 flex items-center gap-2.5 hover:border-blue-300 hover:bg-slate-50 active:bg-slate-100 transition-all cursor-pointer text-left ${className}`}
-      >
-        <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-          <Icon name="Building2" size={18} className="text-white" />
-        </div>
+      <div className={`w-full bg-white border border-slate-200 rounded-lg p-2.5 flex items-center gap-2.5 ${className}`}>
+        {onBack && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onBack();
+            }}
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded-lg transition-colors"
+          >
+            <Icon name="ChevronLeft" size={20} className="text-slate-600" />
+          </button>
+        )}
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-bold text-slate-900 truncate">
-              {object.title}
-            </h3>
-            {object.status && getStatusBadge(object.status)}
-          </div>
-          {object.address && (
-            <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
-              <Icon name="MapPin" size={12} />
-              <span className="truncate">{object.address}</span>
+        <button
+          onClick={handleClick}
+          className="flex-1 min-w-0 flex items-center gap-2.5 hover:opacity-80 transition-opacity"
+        >
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold text-slate-900 truncate">
+                {object.title}
+              </h3>
+              {object.status && getStatusBadge(object.status)}
             </div>
-          )}
-        </div>
+            {object.address && (
+              <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
+                <Icon name="MapPin" size={12} />
+                <span className="truncate">{object.address}</span>
+              </div>
+            )}
+          </div>
 
-        <div className="flex-shrink-0">
-          <Icon name="ExternalLink" size={16} className="text-slate-400" />
-        </div>
-      </button>
+          <div className="flex-shrink-0">
+            <Icon name="ExternalLink" size={16} className="text-slate-400" />
+          </div>
+        </button>
+      </div>
     );
   }
 

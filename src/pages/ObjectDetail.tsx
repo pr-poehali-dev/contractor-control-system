@@ -125,19 +125,12 @@ const ObjectDetail = () => {
     <div className="min-h-screen bg-slate-50">
       {/* Mobile: хедер */}
       <div className="md:hidden sticky top-0 z-10 bg-white border-b border-slate-200 p-4">
-        <div className="flex items-start gap-3 mb-3">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="flex-shrink-0 mt-1"
-            onClick={() => navigate('/objects')}
-          >
-            <Icon name="ChevronLeft" size={24} />
-          </Button>
-          
-          <div className="flex-1 min-w-0">
-            <ObjectInfoBar object={object} compact />
-          </div>
+        <div className="mb-3">
+          <ObjectInfoBar 
+            object={object} 
+            compact 
+            onBack={() => navigate('/objects')}
+          />
         </div>
 
         <div className="space-y-2">
