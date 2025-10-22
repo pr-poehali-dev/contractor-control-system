@@ -159,19 +159,12 @@ const Defects = () => {
                   )}
                 </div>
 
-                <div className="space-y-2 text-sm text-slate-600 mt-4">
-                  {inspection.scheduled_date && (
-                    <div className="flex gap-2">
-                      <Icon name="Calendar" size={16} />
-                      <span><strong>Запланирована:</strong> {formatDate(inspection.scheduled_date)}</span>
-                    </div>
-                  )}
-                  <div className="flex gap-2 text-slate-500 text-xs pt-2 border-t">
-                    <Icon name="Calendar" size={14} />
-                    <span>Создана: {formatDate(inspection.created_at)}</span>
-                    {inspection.completed_at && <span> • Завершена: {formatDate(inspection.completed_at)}</span>}
+                {inspection.scheduled_date && (
+                  <div className="flex gap-2 text-sm text-slate-600 mt-4">
+                    <Icon name="Calendar" size={16} />
+                    <span><strong>Запланирована:</strong> {formatDate(inspection.scheduled_date)}</span>
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
           ))}
