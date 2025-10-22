@@ -72,7 +72,7 @@ const ObjectInfoBar = ({ object, className = '', compact = false, onBack, onSett
   }
 
   return (
-    <div className={`w-full bg-gradient-to-b from-white to-slate-50/50 border-b border-white px-4 py-[18px] flex items-center gap-4 ${className}`}>
+    <div className={`w-full bg-gradient-to-b from-white to-slate-50/50 border-b border-white px-6 py-[18px] flex items-center gap-4 ${className}`}>
       {onBack ? (
         <button
           onClick={onBack}
