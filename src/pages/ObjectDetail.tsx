@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
 import { NotificationGroup } from '@/components/ui/notification-badge';
+import ObjectInfoBar from '@/components/objects/ObjectInfoBar';
 
 const ObjectDetail = () => {
   const { objectId } = useParams();
@@ -122,29 +123,24 @@ const ObjectDetail = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Mobile: старый хедер */}
+      {/* Mobile: хедер */}
       <div className="md:hidden sticky top-0 z-10 bg-white border-b border-slate-200 p-4">
-        <div className="flex items-center gap-3 mb-3">
+        <div className="flex items-start gap-3 mb-3">
           <Button 
             variant="ghost" 
             size="icon"
-            className="flex-shrink-0"
+            className="flex-shrink-0 mt-1"
             onClick={() => navigate('/objects')}
           >
             <Icon name="ChevronLeft" size={24} />
           </Button>
           
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
-              <Icon name="Building2" size={24} className="text-blue-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-lg font-bold text-slate-900 truncate">{object.title}</h1>
-            </div>
+          <div className="flex-1 min-w-0">
+            <ObjectInfoBar object={object} />
           </div>
         </div>
 
-        <div className="mt-3 space-y-2">
+        <div className="space-y-2">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full h-10">
               <SelectValue placeholder="Все работы" />
