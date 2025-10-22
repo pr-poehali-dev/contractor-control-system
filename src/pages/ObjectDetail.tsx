@@ -136,7 +136,7 @@ const ObjectDetail = () => {
           </Button>
           
           <div className="flex-1 min-w-0">
-            <ObjectInfoBar object={object} />
+            <ObjectInfoBar object={object} compact />
           </div>
         </div>
 
