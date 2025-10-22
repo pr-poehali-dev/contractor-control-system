@@ -8,11 +8,14 @@ import WorkJournal from '@/components/WorkJournal';
 const WorkDetail = () => {
   const { objectId, workId } = useParams();
   const navigate = useNavigate();
-  const { isLoading } = useAuth();
+  const { isLoading, userData } = useAuth();
   const works = useAppSelector((state) => 
     state.works.items.filter(w => w.object_id === Number(objectId))
   );
   const work = works.find(w => w.id === Number(workId));
+  
+  const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
+  const currentObject = objects.find(o => o.id === Number(objectId));
 
   if (isLoading) {
     return (
