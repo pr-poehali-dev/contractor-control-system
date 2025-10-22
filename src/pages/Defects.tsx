@@ -129,6 +129,13 @@ const Defects = () => {
                       Проверка №{inspection.inspection_number}
                     </h3>
                     
+                    {inspection.work && (
+                      <div className="flex gap-2 items-center mb-3">
+                        <Icon name="Wrench" size={18} className="text-slate-500" />
+                        <span className="text-base text-slate-700"><strong>Работа:</strong> {inspection.work.title}</span>
+                      </div>
+                    )}
+                    
                     <div className="flex flex-wrap items-center gap-2 mb-2">
                       <Badge className={getStatusColor(inspection.status)}>
                         {getStatusLabel(inspection.status)}
@@ -154,12 +161,6 @@ const Defects = () => {
                 </div>
 
                 <div className="space-y-2 text-sm text-slate-600 mt-4">
-                  {inspection.work && (
-                    <div className="flex gap-2">
-                      <Icon name="Wrench" size={16} />
-                      <span><strong>Работа:</strong> {inspection.work.title}</span>
-                    </div>
-                  )}
                   {inspection.scheduled_date && (
                     <div className="flex gap-2">
                       <Icon name="Calendar" size={16} />
