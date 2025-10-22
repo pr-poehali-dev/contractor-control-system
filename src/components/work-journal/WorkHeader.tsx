@@ -154,11 +154,6 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
               <Icon name="Wrench" size={22} className="text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              {organizationName && (
-                <p className="text-sm text-slate-500 mb-1 truncate font-medium">
-                  {organizationName}
-                </p>
-              )}
               <h2 className="text-2xl font-bold text-slate-900 leading-tight line-clamp-2 mb-2">{selectedWorkData.title}</h2>
               <div className="flex items-center gap-3 flex-wrap">
                 {selectedWorkData.planned_start_date && (
