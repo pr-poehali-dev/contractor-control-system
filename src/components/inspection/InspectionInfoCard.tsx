@@ -16,19 +16,10 @@ interface InspectionInfoCardProps {
 }
 
 export function InspectionInfoCard({
-  inspectionNumber,
   status,
   workTitle,
   objectTitle,
-  scheduledDate,
-  isCollapsed = false,
-  onToggle
 }: InspectionInfoCardProps) {
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return '';
-    return safeFormatDate(dateString);
-  };
-
   const getStatusConfig = (status: string) => {
     switch (status) {
       case 'draft':
@@ -59,71 +50,38 @@ export function InspectionInfoCard({
   return (
     <Card className="mb-6">
       <CardContent className="p-4 md:p-6">
-        <button
-          type="button"
-          onClick={onToggle}
-          className="flex items-start gap-3 w-full text-left hover:opacity-70 transition-opacity mb-4"
-        >
-          <Icon 
-            name={isCollapsed ? "ChevronRight" : "ChevronDown"} 
-            size={20} 
-            className="text-slate-500 flex-shrink-0 mt-0.5"
-          />
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap mb-1">
-              <h3 className="text-base md:text-lg font-semibold">Информация о проверке</h3>
-              <Badge variant="outline" className={cn("text-xs", statusConfig.className)}>
-                {statusConfig.label}
-              </Badge>
+        <div className="flex items-center gap-2 flex-wrap mb-4">
+          <h3 className="text-base md:text-lg font-semibold">Информация о проверке</h3>
+          <Badge variant="outline" className={cn("text-xs", statusConfig.className)}>
+            {statusConfig.label}
+          </Badge>
+        </div>
+
+        <div className="space-y-3">
+          {objectTitle && (
+            <div className="flex items-start gap-3">
+              <div className="bg-blue-100 p-2 rounded-lg shrink-0">
+                <Icon name="Building2" size={18} className="text-blue-600" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 mb-0.5">Объект</p>
+                <p className="text-sm md:text-base font-medium text-slate-900">{objectTitle}</p>
+              </div>
             </div>
-            {isCollapsed && (
-              <p className="text-xs md:text-sm text-slate-500">
-                {objectTitle && `${objectTitle} • `}
-                {workTitle}
-              </p>
-            )}
-          </div>
-        </button>
+          )}
 
-        {!isCollapsed && (
-          <div className="space-y-3 pl-8">
-            {objectTitle && (
-              <div className="flex items-start gap-3">
-                <div className="bg-blue-100 p-2 rounded-lg shrink-0">
-                  <Icon name="Building2" size={18} className="text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500 mb-0.5">Объект</p>
-                  <p className="text-sm md:text-base font-medium text-slate-900">{objectTitle}</p>
-                </div>
+          {workTitle && (
+            <div className="flex items-start gap-3">
+              <div className="bg-purple-100 p-2 rounded-lg shrink-0">
+                <Icon name="Hammer" size={18} className="text-purple-600" />
               </div>
-            )}
-
-            {workTitle && (
-              <div className="flex items-start gap-3">
-                <div className="bg-purple-100 p-2 rounded-lg shrink-0">
-                  <Icon name="Hammer" size={18} className="text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500 mb-0.5">Вид работы</p>
-                  <p className="text-sm md:text-base font-medium text-slate-900">{workTitle}</p>
-                </div>
+              <div>
+                <p className="text-xs text-slate-500 mb-0.5">Вид работы</p>
+                <p className="text-sm md:text-base font-medium text-slate-900">{workTitle}</p>
               </div>
-            )}
-
-            {scheduledDate && (
-              <div className="flex items-start gap-3">
-                <div className="bg-amber-100 p-2 rounded-lg shrink-0">
-                  <Icon name="Calendar" size={18} className="text-amber-600" />
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500 mb-0.5">Дата проверки</p>
-                  <p className="text-sm md:text-base font-medium text-slate-900">{formatDate(scheduledDate)}</p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

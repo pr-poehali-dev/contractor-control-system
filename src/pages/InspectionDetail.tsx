@@ -5,8 +5,6 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { InspectionInfoCard } from '@/components/inspection/InspectionInfoCard';
 import DefectsSectionNew, { Defect } from '@/components/inspection/DefectsSectionNew';
-import ControlPointsSection, { ControlPoint } from '@/components/inspection/ControlPointsSection';
-import CommonDefectsSection from '@/components/inspection/CommonDefectsSection';
 import InspectionActions from '@/components/inspection/InspectionActions';
 import DefectReportCard from '@/components/inspection/DefectReportCard';
 import ScheduledInspectionNotice from '@/components/inspection/ScheduledInspectionNotice';
@@ -19,7 +17,7 @@ const InspectionDetail = () => {
   const { userData, user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const { inspection, defects, setDefects, controlPoints, defectReport, setDefectReport } = useInspectionData(inspectionId);
+  const { inspection, defects, setDefects, defectReport, setDefectReport } = useInspectionData(inspectionId);
   
   const {
     loading,
@@ -49,30 +47,10 @@ const InspectionDetail = () => {
     responsible: '',
     deadline: ''
   });
-  const [checkedPoints, setCheckedPoints] = useState<Set<string>>(new Set());
-  const [infoCollapsed, setInfoCollapsed] = useState(false);
   const defectsRef = useRef<HTMLDivElement>(null);
 
   const handleDefectChange = (field: keyof Defect, value: string) => {
     setNewDefect(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleControlPointClick = (cp: ControlPoint) => {
-    const cpId = String(cp.id);
-    const newChecked = new Set(checkedPoints);
-    
-    if (newChecked.has(cpId)) {
-      newChecked.delete(cpId);
-    } else {
-      newChecked.add(cpId);
-      setNewDefect(prev => ({ ...prev, description: cp.description }));
-      
-      setTimeout(() => {
-        defectsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
-    
-    setCheckedPoints(newChecked);
   };
 
   const onAddDefect = () => {
@@ -143,21 +121,16 @@ const InspectionDetail = () => {
               <Icon name="ArrowLeft" size={20} className="text-slate-600" />
             </button>
             <h1 className="text-xl md:text-3xl font-bold flex-1 min-w-0 truncate">
-              Проверка №{inspectionIndex}
+              Проверка №{inspection.inspection_number || inspectionIndex}
             </h1>
           </div>
           <p className="text-sm md:text-base text-slate-600 ml-10 md:ml-12">Управление проверкой</p>
         </div>
 
         <InspectionInfoCard
-          inspectionNumber={inspectionIndex}
           status={inspection.status}
-          type={inspection.type}
           workTitle={work?.title}
           objectTitle={object?.title}
-          scheduledDate={inspection.scheduled_date}
-          isCollapsed={infoCollapsed}
-          onToggle={() => setInfoCollapsed(!infoCollapsed)}
         />
 
         {!canEdit && inspection.type === 'scheduled' && !isScheduledForToday() && (
@@ -181,24 +154,7 @@ const InspectionDetail = () => {
           />
         </div>
 
-        {inspection.status !== 'completed' && (
-          <>
-            <CommonDefectsSection
-              onSelectDefect={(description) => {
-                handleDefectChange('description', description);
-                setTimeout(() => {
-                  defectsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 100);
-              }}
-            />
 
-            <ControlPointsSection
-              controlPoints={controlPoints}
-              checkedPoints={checkedPoints}
-              onControlPointClick={handleControlPointClick}
-            />
-          </>
-        )}
 
         {inspection.status === 'completed' && defects.length > 0 && (
           <DefectReportCard
