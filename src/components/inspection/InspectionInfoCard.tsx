@@ -51,7 +51,6 @@ export function InspectionInfoCard({
     <Card className="mb-6">
       <CardContent className="p-4 md:p-6">
         <div className="flex items-center gap-2 flex-wrap mb-4">
-          <h3 className="text-base md:text-lg font-semibold">Информация о проверке</h3>
           <Badge variant="outline" className={cn("text-xs", statusConfig.className)}>
             {statusConfig.label}
           </Badge>
