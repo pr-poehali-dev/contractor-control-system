@@ -130,8 +130,7 @@ const Defects = () => {
                     </h3>
                     
                     {inspection.work && (
-                      <div className="flex gap-2 items-center mb-3">
-                        <Icon name="Wrench" size={18} className="text-slate-500" />
+                      <div className="mb-3">
                         <span className="text-base text-slate-700"><strong>Работа:</strong> {inspection.work.title}</span>
                       </div>
                     )}
