@@ -147,7 +147,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
       </div>
 
       {/* DESKTOP: Original header */}
-      <div className="hidden md:block bg-gradient-to-b from-white to-slate-50/50 border-b border-slate-200 px-6 py-[22px] pb-0">
+      <div className="hidden md:block bg-gradient-to-b from-white to-slate-50/50 border-b border-slate-200 px-6 py-[19px] pb-0">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4 flex-1 min-w-0 mr-4">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex-shrink-0 flex items-center justify-center shadow-md">
