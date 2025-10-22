@@ -75,8 +75,8 @@ const ObjectInfoBar = ({ object, className = '', compact = false, onBack }: Obje
       onClick={handleClick}
       className={`w-full bg-gradient-to-b from-white to-slate-50/50 border-b border-slate-200 px-4 py-5 flex items-start gap-4 hover:bg-slate-50 transition-all cursor-pointer text-left ${className}`}
     >
-      <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md">
-        <Icon name="Building2" size={22} className="text-white" />
+      <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md">
+        <Icon name="Building2" size={18} className="text-white" />
       </div>
 
       <div className="flex-1 min-w-0">

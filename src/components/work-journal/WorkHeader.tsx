@@ -150,8 +150,8 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
       <div className="hidden md:block bg-gradient-to-b from-white to-slate-50/50 border-b border-slate-200 px-6 pt-5 pb-0">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-start gap-4 flex-1 min-w-0 mr-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex-shrink-0 flex items-center justify-center shadow-md">
-              <Icon name="Wrench" size={22} className="text-white" />
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex-shrink-0 flex items-center justify-center shadow-md">
+              <Icon name="Wrench" size={18} className="text-white" />
             </div>
             <div className="flex-1 min-w-0">
               <h2 className="text-2xl font-bold text-slate-900 leading-tight line-clamp-2 mb-2">{selectedWorkData.title}</h2>
