@@ -3,20 +3,58 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Analytics = () => {
-  const projectsData = [
-    { name: 'Капремонт Казани 2025', plan: 100, fact: 67, budget: 15000000, spent: 10050000 },
-    { name: 'Благоустройство дворов', plan: 100, fact: 34, budget: 8000000, spent: 2720000 },
-    { name: 'Реконструкция школ', plan: 100, fact: 12, budget: 25000000, spent: 3000000 },
-  ];
+  const { userData } = useAuth();
 
-  const worksData = [
-    { work: 'Замена кровли', progress: 80, planned: 2200000, actual: 1980000, deviation: -10 },
-    { work: 'Ремонт фасада', progress: 100, planned: 1500000, actual: 1650000, deviation: 10 },
-    { work: 'Замена окон', progress: 100, planned: 850000, actual: 820000, deviation: -3.5 },
-    { work: 'Ремонт подъездов', progress: 45, planned: 650000, actual: 350000, deviation: -46 },
-  ];
+  const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
+  const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
+  const inspections = (userData?.inspections && Array.isArray(userData.inspections)) ? userData.inspections : [];
+
+  // Вычисляем данные по объектам
+  const projectsData = objects.map(obj => {
+    const objectWorks = works.filter(w => w.object_id === obj.id);
+    const totalBudget = objectWorks.reduce((sum, w) => sum + (parseFloat(w.budget) || 0), 0);
+    const totalSpent = objectWorks.reduce((sum, w) => sum + (parseFloat(w.actual_cost) || 0), 0);
+    
+    // Рассчитываем средний прогресс работ
+    const avgProgress = objectWorks.length > 0 
+      ? objectWorks.reduce((sum, w) => sum + (parseFloat(w.progress) || 0), 0) / objectWorks.length 
+      : 0;
+
+    return {
+      name: obj.title,
+      plan: 100,
+      fact: Math.round(avgProgress),
+      budget: totalBudget,
+      spent: totalSpent,
+    };
+  });
+
+  // Вычисляем общую аналитику
+  const totalBudget = projectsData.reduce((sum, p) => sum + p.budget, 0);
+  const totalSpent = projectsData.reduce((sum, p) => sum + p.spent, 0);
+  const avgProgress = projectsData.length > 0 
+    ? Math.round(projectsData.reduce((sum, p) => sum + p.fact, 0) / projectsData.length)
+    : 0;
+  const economy = totalSpent - (totalBudget * avgProgress / 100);
+
+  // Вычисляем данные по работам
+  const worksData = works.map(work => {
+    const planned = parseFloat(work.budget) || 0;
+    const actual = parseFloat(work.actual_cost) || 0;
+    const progress = parseFloat(work.progress) || 0;
+    const deviation = planned > 0 ? ((actual - planned) / planned) * 100 : 0;
+
+    return {
+      work: work.title,
+      progress: Math.round(progress),
+      planned,
+      actual,
+      deviation,
+    };
+  });
 
   return (
     <div className="p-8">
@@ -31,7 +69,7 @@ const Analytics = () => {
             <CardTitle className="text-sm font-medium text-slate-600">Общий прогресс</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-[#2563EB]">43%</p>
+            <p className="text-3xl font-bold text-[#2563EB]">{avgProgress}%</p>
             <p className="text-xs text-slate-500 mt-1">По всем проектам</p>
           </CardContent>
         </Card>
@@ -40,7 +78,11 @@ const Analytics = () => {
             <CardTitle className="text-sm font-medium text-slate-600">Бюджет</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-slate-900">48M ₽</p>
+            <p className="text-3xl font-bold text-slate-900">
+              {totalBudget >= 1000000 
+                ? `${(totalBudget / 1000000).toFixed(1)}M ₽` 
+                : `${(totalBudget / 1000).toFixed(0)}K ₽`}
+            </p>
             <p className="text-xs text-slate-500 mt-1">Запланировано</p>
           </CardContent>
         </Card>
@@ -49,8 +91,14 @@ const Analytics = () => {
             <CardTitle className="text-sm font-medium text-slate-600">Освоено</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-green-600">15.77M ₽</p>
-            <p className="text-xs text-slate-500 mt-1">33% от бюджета</p>
+            <p className="text-3xl font-bold text-green-600">
+              {totalSpent >= 1000000 
+                ? `${(totalSpent / 1000000).toFixed(2)}M ₽` 
+                : `${(totalSpent / 1000).toFixed(0)}K ₽`}
+            </p>
+            <p className="text-xs text-slate-500 mt-1">
+              {totalBudget > 0 ? Math.round((totalSpent / totalBudget) * 100) : 0}% от бюджета
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -58,8 +106,14 @@ const Analytics = () => {
             <CardTitle className="text-sm font-medium text-slate-600">Экономия</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-blue-600">-240K ₽</p>
-            <p className="text-xs text-slate-500 mt-1">-1.5% от плана</p>
+            <p className={`text-3xl font-bold ${economy < 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {economy >= 0 ? '+' : ''}{economy >= 1000000 
+                ? `${(economy / 1000000).toFixed(2)}M ₽` 
+                : `${(economy / 1000).toFixed(0)}K ₽`}
+            </p>
+            <p className="text-xs text-slate-500 mt-1">
+              {totalBudget > 0 ? ((economy / totalBudget) * 100).toFixed(1) : 0}% от плана
+            </p>
           </CardContent>
         </Card>
       </div>
