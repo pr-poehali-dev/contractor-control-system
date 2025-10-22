@@ -63,70 +63,71 @@ export const WorkFormCard = ({
       )} />
       
       <CardContent className="p-3 md:p-4">
-        <div className="flex items-start justify-between gap-2 mb-2">
-          <button
-            type="button"
-            onClick={toggleCollapse}
-            className="flex items-start gap-2 md:gap-3 flex-1 text-left hover:opacity-70 transition-opacity min-w-0"
-          >
-            <Icon 
-              name={isCollapsed ? "ChevronRight" : "ChevronDown"} 
-              size={20} 
-              className="text-slate-500 flex-shrink-0 mt-0.5"
-            />
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm md:text-base font-semibold leading-tight mb-1.5">{work.title || 'Новая работа'}</h3>
-              <div className="flex items-center gap-1.5 flex-wrap mb-1">
-                {work.isExisting && (
-                  <Badge variant="outline" className="text-[10px] md:text-xs bg-slate-100 px-1.5 py-0">
-                    Добавленная
-                  </Badge>
-                )}
-                {!work.isExisting && !work.title && (
-                  <Badge variant="secondary" className="text-[10px] md:text-xs bg-blue-50 text-blue-700 px-1.5 py-0">
-                    Новая
-                  </Badge>
-                )}
-                {work.category && (
-                  <Badge variant="secondary" className="text-[10px] md:text-xs px-1.5 py-0">
-                    {work.category}
-                  </Badge>
-                )}
-              </div>
-              {isCollapsed && (
-                <p className="text-xs md:text-sm text-slate-500">
-                  Подрядчик: {getContractorName()} • 
-                  {work.planned_start_date && ` ${formatDate(work.planned_start_date)}`}
-                  {work.planned_end_date && ` — ${formatDate(work.planned_end_date)}`}
-                  {!work.planned_start_date && !work.planned_end_date && ' Даты не указаны'}
-                </p>
+        <button
+          type="button"
+          onClick={toggleCollapse}
+          className="flex items-start gap-2 md:gap-3 w-full text-left hover:opacity-70 transition-opacity mb-2"
+        >
+          <Icon 
+            name={isCollapsed ? "ChevronRight" : "ChevronDown"} 
+            size={20} 
+            className="text-slate-500 flex-shrink-0 mt-0.5"
+          />
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm md:text-base font-semibold leading-tight mb-1.5">{work.title || 'Новая работа'}</h3>
+            <div className="flex items-center gap-1.5 flex-wrap mb-1">
+              {work.isExisting && (
+                <Badge variant="outline" className="text-[10px] md:text-xs bg-slate-100 px-1.5 py-0">
+                  Добавленная
+                </Badge>
+              )}
+              {!work.isExisting && !work.title && (
+                <Badge variant="secondary" className="text-[10px] md:text-xs bg-blue-50 text-blue-700 px-1.5 py-0">
+                  Новая
+                </Badge>
+              )}
+              {work.category && (
+                <Badge variant="secondary" className="text-[10px] md:text-xs px-1.5 py-0">
+                  {work.category}
+                </Badge>
               )}
             </div>
-          </button>
-          <div className="flex items-center gap-2 flex-shrink-0">
+            {isCollapsed && (
+              <p className="text-xs md:text-sm text-slate-500">
+                Подрядчик: {getContractorName()} • 
+                {work.planned_start_date && ` ${formatDate(work.planned_start_date)}`}
+                {work.planned_end_date && ` — ${formatDate(work.planned_end_date)}`}
+                {!work.planned_start_date && !work.planned_end_date && ' Даты не указаны'}
+              </p>
+            )}
+          </div>
+        </button>
+        
+        <div className="flex items-center gap-2 pl-8 mb-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-7 text-xs"
+            onClick={() => onDuplicate(work.id)}
+            title="Дублировать"
+          >
+            <Icon name="Copy" size={14} className="mr-1" />
+            Дублировать
+          </Button>
+          {!work.isExisting && (
             <Button
               type="button"
               variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => onDuplicate(work.id)}
-              title="Дублировать"
+              size="sm"
+              className="h-7 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+              onClick={() => onRemove(work.id)}
+              title="Удалить"
             >
-              <Icon name="Copy" size={16} />
+              <Icon name="Trash2" size={14} className="mr-1" />
+              Удалить
             </Button>
-            {!work.isExisting && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                onClick={() => onRemove(work.id)}
-                title="Удалить"
-              >
-                <Icon name="Trash2" size={16} />
-              </Button>
-            )}
-          </div>
+          )}
         </div>
 
         {!isCollapsed && (
