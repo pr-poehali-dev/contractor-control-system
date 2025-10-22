@@ -108,32 +108,34 @@ export const WorkFormCard = ({
           </div>
         </button>
         
-        <div className="flex items-center gap-2 pl-8 mb-2">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-7 text-xs"
-            onClick={() => onDuplicate(work.id)}
-            title="Дублировать"
-          >
-            <Icon name="Copy" size={14} className="mr-1" />
-            Дублировать
-          </Button>
-          {!work.isExisting && (
+        {!isCollapsed && (
+          <div className="flex items-center gap-2 pl-8 mb-2">
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              className="h-7 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
-              onClick={() => onRemove(work.id)}
-              title="Удалить"
+              className="h-7 text-xs"
+              onClick={() => onDuplicate(work.id)}
+              title="Дублировать"
             >
-              <Icon name="Trash2" size={14} className="mr-1" />
-              Удалить
+              <Icon name="Copy" size={14} className="mr-1" />
+              Дублировать
             </Button>
-          )}
-        </div>
+            {!work.isExisting && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                onClick={() => onRemove(work.id)}
+                title="Удалить"
+              >
+                <Icon name="Trash2" size={14} className="mr-1" />
+                Удалить
+              </Button>
+            )}
+          </div>
+        )}
 
         {!isCollapsed && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-8">
