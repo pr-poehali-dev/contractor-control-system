@@ -29,6 +29,7 @@ export default function WorksList({
   getInitials,
   formatTime,
   objectId,
+  currentObject,
 }: WorksListProps) {
   const navigate = useNavigate();
   const { user, userData } = useAuth();
