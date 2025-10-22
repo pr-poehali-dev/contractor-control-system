@@ -113,66 +113,49 @@ const Defects = () => {
                 navigate(`/inspection/${inspection.id}`);
               }}
             >
-              <div className="bg-gradient-to-r from-slate-50 to-slate-100 px-4 md:px-6 py-3 border-b flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-3 flex-wrap">
-                  <div className="bg-white rounded-lg px-3 py-1.5 shadow-sm border border-slate-300">
-                    <span className="text-sm font-semibold text-slate-900">Проверка №{inspection.inspection_number}</span>
-                  </div>
-                  {inspection.object && (
-                    <div className="flex items-center gap-1.5 text-sm text-slate-700">
-                      <Icon name="MapPin" size={14} />
-                      <span className="font-medium">{inspection.object.title}</span>
+              <div className="bg-gradient-to-r from-slate-50 to-slate-100 px-4 md:px-6 py-3 border-b">
+                <div className="flex items-start justify-between gap-3 flex-wrap">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <div className="bg-white rounded-lg px-3 py-1.5 shadow-sm border border-slate-300">
+                      <span className="text-sm font-semibold text-slate-900">Проверка №{inspection.inspection_number}</span>
                     </div>
-                  )}
+                    {inspection.type && (
+                      <Badge className="bg-amber-100 text-amber-900 border-amber-200 text-xs">
+                        <Icon name={inspection.type === 'scheduled' ? 'Calendar' : 'Zap'} size={12} className="mr-1" />
+                        {inspection.type === 'scheduled' ? 'Плановая' : 'Внеплановая'}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
                 
-                <div className="flex items-center gap-2 flex-wrap">
-                  {inspection.type && (
-                    <Badge className="bg-amber-100 text-amber-900 border-amber-200">
-                      {inspection.type === 'scheduled' ? (
-                        <><Icon name="Calendar" size={12} className="mr-1" />Плановая</>
-                      ) : (
-                        <><Icon name="Zap" size={12} className="mr-1" />Внеплановая</>
-                      )}
-                    </Badge>
-                  )}
+                {inspection.object && (
+                  <div className="flex items-center gap-1.5 text-sm text-slate-600 mt-2">
+                    <Icon name="MapPin" size={14} />
+                    <span>{inspection.object.title}</span>
+                  </div>
+                )}
+              </div>
+              
+              <CardContent className="p-4 md:p-6">
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <Badge className={getStatusColor(inspection.status)}>
+                    {getStatusLabel(inspection.status)}
+                  </Badge>
                   
                   {inspection.defectsCount > 0 && (
                     <div className="flex items-center gap-1.5 px-2.5 py-1 bg-red-100 rounded-full border border-red-200">
                       <Icon name="AlertCircle" size={14} className="text-red-600" />
-                      <span className="text-xs font-semibold text-red-600">{inspection.defectsCount} дефект{inspection.defectsCount > 1 ? 'а' : ''}</span>
+                      <span className="text-xs font-semibold text-red-600">{inspection.defectsCount}</span>
                     </div>
                   )}
-                </div>
-              </div>
-              
-              <CardContent className="p-4 md:p-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <Badge className={getStatusColor(inspection.status)}>
-                    {getStatusLabel(inspection.status)}
-                  </Badge>
                 </div>
 
-                <div className="space-y-2 text-sm text-slate-600">
-                  {inspection.work && (
-                    <div className="flex gap-2 items-start">
-                      <Icon name="Wrench" size={16} className="mt-0.5 flex-shrink-0" />
-                      <span><strong>Работа:</strong> {inspection.work.title}</span>
-                    </div>
-                  )}
-                  {inspection.object && (
-                    <div className="flex gap-2 items-start">
-                      <Icon name="MapPin" size={16} className="mt-0.5 flex-shrink-0" />
-                      <span><strong>Дом Пушкина</strong></span>
-                    </div>
-                  )}
-                  {inspection.scheduled_date && (
-                    <div className="flex gap-2 items-start">
-                      <Icon name="Calendar" size={16} className="mt-0.5 flex-shrink-0" />
-                      <span><strong>Создана:</strong> {formatDate(inspection.scheduled_date)} г.</span>
-                    </div>
-                  )}
-                </div>
+                {inspection.work && (
+                  <div className="flex gap-2 items-start text-sm text-slate-600">
+                    <Icon name="Wrench" size={16} className="mt-0.5 flex-shrink-0" />
+                    <span><strong>Работа:</strong> {inspection.work.title}</span>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
