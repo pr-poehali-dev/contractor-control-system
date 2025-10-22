@@ -10,6 +10,7 @@ const Defects = () => {
   const navigate = useNavigate();
   const { userData } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const inspections = (userData?.inspections && Array.isArray(userData.inspections)) ? userData.inspections : [];
   const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
@@ -31,8 +32,19 @@ const Defects = () => {
   });
 
   const filteredInspections = inspectionsWithContext.filter(i => {
-    if (statusFilter === 'all') return true;
-    return i.status === statusFilter;
+    if (statusFilter !== 'all' && i.status !== statusFilter) return false;
+    
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        i.inspection_number?.toLowerCase().includes(query) ||
+        i.work?.title?.toLowerCase().includes(query) ||
+        i.object?.title?.toLowerCase().includes(query) ||
+        i.description?.toLowerCase().includes(query)
+      );
+    }
+    
+    return true;
   });
 
   const getStatusColor = (status: string) => {
@@ -65,33 +77,54 @@ const Defects = () => {
         <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Проверки</h1>
       </div>
 
-      <div className="mb-6 flex flex-col md:flex-row gap-4 items-stretch md:items-center md:justify-between">
-        <div className="w-full md:w-64">
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Все проверки ({inspections.length})</SelectItem>
-              <SelectItem value="draft">Запланированы ({inspections.filter(i => i.status === 'draft').length})</SelectItem>
-              <SelectItem value="active">На проверке ({inspections.filter(i => i.status === 'active').length})</SelectItem>
-              <SelectItem value="completed">Завершены ({inspections.filter(i => i.status === 'completed').length})</SelectItem>
-            </SelectContent>
-          </Select>
+      <div className="mb-6 space-y-4">
+        <div className="relative">
+          <Icon name="Search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Поиск по номеру, работе, объекту..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+            >
+              <Icon name="X" size={18} />
+            </button>
+          )}
         </div>
 
-        <div className="flex gap-3 justify-around md:justify-end">
-          <div className="text-center">
-            <p className="text-2xl md:text-2xl font-bold text-blue-600">{inspections.filter(i => i.status === 'draft').length}</p>
-            <p className="text-xs text-slate-500">Запланировано</p>
+        <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center md:justify-between">
+          <div className="w-full md:w-64">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Все проверки ({inspections.length})</SelectItem>
+                <SelectItem value="draft">Запланированы ({inspections.filter(i => i.status === 'draft').length})</SelectItem>
+                <SelectItem value="active">На проверке ({inspections.filter(i => i.status === 'active').length})</SelectItem>
+                <SelectItem value="completed">Завершены ({inspections.filter(i => i.status === 'completed').length})</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div className="text-center">
-            <p className="text-2xl md:text-2xl font-bold text-amber-600">{inspections.filter(i => i.status === 'active').length}</p>
-            <p className="text-xs text-slate-500">На проверке</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl md:text-2xl font-bold text-green-600">{inspections.filter(i => i.status === 'completed').length}</p>
-            <p className="text-xs text-slate-500">Завершено</p>
+
+          <div className="flex gap-3 justify-around md:justify-end">
+            <div className="text-center">
+              <p className="text-2xl md:text-2xl font-bold text-blue-600">{inspections.filter(i => i.status === 'draft').length}</p>
+              <p className="text-xs text-slate-500">Запланировано</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl md:text-2xl font-bold text-amber-600">{inspections.filter(i => i.status === 'active').length}</p>
+              <p className="text-xs text-slate-500">На проверке</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl md:text-2xl font-bold text-green-600">{inspections.filter(i => i.status === 'completed').length}</p>
+              <p className="text-xs text-slate-500">Завершено</p>
+            </div>
           </div>
         </div>
       </div>
