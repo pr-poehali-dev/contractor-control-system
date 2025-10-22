@@ -23,6 +23,7 @@ import Contractors from "./pages/Contractors";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import PublicObject from "./pages/PublicObject";
+import ObjectPublicPage from "./pages/ObjectPublicPage";
 import JournalEntryDetail from "./pages/JournalEntryDetail";
 import InspectionDetail from "./pages/InspectionDetail";
 import DefectReportDetail from "./pages/DefectReportDetail";
@@ -72,6 +73,7 @@ const App = () => (
               <Route path="/objects" element={<ProtectedRoute><Objects /></ProtectedRoute>} />
               <Route path="/objects/create" element={<ProtectedRoute><CreateObject /></ProtectedRoute>} />
               <Route path="/objects/:objectId/edit" element={<ProtectedRoute><EditObject /></ProtectedRoute>} />
+              <Route path="/objects/:objectId/public" element={<ProtectedRoute><ObjectPublicPage /></ProtectedRoute>} />
               <Route path="/objects/:objectId" element={<ProtectedRoute><ObjectDetail /></ProtectedRoute>} />
               <Route path="/objects/:objectId/works/create" element={<ProtectedRoute><CreateWork /></ProtectedRoute>} />
               <Route path="/objects/:objectId/works/:workId" element={<ProtectedRoute><WorkDetail /></ProtectedRoute>} />

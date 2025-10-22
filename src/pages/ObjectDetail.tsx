@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
 import { NotificationGroup } from '@/components/ui/notification-badge';
+import ObjectHeader from '@/components/objects/ObjectHeader';
 
 const ObjectDetail = () => {
   const { objectId } = useParams();
@@ -122,6 +123,16 @@ const ObjectDetail = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Desktop: Новый ObjectHeader */}
+      <div className="hidden md:block">
+        <ObjectHeader 
+          object={object} 
+          showBackButton 
+          onEdit={user?.role === 'client' || user?.role === 'admin' ? handleEdit : undefined}
+        />
+      </div>
+
+      {/* Mobile: старый хедер */}
       <div className="md:hidden sticky top-0 z-10 bg-white border-b border-slate-200 p-4">
         <div className="flex items-center gap-3 mb-3">
           <Button 
@@ -170,53 +181,7 @@ const ObjectDetail = () => {
         </div>
       </div>
 
-      <div className="hidden md:block sticky top-0 z-10 bg-white border-b border-slate-200 px-4 md:px-6 py-3">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3 min-w-0 flex-1">
-            <Button 
-              variant="ghost" 
-              size="icon"
-              className="flex-shrink-0 mt-0.5"
-              onClick={() => navigate('/objects')}
-            >
-              <Icon name="ChevronLeft" size={24} />
-            </Button>
-            
-            <div className="min-w-0 flex-1">
-              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-slate-900 mb-1">{object.title}</h1>
-              {object.address && (
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <Icon name="MapPin" size={16} />
-                  <span className="truncate">{object.address}</span>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          {(user?.role === 'client' || user?.role === 'admin') && (
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => setShowActions(!showActions)}
-            >
-              <Icon name="MoreVertical" size={20} />
-            </Button>
-          )}
-        </div>
 
-        {showActions && (
-          <div className="mt-4 flex gap-2">
-            <Button variant="outline" size="sm" className="flex-1" onClick={handleEdit}>
-              <Icon name="Edit" size={18} className="mr-1" />
-              Изменить
-            </Button>
-            <Button variant="outline" size="sm" className="flex-1" onClick={handleDelete}>
-              <Icon name="Trash2" size={16} className="mr-1" />
-              Удалить
-            </Button>
-          </div>
-        )}
-      </div>
 
       <div className="md:hidden pb-24">
         {objectWorks.length === 0 ? (

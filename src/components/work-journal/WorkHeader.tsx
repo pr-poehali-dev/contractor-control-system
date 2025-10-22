@@ -38,7 +38,14 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
           
           <div className="flex-1 min-w-0">
             {organizationName && (
-              <div className="text-[10px] text-slate-500 truncate leading-tight mb-0.5">{organizationName}</div>
+              <button
+                onClick={() => navigate(`/objects/${objectId}/public`)}
+                className="text-[10px] text-slate-500 hover:text-blue-600 truncate leading-tight mb-0.5 flex items-center gap-1 transition-colors"
+              >
+                <Icon name="Building2" size={10} />
+                <span className="truncate">{organizationName}</span>
+                <Icon name="ExternalLink" size={8} />
+              </button>
             )}
             <h1 className="text-[14px] font-bold text-slate-900 leading-tight mb-1.5 line-clamp-2">{selectedWorkData.title}</h1>
             
