@@ -142,7 +142,8 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
         )}
       </div>
       
-      <div className="flex flex-wrap gap-2">
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide"
+           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="h-9 flex-shrink-0">
