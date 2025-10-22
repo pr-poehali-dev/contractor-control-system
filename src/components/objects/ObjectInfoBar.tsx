@@ -98,12 +98,9 @@ const ObjectInfoBar = ({ object, className = '', compact = false, onBack, onSett
         onClick={handleClick}
         className="flex-1 min-w-0 hover:opacity-80 transition-opacity text-left"
       >
-        <div className="flex items-center gap-2 mb-1">
-          <h3 className="text-base font-bold text-slate-900 truncate">
-            {object.title}
-          </h3>
-          {object.status && getStatusBadge(object.status)}
-        </div>
+        <h3 className="text-base font-bold text-slate-900 truncate mb-1">
+          {object.title}
+        </h3>
         {object.address && (
           <div className="flex items-center gap-1.5 text-sm text-slate-600">
             <Icon name="MapPin" size={14} />
