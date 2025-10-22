@@ -230,6 +230,8 @@ export default function DefectsSection({
       {defects.length > 0 ? (
         <div className="space-y-3">
           {defects.map((defect, index) => {
+            const [isExpanded, setIsExpanded] = useState(false);
+            
             const getSeverityBadge = (severity?: string) => {
               switch (severity) {
                 case 'critical':
@@ -246,59 +248,87 @@ export default function DefectsSection({
             };
 
             return (
-              <div key={defect.id} className="border border-slate-200 rounded-xl p-4 bg-gradient-to-br from-white to-slate-50 relative shadow-sm hover:shadow-md transition-shadow">
-                {isDraft && isClient && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onRemoveDefect(defect.id)}
-                    className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
-                  >
-                    <Icon name="X" size={16} />
-                  </Button>
-                )}
-                
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="bg-slate-200 text-slate-700 text-xs font-semibold px-2 py-1 rounded">
-                    #{index + 1}
-                  </span>
-                  {getSeverityBadge(defect.severity)}
-                </div>
-
-                <p className="text-slate-800 pr-8 mb-3 leading-relaxed font-medium">{defect.description}</p>
-                
-                {defect.location && (
-                  <div className="flex items-center gap-2 text-sm text-slate-600 mb-2">
-                    <Icon name="MapPin" size={14} className="text-slate-400" />
-                    <span>{defect.location}</span>
+              <div key={defect.id} className="border border-slate-200 rounded-xl bg-white relative shadow-sm hover:shadow-md transition-shadow">
+                <button
+                  type="button"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="w-full text-left p-4 flex items-start gap-3 hover:bg-slate-50 transition-colors rounded-xl"
+                >
+                  <Icon 
+                    name={isExpanded ? "ChevronDown" : "ChevronRight"} 
+                    size={20} 
+                    className="text-slate-500 flex-shrink-0 mt-0.5"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                      <span className="bg-slate-200 text-slate-700 text-xs font-semibold px-2 py-1 rounded">
+                        #{index + 1}
+                      </span>
+                      {getSeverityBadge(defect.severity)}
+                    </div>
+                    <p className="text-sm md:text-base text-slate-900 font-medium line-clamp-2">{defect.description}</p>
+                    {!isExpanded && (
+                      <p className="text-xs md:text-sm text-slate-500 mt-1">
+                        {[defect.location, defect.responsible].filter(Boolean).join(' • ')}
+                      </p>
+                    )}
                   </div>
-                )}
+                  {isDraft && isClient && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRemoveDefect(defect.id);
+                      }}
+                      className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600 flex-shrink-0"
+                    >
+                      <Icon name="X" size={16} />
+                    </Button>
+                  )}
+                </button>
 
-                {defect.responsible && (
-                  <div className="flex items-center gap-2 text-sm text-slate-600 mb-2">
-                    <Icon name="User" size={14} className="text-slate-400" />
-                    <span>{defect.responsible}</span>
-                  </div>
-                )}
+                {isExpanded && (
+                  <div className="px-4 pb-4 pl-11 space-y-3">
+                    <p className="text-slate-800 leading-relaxed">{defect.description}</p>
+                    
+                    {defect.location && (
+                      <div className="flex items-center gap-2 text-sm text-slate-600">
+                        <Icon name="MapPin" size={14} className="text-slate-400" />
+                        <span>{defect.location}</span>
+                      </div>
+                    )}
 
-                {defect.deadline && (
-                  <div className="flex items-center gap-2 text-sm text-slate-600 mb-2">
-                    <Icon name="Clock" size={14} className="text-slate-400" />
-                    <span>Устранить до: {new Date(defect.deadline).toLocaleDateString('ru-RU')}</span>
-                  </div>
-                )}
-                
-                {defect.photo_urls && defect.photo_urls.length > 0 && (
-                  <div className="grid grid-cols-3 gap-2 mt-3">
-                    {defect.photo_urls.map((url, idx) => (
-                      <img
-                        key={idx}
-                        src={url}
-                        alt={`Замечание ${index + 1} - фото ${idx + 1}`}
-                        className="w-full h-24 object-cover rounded-lg border-2 border-white shadow-sm cursor-pointer hover:scale-105 transition-transform"
-                        onClick={() => window.open(url, '_blank')}
-                      />
-                    ))}
+                    {defect.responsible && (
+                      <div className="flex items-center gap-2 text-sm text-slate-600">
+                        <Icon name="User" size={14} className="text-slate-400" />
+                        <span>{defect.responsible}</span>
+                      </div>
+                    )}
+
+                    {defect.deadline && (
+                      <div className="flex items-center gap-2 text-sm text-slate-600">
+                        <Icon name="Clock" size={14} className="text-slate-400" />
+                        <span>Устранить до: {new Date(defect.deadline).toLocaleDateString('ru-RU')}</span>
+                      </div>
+                    )}
+                    
+                    {defect.photo_urls && defect.photo_urls.length > 0 && (
+                      <div className="grid grid-cols-3 gap-2 mt-3">
+                        {defect.photo_urls.map((url, idx) => (
+                          <img
+                            key={idx}
+                            src={url}
+                            alt={`Замечание ${index + 1} - фото ${idx + 1}`}
+                            className="w-full h-24 object-cover rounded-lg border-2 border-white shadow-sm cursor-pointer hover:scale-105 transition-transform"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(url, '_blank');
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
