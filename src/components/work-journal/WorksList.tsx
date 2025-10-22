@@ -37,15 +37,15 @@ export default function WorksList({
   const isContractor = user?.role === 'contractor';
   return (
     <div className="hidden md:block w-96 bg-white border-r border-slate-200 flex-col">
-      {currentObject && (
-        <ObjectInfoBar 
-          object={currentObject} 
-          onBack={() => navigate('/objects')}
-          onSettings={() => navigate(`/objects/${objectId}/works/create`)}
-        />
-      )}
-      
-      <div className="border-b border-slate-100" />
+      <div className="border-b border-slate-100">
+        {currentObject && (
+          <ObjectInfoBar 
+            object={currentObject} 
+            onBack={() => navigate('/objects')}
+            onSettings={() => navigate(`/objects/${objectId}/works/create`)}
+          />
+        )}
+      </div>
 
       <div className="flex-1 overflow-y-auto flex flex-col">
         {works.length === 0 ? (
