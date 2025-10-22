@@ -39,15 +39,18 @@ const CreateWork = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="max-w-5xl mx-auto px-4 py-6 md:py-8">
+      <div className="max-w-5xl mx-auto px-4 py-4 md:py-8">
         <div className="mb-6">
-          <Button variant="ghost" onClick={handleCancel} className="mb-4">
-            <Icon name="ArrowLeft" size={18} className="mr-2" />
-            К объекту
-          </Button>
-          
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">{objectData.name || 'Загрузка...'}</h1>
-          <p className="text-slate-600">Управление объектом и работами</p>
+          <div className="flex items-center gap-2 md:gap-3 mb-2">
+            <button 
+              onClick={handleCancel}
+              className="flex-shrink-0 h-8 w-8 md:h-9 md:w-9 flex items-center justify-center hover:bg-slate-100 rounded-lg transition-colors"
+            >
+              <Icon name="ArrowLeft" size={20} className="text-slate-600" />
+            </button>
+            <h1 className="text-xl md:text-3xl font-bold flex-1 min-w-0 truncate">{objectData.name || 'Загрузка...'}</h1>
+          </div>
+          <p className="text-sm md:text-base text-slate-600 ml-10 md:ml-12">Управление объектом и работами</p>
         </div>
 
         <ObjectInfoSection 
