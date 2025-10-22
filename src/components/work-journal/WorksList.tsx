@@ -37,20 +37,13 @@ export default function WorksList({
   const isContractor = user?.role === 'contractor';
   return (
     <div className="hidden md:block w-96 bg-white border-r border-slate-200 flex-col">
-      <div className="p-4 border-b border-slate-200 space-y-3">
+      <div className="p-4 border-b border-slate-200">
         {currentObject && (
           <ObjectInfoBar object={currentObject} />
         )}
-        <div className="flex items-center justify-between">
-          <h3 className="font-bold text-lg">Работы ({works.length})</h3>
-          <Button
-            size="sm"
-            onClick={() => navigate(`/objects/${objectId}/works/create`)}
-          >Редактировать</Button>
-        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto flex flex-col">
         {works.length === 0 ? (
           <div className="p-8 text-center">
             <Icon name="Briefcase" size={48} className="text-slate-300 mx-auto mb-4" />
@@ -64,8 +57,9 @@ export default function WorksList({
             </Button>
           </div>
         ) : (
-          <div className="p-2">
-            {works.map((work) => {
+          <>
+            <div className="p-2 flex-1">
+              {works.map((work) => {
               const logs = workLogs.filter(log => log.work_id === work.id);
               const lastLog = logs[0];
               
@@ -120,6 +114,17 @@ export default function WorksList({
               );
             })}
           </div>
+          <div className="p-4 border-t border-slate-200">
+            <Button
+              className="w-full"
+              variant="outline"
+              onClick={() => navigate(`/objects/${objectId}/works/create`)}
+            >
+              <Icon name="Settings" size={16} className="mr-2" />
+              Редактировать
+            </Button>
+          </div>
+        </>
         )}
       </div>
     </div>
