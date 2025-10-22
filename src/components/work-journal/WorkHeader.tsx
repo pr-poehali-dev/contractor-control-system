@@ -25,40 +25,40 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
   return (
     <>
       {/* MOBILE: Compact header with back button */}
-      <div className="md:hidden bg-white border-b border-slate-200 px-2.5 py-2.5 overflow-x-hidden">
-        <div className="flex items-start gap-2 mb-2">
+      <div className="md:hidden bg-white border-b border-slate-200 px-4 py-3.5 overflow-x-hidden">
+        <div className="flex items-start gap-3 mb-2.5">
           <Button 
             variant="ghost" 
             size="icon"
-            className="flex-shrink-0 h-8 w-8"
+            className="flex-shrink-0 h-9 w-9"
             onClick={() => navigate(`/objects/${objectId}`)}
           >
-            <Icon name="ChevronLeft" size={18} />
+            <Icon name="ChevronLeft" size={20} />
           </Button>
           
           <div className="flex-1 min-w-0">
             {organizationName && (
               <button
                 onClick={() => navigate(`/objects/${objectId}/public`)}
-                className="text-[10px] text-slate-500 hover:text-blue-600 truncate leading-tight mb-0.5 flex items-center gap-1 transition-colors"
+                className="text-[11px] text-slate-500 hover:text-blue-600 truncate leading-tight mb-1 flex items-center gap-1 transition-colors"
               >
-                <Icon name="Building2" size={10} />
+                <Icon name="Building2" size={11} />
                 <span className="truncate">{organizationName}</span>
-                <Icon name="ExternalLink" size={8} />
+                <Icon name="ExternalLink" size={9} />
               </button>
             )}
-            <h1 className="text-[14px] font-bold text-slate-900 leading-tight mb-1.5 line-clamp-2">{selectedWorkData.title}</h1>
+            <h1 className="text-[15px] font-bold text-slate-900 leading-tight mb-2 line-clamp-2">{selectedWorkData.title}</h1>
             
-            <div className="flex items-center gap-2 flex-wrap mb-1">
+            <div className="flex items-center gap-2 flex-wrap mb-1.5">
               <Badge 
-                className={`text-[10px] font-semibold px-1.5 py-0.5 ${getWorkStatusInfo(selectedWorkData).color}`}
+                className={`text-[11px] font-semibold px-2 py-0.5 ${getWorkStatusInfo(selectedWorkData).color}`}
               >
                 {getWorkStatusInfo(selectedWorkData).icon} {getWorkStatusInfo(selectedWorkData).message}
               </Badge>
               
               {selectedWorkData.planned_start_date && (
-                <div className="flex items-center gap-1 text-[10px] text-slate-500">
-                  <Icon name="Calendar" size={11} />
+                <div className="flex items-center gap-1 text-[11px] text-slate-500">
+                  <Icon name="Calendar" size={12} />
                   <span>{formatDateRange(selectedWorkData.planned_start_date, selectedWorkData.planned_end_date)}</span>
                 </div>
               )}
@@ -77,9 +77,9 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
               variant="ghost" 
               size="icon"
               onClick={() => navigate(`/objects/${objectId}/works/create`)}
-              className="h-8 w-8 flex-shrink-0"
+              className="h-9 w-9 flex-shrink-0"
             >
-              <Icon name="Settings" size={16} />
+              <Icon name="Settings" size={18} />
             </Button>
           )}
         </div>
