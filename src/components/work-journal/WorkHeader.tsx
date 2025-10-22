@@ -85,11 +85,11 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
         </div>
 
         {/* Mobile tabs */}
-        <div className="border-t border-slate-200 -mx-4 px-4 py-1">
+        <div className="border-t border-slate-200 -mx-4 px-4 pt-1 pb-0">
         <div className="grid grid-cols-5 gap-1">
           <button
             onClick={() => setActiveTab('journal')}
-            className={`py-1 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
+            className={`pt-1 pb-0.5 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
               activeTab === 'journal'
                 ? 'text-blue-600 bg-blue-50'
                 : 'text-slate-600'
@@ -100,7 +100,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
           </button>
           <button
             onClick={() => setActiveTab('info')}
-            className={`py-1 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
+            className={`pt-1 pb-0.5 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
               activeTab === 'info'
                 ? 'text-blue-600 bg-blue-50'
                 : 'text-slate-600'
@@ -111,7 +111,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
           </button>
           <button
             onClick={() => setActiveTab('description')}
-            className={`py-1 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
+            className={`pt-1 pb-0.5 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
               activeTab === 'description'
                 ? 'text-blue-600 bg-blue-50'
                 : 'text-slate-600'
@@ -122,7 +122,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
           </button>
           <button
             onClick={() => setActiveTab('estimate')}
-            className={`py-1 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
+            className={`pt-1 pb-0.5 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
               activeTab === 'estimate'
                 ? 'text-blue-600 bg-blue-50'
                 : 'text-slate-600'
@@ -133,7 +133,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
           </button>
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`py-1 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
+            className={`pt-1 pb-0.5 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
               activeTab === 'analytics'
                 ? 'text-blue-600 bg-blue-50'
                 : 'text-slate-600'
