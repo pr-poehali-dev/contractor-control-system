@@ -97,18 +97,12 @@ const ScheduleTab = ({ works, onRefresh, isRefreshing }: ScheduleTabProps) => {
                           <div 
                             className="h-full bg-blue-600 rounded-full transition-all"
                             style={{
-                              width: `${Math.min(100, Math.max(0, 
-                                ((new Date().getTime() - new Date(work.start_date!).getTime()) / 
-                                (new Date(work.end_date!).getTime() - new Date(work.start_date!).getTime())) * 100
-                              ))}%`
+                              width: `${parseFloat(work.progress) || 0}%`
                             }}
                           />
                         </div>
-                        <span className="text-xs text-slate-500 min-w-[45px] text-right">
-                          {Math.min(100, Math.max(0, Math.round(
-                            ((new Date().getTime() - new Date(work.start_date!).getTime()) / 
-                            (new Date(work.end_date!).getTime() - new Date(work.start_date!).getTime())) * 100
-                          )))}%
+                        <span className="text-xs font-semibold text-slate-700 min-w-[45px] text-right">
+                          {Math.round(parseFloat(work.progress) || 0)}%
                         </span>
                       </div>
                     </div>

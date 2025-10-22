@@ -84,7 +84,7 @@ const PublicObject = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+      <div className="bg-white border-b border-slate-200 shadow-sm">
         <ObjectHeader object={object} onBack={() => navigate('/profile')} />
         <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
@@ -92,7 +92,7 @@ const PublicObject = () => {
       <div className="container max-w-4xl mx-auto px-4 py-6">
         <div className="space-y-6">
           {activeTab === 'info' && <InfoTab object={object} formatDate={formatDate} />}
-          {activeTab === 'journal' && <JournalTab works={works} />}
+          {activeTab === 'journal' && <JournalTab objectId={Number(objectId)} />}
           {activeTab === 'schedule' && (
             <ScheduleTab 
               works={works} 
@@ -100,8 +100,8 @@ const PublicObject = () => {
               isRefreshing={isRefreshing}
             />
           )}
-          {activeTab === 'analytics' && <AnalyticsTab />}
-          {activeTab === 'inspections' && <InspectionsTab />}
+          {activeTab === 'analytics' && <AnalyticsTab objectId={Number(objectId)} />}
+          {activeTab === 'inspections' && <InspectionsTab objectId={Number(objectId)} />}
         </div>
       </div>
     </div>
