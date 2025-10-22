@@ -50,12 +50,6 @@ export function InspectionInfoCard({
   return (
     <Card className="mb-6">
       <CardContent className="p-4 md:p-6">
-        <div className="flex items-center gap-2 flex-wrap mb-4">
-          <Badge variant="outline" className={cn("text-xs", statusConfig.className)}>
-            {statusConfig.label}
-          </Badge>
-        </div>
-
         <div className="space-y-3">
           {objectTitle && (
             <div className="flex items-start gap-3">
@@ -80,6 +74,18 @@ export function InspectionInfoCard({
               </div>
             </div>
           )}
+
+          <div className="flex items-start gap-3">
+            <div className="bg-slate-100 p-2 rounded-lg shrink-0">
+              <Icon name="CheckCircle2" size={18} className="text-slate-600" />
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 mb-0.5">Статус</p>
+              <Badge variant="outline" className={cn("text-xs", statusConfig.className)}>
+                {statusConfig.label}
+              </Badge>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
