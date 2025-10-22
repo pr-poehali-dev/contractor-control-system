@@ -71,27 +71,31 @@ const ScheduleTab = ({ works, onRefresh, isRefreshing }: ScheduleTabProps) => {
             <div className="space-y-3">
               {worksWithDates.map((work) => (
                 <Card key={work.id}>
-                  <CardContent className="p-4">
-                    <div className="space-y-3">
+                  <CardContent className="p-3 md:p-4">
+                    <div className="space-y-2.5">
                       <div>
-                        <h3 className="font-semibold text-slate-900">{work.title}</h3>
+                        <h3 className="font-semibold text-slate-900 text-sm md:text-base">{work.title}</h3>
                         {work.contractor_name && (
-                          <p className="text-sm text-slate-500 mt-1 flex items-center gap-1">
-                            <Icon name="Users" size={14} />
+                          <p className="text-xs md:text-sm text-slate-500 mt-0.5 flex items-center gap-1">
+                            <Icon name="Users" size={12} />
                             {work.contractor_name}
                           </p>
                         )}
                       </div>
-                      <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-sm">
-                        <div className="flex items-center gap-1.5 text-slate-600">
-                          <Icon name="CalendarDays" size={16} className="text-green-600" />
-                          <span className="font-medium">Начало:</span>
-                          <span>{new Date(work.start_date || work.planned_start_date!).toLocaleDateString('ru-RU')}</span>
+                      <div className="flex flex-col gap-1.5 text-xs md:text-sm">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 text-slate-600">
+                            <Icon name="CalendarDays" size={14} className="text-green-600" />
+                            <span className="font-medium">Начало:</span>
+                          </div>
+                          <span className="text-slate-900">{new Date(work.start_date || work.planned_start_date!).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-slate-600">
-                          <Icon name="CalendarCheck" size={16} className="text-blue-600" />
-                          <span className="font-medium">Окончание:</span>
-                          <span>{new Date(work.end_date || work.planned_end_date!).toLocaleDateString('ru-RU')}</span>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 text-slate-600">
+                            <Icon name="CalendarCheck" size={14} className="text-blue-600" />
+                            <span className="font-medium">Окончание:</span>
+                          </div>
+                          <span className="text-slate-900">{new Date(work.end_date || work.planned_end_date!).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -103,7 +107,7 @@ const ScheduleTab = ({ works, onRefresh, isRefreshing }: ScheduleTabProps) => {
                             }}
                           />
                         </div>
-                        <span className="text-xs font-semibold text-slate-700 min-w-[45px] text-right">
+                        <span className="text-xs font-semibold text-slate-700 min-w-[40px] text-right">
                           {Math.round(work.completion_percentage || parseFloat(work.progress || '0') || 0)}%
                         </span>
                       </div>
