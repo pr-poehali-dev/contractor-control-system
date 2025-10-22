@@ -72,7 +72,7 @@ const ObjectInfoBar = ({ object, className = '', compact = false, onBack, onSett
   }
 
   return (
-    <div className={`w-full bg-gradient-to-b from-white to-slate-50/50 px-6 pt-[18px] pb-4 flex items-start gap-4 ${className}`}>
+    <div className={`w-full bg-gradient-to-b from-white to-slate-50/50 px-6 pt-[18px] pb-[52px] flex items-start gap-4 ${className}`}>
       {onBack ? (
         <button
           onClick={onBack}
