@@ -85,62 +85,62 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
         </div>
 
         {/* Mobile tabs */}
-        <div className="border-t border-slate-200 my-0 py-0.5">
-        <div className="grid grid-cols-5 gap-1 py-0">
+        <div className="border-t border-slate-200 -mx-4 px-4 pt-2 pb-1">
+        <div className="grid grid-cols-5 gap-1">
           <button
             onClick={() => setActiveTab('journal')}
-            className={`py-1.5 text-[11px] font-semibold transition-all relative flex flex-col items-center gap-0.5 rounded-lg ${
+            className={`py-2 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
               activeTab === 'journal'
-                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100'
-                : 'text-slate-500'
+                ? 'text-blue-600 bg-blue-50'
+                : 'text-slate-600'
             }`}
           >
-            <Icon name="MessageSquare" size={16} />
-            <span className="text-[9px]">Журнал</span>
+            <Icon name="MessageSquare" size={18} />
+            <span className="text-[10px] font-medium">Журнал</span>
           </button>
           <button
             onClick={() => setActiveTab('info')}
-            className={`py-1.5 text-[11px] font-semibold transition-all relative flex flex-col items-center gap-0.5 rounded-lg ${
+            className={`py-2 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
               activeTab === 'info'
-                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100'
-                : 'text-slate-500'
+                ? 'text-blue-600 bg-blue-50'
+                : 'text-slate-600'
             }`}
           >
-            <Icon name="Info" size={16} />
-            <span className="text-[9px]">Инфо</span>
+            <Icon name="Info" size={18} />
+            <span className="text-[10px] font-medium">Инфо</span>
           </button>
           <button
             onClick={() => setActiveTab('description')}
-            className={`py-1.5 text-[11px] font-semibold transition-all relative flex flex-col items-center gap-0.5 rounded-lg ${
+            className={`py-2 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
               activeTab === 'description'
-                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100'
-                : 'text-slate-500'
+                ? 'text-blue-600 bg-blue-50'
+                : 'text-slate-600'
             }`}
           >
-            <Icon name="FileText" size={16} />
-            <span className="text-[9px]">Докум.</span>
+            <Icon name="FileText" size={18} />
+            <span className="text-[10px] font-medium">Докум.</span>
           </button>
           <button
             onClick={() => setActiveTab('estimate')}
-            className={`py-1.5 text-[11px] font-semibold transition-all relative flex flex-col items-center gap-0.5 rounded-lg ${
+            className={`py-2 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
               activeTab === 'estimate'
-                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100'
-                : 'text-slate-500'
+                ? 'text-blue-600 bg-blue-50'
+                : 'text-slate-600'
             }`}
           >
-            <Icon name="Calculator" size={16} />
-            <span className="text-[9px]">Смета</span>
+            <Icon name="Calculator" size={18} />
+            <span className="text-[10px] font-medium">Смета</span>
           </button>
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`py-1.5 text-[11px] font-semibold transition-all relative flex flex-col items-center gap-0.5 rounded-lg ${
+            className={`py-2 transition-all relative flex flex-col items-center gap-1 rounded-lg ${
               activeTab === 'analytics'
-                ? 'text-blue-600 bg-gradient-to-br from-blue-50 to-blue-100'
-                : 'text-slate-500'
+                ? 'text-blue-600 bg-blue-50'
+                : 'text-slate-600'
             }`}
           >
-            <Icon name="BarChart" size={16} />
-            <span className="text-[9px]">Данные</span>
+            <Icon name="BarChart" size={18} />
+            <span className="text-[10px] font-medium">Данные</span>
           </button>
         </div>
         </div>
