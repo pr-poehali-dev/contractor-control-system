@@ -47,20 +47,29 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
                 <Icon name="ExternalLink" size={9} />
               </button>
             )}
-            <h1 className="text-[15px] font-bold text-slate-900 leading-tight mb-2 line-clamp-2">{selectedWorkData.title}</h1>
+            <h1 className="text-[15px] font-bold text-slate-900 leading-tight mb-2">{selectedWorkData.title}</h1>
             
             <div className="flex items-center gap-2 flex-wrap mb-1.5">
               <Badge 
-                className={`text-[11px] font-semibold px-2 py-0.5 ${getWorkStatusInfo(selectedWorkData).color}`}
+                className={`text-[11px] font-semibold px-2 py-0.5 flex-shrink-0 ${getWorkStatusInfo(selectedWorkData).color}`}
               >
                 {getWorkStatusInfo(selectedWorkData).icon} {getWorkStatusInfo(selectedWorkData).message}
               </Badge>
               
               {selectedWorkData.planned_start_date && (
-                <div className="flex items-center gap-1 text-[11px] text-slate-500">
+                <div className="flex items-center gap-1 text-[11px] text-slate-500 flex-shrink-0">
                   <Icon name="Calendar" size={12} />
                   <span>{formatDateRange(selectedWorkData.planned_start_date, selectedWorkData.planned_end_date)}</span>
                 </div>
+              )}
+              
+              {(userRole === 'client' || userRole === 'admin') && (
+                <button
+                  onClick={() => navigate(`/objects/${objectId}/works/create`)}
+                  className="ml-auto flex-shrink-0 h-7 w-7 flex items-center justify-center hover:bg-slate-100 rounded-lg transition-colors"
+                >
+                  <Icon name="Settings" size={16} className="text-slate-600" />
+                </button>
               )}
             </div>
             
@@ -71,17 +80,6 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
               size="xs"
             />
           </div>
-
-          {(userRole === 'client' || userRole === 'admin') && (
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => navigate(`/objects/${objectId}/works/create`)}
-              className="h-9 w-9 flex-shrink-0"
-            >
-              <Icon name="Settings" size={18} />
-            </Button>
-          )}
         </div>
 
         {/* Mobile tabs */}
