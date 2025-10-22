@@ -11,6 +11,7 @@ interface WorkHeaderProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   organizationName?: string;
+  objectAddress?: string;
   userRole?: string;
   onEdit?: () => void;
   unreadMessages?: number;
@@ -18,7 +19,7 @@ interface WorkHeaderProps {
   unreadInspections?: number;
 }
 
-export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, organizationName, userRole, onEdit, unreadMessages, unreadLogs, unreadInspections }: WorkHeaderProps) {
+export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, organizationName, objectAddress, userRole, onEdit, unreadMessages, unreadLogs, unreadInspections }: WorkHeaderProps) {
   const navigate = useNavigate();
   const { objectId } = useParams();
 
@@ -147,7 +148,30 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
       </div>
 
       {/* DESKTOP: Original header */}
-      <div className="hidden md:block bg-gradient-to-b from-white to-slate-50/50 border-b border-slate-200 px-6 pt-5 pb-0">
+      <div className="hidden md:block bg-gradient-to-b from-white to-slate-50/50 border-b border-slate-200 px-6 pt-4 pb-0">
+        {/* Object info */}
+        {organizationName && (
+          <button
+            onClick={() => navigate(`/public/objects/${objectId}`)}
+            className="flex items-center gap-2.5 mb-3 group hover:bg-slate-50/50 -mx-2 px-2 py-1.5 rounded-lg transition-colors"
+          >
+            <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <Icon name="Building2" size={18} className="text-white" />
+            </div>
+            <div className="flex-1 min-w-0 text-left">
+              <div className="text-sm font-bold text-slate-900 truncate group-hover:text-blue-600 transition-colors">
+                {organizationName}
+              </div>
+              {objectAddress && (
+                <div className="flex items-center gap-1 text-xs text-slate-500">
+                  <Icon name="MapPin" size={12} />
+                  <span className="truncate">{objectAddress}</span>
+                </div>
+              )}
+            </div>
+            <Icon name="ExternalLink" size={14} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
+          </button>
+        )}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-start gap-4 flex-1 min-w-0 mr-4">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex-shrink-0 flex items-center justify-center shadow-md">
