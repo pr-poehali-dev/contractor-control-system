@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
@@ -20,6 +21,8 @@ export function InspectionInfoCard({
   workTitle,
   objectTitle,
 }: InspectionInfoCardProps) {
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
   const getStatusConfig = (status: string) => {
     switch (status) {
       case 'draft':
@@ -49,8 +52,30 @@ export function InspectionInfoCard({
 
   return (
     <Card className="mb-6">
-      <CardContent className="p-4 md:p-6">
-        <div className="space-y-3">
+      <CardContent className="p-3 md:p-4">
+        <button
+          type="button"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="flex items-start gap-2 md:gap-3 w-full text-left hover:opacity-70 transition-opacity min-w-0"
+        >
+          <Icon 
+            name={isCollapsed ? "ChevronRight" : "ChevronDown"} 
+            size={20} 
+            className="text-slate-500 flex-shrink-0 mt-0.5"
+          />
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm md:text-base font-semibold leading-tight mb-1.5">Информация о проверке</h3>
+            {isCollapsed && (
+              <p className="text-xs md:text-sm text-slate-500">
+                {objectTitle && `${objectTitle} • `}
+                {workTitle}
+              </p>
+            )}
+          </div>
+        </button>
+
+        {!isCollapsed && (
+          <div className="space-y-3 pl-8 mt-3">
           {objectTitle && (
             <div className="flex items-start gap-3">
               <div className="bg-blue-100 p-2 rounded-lg shrink-0">
@@ -87,6 +112,7 @@ export function InspectionInfoCard({
             </div>
           </div>
         </div>
+        )}
       </CardContent>
     </Card>
   );
