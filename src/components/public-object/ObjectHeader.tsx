@@ -10,23 +10,15 @@ interface ObjectHeaderProps {
 const ObjectHeader = ({ object, onBack }: ObjectHeaderProps) => {
   return (
     <div className="container max-w-4xl mx-auto px-4 py-3">
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center gap-3 mb-2">
         <Button 
           variant="ghost" 
           size="icon"
           onClick={onBack}
+          className="flex-shrink-0"
         >
           <Icon name="ArrowLeft" size={20} />
         </Button>
-        <Button 
-          variant="ghost" 
-          size="icon"
-        >
-          <Icon name="MoreVertical" size={20} />
-        </Button>
-      </div>
-
-      <div className="flex items-center gap-3 mb-2">
         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center flex-shrink-0">
           <Icon name="Building2" size={24} className="text-blue-600" />
         </div>
