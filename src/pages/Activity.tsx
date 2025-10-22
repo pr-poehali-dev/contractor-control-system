@@ -72,6 +72,8 @@ const Activity = () => {
         workId: insp.work_id,
         contractorId: work?.contractor_id,
         objectId: work?.object_id,
+        inspectionNumber: insp.inspection_number,
+        workTitle: work?.title,
       };
     }),
     ...infoPosts.map(post => {
@@ -221,19 +223,52 @@ const Activity = () => {
             {filteredActivity.map((item, index) => (
               <Card 
                 key={item.id}
-                className="animate-fade-in hover:shadow-md transition-shadow"
+                className="animate-fade-in hover:shadow-md transition-shadow overflow-hidden"
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
+                {item.type === 'check' && (
+                  <div className="bg-gradient-to-r from-amber-50 to-orange-50 px-6 py-3 border-b flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-white rounded-lg px-3 py-1.5 shadow-sm border border-amber-200">
+                        <span className="text-sm font-semibold text-amber-900">{item.title}</span>
+                      </div>
+                      {item.objectId && (
+                        <div className="flex items-center gap-1.5 text-sm text-slate-700">
+                          <Icon name="MapPin" size={14} />
+                          <span className="font-medium">{getObjectTitle(item.objectId)}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 rounded-full text-xs font-medium text-amber-900 border border-amber-200">
+                      <Icon name="Zap" size={12} />
+                      <span>Внеплановая</span>
+                    </div>
+                  </div>
+                )}
+                
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getIconColor(item.type)}`}>
-                      <Icon name={getIcon(item.type) as any} size={20} />
-                    </div>
+                    {item.type !== 'check' && (
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getIconColor(item.type)}`}>
+                        <Icon name={getIcon(item.type) as any} size={20} />
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-slate-900 mb-1">{item.title}</h3>
+                          {item.type !== 'check' && (
+                            <h3 className="font-semibold text-slate-900 mb-1">{item.title}</h3>
+                          )}
+                          
+                          {item.type === 'check' && item.workId && (
+                            <div className="flex items-center gap-2 mb-2">
+                              <Icon name="Wrench" size={14} className="text-slate-500" />
+                              <span className="text-sm font-medium text-slate-700">Работа: {getWorkTitle(item.workId)}</span>
+                            </div>
+                          )}
+                          
                           <p className="text-sm text-slate-600 mb-2">{item.description}</p>
+                          
                           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
                             <span className="flex items-center gap-1">
                               <Icon name="User" size={12} />
@@ -243,13 +278,13 @@ const Activity = () => {
                               <Icon name="Clock" size={12} />
                               {formatTimestamp(item.timestamp)}
                             </span>
-                            {item.objectId && (
+                            {item.type !== 'check' && item.objectId && (
                               <span className="flex items-center gap-1">
                                 <Icon name="Building" size={12} />
                                 {getObjectTitle(item.objectId)}
                               </span>
                             )}
-                            {item.workId && (
+                            {item.type !== 'check' && item.workId && (
                               <span className="flex items-center gap-1">
                                 <Icon name="Briefcase" size={12} />
                                 {getWorkTitle(item.workId)}
