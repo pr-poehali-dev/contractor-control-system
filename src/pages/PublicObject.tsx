@@ -85,7 +85,7 @@ const PublicObject = () => {
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
       <div className="bg-white border-b border-slate-200 shadow-sm">
-        <ObjectHeader object={object} onBack={() => navigate('/profile')} />
+        <ObjectHeader object={object} onBack={() => navigate(-1)} />
         <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
 
