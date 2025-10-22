@@ -138,9 +138,9 @@ export const WorkFormCard = ({
         )}
 
         {!isCollapsed && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 px-3 md:pl-8 md:pr-0">
             <div>
-              <Label htmlFor={`category-${work.id}`} className="text-sm">
+              <Label htmlFor={`category-${work.id}`} className="text-xs md:text-sm mb-1">
                 Категория работ <span className="text-red-500">*</span>
               </Label>
               <Select
@@ -154,7 +154,7 @@ export const WorkFormCard = ({
                 }}
                 disabled={work.isExisting}
               >
-                <SelectTrigger id={`category-${work.id}`} className="h-9">
+                <SelectTrigger id={`category-${work.id}`} className="h-9 md:h-10 text-sm">
                   <SelectValue placeholder="Выберите категорию" />
                 </SelectTrigger>
                 <SelectContent>
@@ -168,7 +168,7 @@ export const WorkFormCard = ({
             </div>
 
             <div key={`title-container-${work.id}-${work.category}`}>
-              <Label htmlFor={`title-${work.id}`} className="text-sm">
+              <Label htmlFor={`title-${work.id}`} className="text-xs md:text-sm mb-1">
                 Вид работ <span className="text-red-500">*</span>
               </Label>
               {work.category ? (
@@ -178,7 +178,7 @@ export const WorkFormCard = ({
                   onValueChange={(value) => onUpdate(work.id, 'title', value)}
                   disabled={work.isExisting}
                 >
-                  <SelectTrigger id={`title-${work.id}`} className={cn(!work.title && 'border-red-300', "h-9")}>
+                  <SelectTrigger id={`title-${work.id}`} className={cn(!work.title && 'border-red-300', "h-9 md:h-10 text-sm")}>
                     <SelectValue placeholder="Выберите вид работ" />
                   </SelectTrigger>
                   <SelectContent>
@@ -192,31 +192,31 @@ export const WorkFormCard = ({
                   </SelectContent>
                 </Select>
               ) : (
-                <div className="h-9 flex items-center px-3 text-sm text-slate-400 border border-slate-200 rounded-md bg-slate-50">
+                <div className="h-9 md:h-10 flex items-center px-3 text-xs md:text-sm text-slate-400 border border-slate-200 rounded-md bg-slate-50">
                   Сначала выберите категорию
                 </div>
               )}
             </div>
 
             <div>
-              <Label htmlFor={`volume-${work.id}`} className="text-sm">Объём работ</Label>
+              <Label htmlFor={`volume-${work.id}`} className="text-xs md:text-sm mb-1">Объём работ</Label>
               <Input
                 id={`volume-${work.id}`}
                 type="number"
                 placeholder="0"
                 value={work.volume}
                 onChange={(e) => onUpdate(work.id, 'volume', e.target.value)}
-                className="h-9"
+                className="h-9 md:h-10 text-sm"
               />
             </div>
 
             <div>
-              <Label htmlFor={`unit-${work.id}`} className="text-sm">Единица измерения</Label>
+              <Label htmlFor={`unit-${work.id}`} className="text-xs md:text-sm mb-1">Единица измерения</Label>
               <Select
                 value={work.unit}
                 onValueChange={(value) => onUpdate(work.id, 'unit', value)}
               >
-                <SelectTrigger id={`unit-${work.id}`} className="h-9">
+                <SelectTrigger id={`unit-${work.id}`} className="h-9 md:h-10 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -230,34 +230,34 @@ export const WorkFormCard = ({
             </div>
 
             <div>
-              <Label htmlFor={`start-${work.id}`} className="text-sm">Плановое начало</Label>
+              <Label htmlFor={`start-${work.id}`} className="text-xs md:text-sm mb-1">Плановое начало</Label>
               <Input
                 id={`start-${work.id}`}
                 type="date"
                 value={work.planned_start_date}
                 onChange={(e) => onUpdate(work.id, 'planned_start_date', e.target.value)}
-                className="h-9"
+                className="h-9 md:h-10 text-sm"
               />
             </div>
 
             <div>
-              <Label htmlFor={`end-${work.id}`} className="text-sm">Плановое окончание</Label>
+              <Label htmlFor={`end-${work.id}`} className="text-xs md:text-sm mb-1">Плановое окончание</Label>
               <Input
                 id={`end-${work.id}`}
                 type="date"
                 value={work.planned_end_date}
                 onChange={(e) => onUpdate(work.id, 'planned_end_date', e.target.value)}
-                className="h-9"
+                className="h-9 md:h-10 text-sm"
               />
             </div>
 
             <div className="md:col-span-2">
-              <Label htmlFor={`contractor-${work.id}`} className="text-sm">Подрядчик</Label>
+              <Label htmlFor={`contractor-${work.id}`} className="text-xs md:text-sm mb-1">Подрядчик</Label>
               <Select
                 value={work.contractor_id || 'none'}
                 onValueChange={(value) => onUpdate(work.id, 'contractor_id', value === 'none' ? '' : value)}
               >
-                <SelectTrigger id={`contractor-${work.id}`} className="h-9">
+                <SelectTrigger id={`contractor-${work.id}`} className="h-9 md:h-10 text-sm">
                   <SelectValue placeholder="Не выбран" />
                 </SelectTrigger>
                 <SelectContent>
