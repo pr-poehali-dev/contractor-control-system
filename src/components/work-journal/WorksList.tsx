@@ -7,7 +7,8 @@ import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
 import { useAuth } from '@/contexts/AuthContext';
-import type { Work } from '@/contexts/AuthContext';
+import ObjectInfoBar from '@/components/objects/ObjectInfoBar';
+import type { Work, ObjectData } from '@/contexts/AuthContext';
 
 interface WorksListProps {
   works: Work[];
@@ -17,6 +18,7 @@ interface WorksListProps {
   getInitials: (name: string) => string;
   formatTime: (timestamp: string) => string;
   objectId: number;
+  currentObject?: ObjectData;
 }
 
 export default function WorksList({
@@ -34,8 +36,11 @@ export default function WorksList({
   const isContractor = user?.role === 'contractor';
   return (
     <div className="hidden md:block w-80 bg-white border-r border-slate-200 flex-col">
-      <div className="p-4 border-b border-slate-200">
-        <div className="flex items-center justify-between mb-3">
+      <div className="p-4 border-b border-slate-200 space-y-3">
+        {currentObject && (
+          <ObjectInfoBar object={currentObject} />
+        )}
+        <div className="flex items-center justify-between">
           <h3 className="font-bold text-lg">Работы ({works.length})</h3>
           <Button
             size="sm"

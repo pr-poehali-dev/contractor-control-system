@@ -22,7 +22,6 @@ import WorkEditDialog from '@/components/work-detail/WorkEditDialog';
 import JournalTabContent from '@/components/work-journal/JournalTabContent';
 import { NoWorksEmptyState, NoWorkSelectedEmptyState } from '@/components/work-journal/WorkJournalEmptyStates';
 import { useWorkJournalHandlers } from '@/components/work-journal/useWorkJournalHandlers';
-import ObjectHeader from '@/components/objects/ObjectHeader';
 import type { JournalEvent, UserRole } from '@/types/journal';
 
 interface WorkJournalProps {
@@ -252,16 +251,6 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
 
   return (
     <div className="flex flex-col h-full bg-white overflow-x-hidden">
-      {/* ObjectHeader - только для desktop */}
-      {currentObject && (
-        <div className="hidden md:block">
-          <ObjectHeader 
-            object={currentObject}
-            onEdit={user?.role === 'client' || user?.role === 'admin' ? () => navigate(`/objects/${objectId}/edit`) : undefined}
-          />
-        </div>
-      )}
-
       <div className="flex flex-1 min-h-0">
         <WorksList
           works={works}
@@ -271,6 +260,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
           getInitials={getInitials}
           formatTime={formatTime}
           objectId={objectId}
+          currentObject={currentObject}
         />
 
         <div className="flex-1 flex flex-col bg-slate-50 min-w-0">

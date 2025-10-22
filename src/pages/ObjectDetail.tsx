@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/select";
 import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
 import { NotificationGroup } from '@/components/ui/notification-badge';
-import ObjectHeader from '@/components/objects/ObjectHeader';
 
 const ObjectDetail = () => {
   const { objectId } = useParams();
@@ -123,15 +122,6 @@ const ObjectDetail = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Desktop: Новый ObjectHeader */}
-      <div className="hidden md:block">
-        <ObjectHeader 
-          object={object} 
-          showBackButton 
-          onEdit={user?.role === 'client' || user?.role === 'admin' ? handleEdit : undefined}
-        />
-      </div>
-
       {/* Mobile: старый хедер */}
       <div className="md:hidden sticky top-0 z-10 bg-white border-b border-slate-200 p-4">
         <div className="flex items-center gap-3 mb-3">
