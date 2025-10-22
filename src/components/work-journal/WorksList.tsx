@@ -40,7 +40,7 @@ export default function WorksList({
           <Button
             size="sm"
             onClick={() => navigate(`/objects/${objectId}/works/create`)}
-          >Управление</Button>
+          >Редактировать</Button>
         </div>
       </div>
 
