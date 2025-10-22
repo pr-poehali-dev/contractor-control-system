@@ -93,12 +93,17 @@ export const WorkFormCard = ({
               )}
             </div>
             {isCollapsed && (
-              <p className="text-xs md:text-sm text-slate-500">
-                Подрядчик: {getContractorName()} • 
-                {work.planned_start_date && ` ${formatDate(work.planned_start_date)}`}
-                {work.planned_end_date && ` — ${formatDate(work.planned_end_date)}`}
-                {!work.planned_start_date && !work.planned_end_date && ' Даты не указаны'}
-              </p>
+              <div className="space-y-0.5 text-xs md:text-sm text-slate-500">
+                <div>Подрядчик: {getContractorName()}</div>
+                {(work.planned_start_date || work.planned_end_date) ? (
+                  <div>
+                    {work.planned_start_date && formatDate(work.planned_start_date)}
+                    {work.planned_end_date && ` — ${formatDate(work.planned_end_date)}`}
+                  </div>
+                ) : (
+                  <div>Даты не указаны</div>
+                )}
+              </div>
             )}
           </div>
         </button>
