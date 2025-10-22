@@ -113,56 +113,55 @@ const Defects = () => {
                 navigate(`/inspection/${inspection.id}`);
               }}
             >
-              <CardContent className="p-4 md:p-6">
-                <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-3">
+              <CardContent className="p-5 md:p-6">
+                <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                   <div className="flex-1 w-full">
-                    <div className="flex flex-wrap items-center gap-2 mb-3">
-                      {inspection.object && (
-                        <div className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm font-medium flex items-center gap-1.5">
-                          <Icon name="MapPin" size={14} />
-                          {inspection.object.title}
-                        </div>
-                      )}
-                    </div>
+                    {inspection.object && (
+                      <div className="flex items-center gap-1.5 text-sm text-slate-600 mb-3">
+                        <Icon name="MapPin" size={15} className="text-slate-500" />
+                        <span className="font-medium">{inspection.object.title}</span>
+                      </div>
+                    )}
                     
-                    <h3 className="font-semibold text-base md:text-lg mb-2">
+                    <h3 className="font-bold text-lg md:text-xl text-slate-900 mb-3">
                       Проверка №{inspection.inspection_number}
                     </h3>
                     
                     {inspection.work && (
-                      <div className="mb-3">
-                        <span className="text-base text-slate-700"><strong>Работа:</strong> {inspection.work.title}</span>
+                      <div className="mb-4">
+                        <span className="text-slate-600 text-sm"><span className="font-semibold text-slate-900">Работа:</span> {inspection.work.title}</span>
                       </div>
                     )}
                     
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <Badge className={getStatusColor(inspection.status)}>
                         {getStatusLabel(inspection.status)}
                       </Badge>
                       {inspection.type && (
-                        <span className="text-sm text-slate-600">
-                          {inspection.type === 'scheduled' ? '📅 Плановая' : '⚡ Внеплановая'}
+                        <span className="text-xs text-slate-500 flex items-center gap-1">
+                          <Icon name={inspection.type === 'scheduled' ? 'Calendar' : 'Zap'} size={13} />
+                          {inspection.type === 'scheduled' ? 'Плановая' : 'Внеплановая'}
                         </span>
                       )}
                     </div>
                     
                     {inspection.description && (
-                      <p className="text-slate-700 mt-2 text-sm">{inspection.description}</p>
+                      <p className="text-slate-600 mt-3 text-sm leading-relaxed">{inspection.description}</p>
                     )}
                   </div>
                   
                   {inspection.defectsCount > 0 && (
-                    <div className="flex items-center gap-2 px-3 py-2 bg-red-100 rounded-lg self-start">
+                    <div className="flex items-center gap-2 px-3 py-2 bg-red-50 rounded-lg border border-red-200 self-start">
                       <Icon name="AlertCircle" size={18} className="text-red-600" />
-                      <span className="font-semibold text-red-600">{inspection.defectsCount}</span>
+                      <span className="font-bold text-red-600 text-lg">{inspection.defectsCount}</span>
                     </div>
                   )}
                 </div>
 
                 {inspection.scheduled_date && (
-                  <div className="flex gap-2 text-sm text-slate-600 mt-4">
-                    <Icon name="Calendar" size={16} />
-                    <span><strong>Запланирована:</strong> {formatDate(inspection.scheduled_date)}</span>
+                  <div className="flex gap-2 text-xs text-slate-500 mt-4 pt-4 border-t border-slate-100">
+                    <Icon name="Calendar" size={14} />
+                    <span><span className="font-medium">Запланирована:</span> {formatDate(inspection.scheduled_date)}</span>
                   </div>
                 )}
               </CardContent>
