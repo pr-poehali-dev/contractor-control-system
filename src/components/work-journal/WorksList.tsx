@@ -37,7 +37,7 @@ export default function WorksList({
   const isContractor = user?.role === 'contractor';
   return (
     <div className="hidden md:block w-96 bg-white border-r border-slate-200 flex-col">
-      <div className="p-4 border-b border-slate-200">
+      <div className="border-b border-slate-200">
         {currentObject && (
           <ObjectInfoBar object={currentObject} />
         )}
