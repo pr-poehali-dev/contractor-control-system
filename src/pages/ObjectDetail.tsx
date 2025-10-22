@@ -374,7 +374,7 @@ const ObjectDetail = () => {
             onClick={() => navigate(`/objects/${objectId}/works/create`)}
           >
             <Icon name="Settings" size={20} className="mr-2" />
-            Управление
+            Редактировать
           </Button>
         </div>
       )}
