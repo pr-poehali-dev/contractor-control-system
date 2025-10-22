@@ -113,7 +113,7 @@ const InspectionDetail = () => {
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-5xl mx-auto px-4 py-4 md:py-8">
         <div className="mb-6">
-          <div className="flex items-center gap-2 md:gap-3 mb-2">
+          <div className="flex items-center gap-2 md:gap-3">
             <button 
               onClick={handleBack}
               className="flex-shrink-0 h-8 w-8 md:h-9 md:w-9 flex items-center justify-center hover:bg-slate-100 rounded-lg transition-colors"
@@ -124,7 +124,6 @@ const InspectionDetail = () => {
               Проверка №{inspection.inspection_number || inspectionIndex}
             </h1>
           </div>
-          <p className="text-sm md:text-base text-slate-600 ml-10 md:ml-12">Управление проверкой</p>
         </div>
 
         <InspectionInfoCard
