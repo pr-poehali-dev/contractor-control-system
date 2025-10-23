@@ -56,7 +56,6 @@ export default function DefectsSectionNew({
 
   const handleAddDefect = () => {
     onAddDefect();
-    setShowForm(false);
   };
 
   return (
@@ -197,7 +196,7 @@ export default function DefectsSectionNew({
               }} 
               className="flex-1"
             >
-              Отмена
+              Закрыть
             </Button>
             <Button 
               type="button"
@@ -205,7 +204,8 @@ export default function DefectsSectionNew({
               disabled={!newDefect.description}
               className="flex-1"
             >
-              Добавить замечание
+              <Icon name="Plus" size={16} className="mr-1" />
+              Добавить
             </Button>
           </div>
         </div>
