@@ -38,9 +38,12 @@ export default function ObjectsMobileHeader({
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold text-slate-900">Объекты</h1>
         {!isContractor && (
-          <Button size="sm" onClick={onCreateClick}>
-            <Icon name="Plus" size={18} className="mr-1" />
-            Добавить
+          <Button 
+            size="icon" 
+            onClick={onCreateClick}
+            className="rounded-full h-12 w-12"
+          >
+            <Icon name="Plus" size={20} />
           </Button>
         )}
       </div>

@@ -78,9 +78,12 @@ const Defects = () => {
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Проверки</h1>
-        <Button onClick={() => setIsCreateModalOpen(true)}>
-          <Icon name="Plus" size={18} className="mr-1" />
-          Создать проверку
+        <Button 
+          onClick={() => setIsCreateModalOpen(true)}
+          size="icon"
+          className="rounded-full h-12 w-12"
+        >
+          <Icon name="Plus" size={20} />
         </Button>
       </div>
 

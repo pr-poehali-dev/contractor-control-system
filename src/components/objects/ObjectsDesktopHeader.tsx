@@ -47,9 +47,13 @@ export default function ObjectsDesktopHeader({
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-slate-900">Мои объекты</h1>
           {!isContractor && (
-            <Button size="lg" onClick={onCreateClick} data-tour="create-object-btn">
-              <Icon name="Plus" size={20} className="mr-2" />
-              Добавить объект
+            <Button 
+              size="icon" 
+              onClick={onCreateClick} 
+              data-tour="create-object-btn"
+              className="rounded-full h-12 w-12"
+            >
+              <Icon name="Plus" size={20} />
             </Button>
           )}
         </div>
