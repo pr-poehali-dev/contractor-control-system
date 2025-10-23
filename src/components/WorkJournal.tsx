@@ -12,7 +12,7 @@ import { ENDPOINTS } from '@/api/endpoints';
 
 import WorksList from '@/components/work-journal/WorksList';
 import WorkHeader from '@/components/work-journal/WorkHeader';
-import InfoTab from '@/components/work-journal/InfoTab';
+import WorkLogTab from '@/components/work-journal/WorkLogTab';
 import DescriptionTab from '@/components/work-journal/DescriptionTab';
 import EstimateTab from '@/components/work-journal/EstimateTab';
 import AnalyticsTab from '@/components/work-journal/AnalyticsTab';
@@ -304,12 +304,9 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                 )}
 
                 {activeTab === 'info' && (
-                  <InfoTab
-                    selectedWorkData={selectedWorkData}
-                    workEntries={workEntries}
-                    formatDate={formatDate}
-                    formatTime={formatTime}
-                    handleCreateInspection={() => handlers.setIsInspectionModalOpen(true)}
+                  <WorkLogTab
+                    workId={selectedWork}
+                    objectId={objectId}
                   />
                 )}
 

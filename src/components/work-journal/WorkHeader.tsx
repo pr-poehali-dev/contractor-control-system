@@ -82,7 +82,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
                 : 'text-slate-600 font-medium'
             }`}
           >
-            <span className="text-[12px]">Журнал</span>
+            <span className="text-[12px]">Чат</span>
           </button>
           <button
             onClick={() => setActiveTab('info')}
@@ -92,7 +92,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
                 : 'text-slate-600 font-medium'
             }`}
           >
-            <span className="text-[12px]">Инфо</span>
+            <span className="text-[12px]">Журнал</span>
           </button>
           <button
             onClick={() => setActiveTab('description')}
@@ -174,7 +174,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
               }`}
             >
-              Журнал
+              Чат
               {activeTab === 'journal' && (
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-lg" />
               )}
@@ -187,7 +187,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
               }`}
             >
-              Информация
+              Журнал работрмация
               {activeTab === 'info' && (
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-lg" />
               )}
