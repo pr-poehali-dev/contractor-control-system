@@ -148,7 +148,6 @@ const MyTasks = () => {
             <Icon name="ClipboardCheck" size={28} className="text-blue-600" />
             Мои задачи
           </h1>
-          <p className="text-slate-600 mt-2">Замечания для устранения</p>
         </div>
       </div>
 
