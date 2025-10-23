@@ -143,15 +143,15 @@ const MyTasks = () => {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div className="max-w-6xl mx-auto px-4 py-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
           <Card 
             className={`cursor-pointer transition-all ${filter === 'all' ? 'ring-2 ring-blue-600' : ''}`}
             onClick={() => setFilter('all')}
           >
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-slate-900">{stats.all}</div>
-              <div className="text-xs text-slate-600 mt-1">Всего</div>
+            <CardContent className="p-3 text-center">
+              <div className="text-xl font-bold text-slate-900">{stats.all}</div>
+              <div className="text-xs text-slate-600">Всего</div>
             </CardContent>
           </Card>
 
@@ -159,9 +159,9 @@ const MyTasks = () => {
             className={`cursor-pointer transition-all ${filter === 'pending' ? 'ring-2 ring-orange-600' : ''}`}
             onClick={() => setFilter('pending')}
           >
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-orange-600">{stats.pending}</div>
-              <div className="text-xs text-slate-600 mt-1">В работе</div>
+            <CardContent className="p-3 text-center">
+              <div className="text-xl font-bold text-orange-600">{stats.pending}</div>
+              <div className="text-xs text-slate-600">В работе</div>
             </CardContent>
           </Card>
 
@@ -169,9 +169,9 @@ const MyTasks = () => {
             className={`cursor-pointer transition-all ${filter === 'completed' ? 'ring-2 ring-blue-600' : ''}`}
             onClick={() => setFilter('completed')}
           >
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600">{stats.completed}</div>
-              <div className="text-xs text-slate-600 mt-1">На проверке</div>
+            <CardContent className="p-3 text-center">
+              <div className="text-xl font-bold text-blue-600">{stats.completed}</div>
+              <div className="text-xs text-slate-600">На проверке</div>
             </CardContent>
           </Card>
 
@@ -179,9 +179,9 @@ const MyTasks = () => {
             className={`cursor-pointer transition-all ${filter === 'verified' ? 'ring-2 ring-green-600' : ''}`}
             onClick={() => setFilter('verified')}
           >
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-600">{stats.verified}</div>
-              <div className="text-xs text-slate-600 mt-1">Выполнено</div>
+            <CardContent className="p-3 text-center">
+              <div className="text-xl font-bold text-green-600">{stats.verified}</div>
+              <div className="text-xs text-slate-600">Выполнено</div>
             </CardContent>
           </Card>
         </div>
