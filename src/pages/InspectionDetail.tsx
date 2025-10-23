@@ -39,33 +39,57 @@ const InspectionDetail = () => {
     resetPhotos
   } = useDefectPhotos();
 
-  const [newDefect, setNewDefect] = useState<Defect>({
-    id: '',
-    description: '',
-    location: '',
-    severity: '',
-    responsible: '',
-    deadline: ''
-  });
+  interface DraftDefect extends Defect {
+    tempId: string;
+    photos: string[];
+  }
+
+  const [draftDefects, setDraftDefects] = useState<DraftDefect[]>([]);
   const defectsRef = useRef<HTMLDivElement>(null);
 
-  const handleDefectChange = (field: keyof Defect, value: string) => {
-    setNewDefect(prev => ({ ...prev, [field]: value }));
+  const handleAddDraft = () => {
+    const newDraft: DraftDefect = {
+      id: '',
+      tempId: Date.now().toString(),
+      description: '',
+      location: '',
+      severity: '',
+      responsible: '',
+      deadline: '',
+      photos: []
+    };
+    setDraftDefects(prev => [...prev, newDraft]);
   };
 
-  const onAddDefect = () => {
-    const success = handleAddDefect(newDefect, newDefectPhotos);
-    if (success) {
-      setNewDefect({
-        id: '',
-        description: '',
-        location: '',
-        severity: '',
-        responsible: '',
-        deadline: ''
-      });
-      resetPhotos();
-    }
+  const handleDraftChange = (tempId: string, field: keyof Defect, value: string) => {
+    setDraftDefects(prev => prev.map(draft => 
+      draft.tempId === tempId ? { ...draft, [field]: value } : draft
+    ));
+  };
+
+  const handleDraftPhotoAdd = (tempId: string, photos: string[]) => {
+    setDraftDefects(prev => prev.map(draft => 
+      draft.tempId === tempId ? { ...draft, photos: [...draft.photos, ...photos] } : draft
+    ));
+  };
+
+  const handleDraftPhotoRemove = (tempId: string, photoUrl: string) => {
+    setDraftDefects(prev => prev.map(draft => 
+      draft.tempId === tempId ? { ...draft, photos: draft.photos.filter(p => p !== photoUrl) } : draft
+    ));
+  };
+
+  const handleRemoveDraft = (tempId: string) => {
+    setDraftDefects(prev => prev.filter(draft => draft.tempId !== tempId));
+  };
+
+  const handleSaveDefects = () => {
+    draftDefects.forEach(draft => {
+      if (draft.description) {
+        handleAddDefect(draft, draft.photos);
+      }
+    });
+    setDraftDefects([]);
   };
 
   if (!inspection) {
@@ -139,16 +163,15 @@ const InspectionDetail = () => {
         <div ref={defectsRef}>
           <DefectsSectionNew
             defects={defects}
-            newDefect={newDefect}
-            newDefectPhotos={newDefectPhotos}
-            uploadingPhotos={uploadingPhotos}
+            draftDefects={draftDefects}
             isDraft={canEdit}
             isClient={isClient}
-            fileInputRef={fileInputRef}
-            onDefectChange={handleDefectChange}
-            onFileSelect={(e) => handleFileSelect(e, fileInputRef)}
-            onRemovePhoto={handleRemovePhoto}
-            onAddDefect={onAddDefect}
+            onAddDraft={handleAddDraft}
+            onDraftChange={handleDraftChange}
+            onDraftPhotoAdd={handleDraftPhotoAdd}
+            onDraftPhotoRemove={handleDraftPhotoRemove}
+            onRemoveDraft={handleRemoveDraft}
+            onSaveDefects={handleSaveDefects}
             onRemoveDefect={handleRemoveDefect}
           />
         </div>

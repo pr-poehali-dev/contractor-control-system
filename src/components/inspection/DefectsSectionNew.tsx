@@ -17,46 +17,76 @@ export interface Defect {
   photo_urls?: string[];
 }
 
+export interface DraftDefect extends Defect {
+  tempId: string;
+  photos: string[];
+}
+
 interface DefectsSectionProps {
   defects: Defect[];
-  newDefect: Defect;
-  newDefectPhotos: string[];
-  uploadingPhotos: boolean;
+  draftDefects: DraftDefect[];
   isDraft: boolean;
   isClient: boolean;
-  fileInputRef: RefObject<HTMLInputElement>;
-  onDefectChange: (field: keyof Defect, value: string) => void;
-  onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onRemovePhoto: (url: string) => void;
-  onAddDefect: () => void;
+  onAddDraft: () => void;
+  onDraftChange: (tempId: string, field: keyof Defect, value: string) => void;
+  onDraftPhotoAdd: (tempId: string, photos: string[]) => void;
+  onDraftPhotoRemove: (tempId: string, photoUrl: string) => void;
+  onRemoveDraft: (tempId: string) => void;
+  onSaveDefects: () => void;
   onRemoveDefect: (id: string) => void;
 }
 
 export default function DefectsSectionNew({
   defects,
-  newDefect,
-  newDefectPhotos,
-  uploadingPhotos,
+  draftDefects,
   isDraft,
   isClient,
-  fileInputRef,
-  onDefectChange,
-  onFileSelect,
-  onRemovePhoto,
-  onAddDefect,
+  onAddDraft,
+  onDraftChange,
+  onDraftPhotoAdd,
+  onDraftPhotoRemove,
+  onRemoveDraft,
+  onSaveDefects,
   onRemoveDefect
 }: DefectsSectionProps) {
-  const [showForm, setShowForm] = useState(false);
+  const [uploadingPhotos, setUploadingPhotos] = useState<Record<string, boolean>>({});
+  const fileInputRefs = React.useRef<Record<string, HTMLInputElement | null>>({});
 
-  React.useEffect(() => {
-    if (newDefect.description && !showForm) {
-      setShowForm(true);
+  const handleFileSelect = async (tempId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadingPhotos(prev => ({ ...prev, [tempId]: true }));
+
+    const uploadedUrls: string[] = [];
+    for (const file of Array.from(files)) {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          uploadedUrls.push(data.url);
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+      }
     }
-  }, [newDefect.description, showForm]);
 
-  const handleAddDefect = () => {
-    onAddDefect();
+    if (uploadedUrls.length > 0) {
+      onDraftPhotoAdd(tempId, uploadedUrls);
+    }
+
+    setUploadingPhotos(prev => ({ ...prev, [tempId]: false }));
+    if (e.target) e.target.value = '';
   };
+
+  const hasValidDrafts = draftDefects.some(draft => draft.description.trim());
 
   return (
     <div className="mb-6">
@@ -64,16 +94,57 @@ export default function DefectsSectionNew({
         <h2 className="text-xl font-semibold">Замечания</h2>
       </div>
 
-      {isDraft && isClient && showForm && (
-        <div className="mb-4 p-4 md:p-5 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border border-slate-200 space-y-3">
+      {defects.length === 0 && draftDefects.length === 0 && (
+        <div className="text-center py-12 bg-slate-50 rounded-lg border border-dashed mb-4">
+          <Icon name="AlertCircle" size={48} className="mx-auto text-slate-300 mb-3" />
+          <p className="text-slate-500 mb-4">Замечаний пока нет</p>
+          {isDraft && isClient && (
+            <Button type="button" onClick={onAddDraft}>
+              <Icon name="Plus" size={16} className="mr-2" />
+              Добавить замечание
+            </Button>
+          )}
+        </div>
+      )}
+
+      {defects.length > 0 && (
+        <div className="space-y-3 mb-4">
+          {defects.map((defect, index) => (
+            <DefectCard
+              key={defect.id}
+              defect={defect}
+              index={index}
+              isDraft={isDraft}
+              isClient={isClient}
+              onRemove={onRemoveDefect}
+            />
+          ))}
+        </div>
+      )}
+
+      {draftDefects.map((draft) => (
+        <div key={draft.tempId} className="mb-4 p-4 md:p-5 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border border-slate-200 space-y-3">
+          <div className="flex justify-between items-start mb-2">
+            <span className="text-xs font-semibold text-blue-600">Новое замечание</span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => onRemoveDraft(draft.tempId)}
+              className="h-6 w-6 p-0 hover:bg-red-50 hover:text-red-600"
+            >
+              <Icon name="X" size={14} />
+            </Button>
+          </div>
+
           <div>
-            <Label htmlFor="description" className="text-xs md:text-sm mb-1 block">
+            <Label htmlFor={`description-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
               Описание нарушения <span className="text-red-500">*</span>
             </Label>
             <Textarea
-              id="description"
-              value={newDefect.description}
-              onChange={(e) => onDefectChange('description', e.target.value)}
+              id={`description-${draft.tempId}`}
+              value={draft.description}
+              onChange={(e) => onDraftChange(draft.tempId, 'description', e.target.value)}
               placeholder="Опишите выявленное нарушение"
               rows={3}
               className="text-sm resize-none"
@@ -81,13 +152,13 @@ export default function DefectsSectionNew({
           </div>
 
           <div>
-            <Label htmlFor="location" className="text-xs md:text-sm mb-1 block">
+            <Label htmlFor={`location-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
               Местоположение
             </Label>
             <Input
-              id="location"
-              value={newDefect.location || ''}
-              onChange={(e) => onDefectChange('location', e.target.value)}
+              id={`location-${draft.tempId}`}
+              value={draft.location || ''}
+              onChange={(e) => onDraftChange(draft.tempId, 'location', e.target.value)}
               placeholder="Например: 2 этаж, комната 205"
               className="text-sm h-9 md:h-10"
             />
@@ -95,10 +166,10 @@ export default function DefectsSectionNew({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="severity" className="text-xs md:text-sm mb-1 block">
+              <Label htmlFor={`severity-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
                 Критичность
               </Label>
-              <Select value={newDefect.severity || ''} onValueChange={(val) => onDefectChange('severity', val)}>
+              <Select value={draft.severity || ''} onValueChange={(val) => onDraftChange(draft.tempId, 'severity', val)}>
                 <SelectTrigger className="text-sm h-9 md:h-10">
                   <SelectValue placeholder="Выберите" />
                 </SelectTrigger>
@@ -112,27 +183,27 @@ export default function DefectsSectionNew({
             </div>
 
             <div>
-              <Label htmlFor="deadline" className="text-xs md:text-sm mb-1 block">
+              <Label htmlFor={`deadline-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
                 Срок устранения
               </Label>
               <Input
-                id="deadline"
+                id={`deadline-${draft.tempId}`}
                 type="date"
-                value={newDefect.deadline || ''}
-                onChange={(e) => onDefectChange('deadline', e.target.value)}
+                value={draft.deadline || ''}
+                onChange={(e) => onDraftChange(draft.tempId, 'deadline', e.target.value)}
                 className="text-sm h-9 md:h-10"
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="responsible" className="text-xs md:text-sm mb-1 block">
+            <Label htmlFor={`responsible-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
               Ответственный за устранение
             </Label>
             <Input
-              id="responsible"
-              value={newDefect.responsible || ''}
-              onChange={(e) => onDefectChange('responsible', e.target.value)}
+              id={`responsible-${draft.tempId}`}
+              value={draft.responsible || ''}
+              onChange={(e) => onDraftChange(draft.tempId, 'responsible', e.target.value)}
               placeholder="ФИО или название организации"
               className="text-sm h-9 md:h-10"
             />
@@ -143,29 +214,29 @@ export default function DefectsSectionNew({
               Фотофиксация
             </Label>
             <input
-              ref={fileInputRef}
+              ref={(el) => fileInputRefs.current[draft.tempId] = el}
               type="file"
               accept="image/*"
               multiple
-              onChange={onFileSelect}
+              onChange={(e) => handleFileSelect(draft.tempId, e)}
               className="hidden"
             />
             <Button
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploadingPhotos}
+              onClick={() => fileInputRefs.current[draft.tempId]?.click()}
+              disabled={uploadingPhotos[draft.tempId]}
               className="w-full"
             >
               <Icon name="Camera" size={16} className="mr-2" />
-              {uploadingPhotos ? 'Загрузка...' : 'Добавить фото'}
+              {uploadingPhotos[draft.tempId] ? 'Загрузка...' : 'Добавить фото'}
             </Button>
           </div>
 
-          {newDefectPhotos.length > 0 && (
+          {draft.photos.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {newDefectPhotos.map((url, idx) => (
+              {draft.photos.map((url, idx) => (
                 <div key={idx} className="relative group">
                   <img
                     src={url}
@@ -177,7 +248,7 @@ export default function DefectsSectionNew({
                     variant="destructive"
                     size="sm"
                     className="absolute top-1 right-1 h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                    onClick={() => onRemovePhoto(url)}
+                    onClick={() => onDraftPhotoRemove(draft.tempId, url)}
                   >
                     <Icon name="X" size={14} />
                   </Button>
@@ -185,70 +256,32 @@ export default function DefectsSectionNew({
               ))}
             </div>
           )}
-
-          <div className="flex gap-2 pt-2">
-            <Button 
-              type="button"
-              variant="outline" 
-              onClick={() => {
-                setShowForm(false);
-                onDefectChange('description', '');
-              }} 
-              className="flex-1"
-            >
-              Закрыть
-            </Button>
-            <Button 
-              type="button"
-              onClick={handleAddDefect}
-              disabled={!newDefect.description}
-              className="flex-1"
-            >
-              <Icon name="Plus" size={16} className="mr-1" />
-              Добавить
-            </Button>
-          </div>
         </div>
-      )}
+      ))}
 
-      {defects.length === 0 && !showForm ? (
-        <div className="text-center py-12 bg-slate-50 rounded-lg border border-dashed mb-4">
-          <Icon name="AlertCircle" size={48} className="mx-auto text-slate-300 mb-3" />
-          <p className="text-slate-500 mb-4">Замечаний пока нет</p>
-          {isDraft && isClient && (
-            <Button type="button" onClick={() => setShowForm(true)}>
-              <Icon name="Plus" size={16} className="mr-2" />
-              Добавить замечание
+      {isDraft && isClient && (draftDefects.length > 0 || defects.length > 0) && (
+        <div className="flex gap-2">
+          <Button 
+            type="button"
+            variant="outline" 
+            onClick={onAddDraft}
+            className="flex-1 border-dashed"
+          >
+            <Icon name="Plus" size={16} className="mr-2" />
+            Добавить замечание
+          </Button>
+          {draftDefects.length > 0 && (
+            <Button 
+              type="button"
+              onClick={onSaveDefects}
+              disabled={!hasValidDrafts}
+              className="flex-1 bg-blue-600 hover:bg-blue-700"
+            >
+              <Icon name="Save" size={16} className="mr-2" />
+              Сохранить ({draftDefects.length})
             </Button>
           )}
         </div>
-      ) : (
-        <>
-          <div className="space-y-3 mb-4">
-            {defects.map((defect, index) => (
-              <DefectCard
-                key={defect.id}
-                defect={defect}
-                index={index}
-                isDraft={isDraft}
-                isClient={isClient}
-                onRemove={onRemoveDefect}
-              />
-            ))}
-          </div>
-
-          {isDraft && isClient && !showForm && (
-            <Button 
-              type="button"
-              variant="outline" 
-              onClick={() => setShowForm(true)}
-              className="w-full border-dashed"
-            >
-              <Icon name="Plus" size={16} className="mr-2" />
-              Добавить замечание
-            </Button>
-          )}
-        </>
       )}
     </div>
   );
