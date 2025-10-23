@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 const CreateObject = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, token, setUserData } = useAuthRedux();
+  const { user, token, loadUserData } = useAuthRedux();
   const [formData, setFormData] = useState({
     title: '',
     address: '',
@@ -49,8 +49,7 @@ const CreateObject = () => {
       });
 
       if (token) {
-        const refreshedData = await api.getUserData(token);
-        setUserData(refreshedData);
+        await loadUserData();
       }
 
       toast({

@@ -18,13 +18,13 @@ export const useAuthRedux = () => {
   const isLoading = useAppSelector((state) => state.user.isLoading);
   const error = useAppSelector((state) => state.user.error);
 
-  const objects = useAppSelector((state) => state.objects.objects);
-  const works = useAppSelector((state) => state.works.works);
-  const inspections = useAppSelector((state) => state.inspections.inspections);
-  const workLogs = useAppSelector((state) => state.workLogs.workLogs);
-  const contractors = useAppSelector((state) => state.contractors.contractors);
-  const chatMessages = useAppSelector((state) => state.chatMessages.chatMessages);
-  const defectReports = useAppSelector((state) => state.defectReports.defectReports);
+  const objects = useAppSelector((state) => state.objects.items);
+  const works = useAppSelector((state) => state.works.items);
+  const inspections = useAppSelector((state) => state.inspections.items);
+  const workLogs = useAppSelector((state) => state.workLogs.items);
+  const contractors = useAppSelector((state) => state.contractors.items);
+  const chatMessages = useAppSelector((state) => state.chatMessages.items);
+  const defectReports = useAppSelector((state) => state.defectReports.items);
 
   const userData = useMemo(
     () => ({

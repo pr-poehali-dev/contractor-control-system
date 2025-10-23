@@ -17,7 +17,7 @@ interface WorkStartNotificationProps {
 
 export default function WorkStartNotification({ work, onNotified }: WorkStartNotificationProps) {
   const { toast } = useToast();
-  const { token, setUserData } = useAuthRedux();
+  const { token, loadUserData } = useAuthRedux();
   const [isNotifying, setIsNotifying] = useState(false);
   const statusInfo = getWorkStatusInfo(work);
 
@@ -44,8 +44,7 @@ export default function WorkStartNotification({ work, onNotified }: WorkStartNot
       }
 
       if (token) {
-        const refreshedData = await api.getUserData(token);
-        setUserData(refreshedData);
+        await loadUserData();
       }
 
       const createLogResponse = await apiClient.post(ENDPOINTS.ENTITIES.CREATE, {
@@ -63,8 +62,7 @@ export default function WorkStartNotification({ work, onNotified }: WorkStartNot
 
       if (createLogResponse.success) {
         if (token) {
-          const refreshedData = await api.getUserData(token);
-          setUserData(refreshedData);
+          await loadUserData();
         }
         
         toast({

@@ -21,7 +21,7 @@ import ObjectInfoBar from '@/components/objects/ObjectInfoBar';
 const ObjectDetail = () => {
   const { objectId } = useParams();
   const navigate = useNavigate();
-  const { user, token, userData, setUserData } = useAuthRedux();
+  const { user, userData } = useAuthRedux();
   const { toast } = useToast();
   const [showActions, setShowActions] = useState(false);
   const [sortBy, setSortBy] = useState<string>('priority');
