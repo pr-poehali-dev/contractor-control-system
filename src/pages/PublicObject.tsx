@@ -82,10 +82,18 @@ const PublicObject = () => {
     }
   };
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
       <div className="bg-white border-b border-slate-200 shadow-sm">
-        <ObjectHeader object={object} onBack={() => navigate(-1)} />
+        <ObjectHeader object={object} onBack={handleBack} />
         <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
 
