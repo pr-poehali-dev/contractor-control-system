@@ -213,7 +213,7 @@ const Dashboard = () => {
       // Находим группу работ по названию
       const workGroup = worksByTitle.find(g => g.title === workTitle);
       // Проверяем, входит ли workId события в эту группу
-      return workGroup?.workIds.includes(event.workId);
+      return event.workId && workGroup?.workIds.includes(event.workId);
     });
 
     const contractorMatch = contractorTags.length === 0 || contractorTags.some(tag => {

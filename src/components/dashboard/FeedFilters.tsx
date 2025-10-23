@@ -65,9 +65,9 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
       const eventContractor = `contractor-${event.author}`;
       
       // Для работы находим тег с workIds
-      const eventWorkTag = availableTags.find(t => 
+      const eventWorkTag = event.workId ? availableTags.find(t => 
         t.type === 'work' && t.workIds?.includes(event.workId)
-      );
+      ) : undefined;
       const eventWorkId = eventWorkTag?.id;
 
       // Проверяем совместимость с текущими выборами
