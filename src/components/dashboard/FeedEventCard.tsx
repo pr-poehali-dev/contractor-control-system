@@ -215,8 +215,8 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
               className="font-semibold text-slate-900 text-base leading-snug cursor-pointer hover:text-blue-600 transition-colors break-words"
               onClick={(e) => {
                 e.stopPropagation();
-                if (event.workId && onTagClick) {
-                  onTagClick(`work-${event.workId}`, 'work');
+                if (event.workTitle && onTagClick) {
+                  onTagClick(`work-${event.workTitle}`, 'work');
                 }
               }}
             >
