@@ -5,6 +5,12 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -67,6 +73,25 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
     toast({
       title: 'Версия сметы активирована',
       description: `Версия ${versions.find((v) => v.id === versionId)?.version} установлена как актуальная`,
+    });
+  };
+
+  const handleDeleteVersion = (versionId: number) => {
+    const versionToDelete = versions.find(v => v.id === versionId);
+    const wasActive = versionToDelete?.isActive;
+    
+    const remainingVersions = versions.filter(v => v.id !== versionId);
+    
+    if (wasActive && remainingVersions.length > 0) {
+      remainingVersions[0].isActive = true;
+    }
+    
+    setVersions(remainingVersions);
+    toast({
+      title: 'Версия удалена',
+      description: wasActive && remainingVersions.length > 0
+        ? `Версия ${versionToDelete?.version} удалена. Актуальная версия: ${remainingVersions[0].version}`
+        : `Версия ${versionToDelete?.version} удалена`,
     });
   };
 
@@ -170,17 +195,28 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
                       )}
                     </div>
                   </div>
-                  {!version.isActive && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleSetActive(version.id)}
-                      className="w-full md:w-auto text-xs md:text-sm"
-                    >
-                      <Icon name="CheckCircle2" size={14} className="mr-1.5" />
-                      Сделать актуальной
-                    </Button>
-                  )}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 flex-shrink-0">
+                        <Icon name="MoreVertical" size={16} className="text-slate-600" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {!version.isActive && (
+                        <DropdownMenuItem onClick={() => handleSetActive(version.id)}>
+                          <Icon name="CheckCircle2" size={16} className="mr-2" />
+                          Сделать актуальной
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem 
+                        onClick={() => handleDeleteVersion(version.id)}
+                        className="text-red-600 focus:text-red-600"
+                      >
+                        <Icon name="Trash2" size={16} className="mr-2" />
+                        Удалить
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </CardContent>
             </Card>
