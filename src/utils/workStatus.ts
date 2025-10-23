@@ -1,4 +1,4 @@
-import type { Work } from '@/contexts/AuthContext';
+import type { Work } from '@/store/slices/userSlice';
 
 export interface WorkStatus {
   status: 'planned' | 'awaiting_start' | 'in_progress' | 'awaiting_acceptance' | 'completed' | 'delayed';

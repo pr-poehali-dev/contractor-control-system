@@ -5,7 +5,7 @@ import EventItem from '@/components/work-journal/EventItem';
 import WorkStartNotification from '@/components/work-journal/WorkStartNotification';
 import { NoJournalEntriesEmptyState } from '@/components/work-journal/WorkJournalEmptyStates';
 import type { JournalEvent, UserRole } from '@/types/journal';
-import type { Work } from '@/contexts/AuthContext';
+import type { Work } from '@/store/slices/userSlice';
 
 interface JournalTabContentProps {
   mockEvents: JournalEvent[];

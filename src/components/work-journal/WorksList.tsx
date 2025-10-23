@@ -8,7 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import ObjectInfoBar from '@/components/objects/ObjectInfoBar';
-import type { Work, ObjectData } from '@/contexts/AuthContext';
+import type { Work } from '@/store/slices/userSlice';
+import type { ObjectEntity } from '@/store/slices/objectsSlice';
 
 interface WorksListProps {
   works: Work[];
@@ -18,7 +19,7 @@ interface WorksListProps {
   getInitials: (name: string) => string;
   formatTime: (timestamp: string) => string;
   objectId: number;
-  currentObject?: ObjectData;
+  currentObject?: ObjectEntity;
 }
 
 export default function WorksList({

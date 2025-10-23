@@ -2,10 +2,10 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
-import type { ObjectData } from '@/contexts/AuthContext';
+import type { ObjectEntity } from '@/store/slices/objectsSlice';
 
 interface ObjectHeaderProps {
-  object: ObjectData;
+  object: ObjectEntity;
   showBackButton?: boolean;
   onEdit?: () => void;
 }

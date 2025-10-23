@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
-import type { ObjectData } from '@/contexts/AuthContext';
+import type { ObjectEntity } from '@/store/slices/objectsSlice';
 
 interface ObjectInfoBarProps {
-  object: ObjectData;
+  object: ObjectEntity;
   className?: string;
   compact?: boolean;
   onBack?: () => void;

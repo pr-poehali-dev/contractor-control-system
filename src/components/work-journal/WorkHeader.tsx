@@ -4,7 +4,7 @@ import Icon from '@/components/ui/icon';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
 import { NotificationGroup } from '@/components/ui/notification-badge';
-import type { Work } from '@/contexts/AuthContext';
+import type { Work } from '@/store/slices/userSlice';
 
 interface WorkHeaderProps {
   selectedWorkData: Work;

@@ -11,7 +11,6 @@ import JournalTab from '@/components/public-object/JournalTab';
 import ScheduleTab from '@/components/public-object/ScheduleTab';
 import AnalyticsTab from '@/components/public-object/AnalyticsTab';
 import InspectionsTab from '@/components/public-object/InspectionsTab';
-import { api } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 
 const PublicObject = () => {
