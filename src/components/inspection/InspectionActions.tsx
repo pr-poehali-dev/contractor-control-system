@@ -21,12 +21,22 @@ export default function InspectionActions({
   onStartInspection,
   onCompleteInspection
 }: InspectionActionsProps) {
-  if (!isClient) return null;
+  console.log('InspectionActions render:', { isClient, inspectionStatus, inspectionType, canEdit });
   
-  if (inspectionStatus === 'completed') return null;
+  if (!isClient) {
+    console.log('InspectionActions hidden: not client');
+    return null;
+  }
+  
+  if (inspectionStatus === 'completed') {
+    console.log('InspectionActions hidden: completed');
+    return null;
+  }
+
+  console.log('InspectionActions: rendering buttons');
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-20">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-50">
       <div className="max-w-4xl mx-auto flex gap-3">
         {canEdit && (
           <Button
