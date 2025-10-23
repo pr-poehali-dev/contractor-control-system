@@ -307,6 +307,9 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                   <WorkLogTab
                     workId={selectedWork}
                     objectId={objectId}
+                    userRole={userRole}
+                    onCreateInspection={() => handlers.setIsInspectionModalOpen(true)}
+                    onCreateReport={() => handlers.setIsWorkReportModalOpen(true)}
                   />
                 )}
 

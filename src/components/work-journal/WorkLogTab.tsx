@@ -4,13 +4,17 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '@/components/ui/icon';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface WorkLogTabProps {
   workId: number;
   objectId: number;
+  onCreateInspection?: () => void;
+  onCreateReport?: () => void;
+  userRole?: string;
 }
 
-export default function WorkLogTab({ workId, objectId }: WorkLogTabProps) {
+export default function WorkLogTab({ workId, objectId, onCreateInspection, onCreateReport, userRole }: WorkLogTabProps) {
   const { userData } = useAuth();
   const navigate = useNavigate();
   const [inspectionEvents, setInspectionEvents] = useState<ApiInspectionEvent[]>([]);
@@ -71,7 +75,25 @@ export default function WorkLogTab({ workId, objectId }: WorkLogTabProps) {
 
   return (
     <div className="flex-1 overflow-y-auto bg-slate-50 w-full overflow-x-hidden">
-      <div className="px-3 py-4 md:p-6 max-w-5xl mx-auto w-full space-y-4">
+      <div className="px-3 py-4 md:p-6 max-w-5xl mx-auto w-full">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-slate-900">Журнал работ</h3>
+          {userRole === 'client' || userRole === 'admin' ? (
+            <Button onClick={onCreateInspection} size="sm" className="flex-shrink-0">
+              <Icon name="ClipboardCheck" size={16} className="mr-2" />
+              <span className="hidden sm:inline">Создать проверку</span>
+              <span className="sm:hidden">Проверка</span>
+            </Button>
+          ) : (
+            <Button onClick={onCreateReport} size="sm" className="flex-shrink-0">
+              <Icon name="FileText" size={16} className="mr-2" />
+              <span className="hidden sm:inline">Создать отчёт</span>
+              <span className="sm:hidden">Отчёт</span>
+            </Button>
+          )}
+        </div>
+        
+        <div className="space-y-4">
         
         {allEvents.map((event) => event.type === 'report' ? (
           <div key={event.data.id} className="bg-white rounded-lg shadow-sm border border-slate-200 p-3 md:p-4 relative">
@@ -179,6 +201,7 @@ export default function WorkLogTab({ workId, objectId }: WorkLogTabProps) {
             <p className="text-sm text-slate-400 mt-1">Отчёты и проверки появятся здесь</p>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
