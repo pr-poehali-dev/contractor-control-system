@@ -74,63 +74,54 @@ export default function WorkLogTab({ workId, objectId }: WorkLogTabProps) {
       <div className="px-3 py-4 md:p-6 max-w-5xl mx-auto w-full space-y-4">
         
         {allEvents.map((event) => event.type === 'report' ? (
-          <div key={event.data.id} className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
-            <div className="flex items-start gap-3 mb-3">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Icon name="ClipboardCheck" size={20} className="text-green-600" />
+          <div key={event.data.id} className="bg-white rounded-lg shadow-sm border border-slate-200 p-3 md:p-4">
+            <div className="flex items-start gap-2.5">
+              <div className="w-9 h-9 md:w-10 md:h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Icon name="ClipboardCheck" size={18} className="text-green-600" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-slate-900">Отчёт о работе</h3>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-sm text-slate-500">
-                    {event.data.author_name}
-                  </span>
-                  <span className="text-xs text-slate-400">
+                <h3 className="font-semibold text-slate-900 text-sm md:text-base mb-1">Отчёт о работе</h3>
+                <div className="text-xs md:text-sm text-slate-500 mb-2">
+                  {event.data.author_name}
+                  <span className="mx-1.5 text-slate-300">•</span>
+                  <span className="text-slate-400">
                     {formatDate(event.data.created_at)} в {formatTime(event.data.created_at)}
                   </span>
                 </div>
+
+                {event.data.description && (
+                  <p className="text-xs md:text-sm text-slate-700 mb-2 line-clamp-2">{event.data.description}</p>
+                )}
+
+                <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs md:text-sm">
+                  {event.data.completion_percentage !== undefined && event.data.completion_percentage !== null && (
+                    <div className="flex items-center gap-1.5 text-green-600 font-medium">
+                      <Icon name="TrendingUp" size={14} />
+                      <span>{event.data.completion_percentage}%</span>
+                    </div>
+                  )}
+                  {event.data.volume && (
+                    <div className="flex items-center gap-1.5 text-slate-600">
+                      <Icon name="Box" size={14} />
+                      <span>{event.data.volume}</span>
+                    </div>
+                  )}
+                </div>
+
+                {event.data.photo_urls && event.data.photo_urls.split(',').filter(url => url.trim()).length > 0 && (
+                  <div className="grid grid-cols-3 gap-1.5 md:gap-2 mt-2.5">
+                    {event.data.photo_urls.split(',').filter(url => url.trim()).slice(0, 3).map((url, idx) => (
+                      <img
+                        key={idx}
+                        src={url.trim()}
+                        alt={`Фото ${idx + 1}`}
+                        className="w-full h-16 md:h-20 object-cover rounded border border-slate-200"
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-
-            {event.data.description && (
-              <p className="text-sm text-slate-700 mb-3">{event.data.description}</p>
-            )}
-
-            {event.data.volume && (
-              <div className="flex items-center gap-2 text-sm text-slate-600 mb-2">
-                <Icon name="Box" size={16} />
-                <span>Объём: <strong>{event.data.volume}</strong></span>
-              </div>
-            )}
-
-            {event.data.materials && (
-              <div className="flex items-start gap-2 text-sm text-slate-600 mb-2">
-                <Icon name="Package" size={16} className="mt-0.5" />
-                <span>Материалы: <strong>{event.data.materials}</strong></span>
-              </div>
-            )}
-
-            {event.data.completion_percentage !== undefined && event.data.completion_percentage !== null && (
-              <div className="flex items-center gap-2 text-sm mb-3">
-                <Icon name="TrendingUp" size={16} className="text-green-600" />
-                <span className="text-green-600 font-semibold">
-                  Выполнено: {event.data.completion_percentage}%
-                </span>
-              </div>
-            )}
-
-            {event.data.photo_urls && event.data.photo_urls.split(',').filter(url => url.trim()).length > 0 && (
-              <div className="grid grid-cols-3 gap-2 mt-3">
-                {event.data.photo_urls.split(',').filter(url => url.trim()).map((url, idx) => (
-                  <img
-                    key={idx}
-                    src={url.trim()}
-                    alt={`Фото ${idx + 1}`}
-                    className="w-full h-20 object-cover rounded-lg border border-slate-200"
-                  />
-                ))}
-              </div>
-            )}
           </div>
         ) : (
           (() => {
@@ -140,48 +131,42 @@ export default function WorkLogTab({ workId, objectId }: WorkLogTabProps) {
             return (
               <div 
                 key={inspection.id} 
-                className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 cursor-pointer hover:shadow-md transition-shadow"
+                className="bg-white rounded-lg shadow-sm border border-slate-200 p-3 md:p-4 cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => navigate(`/inspection/${inspection.id}`)}
               >
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Icon name="ClipboardCheck" size={20} className="text-blue-600" />
+                <div className="flex items-start gap-2.5">
+                  <div className="w-9 h-9 md:w-10 md:h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Icon name="ClipboardCheck" size={18} className="text-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-semibold text-slate-900">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <h3 className="font-semibold text-slate-900 text-sm md:text-base">
                         Проверка №{inspection.inspection_number}
                       </h3>
                       {getStatusBadge(inspection.status)}
                     </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm text-slate-500">
-                        {inspection.author_name}
-                      </span>
-                      <span className="text-xs text-slate-400">
+                    <div className="text-xs md:text-sm text-slate-500 mb-2">
+                      {inspection.author_name}
+                      <span className="mx-1.5 text-slate-300">•</span>
+                      <span className="text-slate-400">
                         {formatDate(inspection.created_at)}
                       </span>
                     </div>
+
+                    <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs md:text-sm">
+                      <div className="flex items-center gap-1.5">
+                        <Icon name="AlertCircle" size={14} className="text-amber-500" />
+                        <span className="text-slate-600">Замечаний: <strong>{defectsArray.length}</strong></span>
+                      </div>
+                      {inspection.scheduled_date && (
+                        <div className="flex items-center gap-1.5 text-slate-500">
+                          <Icon name="Calendar" size={14} />
+                          <span>{new Date(inspection.scheduled_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-4 text-sm">
-                  <div className="flex items-center gap-1.5">
-                    <Icon name="Wrench" size={16} className="text-slate-400" />
-                    <span className="text-slate-600">{inspection.work_type_name || 'Работа'}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Icon name="AlertCircle" size={16} className="text-amber-500" />
-                    <span className="text-slate-600">Замечаний: <strong>{defectsArray.length}</strong></span>
-                  </div>
-                </div>
-
-                {inspection.scheduled_date && (
-                  <div className="flex items-center gap-2 text-sm text-slate-500 mt-2">
-                    <Icon name="Calendar" size={16} />
-                    <span>Запланирована на {new Date(inspection.scheduled_date).toLocaleDateString('ru-RU')}</span>
-                  </div>
-                )}
               </div>
             );
           })()
