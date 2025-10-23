@@ -50,7 +50,16 @@ export default function DefectsSectionNew({
   onRemoveDefect
 }: DefectsSectionProps) {
   const [uploadingPhotos, setUploadingPhotos] = useState<Record<string, boolean>>({});
+  const [expandedDrafts, setExpandedDrafts] = useState<Record<string, boolean>>({});
   const fileInputRefs = React.useRef<Record<string, HTMLInputElement | null>>({});
+
+  React.useEffect(() => {
+    draftDefects.forEach(draft => {
+      if (expandedDrafts[draft.tempId] === undefined) {
+        setExpandedDrafts(prev => ({ ...prev, [draft.tempId]: true }));
+      }
+    });
+  }, [draftDefects]);
 
   const handleFileSelect = async (tempId: string, e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -122,142 +131,171 @@ export default function DefectsSectionNew({
         </div>
       )}
 
-      {draftDefects.map((draft) => (
-        <div key={draft.tempId} className="mb-4 p-4 md:p-5 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border border-slate-200 space-y-3">
-          <div className="flex justify-between items-start mb-2">
-            <span className="text-xs font-semibold text-blue-600">Новое замечание</span>
-            <Button
+      {draftDefects.map((draft, index) => {
+        const isExpanded = expandedDrafts[draft.tempId] ?? true;
+        const draftNumber = defects.length + index + 1;
+
+        return (
+          <div key={draft.tempId} className="mb-4 border border-slate-200 rounded-xl bg-white shadow-sm">
+            <button
               type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => onRemoveDraft(draft.tempId)}
-              className="h-6 w-6 p-0 hover:bg-red-50 hover:text-red-600"
+              onClick={() => setExpandedDrafts(prev => ({ ...prev, [draft.tempId]: !prev[draft.tempId] }))}
+              className="w-full text-left p-4 flex items-center gap-3 hover:bg-slate-50 transition-colors rounded-t-xl"
             >
-              <Icon name="X" size={14} />
-            </Button>
-          </div>
-
-          <div>
-            <Label htmlFor={`description-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
-              Описание нарушения <span className="text-red-500">*</span>
-            </Label>
-            <Textarea
-              id={`description-${draft.tempId}`}
-              value={draft.description}
-              onChange={(e) => onDraftChange(draft.tempId, 'description', e.target.value)}
-              placeholder="Опишите выявленное нарушение"
-              rows={3}
-              className="text-sm resize-none"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor={`location-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
-              Местоположение
-            </Label>
-            <Input
-              id={`location-${draft.tempId}`}
-              value={draft.location || ''}
-              onChange={(e) => onDraftChange(draft.tempId, 'location', e.target.value)}
-              placeholder="Например: 2 этаж, комната 205"
-              className="text-sm h-9 md:h-10"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <Label htmlFor={`severity-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
-                Критичность
-              </Label>
-              <Select value={draft.severity || ''} onValueChange={(val) => onDraftChange(draft.tempId, 'severity', val)}>
-                <SelectTrigger className="text-sm h-9 md:h-10">
-                  <SelectValue placeholder="Выберите" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Низкая</SelectItem>
-                  <SelectItem value="medium">Средняя</SelectItem>
-                  <SelectItem value="high">Высокая</SelectItem>
-                  <SelectItem value="critical">Критическая</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor={`deadline-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
-                Срок устранения
-              </Label>
-              <Input
-                id={`deadline-${draft.tempId}`}
-                type="date"
-                value={draft.deadline || ''}
-                onChange={(e) => onDraftChange(draft.tempId, 'deadline', e.target.value)}
-                className="text-sm h-9 md:h-10"
+              <Icon 
+                name={isExpanded ? "ChevronDown" : "ChevronRight"} 
+                size={20} 
+                className="text-slate-500 flex-shrink-0"
               />
-            </div>
-          </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-semibold text-blue-600">Новое замечание</span>
+                  {draft.description && (
+                    <span className="text-xs text-slate-500">• {draft.description.slice(0, 50)}{draft.description.length > 50 ? '...' : ''}</span>
+                  )}
+                </div>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemoveDraft(draft.tempId);
+                }}
+                className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600 flex-shrink-0"
+              >
+                <Icon name="X" size={16} />
+              </Button>
+            </button>
 
-          <div>
-            <Label htmlFor={`responsible-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
-              Ответственный за устранение
-            </Label>
-            <Input
-              id={`responsible-${draft.tempId}`}
-              value={draft.responsible || ''}
-              onChange={(e) => onDraftChange(draft.tempId, 'responsible', e.target.value)}
-              placeholder="ФИО или название организации"
-              className="text-sm h-9 md:h-10"
-            />
-          </div>
+            {isExpanded && (
+              <div className="px-4 pb-4 space-y-3">
 
-          <div>
-            <Label className="text-xs md:text-sm mb-1 block">
-              Фотофиксация
-            </Label>
-            <input
-              ref={(el) => fileInputRefs.current[draft.tempId] = el}
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={(e) => handleFileSelect(draft.tempId, e)}
-              className="hidden"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => fileInputRefs.current[draft.tempId]?.click()}
-              disabled={uploadingPhotos[draft.tempId]}
-              className="w-full"
-            >
-              <Icon name="Camera" size={16} className="mr-2" />
-              {uploadingPhotos[draft.tempId] ? 'Загрузка...' : 'Добавить фото'}
-            </Button>
-          </div>
+                <div>
+                  <Label htmlFor={`description-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
+                    Описание нарушения <span className="text-red-500">*</span>
+                  </Label>
+                  <Textarea
+                    id={`description-${draft.tempId}`}
+                    value={draft.description}
+                    onChange={(e) => onDraftChange(draft.tempId, 'description', e.target.value)}
+                    placeholder="Опишите выявленное нарушение"
+                    rows={3}
+                    className="text-sm resize-none"
+                  />
+                </div>
 
-          {draft.photos.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {draft.photos.map((url, idx) => (
-                <div key={idx} className="relative group">
-                  <img
-                    src={url}
-                    alt={`Фото ${idx + 1}`}
-                    className="w-full h-24 object-cover rounded-lg border-2 border-white shadow-sm"
+                <div>
+                  <Label htmlFor={`location-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
+                    Местоположение
+                  </Label>
+                  <Input
+                    id={`location-${draft.tempId}`}
+                    value={draft.location || ''}
+                    onChange={(e) => onDraftChange(draft.tempId, 'location', e.target.value)}
+                    placeholder="Например: 2 этаж, комната 205"
+                    className="text-sm h-9 md:h-10"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor={`severity-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
+                      Критичность
+                    </Label>
+                    <Select value={draft.severity || ''} onValueChange={(val) => onDraftChange(draft.tempId, 'severity', val)}>
+                      <SelectTrigger className="text-sm h-9 md:h-10">
+                        <SelectValue placeholder="Выберите" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Низкая</SelectItem>
+                        <SelectItem value="medium">Средняя</SelectItem>
+                        <SelectItem value="high">Высокая</SelectItem>
+                        <SelectItem value="critical">Критическая</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor={`deadline-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
+                      Срок устранения
+                    </Label>
+                    <Input
+                      id={`deadline-${draft.tempId}`}
+                      type="date"
+                      value={draft.deadline || ''}
+                      onChange={(e) => onDraftChange(draft.tempId, 'deadline', e.target.value)}
+                      className="text-sm h-9 md:h-10"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor={`responsible-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
+                    Ответственный за устранение
+                  </Label>
+                  <Input
+                    id={`responsible-${draft.tempId}`}
+                    value={draft.responsible || ''}
+                    onChange={(e) => onDraftChange(draft.tempId, 'responsible', e.target.value)}
+                    placeholder="ФИО или название организации"
+                    className="text-sm h-9 md:h-10"
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-xs md:text-sm mb-1 block">
+                    Фотофиксация
+                  </Label>
+                  <input
+                    ref={(el) => fileInputRefs.current[draft.tempId] = el}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => handleFileSelect(draft.tempId, e)}
+                    className="hidden"
                   />
                   <Button
                     type="button"
-                    variant="destructive"
+                    variant="outline"
                     size="sm"
-                    className="absolute top-1 right-1 h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                    onClick={() => onDraftPhotoRemove(draft.tempId, url)}
+                    onClick={() => fileInputRefs.current[draft.tempId]?.click()}
+                    disabled={uploadingPhotos[draft.tempId]}
+                    className="w-full"
                   >
-                    <Icon name="X" size={14} />
+                    <Icon name="Camera" size={16} className="mr-2" />
+                    {uploadingPhotos[draft.tempId] ? 'Загрузка...' : 'Добавить фото'}
                   </Button>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
+
+                {draft.photos.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {draft.photos.map((url, idx) => (
+                      <div key={idx} className="relative group">
+                        <img
+                          src={url}
+                          alt={`Фото ${idx + 1}`}
+                          className="w-full h-24 object-cover rounded-lg border-2 border-white shadow-sm"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-1 right-1 h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                          onClick={() => onDraftPhotoRemove(draft.tempId, url)}
+                        >
+                          <Icon name="X" size={14} />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
 
       {isDraft && isClient && (draftDefects.length > 0 || defects.length > 0) && (
         <div className="flex gap-2">
