@@ -41,19 +41,19 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, isLoading, token, verifyToken, loadUserData } = useAuthRedux();
+  const { isAuthenticated, isLoading, token, verifyToken, loadUserData, userData } = useAuthRedux();
   const initRef = useRef(false);
   
   useEffect(() => {
-    if (!initRef.current && token && !isAuthenticated) {
+    if (!initRef.current && token) {
       initRef.current = true;
       verifyToken().then((result: any) => {
-        if (result.payload?.success) {
+        if (result.payload === true || result.meta?.requestStatus === 'fulfilled') {
           loadUserData();
         }
       });
     }
-  }, [token, isAuthenticated, verifyToken, loadUserData]);
+  }, [token, verifyToken, loadUserData]);
   
   if (isLoading) {
     return (

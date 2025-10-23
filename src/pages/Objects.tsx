@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
@@ -45,7 +45,9 @@ export default function Objects() {
 
   const objects = useAppSelector((state) => state.objects.items);
   const works = useAppSelector((state) => state.works.items);
-  const unreadCounts = useAppSelector((state) => state.user.userData?.unreadCounts || {});
+  const userDataUnreadCounts = useAppSelector((state) => state.user.userData?.unreadCounts);
+  
+  const unreadCounts = useMemo(() => userDataUnreadCounts || {}, [userDataUnreadCounts]);
   
   console.log('🔔 unreadCounts:', unreadCounts);
 
