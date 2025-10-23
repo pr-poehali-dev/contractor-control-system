@@ -153,46 +153,29 @@ const MyTasks = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
-          <Card 
-            className={`cursor-pointer transition-all ${filter === 'all' ? 'ring-2 ring-blue-600' : ''}`}
-            onClick={() => setFilter('all')}
-          >
-            <CardContent className="p-3 text-center">
-              <div className="text-xl font-bold text-slate-900">{stats.all}</div>
-              <div className="text-xs text-slate-600">Всего</div>
-            </CardContent>
-          </Card>
+        <div className="mb-4 space-y-3">
+          <div className="relative">
+            <Icon name="Search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Input
+              type="text"
+              placeholder="Поиск по задачам, актам, объектам..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
 
-          <Card 
-            className={`cursor-pointer transition-all ${filter === 'pending' ? 'ring-2 ring-orange-600' : ''}`}
-            onClick={() => setFilter('pending')}
-          >
-            <CardContent className="p-3 text-center">
-              <div className="text-xl font-bold text-orange-600">{stats.pending}</div>
-              <div className="text-xs text-slate-600">В работе</div>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className={`cursor-pointer transition-all ${filter === 'completed' ? 'ring-2 ring-blue-600' : ''}`}
-            onClick={() => setFilter('completed')}
-          >
-            <CardContent className="p-3 text-center">
-              <div className="text-xl font-bold text-blue-600">{stats.completed}</div>
-              <div className="text-xs text-slate-600">На проверке</div>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className={`cursor-pointer transition-all ${filter === 'verified' ? 'ring-2 ring-green-600' : ''}`}
-            onClick={() => setFilter('verified')}
-          >
-            <CardContent className="p-3 text-center">
-              <div className="text-xl font-bold text-green-600">{stats.verified}</div>
-              <div className="text-xs text-slate-600">Выполнено</div>
-            </CardContent>
-          </Card>
+          <Select value={filter} onValueChange={(value: any) => setFilter(value)}>
+            <SelectTrigger className="w-full sm:w-[240px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Всего ({stats.all})</SelectItem>
+              <SelectItem value="pending">В работе ({stats.pending})</SelectItem>
+              <SelectItem value="completed">На проверке ({stats.completed})</SelectItem>
+              <SelectItem value="verified">Выполнено ({stats.verified})</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {filteredTasks.length === 0 ? (
