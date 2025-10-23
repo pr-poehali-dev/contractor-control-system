@@ -142,16 +142,10 @@ const MyTasks = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="bg-white">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold">
-            Мои задачи
-          </h1>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-4 py-4">
-        <div className="mb-4 space-y-3">
+      <div className="bg-white border-b border-slate-200 p-4">
+        <h1 className="text-2xl font-bold text-slate-900 mb-4">Мои задачи</h1>
+        
+        <div className="space-y-3">
           <div className="relative">
             <Icon name="Search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <Input
@@ -159,12 +153,12 @@ const MyTasks = () => {
               placeholder="Поиск по задачам, актам, объектам..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 h-11"
             />
           </div>
 
           <Select value={filter} onValueChange={(value: any) => setFilter(value)}>
-            <SelectTrigger className="w-full sm:w-[240px]">
+            <SelectTrigger className="w-full h-11">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -175,6 +169,9 @@ const MyTasks = () => {
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 py-4">
 
         {filteredTasks.length === 0 ? (
           <Card>
