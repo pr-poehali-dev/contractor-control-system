@@ -7,6 +7,7 @@ import inspectionsReducer from './slices/inspectionsSlice';
 import contractorsReducer from './slices/contractorsSlice';
 import defectReportsReducer from './slices/defectReportsSlice';
 import chatMessagesReducer from './slices/chatMessagesSlice';
+import infoPostsReducer from './slices/infoPostsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     contractors: contractorsReducer,
     defectReports: defectReportsReducer,
     chatMessages: chatMessagesReducer,
+    infoPosts: infoPostsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

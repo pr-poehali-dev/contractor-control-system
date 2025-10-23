@@ -48,8 +48,6 @@ export default function Objects() {
   const userDataUnreadCounts = useAppSelector((state) => state.user.userData?.unreadCounts);
   
   const unreadCounts = useMemo(() => userDataUnreadCounts || {}, [userDataUnreadCounts]);
-  
-  console.log('🔔 unreadCounts:', unreadCounts);
 
   const objectData = objects.map(obj => {
     const objectWorks = works.filter(w => w.object_id === obj.id);

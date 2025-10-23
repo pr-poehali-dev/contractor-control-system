@@ -139,12 +139,10 @@ export function useInspectionActions(
     
     setLoadingReport(true);
     try {
-      console.log('📤 Sending POST request to create report...');
       const response = await apiClient.post(ENDPOINTS.DEFECTS.REPORTS, {
         inspection_id: parseInt(inspection.id.toString()),
         notes: ''
       });
-      console.log('📥 Response received:', response);
       
       if (!response.success) {
         console.error('Failed to create report:', response.error);

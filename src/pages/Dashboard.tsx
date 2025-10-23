@@ -9,6 +9,7 @@ import { api, InspectionEvent as ApiInspectionEvent } from '@/lib/api';
 import Icon from '@/components/ui/icon';
 import { apiClient } from '@/api/apiClient';
 import { createWorkLog } from '@/store/slices/workLogsSlice';
+import { createInfoPost } from '@/store/slices/infoPostsSlice';
 import { ENDPOINTS } from '@/api/endpoints';
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
 import FeedFilters from '@/components/dashboard/FeedFilters';
@@ -101,26 +102,15 @@ const Dashboard = () => {
   };
 
   const loadFeed = async () => {
-    if (!user) {
-      console.log('⚠️ loadFeed: No user, skipping');
-      return;
-    }
+    if (!user) return;
     
-    console.log('🔄 loadFeed: Starting...', { userId: user.id });
     setLoading(true);
     try {
       const url = `${ENDPOINTS.FEED}?user_id=${user.id}`;
-      console.log('📡 loadFeed: Fetching from', url);
       const response = await apiClient.get(url);
       
-      console.log('📥 loadFeed: Response received', response);
-      
       if (response.success) {
-        // Backend возвращает { success: true, events: [...] }
-        // apiClient.normalizeResponse возвращает это как есть
         const rawEvents = (response as any).events || [];
-        console.log('📦 loadFeed: rawEvents count', rawEvents.length);
-        console.log('📦 loadFeed: rawEvents sample', rawEvents.slice(0, 2));
         
         const normalizedEvents = rawEvents.map((event: any) => {
           if (event.photoUrls && typeof event.photoUrls === 'string') {
@@ -132,13 +122,10 @@ const Dashboard = () => {
           }
           return event;
         }) || [];
-        console.log('✅ loadFeed: Loaded events', normalizedEvents.length);
         setFeed(normalizedEvents);
-      } else {
-        console.warn('⚠️ loadFeed: Response not successful', response);
       }
     } catch (error) {
-      console.error('❌ loadFeed: Error', error);
+      console.error('Failed to load feed:', error);
     } finally {
       setLoading(false);
     }
@@ -304,11 +291,11 @@ const Dashboard = () => {
     }
 
     try {
-      await api.createItem(token!, 'info_post', {
+      await dispatch(createInfoPost({
         title: infoPostForm.title,
         content: infoPostForm.content,
-        link: infoPostForm.link || null
-      });
+        link: infoPostForm.link || undefined
+      })).unwrap();
 
       toast({
         title: 'Инфо-пост создан',

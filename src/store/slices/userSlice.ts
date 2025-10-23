@@ -201,15 +201,6 @@ export const loadUserData = createAsyncThunk(
 
       const data = response.data as UserData;
       
-      console.log('📊 loadUserData response.data:', data);
-      console.log('📦 Objects count:', data.objects?.length || 0);
-      console.log('⚒️ Works count:', data.works?.length || 0);
-      console.log('📋 WorkLogs count:', data.workLogs?.length || 0);
-      console.log('💬 ChatMessages count:', data.chatMessages?.length || 0);
-      console.log('🔍 Inspections count:', data.inspections?.length || 0);
-      console.log('📄 Defect reports count:', data.defect_reports?.length || 0);
-      
-      // Динамически импортируем slices и обновляем данные
       try {
         const { setObjects } = await import('./objectsSlice');
         const { setWorks } = await import('./worksSlice');
@@ -219,7 +210,6 @@ export const loadUserData = createAsyncThunk(
         const { setDefectReports } = await import('./defectReportsSlice');
         const { setChatMessages } = await import('./chatMessagesSlice');
         
-        console.log('🚀 Dispatching to Redux...');
         dispatch(setObjects(data.objects || []));
         dispatch(setWorks(data.works || []));
         dispatch(setWorkLogs(data.workLogs || []));
@@ -227,7 +217,6 @@ export const loadUserData = createAsyncThunk(
         dispatch(setContractors(data.contractors || []));
         dispatch(setDefectReports(data.defect_reports || []));
         dispatch(setChatMessages(data.chatMessages || []));
-        console.log('✅ Dispatched successfully');
       } catch (importError) {
         console.error('Failed to import slices:', importError);
       }

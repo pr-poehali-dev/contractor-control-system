@@ -1,9 +1,6 @@
 const API_BASE_URL = 'https://functions.poehali.dev';
 
 const AUTH_API = 'b9d6731e-788e-476b-bad5-047bd3d6adc1';
-const DATA_API = 'c30e1bf9-0423-48e8-b295-07120e205fa7';
-const CREATE_API = '8d57b03e-49c5-4589-abfb-691e6e084c6a';
-const UPDATE_API = 'b69598bf-df90-4a71-93a1-6108c6c39317';
 const INSPECTION_EVENT_API = '0b3a32ce-bc6d-455c-a189-7cd294c69c95';
 
 export interface User {
@@ -130,85 +127,6 @@ export const api = {
     }
 
     return response.json();
-  },
-
-  async getUserData(token: string): Promise<UserData> {
-    const response = await fetch(`${API_BASE_URL}/bdee636b-a6c0-42d0-8f77-23c316751e34`, {
-      method: 'GET',
-      headers: {
-        'X-Auth-Token': token,
-      },
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to fetch data');
-    }
-
-    return response.json();
-  },
-
-  async createItem(token: string, type: string, data: any): Promise<any> {
-    const response = await fetch(`${API_BASE_URL}/${CREATE_API}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Auth-Token': token,
-      },
-      body: JSON.stringify({ type, data }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to create item');
-    }
-
-    return response.json();
-  },
-
-  async updateItem(token: string, type: string, id: number, data: any): Promise<any> {
-    const response = await fetch(`${API_BASE_URL}/${UPDATE_API}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Auth-Token': token,
-      },
-      body: JSON.stringify({ type, id, data }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to update item');
-    }
-
-    return response.json();
-  },
-
-  async deleteItem(token: string, type: string, id: number): Promise<any> {
-    const url = `${API_BASE_URL}/${UPDATE_API}`;
-    const payload = { type, id };
-    console.log('API: DELETE request', { url, method: 'DELETE', payload });
-    
-    const response = await fetch(url, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Auth-Token': token,
-      },
-      body: JSON.stringify(payload),
-    });
-
-    console.log('API: DELETE response', { status: response.status, ok: response.ok });
-
-    if (!response.ok) {
-      const error = await response.json();
-      console.error('API: DELETE error', error);
-      throw new Error(error.error || 'Failed to delete item');
-    }
-
-    const result = await response.json();
-    console.log('API: DELETE success', result);
-    return result;
   },
 
   async getInspectionEvents(token: string, inspectionId?: number): Promise<InspectionEvent[]> {
