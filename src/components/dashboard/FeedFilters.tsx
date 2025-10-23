@@ -102,7 +102,7 @@ const FeedFilters = ({ filter, onFilterChange, selectedTags, onTagsChange, avail
     .filter(t => t.label.toLowerCase().includes(workSearch.toLowerCase()))
     .map(tag => ({
       ...tag,
-      disabled: !isTagAvailable(tag.id, 'work')
+      disabled: false
     }));
   
   const allContractorTags = availableTags.filter(t => t.type === 'contractor');
