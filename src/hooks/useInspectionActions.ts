@@ -23,12 +23,7 @@ export function useInspectionActions(
 
   const handleBack = () => {
     sessionStorage.removeItem('inspectionFromPage');
-    const work = userData?.works?.find((w: any) => w.id === inspection?.work_id);
-    if (work?.object_id && inspection?.work_id) {
-      navigate(`/objects/${work.object_id}/works/${inspection.work_id}`);
-    } else {
-      navigate('/dashboard');
-    }
+    navigate(-1);
   };
 
   const handleCompleteInspection = async () => {
