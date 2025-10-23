@@ -21,7 +21,7 @@ const PublicObject = () => {
   const { toast } = useToast();
   const [object, setObject] = useState<BuildingObject | null>(null);
   const [works, setWorks] = useState<Work[]>([]);
-  const [activeTab, setActiveTab] = useState('info');
+  const [activeTab, setActiveTab] = useState('journal');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
