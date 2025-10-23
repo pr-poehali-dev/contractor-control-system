@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
-import { api } from '@/lib/api';
+import { useAppDispatch } from '@/store/hooks';
+import { deleteObject } from '@/store/slices/objectsSlice';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,8 +22,9 @@ import ObjectInfoBar from '@/components/objects/ObjectInfoBar';
 const ObjectDetail = () => {
   const { objectId } = useParams();
   const navigate = useNavigate();
-  const { user, userData } = useAuthRedux();
+  const { user, userData, loadUserData } = useAuthRedux();
   const { toast } = useToast();
+  const dispatch = useAppDispatch();
   const [showActions, setShowActions] = useState(false);
   const [sortBy, setSortBy] = useState<string>('priority');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -102,14 +104,11 @@ const ObjectDetail = () => {
 
   const handleDelete = async () => {
     if (!confirm('Удалить объект? Это действие нельзя отменить.')) return;
-    if (!user) return;
+    if (!user || !object) return;
     
     try {
-      await api.deleteItem(token!, 'object', object.id);
-      if (token) {
-        const refreshed = await api.getUserData(token);
-        setUserData(refreshed);
-      }
+      await dispatch(deleteObject(object.id)).unwrap();
+      await loadUserData();
       toast({ title: 'Объект удалён' });
       navigate('/objects');
     } catch (error) {

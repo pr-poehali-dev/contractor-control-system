@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
-import { api } from '@/lib/api';
+import { useAppDispatch } from '@/store/hooks';
+import { updateObject } from '@/store/slices/objectsSlice';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +14,8 @@ const EditObject = () => {
   const { objectId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, token, loadUserData, userData } = useAuthRedux();
+  const { user, loadUserData, userData } = useAuthRedux();
+  const dispatch = useAppDispatch();
   const [formData, setFormData] = useState({
     title: '',
     address: '',
@@ -53,14 +55,15 @@ const EditObject = () => {
     setIsSubmitting(true);
 
     try {
-      await api.updateItem(token!, 'object', Number(objectId), {
-        title: formData.title,
-        address: formData.address,
-      });
+      await dispatch(updateObject({
+        id: Number(objectId),
+        data: {
+          title: formData.title,
+          address: formData.address,
+        },
+      })).unwrap();
 
-      if (token) {
-        await loadUserData();
-      }
+      await loadUserData();
 
       toast({
         title: 'Объект обновлён!',

@@ -7,7 +7,8 @@ import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
-import { api } from '@/lib/api';
+import { useAppDispatch } from '@/store/hooks';
+import { createInspection } from '@/store/slices/inspectionsSlice';
 
 interface CreateInspectionSimpleProps {
   isOpen: boolean;
@@ -17,14 +18,15 @@ interface CreateInspectionSimpleProps {
 
 export default function CreateInspectionSimple({ isOpen, onClose, workId }: CreateInspectionSimpleProps) {
   const navigate = useNavigate();
-  const { token, loadUserData, userData, user } = useAuthRedux();
+  const { loadUserData, userData, user } = useAuthRedux();
   const { toast } = useToast();
+  const dispatch = useAppDispatch();
   
   const [loading, setLoading] = useState(false);
   const [scheduledDate, setScheduledDate] = useState('');
 
   const handleCreate = async () => {
-    if (!token || !user?.id) return;
+    if (!user?.id) return;
     
     if (scheduledDate) {
       const date = new Date(scheduledDate);
@@ -43,15 +45,15 @@ export default function CreateInspectionSimple({ isOpen, onClose, workId }: Crea
     
     setLoading(true);
     try {
-      const result = await api.createItem(token, 'inspection', {
+      const result = await dispatch(createInspection({
         work_id: workId,
         type: scheduledDate ? 'scheduled' : 'unscheduled',
         title: 'Проверка',
         scheduled_date: scheduledDate || undefined,
         status: scheduledDate ? 'draft' : 'active'
-      });
+      })).unwrap();
       
-      const inspectionId = result?.data?.id;
+      const inspectionId = result?.id;
       
       if (!inspectionId) {
         console.error('No inspection ID returned, result:', result);

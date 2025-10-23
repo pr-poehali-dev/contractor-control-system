@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
-import { api } from '@/lib/api';
+import { useAppDispatch } from '@/store/hooks';
+import { createObject } from '@/store/slices/objectsSlice';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +13,8 @@ import { useToast } from '@/hooks/use-toast';
 const CreateObject = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, token, loadUserData } = useAuthRedux();
+  const { user, loadUserData } = useAuthRedux();
+  const dispatch = useAppDispatch();
   const [formData, setFormData] = useState({
     title: '',
     address: '',
@@ -42,15 +44,13 @@ const CreateObject = () => {
     setIsSubmitting(true);
 
     try {
-      await api.createItem(token!, 'object', {
+      const result = await dispatch(createObject({
         title: formData.title,
         address: formData.address,
         status: 'active',
-      });
+      })).unwrap();
 
-      if (token) {
-        await loadUserData();
-      }
+      await loadUserData();
 
       toast({
         title: 'Объект создан!',
