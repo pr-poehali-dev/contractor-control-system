@@ -7,10 +7,11 @@ import {
   verifyToken as verifyTokenAction,
   loadUserData as loadUserDataAction,
 } from '@/store/slices/userSlice';
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 
 export const useAuthRedux = () => {
   const dispatch = useAppDispatch();
+  const hasInitialized = useRef(false);
   
   const user = useAppSelector((state) => state.user.user);
   const token = useAppSelector((state) => state.user.token);
@@ -18,28 +19,28 @@ export const useAuthRedux = () => {
   const isLoading = useAppSelector((state) => state.user.isLoading);
   const error = useAppSelector((state) => state.user.error);
 
-  const objects = useAppSelector((state) => state.objects.objects);
-  const works = useAppSelector((state) => state.works.works);
-  const inspections = useAppSelector((state) => state.inspections.inspections);
-  const workLogs = useAppSelector((state) => state.workLogs.workLogs);
-  const contractors = useAppSelector((state) => state.contractors.contractors);
-  const defectReports = useAppSelector((state) => state.defectReports.defectReports);
-  const chatMessages = useAppSelector((state) => state.chatMessages.chatMessages);
+  const userData = useAppSelector((state) => ({
+    objects: state.objects.objects,
+    works: state.works.works,
+    inspections: state.inspections.inspections,
+    remarks: [],
+    workLogs: state.workLogs.workLogs,
+    checkpoints: [],
+    contractors: state.contractors.contractors,
+    chatMessages: state.chatMessages.chatMessages,
+    defect_reports: state.defectReports.defectReports,
+  }));
 
-  const userData = useMemo(
-    () => ({
-      objects,
-      works,
-      inspections,
-      remarks: [],
-      workLogs,
-      checkpoints: [],
-      contractors,
-      chatMessages,
-      defect_reports: defectReports,
-    }),
-    [objects, works, inspections, workLogs, contractors, chatMessages, defectReports]
-  );
+  useEffect(() => {
+    if (!hasInitialized.current && token) {
+      hasInitialized.current = true;
+      dispatch(verifyTokenAction()).then((result) => {
+        if (verifyTokenAction.fulfilled.match(result)) {
+          dispatch(loadUserDataAction());
+        }
+      });
+    }
+  }, [dispatch, token]);
 
   const login = async (email: string, password: string) => {
     const result = await dispatch(loginAction({ email, password }));
