@@ -187,9 +187,7 @@ export default function DefectsSectionNew({
                 </div>
 
                 <div>
-                  <Label htmlFor={`location-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
-                    Местоположение
-                  </Label>
+                  <Label htmlFor={`location-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">Место осмотра</Label>
                   <Input
                     id={`location-${draft.tempId}`}
                     value={draft.location || ''}
