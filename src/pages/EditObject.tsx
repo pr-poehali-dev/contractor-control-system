@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { api } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,7 @@ const EditObject = () => {
   const { objectId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, token, setUserData, userData } = useAuth();
+  const { user, token, loadUserData, userData } = useAuthRedux();
   const [formData, setFormData] = useState({
     title: '',
     address: '',
@@ -59,8 +59,7 @@ const EditObject = () => {
       });
 
       if (token) {
-        const refreshedData = await api.getUserData(token);
-        setUserData(refreshedData);
+        await loadUserData();
       }
 
       toast({

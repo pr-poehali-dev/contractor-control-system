@@ -3,10 +3,10 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 
 const Analytics = () => {
-  const { userData } = useAuth();
+  const { userData } = useAuthRedux();
 
   const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
   const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];

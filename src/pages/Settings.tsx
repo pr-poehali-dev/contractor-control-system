@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ import Icon from '@/components/ui/icon';
 import { Badge } from '@/components/ui/badge';
 
 const Settings = () => {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthRedux();
   const navigate = useNavigate();
 
   const handleLogout = () => {

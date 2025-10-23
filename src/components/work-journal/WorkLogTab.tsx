@@ -1,4 +1,4 @@
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { api, InspectionEvent as ApiInspectionEvent } from '@/lib/api';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -15,7 +15,7 @@ interface WorkLogTabProps {
 }
 
 export default function WorkLogTab({ workId, objectId, onCreateInspection, onCreateReport, userRole }: WorkLogTabProps) {
-  const { userData } = useAuth();
+  const { userData } = useAuthRedux();
   const navigate = useNavigate();
   const [inspectionEvents, setInspectionEvents] = useState<ApiInspectionEvent[]>([]);
 

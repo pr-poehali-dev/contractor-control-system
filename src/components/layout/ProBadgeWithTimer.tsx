@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 
 interface TimeLeft {
   hours: number;
@@ -12,7 +12,7 @@ interface TimeLeft {
 
 export default function ProBadgeWithTimer() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user } = useAuthRedux();
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
   const [isOfferActive, setIsOfferActive] = useState(false);
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 
 interface TimeLeft {
   hours: number;
@@ -10,7 +10,7 @@ interface TimeLeft {
 }
 
 export default function DiscountTimer() {
-  const { user } = useAuth();
+  const { user } = useAuthRedux();
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
   const [isOfferActive, setIsOfferActive] = useState(false);
 

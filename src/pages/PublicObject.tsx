@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { Work, BuildingObject } from '@/components/public-object/types';
@@ -17,7 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 const PublicObject = () => {
   const { objectId } = useParams();
   const navigate = useNavigate();
-  const { userData, token, setUserData } = useAuth();
+  const { userData, token, loadUserData } = useAuthRedux();
   const { toast } = useToast();
   const [object, setObject] = useState<BuildingObject | null>(null);
   const [works, setWorks] = useState<Work[]>([]);
@@ -65,8 +65,7 @@ const PublicObject = () => {
     
     setIsRefreshing(true);
     try {
-      const refreshedData = await api.getUserData(token);
-      setUserData(refreshedData);
+      await loadUserData();
       toast({
         title: 'Данные обновлены',
         description: 'График работ обновлён',

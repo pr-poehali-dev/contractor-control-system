@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { api } from '@/lib/api';
 import type { Work } from '@/contexts/AuthContext';
 import { getWorkStatusInfo } from '@/utils/workStatus';
@@ -17,7 +17,7 @@ interface WorkStartNotificationProps {
 
 export default function WorkStartNotification({ work, onNotified }: WorkStartNotificationProps) {
   const { toast } = useToast();
-  const { token, setUserData } = useAuth();
+  const { token, setUserData } = useAuthRedux();
   const [isNotifying, setIsNotifying] = useState(false);
   const statusInfo = getWorkStatusInfo(work);
 

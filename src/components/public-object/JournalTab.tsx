@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { safeDateCompare, isValidDate } from '@/utils/dateValidation';
 
 interface JournalTabProps {
@@ -8,7 +8,7 @@ interface JournalTabProps {
 }
 
 const JournalTab = ({ objectId }: JournalTabProps) => {
-  const { userData } = useAuth();
+  const { userData } = useAuthRedux();
 
   const works = (userData?.works && Array.isArray(userData.works)) 
     ? userData.works.filter(w => w.object_id === objectId) 

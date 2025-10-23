@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
 const Documents = () => {
-  const { userData } = useAuth();
+  const { userData } = useAuthRedux();
   const navigate = useNavigate();
   const [filter, setFilter] = useState<'all' | 'defect_reports' | 'acts' | 'protocols'>('all');
 

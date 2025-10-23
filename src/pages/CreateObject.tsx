@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { api } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 const CreateObject = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, token, setUserData } = useAuth();
+  const { user, token, setUserData } = useAuthRedux();
   const [formData, setFormData] = useState({
     title: '',
     address: '',

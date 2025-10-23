@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
@@ -24,7 +24,7 @@ interface Task {
 
 const MyTasks = () => {
   const navigate = useNavigate();
-  const { user, token } = useAuth();
+  const { user, token } = useAuthRedux();
   const { toast } = useToast();
   
   const [tasks, setTasks] = useState<Task[]>([]);

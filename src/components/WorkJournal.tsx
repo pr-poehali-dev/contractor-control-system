@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
@@ -30,7 +30,7 @@ interface WorkJournalProps {
 }
 
 export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalProps) {
-  const { user, userData } = useAuth();
+  const { user, userData } = useAuthRedux();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [inspectionEvents, setInspectionEvents] = useState<ApiInspectionEvent[]>([]);

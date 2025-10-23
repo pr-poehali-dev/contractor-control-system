@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { apiClient } from '@/api/apiClient';
 import { ENDPOINTS } from '@/api/endpoints';
 import {
@@ -19,7 +19,7 @@ import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 
 const WorkTemplates = () => {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user } = useAuthRedux();
   const [templates, setTemplates] = useState<WorkTemplate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);

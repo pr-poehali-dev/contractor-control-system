@@ -1,14 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import Icon from '@/components/ui/icon';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 
 interface AnalyticsTabProps {
   objectId: number;
 }
 
 const AnalyticsTab = ({ objectId }: AnalyticsTabProps) => {
-  const { userData } = useAuth();
+  const { userData } = useAuthRedux();
 
   const works = (userData?.works && Array.isArray(userData.works)) 
     ? userData.works.filter(w => w.object_id === objectId) 

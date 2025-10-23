@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { deleteObject } from '@/store/slices/objectsSlice';
 import { useToast } from '@/hooks/use-toast';
@@ -17,7 +17,7 @@ type ViewMode = 'grid' | 'table';
 
 export default function Objects() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user } = useAuthRedux();
   const dispatch = useAppDispatch();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');

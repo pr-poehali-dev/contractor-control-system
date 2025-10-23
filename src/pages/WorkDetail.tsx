@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useAppSelector } from '@/store/hooks';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
@@ -8,7 +8,7 @@ import WorkJournal from '@/components/WorkJournal';
 const WorkDetail = () => {
   const { objectId, workId } = useParams();
   const navigate = useNavigate();
-  const { isLoading, userData } = useAuth();
+  const { isLoading, userData } = useAuthRedux();
   const works = useAppSelector((state) => 
     state.works.items.filter(w => w.object_id === Number(objectId))
   );

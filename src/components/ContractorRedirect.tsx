@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import Icon from '@/components/ui/icon';
 import { apiClient } from '@/api/apiClient';
 import { ENDPOINTS } from '@/api/endpoints';
 
 const ContractorRedirect = () => {
-  const { user } = useAuth();
+  const { user } = useAuthRedux();
   const navigate = useNavigate();
   const [isChecking, setIsChecking] = useState(true);
 

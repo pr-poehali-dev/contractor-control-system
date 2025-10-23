@@ -1,14 +1,14 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 
 interface InspectionsTabProps {
   objectId: number;
 }
 
 const InspectionsTab = ({ objectId }: InspectionsTabProps) => {
-  const { userData } = useAuth();
+  const { userData } = useAuthRedux();
 
   const works = (userData?.works && Array.isArray(userData.works)) 
     ? userData.works.filter(w => w.object_id === objectId) 

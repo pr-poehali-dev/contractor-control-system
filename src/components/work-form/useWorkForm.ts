@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { loadUserData } from '@/store/slices/userSlice';
 import { api } from '@/lib/api';
@@ -18,7 +18,7 @@ interface ObjectData {
 export const useWorkForm = (objectId: string | undefined) => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, token } = useAuth();
+  const { user, token } = useAuthRedux();
   const dispatch = useAppDispatch();
   const userData = useAppSelector((state) => state.user.userData);
   const [works, setWorks] = useState<WorkForm[]>([]);

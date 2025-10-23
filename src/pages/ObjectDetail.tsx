@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,7 +21,7 @@ import ObjectInfoBar from '@/components/objects/ObjectInfoBar';
 const ObjectDetail = () => {
   const { objectId } = useParams();
   const navigate = useNavigate();
-  const { user, token, userData, setUserData } = useAuth();
+  const { user, token, userData, setUserData } = useAuthRedux();
   const { toast } = useToast();
   const [showActions, setShowActions] = useState(false);
   const [sortBy, setSortBy] = useState<string>('priority');

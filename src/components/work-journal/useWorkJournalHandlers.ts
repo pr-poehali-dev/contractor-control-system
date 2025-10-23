@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { api } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { useAppDispatch } from '@/store/hooks';
@@ -8,7 +8,7 @@ import { createWorkLog } from '@/store/slices/workLogsSlice';
 import { fetchUserData } from '@/store/slices/userSlice';
 
 export function useWorkJournalHandlers(selectedWork: number | null) {
-  const { user, token, setUserData } = useAuth();
+  const { user, token, setUserData } = useAuthRedux();
   const { toast } = useToast();
   const dispatch = useAppDispatch();
 

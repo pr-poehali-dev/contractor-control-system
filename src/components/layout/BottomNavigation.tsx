@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
@@ -22,7 +22,7 @@ const mobileNavItems: NavItem[] = [
 export default function BottomNavigation() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user } = useAuthRedux();
 
   const visibleNavItems = mobileNavItems
     .filter((item) => !item.roles || item.roles.includes(user?.role as any || 'contractor'))

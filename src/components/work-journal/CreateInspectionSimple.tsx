@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { api } from '@/lib/api';
 
 interface CreateInspectionSimpleProps {
@@ -17,7 +17,7 @@ interface CreateInspectionSimpleProps {
 
 export default function CreateInspectionSimple({ isOpen, onClose, workId }: CreateInspectionSimpleProps) {
   const navigate = useNavigate();
-  const { token, loadUserData, userData, user } = useAuth();
+  const { token, loadUserData, userData, user } = useAuthRedux();
   const { toast } = useToast();
   
   const [loading, setLoading] = useState(false);

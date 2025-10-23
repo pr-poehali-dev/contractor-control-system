@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
@@ -14,7 +14,7 @@ const Login = () => {
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [devCode, setDevCode] = useState('');
-  const { loginWithPhone, login } = useAuth();
+  const { loginWithPhone, login } = useAuthRedux();
   const navigate = useNavigate();
   const { toast } = useToast();
 

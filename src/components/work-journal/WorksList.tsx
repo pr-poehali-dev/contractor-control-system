@@ -6,7 +6,7 @@ import { NotificationGroup } from '@/components/ui/notification-badge';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import ObjectInfoBar from '@/components/objects/ObjectInfoBar';
 import type { Work, ObjectData } from '@/contexts/AuthContext';
 
@@ -32,7 +32,7 @@ export default function WorksList({
   currentObject,
 }: WorksListProps) {
   const navigate = useNavigate();
-  const { user, userData } = useAuth();
+  const { user, userData } = useAuthRedux();
   const unreadCounts = userData?.unreadCounts || {};
   const isContractor = user?.role === 'contractor';
   return (

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 
 export function useDiscountOffer() {
-  const { user } = useAuth();
+  const { user } = useAuthRedux();
   const [isOfferActive, setIsOfferActive] = useState(false);
   const [discountPercent, setDiscountPercent] = useState(0);
 

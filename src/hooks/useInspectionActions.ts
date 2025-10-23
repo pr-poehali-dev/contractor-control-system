@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useToast } from '@/hooks/use-toast';
 import { api } from '@/lib/api';
 import { Defect } from '@/components/inspection/DefectsSection';
@@ -14,7 +14,7 @@ export function useInspectionActions(
   setDefectReport: (report: any) => void
 ) {
   const navigate = useNavigate();
-  const { userData, token, user, loadUserData } = useAuth();
+  const { userData, token, user, loadUserData } = useAuthRedux();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [loadingReport, setLoadingReport] = useState(false);

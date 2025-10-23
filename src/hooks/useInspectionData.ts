@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { Defect } from '@/components/inspection/DefectsSection';
 import { ControlPoint } from '@/components/inspection/ControlPointsSection';
 import { apiClient } from '@/api/apiClient';
 import { ENDPOINTS } from '@/api/endpoints';
 
 export function useInspectionData(inspectionId: string | undefined) {
-  const { userData, user, token } = useAuth();
+  const { userData, user, token } = useAuthRedux();
   const [inspection, setInspection] = useState<any>(null);
   const [defects, setDefects] = useState<Defect[]>([]);
   const [controlPoints, setControlPoints] = useState<ControlPoint[]>([]);

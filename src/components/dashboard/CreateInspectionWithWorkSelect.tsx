@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { api } from '@/lib/api';
 
 interface CreateInspectionWithWorkSelectProps {
@@ -17,7 +17,7 @@ interface CreateInspectionWithWorkSelectProps {
 
 export default function CreateInspectionWithWorkSelect({ isOpen, onClose }: CreateInspectionWithWorkSelectProps) {
   const navigate = useNavigate();
-  const { token, loadUserData, userData } = useAuth();
+  const { token, loadUserData, userData } = useAuthRedux();
   const { toast } = useToast();
   
   const [loading, setLoading] = useState(false);

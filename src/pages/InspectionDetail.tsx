@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { InspectionInfoCard } from '@/components/inspection/InspectionInfoCard';
@@ -14,7 +14,7 @@ import { useDefectPhotos } from '@/hooks/useDefectPhotos';
 
 const InspectionDetail = () => {
   const { inspectionId } = useParams<{ inspectionId: string }>();
-  const { userData, user } = useAuth();
+  const { userData, user } = useAuthRedux();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { inspection, defects, setDefects, defectReport, setDefectReport } = useInspectionData(inspectionId);

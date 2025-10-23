@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { safeDateCompare, isValidDate } from '@/utils/dateValidation';
 
 const Activity = () => {
-  const { userData, user } = useAuth();
+  const { userData, user } = useAuthRedux();
   const [typeFilter, setTypeFilter] = useState<'all' | 'work' | 'check' | 'info'>('all');
   const [objectFilter, setObjectFilter] = useState<number | null>(null);
   const [workFilter, setWorkFilter] = useState<number | null>(null);

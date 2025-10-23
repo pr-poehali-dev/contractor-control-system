@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -43,7 +43,7 @@ interface WorkType {
 }
 
 export default function AdminPanel() {
-  const { user, token } = useAuth();
+  const { user, token } = useAuthRedux();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [stats, setStats] = useState<Stats | null>(null);

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useAppSelector } from '@/store/hooks';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -43,7 +43,7 @@ interface FeedEvent {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user, userData, loadUserData, token } = useAuth();
+  const { user, userData, loadUserData, token } = useAuthRedux();
   const { toast } = useToast();
   const [feed, setFeed] = useState<FeedEvent[]>([]);
   const [loading, setLoading] = useState(true);

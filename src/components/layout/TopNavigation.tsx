@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
@@ -35,7 +35,7 @@ const navItems: NavItem[] = [
 export default function TopNavigation() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthRedux();
 
   const visibleNavItems = navItems.filter(
     (item) => !item.roles || item.roles.includes(user?.role as any || 'contractor')
