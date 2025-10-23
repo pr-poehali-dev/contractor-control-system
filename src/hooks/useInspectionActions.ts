@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useToast } from '@/hooks/use-toast';
-import { api } from '@/lib/api';
 import { Defect } from '@/components/inspection/DefectsSection';
 import { apiClient } from '@/api/apiClient';
 import { ENDPOINTS } from '@/api/endpoints';
+import { useAppDispatch } from '@/store/hooks';
+import { updateInspection } from '@/store/slices/inspectionsSlice';
 
 export function useInspectionActions(
   inspection: any,
@@ -14,8 +15,9 @@ export function useInspectionActions(
   setDefectReport: (report: any) => void
 ) {
   const navigate = useNavigate();
-  const { userData, token, user, loadUserData } = useAuthRedux();
+  const { userData, user, loadUserData } = useAuthRedux();
   const { toast } = useToast();
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const [loadingReport, setLoadingReport] = useState(false);
 
@@ -30,26 +32,18 @@ export function useInspectionActions(
   };
 
   const handleCompleteInspection = async () => {
-    if (!token || !user?.id) return;
+    if (!user?.id) return;
     
     setLoading(true);
     try {
-      await api.updateItem(token, 'inspection', inspection.id, {
-        status: 'completed',
-        defects: JSON.stringify(defects),
-        completed_at: new Date().toISOString()
-      });
-      
-      try {
-        await api.createInspectionEvent(token, {
-          inspection_id: inspection.id,
-          event_type: 'completed',
-          created_by: user.id,
-          metadata: { defects_count: defects.length }
-        });
-      } catch (err) {
-        console.error('Failed to create event:', err);
-      }
+      await dispatch(updateInspection({
+        id: inspection.id,
+        data: {
+          status: 'completed',
+          defects: JSON.stringify(defects),
+          completed_at: new Date().toISOString()
+        }
+      })).unwrap();
       
       await loadUserData();
       
@@ -67,13 +61,14 @@ export function useInspectionActions(
   };
 
   const handleSaveDraft = async () => {
-    if (!token) return;
-    
     setLoading(true);
     try {
-      await api.updateItem(token, 'inspection', inspection.id, {
-        defects: JSON.stringify(defects)
-      });
+      await dispatch(updateInspection({
+        id: inspection.id,
+        data: {
+          defects: JSON.stringify(defects)
+        }
+      })).unwrap();
       
       await loadUserData();
       
@@ -90,25 +85,17 @@ export function useInspectionActions(
   };
 
   const handleStartInspection = async () => {
-    if (!token || !user?.id) return;
+    if (!user?.id) return;
     
     setLoading(true);
     try {
-      await api.updateItem(token, 'inspection', inspection.id, {
-        status: 'active',
-        defects: JSON.stringify(defects)
-      });
-      
-      try {
-        await api.createInspectionEvent(token, {
-          inspection_id: inspection.id,
-          event_type: 'started',
-          created_by: user.id,
-          metadata: {}
-        });
-      } catch (err) {
-        console.error('Failed to create event:', err);
-      }
+      await dispatch(updateInspection({
+        id: inspection.id,
+        data: {
+          status: 'active',
+          defects: JSON.stringify(defects)
+        }
+      })).unwrap();
       
       await loadUserData();
       
@@ -146,22 +133,7 @@ export function useInspectionActions(
   };
 
   const handleCreateDefectReport = async () => {
-    console.log('🔍 handleCreateDefectReport called', {
-      hasToken: !!token,
-      hasUserId: !!user?.id,
-      defectsCount: defects.length,
-      hasInspectionId: !!inspection?.id,
-      inspection,
-      defects
-    });
-    
-    if (!token || !user?.id || defects.length === 0 || !inspection?.id) {
-      console.warn('❌ handleCreateDefectReport aborted:', {
-        token: !!token,
-        userId: user?.id,
-        defectsLength: defects.length,
-        inspectionId: inspection?.id
-      });
+    if (!user?.id || defects.length === 0 || !inspection?.id) {
       return;
     }
     

@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { loadUserData } from '@/store/slices/userSlice';
-import { api } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { updateObject } from '@/store/slices/objectsSlice';
+import { createWork, updateWork as updateWorkAction } from '@/store/slices/worksSlice';
 import { WorkForm, emptyWork } from './types';
 
 interface ObjectData {
@@ -164,12 +165,15 @@ export const useWorkForm = (objectId: string | undefined) => {
 
     setIsSubmitting(true);
     try {
-      await api.updateItem(token, 'object', objectData.id, {
-        title: objectData.name,
-        address: objectData.address,
-        customer: objectData.customer,
-        description: objectData.description,
-      });
+      await dispatch(updateObject({
+        id: objectData.id,
+        data: {
+          title: objectData.name,
+          address: objectData.address,
+          customer: objectData.customer,
+          description: objectData.description,
+        }
+      })).unwrap();
 
       await dispatch(loadUserData(token)).unwrap();
 
@@ -219,24 +223,27 @@ export const useWorkForm = (objectId: string | undefined) => {
 
     try {
       for (const work of newWorks) {
-        await api.createItem(token, 'work', {
+        await dispatch(createWork({
           object_id: Number(objectId),
           title: work.title,
           contractor_id: work.contractor_id ? Number(work.contractor_id) : null,
           status: 'active',
           planned_start_date: work.planned_start_date || null,
           planned_end_date: work.planned_end_date || null,
-        });
+        })).unwrap();
       }
 
       for (const work of existingWorks) {
         if (work.workId) {
-          await api.updateItem(token, 'work', work.workId, {
-            title: work.title,
-            contractor_id: work.contractor_id ? Number(work.contractor_id) : null,
-            planned_start_date: work.planned_start_date || null,
-            planned_end_date: work.planned_end_date || null,
-          });
+          await dispatch(updateWorkAction({
+            id: work.workId,
+            data: {
+              title: work.title,
+              contractor_id: work.contractor_id ? Number(work.contractor_id) : null,
+              planned_start_date: work.planned_start_date || null,
+              planned_end_date: work.planned_end_date || null,
+            }
+          })).unwrap();
         }
       }
 

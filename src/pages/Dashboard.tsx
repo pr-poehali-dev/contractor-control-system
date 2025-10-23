@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
-import { useAppSelector } from '@/store/hooks';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { api, InspectionEvent as ApiInspectionEvent } from '@/lib/api';
 import Icon from '@/components/ui/icon';
 import { apiClient } from '@/api/apiClient';
+import { createWorkLog } from '@/store/slices/workLogsSlice';
 import { ENDPOINTS } from '@/api/endpoints';
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
 import FeedFilters from '@/components/dashboard/FeedFilters';
@@ -45,6 +46,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { user, userData, loadUserData, token } = useAuthRedux();
   const { toast } = useToast();
+  const dispatch = useAppDispatch();
   const [feed, setFeed] = useState<FeedEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'work_logs' | 'inspections' | 'info_posts'>('all');
@@ -254,13 +256,13 @@ const Dashboard = () => {
             'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800'
           ];
       
-      await api.createItem(token!, 'work_log', {
+      await dispatch(createWorkLog({
         work_id: Number(journalForm.workId),
         description: journalForm.description,
         volume: journalForm.volume || null,
         materials: journalForm.materials || null,
         photo_urls: JSON.stringify(photoUrls)
-      });
+      })).unwrap();
 
       toast({
         title: 'Запись создана',

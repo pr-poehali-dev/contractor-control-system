@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
-import { api } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { useAppDispatch } from '@/store/hooks';
 import { createChatMessage } from '@/store/slices/chatMessagesSlice';
 import { createWorkLog } from '@/store/slices/workLogsSlice';
 import { fetchUserData } from '@/store/slices/userSlice';
+import { createInspection } from '@/store/slices/inspectionsSlice';
+import { updateWork, deleteWork } from '@/store/slices/worksSlice';
 
 export function useWorkJournalHandlers(selectedWork: number | null) {
-  const { user, token, setUserData } = useAuthRedux();
+  const { user } = useAuthRedux();
   const { toast } = useToast();
   const dispatch = useAppDispatch();
 
@@ -108,19 +109,16 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
         descriptionParts.push(`Не соответствует: ${nonCompliantCount}`);
       }
 
-      await api.createItem(token!, 'inspection', {
+      await dispatch(createInspection({
         work_id: selectedWork,
         work_log_id: data.journal_entry_id || selectedEntryForInspection || null,
         description: descriptionParts.join(', '),
         status: overallStatus,
         defects: JSON.stringify(defects),
         photo_urls: allPhotos.length > 0 ? allPhotos.join(',') : null,
-      });
+      })).unwrap();
 
-      if (token) {
-        const refreshedData = await api.getUserData(token);
-        setUserData(refreshedData);
-      }
+      await dispatch(fetchUserData());
 
       toast({
         title: 'Проверка создана',
@@ -152,19 +150,16 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
     setIsSubmitting(true);
 
     try {
-      await api.createItem(token!, 'work_log', {
+      await dispatch(createWorkLog({
         work_id: selectedWork,
         description: data.text_content,
         progress: data.completion_percentage,
         volume: data.work_volume || null,
         materials: data.materials.map(m => `${m.name} ${m.quantity} ${m.unit}`).join(', ') || null,
         photo_urls: data.photo_urls.join(',') || null,
-      });
+      })).unwrap();
 
-      if (token) {
-        const refreshedData = await api.getUserData(token);
-        setUserData(refreshedData);
-      }
+      await dispatch(fetchUserData());
 
       setIsWorkReportModalOpen(false);
 
@@ -202,19 +197,19 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
     
     try {
       setIsSubmitting(true);
-      await api.updateItem(token!, 'work', selectedWorkData.id, {
-        title: editFormData.title,
-        description: editFormData.description,
-        contractor_id: editFormData.contractor_id ? Number(editFormData.contractor_id) : null,
-        status: editFormData.status,
-        start_date: editFormData.start_date || null,
-        end_date: editFormData.end_date || null,
-      });
+      await dispatch(updateWork({
+        id: selectedWorkData.id,
+        data: {
+          title: editFormData.title,
+          description: editFormData.description,
+          contractor_id: editFormData.contractor_id ? Number(editFormData.contractor_id) : null,
+          status: editFormData.status,
+          start_date: editFormData.start_date || null,
+          end_date: editFormData.end_date || null,
+        }
+      })).unwrap();
 
-      if (token) {
-        const refreshedData = await api.getUserData(token);
-        setUserData(refreshedData);
-      }
+      await dispatch(fetchUserData());
 
       toast({
         title: 'Работа обновлена',
@@ -237,12 +232,9 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
     
     try {
       setIsSubmitting(true);
-      await api.deleteItem(token!, 'work', selectedWorkData.id);
+      await dispatch(deleteWork(selectedWorkData.id)).unwrap();
 
-      if (token) {
-        const refreshedData = await api.getUserData(token);
-        setUserData(refreshedData);
-      }
+      await dispatch(fetchUserData());
 
       toast({
         title: 'Работа удалена',

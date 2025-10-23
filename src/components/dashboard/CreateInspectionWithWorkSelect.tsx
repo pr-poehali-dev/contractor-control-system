@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
-import { api } from '@/lib/api';
+import { useAppDispatch } from '@/store/hooks';
+import { createInspection } from '@/store/slices/inspectionsSlice';
 
 interface CreateInspectionWithWorkSelectProps {
   isOpen: boolean;
@@ -17,8 +18,9 @@ interface CreateInspectionWithWorkSelectProps {
 
 export default function CreateInspectionWithWorkSelect({ isOpen, onClose }: CreateInspectionWithWorkSelectProps) {
   const navigate = useNavigate();
-  const { token, loadUserData, userData } = useAuthRedux();
+  const { loadUserData, userData } = useAuthRedux();
   const { toast } = useToast();
+  const dispatch = useAppDispatch();
   
   const [loading, setLoading] = useState(false);
   const [scheduledDate, setScheduledDate] = useState('');
@@ -30,7 +32,6 @@ export default function CreateInspectionWithWorkSelect({ isOpen, onClose }: Crea
   const availableWorks = works.filter((w: any) => w.object_id === Number(selectedObjectId));
 
   const handleCreate = async () => {
-    if (!token) return;
     
     if (!selectedWorkId) {
       toast({ 
@@ -57,13 +58,13 @@ export default function CreateInspectionWithWorkSelect({ isOpen, onClose }: Crea
     
     setLoading(true);
     try {
-      const result = await api.createItem(token, 'inspection', {
+      const result = await dispatch(createInspection({
         work_id: Number(selectedWorkId),
         type: scheduledDate ? 'scheduled' : 'unscheduled',
         title: 'Проверка',
         scheduled_date: scheduledDate || undefined,
         status: scheduledDate ? 'draft' : 'active'
-      });
+      })).unwrap();
       
       await loadUserData();
       
