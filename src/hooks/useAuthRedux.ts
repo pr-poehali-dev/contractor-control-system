@@ -7,11 +7,10 @@ import {
   verifyToken as verifyTokenAction,
   loadUserData as loadUserDataAction,
 } from '@/store/slices/userSlice';
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo } from 'react';
 
 export const useAuthRedux = () => {
   const dispatch = useAppDispatch();
-  const hasInitialized = useRef(false);
   
   const user = useAppSelector((state) => state.user.user);
   const token = useAppSelector((state) => state.user.token);
@@ -41,17 +40,6 @@ export const useAuthRedux = () => {
     }),
     [objects, works, inspections, workLogs, contractors, chatMessages, defectReports]
   );
-
-  useEffect(() => {
-    if (!hasInitialized.current && token) {
-      hasInitialized.current = true;
-      dispatch(verifyTokenAction()).then((result) => {
-        if (verifyTokenAction.fulfilled.match(result)) {
-          dispatch(loadUserDataAction());
-        }
-      });
-    }
-  }, [dispatch, token]);
 
   const login = async (email: string, password: string) => {
     const result = await dispatch(loginAction({ email, password }));

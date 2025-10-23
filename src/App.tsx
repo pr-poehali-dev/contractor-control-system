@@ -1,4 +1,4 @@
-
+import { useEffect, useRef } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -41,7 +41,19 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, isLoading } = useAuthRedux();
+  const { isAuthenticated, isLoading, token, verifyToken, loadUserData } = useAuthRedux();
+  const initRef = useRef(false);
+  
+  useEffect(() => {
+    if (!initRef.current && token && !isAuthenticated) {
+      initRef.current = true;
+      verifyToken().then((result: any) => {
+        if (result.payload?.success) {
+          loadUserData();
+        }
+      });
+    }
+  }, [token, isAuthenticated, verifyToken, loadUserData]);
   
   if (isLoading) {
     return (
