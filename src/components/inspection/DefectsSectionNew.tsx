@@ -2,7 +2,7 @@ import React, { RefObject, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { DefectCard } from './DefectCard';
@@ -199,36 +199,44 @@ export default function DefectsSectionNew({
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <Label htmlFor={`severity-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
-                      Критичность
-                    </Label>
-                    <Select value={draft.severity || ''} onValueChange={(val) => onDraftChange(draft.tempId, 'severity', val)}>
-                      <SelectTrigger className="text-sm h-9 md:h-10">
-                        <SelectValue placeholder="Выберите" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="low">Низкая</SelectItem>
-                        <SelectItem value="medium">Средняя</SelectItem>
-                        <SelectItem value="high">Высокая</SelectItem>
-                        <SelectItem value="critical">Критическая</SelectItem>
-                      </SelectContent>
-                    </Select>
+                <div>
+                  <Label className="text-xs md:text-sm mb-2 block">
+                    Критичность
+                  </Label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'low', label: 'Низкая', color: 'bg-green-100 text-green-700 hover:bg-green-200' },
+                      { value: 'medium', label: 'Средняя', color: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' },
+                      { value: 'high', label: 'Высокая', color: 'bg-orange-100 text-orange-700 hover:bg-orange-200' },
+                      { value: 'critical', label: 'Критическая', color: 'bg-red-100 text-red-700 hover:bg-red-200' }
+                    ].map(({ value, label, color }) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => onDraftChange(draft.tempId, 'severity', value)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                          draft.severity === value 
+                            ? `${color} ring-2 ring-offset-1 ring-current` 
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
                   </div>
+                </div>
 
-                  <div>
-                    <Label htmlFor={`deadline-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
-                      Срок устранения
-                    </Label>
-                    <Input
-                      id={`deadline-${draft.tempId}`}
-                      type="date"
-                      value={draft.deadline || ''}
-                      onChange={(e) => onDraftChange(draft.tempId, 'deadline', e.target.value)}
-                      className="text-sm h-9 md:h-10"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor={`deadline-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
+                    Срок устранения
+                  </Label>
+                  <Input
+                    id={`deadline-${draft.tempId}`}
+                    type="date"
+                    value={draft.deadline || ''}
+                    onChange={(e) => onDraftChange(draft.tempId, 'deadline', e.target.value)}
+                    className="text-sm h-9 md:h-10"
+                  />
                 </div>
 
                 <div>
