@@ -142,10 +142,9 @@ const MyTasks = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="bg-white border-b">
+      <div className="bg-white">
         <div className="max-w-6xl mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold flex items-center gap-3">
-            <Icon name="ClipboardCheck" size={28} className="text-blue-600" />
+          <h1 className="text-2xl font-bold">
             Мои задачи
           </h1>
         </div>
