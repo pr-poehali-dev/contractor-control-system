@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { apiClient } from '@/api/apiClient';
