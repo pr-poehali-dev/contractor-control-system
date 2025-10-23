@@ -3,14 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
+import CreateInspectionWithWorkSelect from '@/components/dashboard/CreateInspectionWithWorkSelect';
 
 const Defects = () => {
   const navigate = useNavigate();
   const { userData } = useAuthRedux();
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const inspections = (userData?.inspections && Array.isArray(userData.inspections)) ? userData.inspections : [];
   const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
@@ -73,9 +76,18 @@ const Defects = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-      <div className="mb-8">
+      <div className="mb-8 flex items-center justify-between">
         <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Проверки</h1>
+        <Button onClick={() => setIsCreateModalOpen(true)}>
+          <Icon name="Plus" size={18} className="mr-1" />
+          Создать проверку
+        </Button>
       </div>
+
+      <CreateInspectionWithWorkSelect
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      />
 
       <div className="mb-6 space-y-4">
         <div className="relative">
