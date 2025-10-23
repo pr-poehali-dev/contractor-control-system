@@ -58,6 +58,8 @@ const mockVersions: EstimateVersion[] = [
 export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) {
   const [versions, setVersions] = useState<EstimateVersion[]>(mockVersions);
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [versionToDelete, setVersionToDelete] = useState<number | null>(null);
   const [uploadXmlFile, setUploadXmlFile] = useState<File | null>(null);
   const [uploadXlsxFile, setUploadXlsxFile] = useState<File | null>(null);
   const [uploadVersion, setUploadVersion] = useState('');
@@ -76,22 +78,32 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
     });
   };
 
-  const handleDeleteVersion = (versionId: number) => {
-    const versionToDelete = versions.find(v => v.id === versionId);
-    const wasActive = versionToDelete?.isActive;
+  const openDeleteDialog = (versionId: number) => {
+    setVersionToDelete(versionId);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteVersion = () => {
+    if (versionToDelete === null) return;
     
-    const remainingVersions = versions.filter(v => v.id !== versionId);
+    const version = versions.find(v => v.id === versionToDelete);
+    const wasActive = version?.isActive;
+    
+    const remainingVersions = versions.filter(v => v.id !== versionToDelete);
     
     if (wasActive && remainingVersions.length > 0) {
       remainingVersions[0].isActive = true;
     }
     
     setVersions(remainingVersions);
+    setIsDeleteDialogOpen(false);
+    setVersionToDelete(null);
+    
     toast({
       title: 'Версия удалена',
       description: wasActive && remainingVersions.length > 0
-        ? `Версия ${versionToDelete?.version} удалена. Актуальная версия: ${remainingVersions[0].version}`
-        : `Версия ${versionToDelete?.version} удалена`,
+        ? `Версия ${version?.version} удалена. Актуальная версия: ${remainingVersions[0].version}`
+        : `Версия ${version?.version} удалена`,
     });
   };
 
@@ -209,7 +221,7 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem 
-                        onClick={() => handleDeleteVersion(version.id)}
+                        onClick={() => openDeleteDialog(version.id)}
                         className="text-red-600 focus:text-red-600"
                       >
                         <Icon name="Trash2" size={16} className="mr-2" />
@@ -223,6 +235,32 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
           ))}
         </div>
       </div>
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Удалить версию сметы?</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-slate-600">
+              Вы действительно хотите удалить версию {versions.find(v => v.id === versionToDelete)?.version}?
+              {versions.find(v => v.id === versionToDelete)?.isActive && versions.length > 1 && (
+                <span className="block mt-2 text-amber-600 font-medium">
+                  После удаления актуальной станет версия {versions.filter(v => v.id !== versionToDelete)[0]?.version}
+                </span>
+              )}
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Отмена
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteVersion}>
+              Удалить
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
         <DialogContent className="sm:max-w-md">
