@@ -32,6 +32,7 @@ const MyTasks = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed' | 'verified'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     if (user?.role === 'contractor' && user?.id && token) {
@@ -100,8 +101,14 @@ const MyTasks = () => {
   };
 
   const filteredTasks = tasks.filter(task => {
-    if (filter === 'all') return true;
-    return task.status === filter;
+    const matchesFilter = filter === 'all' || task.status === filter;
+    const matchesSearch = searchQuery === '' || 
+      task.defect_description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.report_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.object_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.work_title.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    return matchesFilter && matchesSearch;
   });
 
   const stats = {
