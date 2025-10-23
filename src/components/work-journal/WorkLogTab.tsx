@@ -48,7 +48,7 @@ export default function WorkLogTab({ workId, objectId }: WorkLogTabProps) {
 
   const formatDate = (timestamp: string) => {
     const date = new Date(timestamp);
-    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+    return date.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
 
   const formatTime = (timestamp: string) => {
@@ -74,8 +74,8 @@ export default function WorkLogTab({ workId, objectId }: WorkLogTabProps) {
       <div className="px-3 py-4 md:p-6 max-w-5xl mx-auto w-full space-y-4">
         
         {allEvents.map((event) => event.type === 'report' ? (
-          <div key={event.data.id} className="bg-white rounded-lg shadow-sm border border-slate-200 p-3 md:p-4">
-            <div className="flex items-start gap-2.5">
+          <div key={event.data.id} className="bg-white rounded-lg shadow-sm border border-slate-200 p-3 md:p-4 relative">
+            <div className="flex items-start gap-2.5 pb-6">
               <div className="w-9 h-9 md:w-10 md:h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                 <Icon name="ClipboardCheck" size={18} className="text-green-600" />
               </div>
@@ -83,10 +83,6 @@ export default function WorkLogTab({ workId, objectId }: WorkLogTabProps) {
                 <h3 className="font-semibold text-slate-900 text-sm md:text-base mb-1">Отчёт о работе</h3>
                 <div className="text-xs md:text-sm text-slate-500 mb-2">
                   {event.data.author_name}
-                  <span className="mx-1.5 text-slate-300">•</span>
-                  <span className="text-slate-400">
-                    {formatDate(event.data.created_at)} в {formatTime(event.data.created_at)}
-                  </span>
                 </div>
 
                 {event.data.description && (
@@ -122,6 +118,9 @@ export default function WorkLogTab({ workId, objectId }: WorkLogTabProps) {
                 )}
               </div>
             </div>
+            <div className="absolute bottom-2 right-3 text-xs text-slate-400">
+              {formatDate(event.data.created_at)} в {formatTime(event.data.created_at)}
+            </div>
           </div>
         ) : (
           (() => {
@@ -131,10 +130,10 @@ export default function WorkLogTab({ workId, objectId }: WorkLogTabProps) {
             return (
               <div 
                 key={inspection.id} 
-                className="bg-white rounded-lg shadow-sm border border-slate-200 p-3 md:p-4 cursor-pointer hover:shadow-md transition-shadow"
+                className="bg-white rounded-lg shadow-sm border border-slate-200 p-3 md:p-4 cursor-pointer hover:shadow-md transition-shadow relative"
                 onClick={() => navigate(`/inspection/${inspection.id}`)}
               >
-                <div className="flex items-start gap-2.5">
+                <div className="flex items-start gap-2.5 pb-6">
                   <div className="w-9 h-9 md:w-10 md:h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                     <Icon name="ClipboardCheck" size={18} className="text-blue-600" />
                   </div>
@@ -147,10 +146,6 @@ export default function WorkLogTab({ workId, objectId }: WorkLogTabProps) {
                     </div>
                     <div className="text-xs md:text-sm text-slate-500 mb-2">
                       {inspection.author_name}
-                      <span className="mx-1.5 text-slate-300">•</span>
-                      <span className="text-slate-400">
-                        {formatDate(inspection.created_at)}
-                      </span>
                     </div>
 
                     <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs md:text-sm">
@@ -161,11 +156,14 @@ export default function WorkLogTab({ workId, objectId }: WorkLogTabProps) {
                       {inspection.scheduled_date && (
                         <div className="flex items-center gap-1.5 text-slate-500">
                           <Icon name="Calendar" size={14} />
-                          <span>{new Date(inspection.scheduled_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}</span>
+                          <span>Запланирована на {new Date(inspection.scheduled_date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                         </div>
                       )}
                     </div>
                   </div>
+                </div>
+                <div className="absolute bottom-2 right-3 text-xs text-slate-400">
+                  {formatDate(inspection.created_at)}
                 </div>
               </div>
             );
