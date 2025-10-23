@@ -173,6 +173,54 @@ export default function DefectsSectionNew({
               <div className="px-4 pb-4 space-y-3">
 
                 <div>
+                  <Label className="text-xs md:text-sm mb-1 block">
+                    Фотофиксация
+                  </Label>
+                  <input
+                    ref={(el) => fileInputRefs.current[draft.tempId] = el}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => handleFileSelect(draft.tempId, e)}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRefs.current[draft.tempId]?.click()}
+                    disabled={uploadingPhotos[draft.tempId]}
+                    className="w-full"
+                  >
+                    <Icon name="Camera" size={16} className="mr-2" />
+                    {uploadingPhotos[draft.tempId] ? 'Загрузка...' : 'Добавить фото'}
+                  </Button>
+                </div>
+
+                {draft.photos.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {draft.photos.map((url, idx) => (
+                      <div key={idx} className="relative group">
+                        <img
+                          src={url}
+                          alt={`Фото ${idx + 1}`}
+                          className="w-full h-24 object-cover rounded-lg border-2 border-white shadow-sm"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-1 right-1 h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                          onClick={() => onDraftPhotoRemove(draft.tempId, url)}
+                        >
+                          <Icon name="X" size={14} />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div>
                   <Label htmlFor={`description-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">
                     Описание нарушения <span className="text-red-500">*</span>
                   </Label>
@@ -187,7 +235,7 @@ export default function DefectsSectionNew({
                 </div>
 
                 <div>
-                  <Label htmlFor={`location-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">Место осмотра</Label>
+                  <Label htmlFor={`location-${draft.tempId}`} className="text-xs md:text-sm mb-1 block">Местоположение</Label>
                   <Input
                     id={`location-${draft.tempId}`}
                     value={draft.location || ''}
