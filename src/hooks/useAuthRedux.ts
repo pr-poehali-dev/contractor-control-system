@@ -19,17 +19,28 @@ export const useAuthRedux = () => {
   const isLoading = useAppSelector((state) => state.user.isLoading);
   const error = useAppSelector((state) => state.user.error);
 
-  const userData = useAppSelector((state) => ({
-    objects: state.objects.objects,
-    works: state.works.works,
-    inspections: state.inspections.inspections,
-    remarks: [],
-    workLogs: state.workLogs.workLogs,
-    checkpoints: [],
-    contractors: state.contractors.contractors,
-    chatMessages: state.chatMessages.chatMessages,
-    defect_reports: state.defectReports.defectReports,
-  }));
+  const objects = useAppSelector((state) => state.objects.objects);
+  const works = useAppSelector((state) => state.works.works);
+  const inspections = useAppSelector((state) => state.inspections.inspections);
+  const workLogs = useAppSelector((state) => state.workLogs.workLogs);
+  const contractors = useAppSelector((state) => state.contractors.contractors);
+  const chatMessages = useAppSelector((state) => state.chatMessages.chatMessages);
+  const defectReports = useAppSelector((state) => state.defectReports.defectReports);
+
+  const userData = useMemo(
+    () => ({
+      objects,
+      works,
+      inspections,
+      remarks: [],
+      workLogs,
+      checkpoints: [],
+      contractors,
+      chatMessages,
+      defect_reports: defectReports,
+    }),
+    [objects, works, inspections, workLogs, contractors, chatMessages, defectReports]
+  );
 
   useEffect(() => {
     if (!hasInitialized.current && token) {
