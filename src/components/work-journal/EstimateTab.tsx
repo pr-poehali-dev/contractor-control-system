@@ -164,7 +164,7 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
               className={version.isActive ? 'border-green-500 bg-green-50' : ''}
             >
               <CardContent className="p-3 md:p-5">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <h5 className="text-sm md:text-lg font-semibold">Версия {version.version}</h5>
