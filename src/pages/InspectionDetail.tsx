@@ -8,6 +8,7 @@ import DefectsSectionNew, { Defect } from '@/components/inspection/DefectsSectio
 import InspectionActions from '@/components/inspection/InspectionActions';
 import DefectReportCard from '@/components/inspection/DefectReportCard';
 import ScheduledInspectionNotice from '@/components/inspection/ScheduledInspectionNotice';
+import InspectionHintsCard from '@/components/inspection/InspectionHintsCard';
 import { useInspectionData } from '@/hooks/useInspectionData';
 import { useInspectionActions } from '@/hooks/useInspectionActions';
 import { useDefectPhotos } from '@/hooks/useDefectPhotos';
@@ -159,6 +160,8 @@ const InspectionDetail = () => {
         {!canEdit && inspection.type === 'scheduled' && !isScheduledForToday() && (
           <ScheduledInspectionNotice scheduledDate={inspection.scheduled_date} />
         )}
+
+        {canEdit && <InspectionHintsCard />}
 
         <div ref={defectsRef}>
           <DefectsSectionNew

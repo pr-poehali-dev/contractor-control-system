@@ -25,8 +25,8 @@ export default function InspectionActions({
   if (inspectionStatus === 'completed') return null;
 
   return (
-    <div className="fixed bottom-16 left-0 right-0 bg-white border-t shadow-lg p-4 z-50">
-      <div className="max-w-4xl mx-auto flex gap-3">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-2xl p-4 z-50">
+      <div className="max-w-5xl mx-auto flex gap-3">
         {canEdit && (
           <Button
             variant="outline"
