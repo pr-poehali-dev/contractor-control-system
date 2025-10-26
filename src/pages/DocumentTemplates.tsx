@@ -274,10 +274,22 @@ export default function DocumentTemplates() {
                         )}
 
                         <div className="flex items-center gap-4 text-xs text-slate-500 pt-3 border-t">
-                          <div className="flex items-center gap-1">
-                            <Icon name="Calendar" size={12} />
-                            <span>Обновлён {format(new Date(template.updated_at), 'd.MM.yyyy', { locale: ru })}</span>
-                          </div>
+                          {template.updated_at && (
+                            <div className="flex items-center gap-1">
+                              <Icon name="Calendar" size={12} />
+                              <span>
+                                Обновлён{' '}
+                                {(() => {
+                                  try {
+                                    const date = new Date(template.updated_at);
+                                    return isNaN(date.getTime()) ? 'недавно' : format(date, 'd.MM.yyyy', { locale: ru });
+                                  } catch {
+                                    return 'недавно';
+                                  }
+                                })()}
+                              </span>
+                            </div>
+                          )}
                           {template.usage_count !== undefined && (
                             <div className="flex items-center gap-1">
                               <Icon name="FileText" size={12} />
