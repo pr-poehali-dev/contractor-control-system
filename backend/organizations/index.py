@@ -137,7 +137,7 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
         cursor.execute(f"""
             SELECT o.*,
                    u.name as creator_name,
-                   (SELECT COUNT(*) FROM {SCHEMA}.users WHERE organization_id = o.id) as employees_count
+                   (SELECT COUNT(*) FROM {SCHEMA}.user_organizations WHERE organization_id = o.id) as employees_count
             FROM {SCHEMA}.organizations o
             LEFT JOIN {SCHEMA}.users u ON o.created_by = u.id
             WHERE o.id = {org_id}
@@ -153,10 +153,11 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
             }
         
         cursor.execute(f"""
-            SELECT u.id, u.name, u.email, u.phone, u.organization_role, u.created_at
+            SELECT u.id, u.name, u.email, u.phone, uo.role as organization_role, uo.created_at
             FROM {SCHEMA}.users u
-            WHERE u.organization_id = {org_id}
-            ORDER BY u.organization_role DESC, u.created_at ASC
+            JOIN {SCHEMA}.user_organizations uo ON u.id = uo.user_id
+            WHERE uo.organization_id = {org_id}
+            ORDER BY uo.role DESC, uo.created_at ASC
         """)
         employees = cursor.fetchall()
         
@@ -181,11 +182,13 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
     else:
         cursor.execute(f"""
             SELECT o.*,
-                   (SELECT COUNT(*) FROM {SCHEMA}.users WHERE organization_id = o.id) as employees_count,
-                   (SELECT COUNT(*) FROM {SCHEMA}.works WHERE contractor_organization_id = o.id) as works_count
+                   (SELECT COUNT(*) FROM {SCHEMA}.user_organizations WHERE organization_id = o.id) as employees_count,
+                   (SELECT COUNT(*) FROM {SCHEMA}.works WHERE contractor_id IN (
+                       SELECT id FROM {SCHEMA}.contractors WHERE organization_id = o.id
+                   )) as works_count
             FROM {SCHEMA}.organizations o
             WHERE o.created_by = {user_id} OR o.id IN (
-                SELECT organization_id FROM {SCHEMA}.users WHERE id = {user_id}
+                SELECT organization_id FROM {SCHEMA}.user_organizations WHERE user_id = {user_id}
             )
             ORDER BY o.created_at DESC
         """)
