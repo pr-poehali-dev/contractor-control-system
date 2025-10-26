@@ -39,9 +39,21 @@ class ApiClient {
     this.instance.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
         const token = localStorage.getItem('auth_token');
+        const userStr = localStorage.getItem('user');
         
         if (token && config.headers) {
           config.headers['X-Auth-Token'] = token;
+        }
+
+        if (userStr && config.headers) {
+          try {
+            const user = JSON.parse(userStr);
+            if (user.id) {
+              config.headers['X-User-Id'] = user.id.toString();
+            }
+          } catch (error) {
+            console.warn('Failed to parse user from localStorage:', error);
+          }
         }
 
         return config;
