@@ -344,11 +344,12 @@ const Contractors = () => {
         </div>
       )}
 
-      <ContractorDetailsModal
-        open={detailsOpen}
-        onOpenChange={setDetailsOpen}
-        contractor={selectedContractor}
-      />
+        <ContractorDetailsModal
+          open={detailsOpen}
+          onOpenChange={setDetailsOpen}
+          contractor={selectedContractor}
+        />
+      </div>
     </div>
   );
 };
