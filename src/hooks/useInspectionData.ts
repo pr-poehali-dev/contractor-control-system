@@ -22,7 +22,8 @@ export function useInspectionData(inspectionId: string | undefined) {
         try {
           parsedDefects = found.defects ? JSON.parse(found.defects) : [];
           setDefects(Array.isArray(parsedDefects) ? parsedDefects : []);
-        } catch (e) {
+        } catch (error) {
+          console.error('Failed to parse defects JSON:', error instanceof Error ? error.message : String(error));
           setDefects([]);
         }
         
@@ -79,7 +80,8 @@ export function useInspectionData(inspectionId: string | undefined) {
       setControlPoints(mockPoints);
       console.log('Loaded control points:', mockPoints.length);
     } catch (error) {
-      console.error('Failed to load control points:', error);
+      console.error('Failed to load control points:', error instanceof Error ? error.message : String(error));
+      setControlPoints([]);
     }
   };
 
@@ -95,7 +97,8 @@ export function useInspectionData(inspectionId: string | undefined) {
         setDefectReport(response.data);
       }
     } catch (error) {
-      console.error('Failed to load defect report:', error);
+      console.error('Failed to load defect report:', error instanceof Error ? error.message : String(error));
+      setDefectReport(null);
     }
   };
 

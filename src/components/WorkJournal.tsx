@@ -55,7 +55,8 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
         const events = await api.getInspectionEvents(token);
         setInspectionEvents(events);
       } catch (error) {
-        console.error('Failed to load inspection events:', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error('Failed to load inspection events:', errorMessage);
         setInspectionEvents([]);
       }
     };
@@ -69,7 +70,8 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
         try {
           await apiClient.post(ENDPOINTS.MARK_SEEN, { work_id: selectedWork });
         } catch (error) {
-          console.error('Failed to mark work as seen:', error);
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          console.error('Failed to mark work as seen:', errorMessage);
         }
       };
       markAsSeen();
@@ -90,7 +92,9 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
           setWorkTemplates(response.data?.work_types || []);
         }
       } catch (error) {
-        console.error('Failed to load work templates:', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error('Failed to load work templates:', errorMessage);
+        setWorkTemplates([]);
       }
     };
     loadWorkTemplates();

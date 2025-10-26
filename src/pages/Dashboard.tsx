@@ -78,11 +78,6 @@ const Dashboard = () => {
 
   const objects = useAppSelector((state) => state.objects.items);
   const works = useAppSelector((state) => state.works.items);
-  const unreadCounts = {};
-  
-  const totalMessages = 0;
-  const totalLogs = 0;
-  const totalInspections = 0;
 
   useEffect(() => {
     loadFeed();
@@ -97,7 +92,9 @@ const Dashboard = () => {
       const events = await api.getInspectionEvents(authToken);
       setInspectionEvents(events);
     } catch (error) {
-      console.error('Failed to load inspection events:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('Failed to load inspection events:', errorMessage);
+      setInspectionEvents([]);
     }
   };
 
@@ -125,7 +122,13 @@ const Dashboard = () => {
         setFeed(normalizedEvents);
       }
     } catch (error) {
-      console.error('Failed to load feed:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('Failed to load feed:', errorMessage);
+      toast({
+        title: 'Ошибка загрузки',
+        description: 'Не удалось загрузить ленту событий',
+        variant: 'destructive'
+      });
     } finally {
       setLoading(false);
     }
@@ -267,11 +270,12 @@ const Dashboard = () => {
       
       await loadUserData();
       loadFeed();
-    } catch (error: any) {
-      console.error('Failed to create work log:', error);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Не удалось создать запись';
+      console.error('Failed to create work log:', errorMessage);
       toast({
         title: 'Ошибка',
-        description: error?.message || 'Не удалось создать запись',
+        description: errorMessage,
         variant: 'destructive'
       });
     }
@@ -310,11 +314,12 @@ const Dashboard = () => {
       
       await loadUserData();
       loadFeed();
-    } catch (error: any) {
-      console.error('Failed to create info post:', error);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Не удалось создать инфо-пост';
+      console.error('Failed to create info post:', errorMessage);
       toast({
         title: 'Ошибка',
-        description: error?.message || 'Не удалось создать инфо-пост',
+        description: errorMessage,
         variant: 'destructive'
       });
     }

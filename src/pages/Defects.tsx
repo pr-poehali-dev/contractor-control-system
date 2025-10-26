@@ -27,7 +27,8 @@ const Defects = () => {
     try {
       const defects = inspection.defects ? JSON.parse(inspection.defects) : [];
       defectsCount = Array.isArray(defects) ? defects.length : 0;
-    } catch (e) {
+    } catch (error) {
+      console.error('Failed to parse defects JSON:', error instanceof Error ? error.message : String(error));
       defectsCount = 0;
     }
 

@@ -81,6 +81,18 @@ const getEventBadgeColor = (type: string) => {
   }
 };
 
+const getPluralDays = (days: number): string => {
+  if (days === 1) return 'день';
+  if (days < 5) return 'дня';
+  return 'дней';
+};
+
+const getPluralHours = (hours: number): string => {
+  if (hours === 1) return 'час';
+  if (hours < 5) return 'часа';
+  return 'часов';
+};
+
 const formatTimeAgo = (timestamp: string) => {
   const date = new Date(timestamp);
   
@@ -96,13 +108,17 @@ const formatTimeAgo = (timestamp: string) => {
 
   if (diffDays > 7) {
     return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
-  } else if (diffDays > 0) {
-    return `${diffDays} ${diffDays === 1 ? 'день' : diffDays < 5 ? 'дня' : 'дней'} назад`;
-  } else if (diffHours > 0) {
-    return `${diffHours} ${diffHours === 1 ? 'час' : diffHours < 5 ? 'часа' : 'часов'} назад`;
-  } else {
-    return 'Только что';
   }
+  
+  if (diffDays > 0) {
+    return `${diffDays} ${getPluralDays(diffDays)} назад`;
+  }
+  
+  if (diffHours > 0) {
+    return `${diffHours} ${getPluralHours(diffHours)} назад`;
+  }
+  
+  return 'Только что';
 };
 
 const getEventBgColor = (type: string) => {

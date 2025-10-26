@@ -206,7 +206,13 @@ const Login = () => {
                 await login('admin@example.com', 'admin123');
                 navigate('/dashboard');
               } catch (error) {
-                console.error('Quick admin login failed:', error);
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                console.error('Quick admin login failed:', errorMessage);
+                toast({
+                  title: 'Ошибка входа',
+                  description: 'Не удалось войти как администратор',
+                  variant: 'destructive'
+                });
               } finally {
                 setIsLoading(false);
               }

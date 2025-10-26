@@ -7,6 +7,26 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+const getRoleLabel = (role?: string): string => {
+  if (role === 'admin') return 'Администратор';
+  if (role === 'client') return 'Заказчик';
+  return 'Подрядчик';
+};
+
+const getRatingData = (role?: string, reliabilityRating: number = 0, qualityRating: number = 0) => {
+  const isClient = role === 'client';
+  return {
+    primary: {
+      value: isClient ? reliabilityRating : qualityRating,
+      label: isClient ? 'Рейтинг надежности' : 'Качество работ'
+    },
+    secondary: {
+      value: isClient ? qualityRating : reliabilityRating,
+      label: isClient ? 'Качество работ' : 'Рейтинг надежности'
+    }
+  };
+};
+
 const Profile = () => {
   const { user, userData, logout } = useAuthRedux();
   const navigate = useNavigate();
@@ -60,7 +80,7 @@ const Profile = () => {
               <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">{user?.name}</h1>
               <p className="text-slate-600 mb-3">укажите информацию о себе</p>
               <Badge variant="outline" className="mb-4">
-                {user?.role === 'admin' ? 'Администратор' : user?.role === 'client' ? 'Заказчик' : 'Подрядчик'}
+                {getRoleLabel(user?.role)}
               </Badge>
             </div>
 
@@ -85,18 +105,18 @@ const Profile = () => {
               <div className="grid grid-cols-3 gap-4 md:gap-8">
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
-                    {user?.role === 'client' ? reliabilityRating : qualityRating}%
+                    {getRatingData(user?.role, reliabilityRating, qualityRating).primary.value}%
                   </div>
                   <p className="text-xs md:text-sm text-slate-600">
-                    {user?.role === 'client' ? 'Рейтинг надежности' : 'Качество работ'}
+                    {getRatingData(user?.role, reliabilityRating, qualityRating).primary.label}
                   </p>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
-                    {user?.role === 'contractor' ? qualityRating : reliabilityRating}%
+                    {getRatingData(user?.role, reliabilityRating, qualityRating).secondary.value}%
                   </div>
                   <p className="text-xs md:text-sm text-slate-600">
-                    {user?.role === 'contractor' ? 'Рейтинг надежности' : 'Качество работ'}
+                    {getRatingData(user?.role, reliabilityRating, qualityRating).secondary.label}
                   </p>
                 </div>
                 <div className="text-center">

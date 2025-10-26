@@ -8,6 +8,12 @@ import { Switch } from '@/components/ui/switch';
 import Icon from '@/components/ui/icon';
 import { Badge } from '@/components/ui/badge';
 
+const getRoleLabel = (role?: string): string => {
+  if (role === 'admin') return 'Администратор';
+  if (role === 'client') return 'Заказчик';
+  return 'Подрядчик';
+};
+
 const Settings = () => {
   const { user, logout } = useAuthRedux();
   const navigate = useNavigate();
@@ -48,7 +54,7 @@ const Settings = () => {
                 <h3 className="text-xl font-semibold text-slate-900">{user?.name}</h3>
                 <p className="text-slate-600">{user?.email}</p>
                 <Badge className="mt-2" variant="outline">
-                  {user?.role === 'admin' ? 'Администратор' : user?.role === 'client' ? 'Заказчик' : 'Подрядчик'}
+                  {getRoleLabel(user?.role)}
                 </Badge>
               </div>
             </div>

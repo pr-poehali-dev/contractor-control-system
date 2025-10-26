@@ -57,7 +57,8 @@ const initialState: UserState = {
       const stored = localStorage.getItem('user');
       return stored ? JSON.parse(stored) : null;
     } catch (error) {
-      console.error('Failed to parse user from localStorage:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('Failed to parse user from localStorage:', errorMessage);
       return null;
     }
   })(),
@@ -95,9 +96,10 @@ export const login = createAsyncThunk(
       localStorage.setItem('user', JSON.stringify(user));
 
       return { token, user };
-    } catch (error: any) {
-      console.error('Login error:', error);
-      return rejectWithValue(error.message || 'Login failed');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      console.error('Login error:', errorMessage);
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -129,9 +131,10 @@ export const loginWithPhone = createAsyncThunk(
       localStorage.setItem('user', JSON.stringify(user));
 
       return { token, user };
-    } catch (error: any) {
-      console.error('Login with phone error:', error);
-      return rejectWithValue(error.message || 'Login failed');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      console.error('Login with phone error:', errorMessage);
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -174,9 +177,10 @@ export const register = createAsyncThunk(
       localStorage.setItem('user', JSON.stringify(user));
 
       return { token, user };
-    } catch (error: any) {
-      console.error('Registration error:', error);
-      return rejectWithValue(error.message || 'Registration failed');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Registration failed';
+      console.error('Registration error:', errorMessage);
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -218,13 +222,15 @@ export const loadUserData = createAsyncThunk(
         dispatch(setDefectReports(data.defect_reports || []));
         dispatch(setChatMessages(data.chatMessages || []));
       } catch (importError) {
-        console.error('Failed to import slices:', importError);
+        const errorMessage = importError instanceof Error ? importError.message : String(importError);
+        console.error('Failed to import slices:', errorMessage);
       }
 
       return data;
-    } catch (error: any) {
-      console.error('Load user data error:', error);
-      return rejectWithValue(error.message || 'Failed to load user data');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load user data';
+      console.error('Load user data error:', errorMessage);
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -263,22 +269,22 @@ export const verifyToken = createAsyncThunk(
 
       console.log('✅ verifyToken: Token valid');
       return true;
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Token verification failed';
+      const status = (error as any)?.response?.status;
+      
       console.error('❌ Token verification error:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        full: error
+        message: errorMessage,
+        status: status
       });
       
       // Удаляем токен только при 401/403 (невалидный токен)
-      const status = error?.response?.status;
       if (status === 401 || status === 403) {
         localStorage.removeItem('auth_token');
         localStorage.removeItem('user');
       }
       
-      return rejectWithValue(error.message || 'Token verification failed');
+      return rejectWithValue(errorMessage);
     }
   }
 );

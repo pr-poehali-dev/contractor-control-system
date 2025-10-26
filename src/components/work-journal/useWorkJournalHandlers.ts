@@ -14,9 +14,6 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
   const dispatch = useAppDispatch();
 
   const [newMessage, setNewMessage] = useState('');
-  const [progress, setProgress] = useState('0');
-  const [volume, setVolume] = useState('');
-  const [materials, setMaterials] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isInspectionModalOpen, setIsInspectionModalOpen] = useState(false);
   const [isWorkReportModalOpen, setIsWorkReportModalOpen] = useState(false);
@@ -51,10 +48,11 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
 
       setNewMessage('');
     } catch (error) {
-      console.error('Send message error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Не удалось отправить сообщение';
+      console.error('Send message error:', errorMessage);
       toast({
         title: 'Ошибка',
-        description: 'Не удалось отправить сообщение',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -260,12 +258,6 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
   return {
     newMessage,
     setNewMessage,
-    progress,
-    setProgress,
-    volume,
-    setVolume,
-    materials,
-    setMaterials,
     isSubmitting,
     isInspectionModalOpen,
     setIsInspectionModalOpen,

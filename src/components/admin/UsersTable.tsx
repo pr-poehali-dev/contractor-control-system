@@ -3,6 +3,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 
+const getRoleBadgeVariant = (role: string): 'default' | 'secondary' | 'outline' => {
+  if (role === 'admin') return 'default';
+  if (role === 'client') return 'secondary';
+  return 'outline';
+};
+
+const getRoleLabel = (role: string): string => {
+  if (role === 'admin') return 'admin';
+  if (role === 'client') return 'client';
+  return 'contractor';
+};
+
 interface AdminUser {
   id: number;
   phone: string;
@@ -53,8 +65,8 @@ export const UsersTable = ({
                 <td className="p-4 text-sm text-slate-600">{user.email || '-'}</td>
                 <td className="p-4 text-sm text-slate-600">{user.phone}</td>
                 <td className="p-4">
-                  <Badge variant={user.role === 'admin' ? 'default' : user.role === 'client' ? 'secondary' : 'outline'}>
-                    {user.role === 'admin' ? 'admin' : user.role === 'client' ? 'client' : 'contractor'}
+                  <Badge variant={getRoleBadgeVariant(user.role)}>
+                    {getRoleLabel(user.role)}
                   </Badge>
                 </td>
                 <td className="p-4 text-sm text-slate-600">{user.organization || '-'}</td>
