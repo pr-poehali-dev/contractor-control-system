@@ -150,7 +150,7 @@ const Contractors = () => {
                 <span className="hidden sm:inline">Пригласить подрядчика</span>
               </Button>
             </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Пригласить подрядчика</DialogTitle>
               <DialogDescription>
