@@ -20,7 +20,9 @@
 ### Назначение системы
 Платформа для контроля строительных работ:
 - **Заказчики (clients)** создают объекты, работы, проверки
-- **Подрядчики (contractors)** ведут журналы работ, отчитываются
+- **Подрядные организации** — юридические лица с сотрудниками
+- **Сотрудники организаций** ведут журналы работ, отчитываются
+- **Документооборот** — создание, подписание, версионирование документов
 - **Админы** управляют пользователями и системой
 
 ### Стек технологий
@@ -65,8 +67,12 @@ Icons:     lucide-react через компонент Icon
 
 #### Пользователи и доступ
 ```
-users (id, email, phone, password_hash, name, role, organization)
+users (id, email, phone, password_hash, name, role, organization_id, organization_role)
   ↓
+organizations (id, name, inn, kpp, legal_address, status)
+  ↓
+organization_invites (id, organization_id, email, token, status, expires_at)
+
 user_sessions (session_token, user_id, expires_at)
 verification_codes (code, phone, expires_at)
 ```
@@ -75,10 +81,11 @@ verification_codes (code, phone, expires_at)
 ```
 objects (id, title, address, client_id, status)
   ↓
-works (id, object_id, title, contractor_id, status, start_date, end_date, completion_percentage)
+works (id, object_id, title, contractor_id, contractor_organization_id, status, start_date, end_date)
   ↓
 work_logs (id, work_id, log_type, date, description, author_id)
 inspections (id, work_id, inspection_number, status, scheduled_date, created_by)
+documents (id, work_id, document_type, title, content jsonb, status)
 ```
 
 #### События и коммуникация
@@ -98,6 +105,26 @@ defect_reports (id, inspection_id, title, defects jsonb[], created_by)
   ↓
 defect_remediations (id, report_id, defect_id, status, remediated_at)
 ```
+
+#### Документооборот (НОВОЕ с 2025-10-26)
+```
+document_templates (id, client_id, name, template_type, content jsonb, version, is_active)
+  ↓
+documents (id, work_id, template_id, document_number, document_type, title, content jsonb, status)
+  ↓
+document_signatures (id, document_id, signer_id, organization_id, signature_type, status, signed_at)
+document_versions (id, document_id, version, content jsonb, changed_by, change_description)
+```
+
+**Статусы документов:**
+- `draft` - черновик
+- `pending_signature` - на подписи
+- `signed` - подписан всеми
+- `rejected` - отклонён
+
+**Типы подписей:**
+- `sms` - подписание через СМС
+- `ecp` - электронная цифровая подпись
 
 #### Справочники
 ```

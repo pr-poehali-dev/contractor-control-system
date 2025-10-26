@@ -1,0 +1,42 @@
+{
+  "tests": [
+    {
+      "name": "Create organization",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "body": {
+        "name": "ООО Стройтех",
+        "inn": "7707123456",
+        "kpp": "770701001",
+        "legal_address": "г. Москва, ул. Ленина, д. 1",
+        "phone": "+7 (495) 123-45-67",
+        "email": "info@stroitech.ru"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "organization": {
+          "id": "number",
+          "name": "string",
+          "inn": "string"
+        }
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get organizations list",
+      "method": "GET",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "organizations": "array"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

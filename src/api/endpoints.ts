@@ -55,4 +55,37 @@ export const ENDPOINTS = {
   },
 
   MARK_SEEN: '/e9dd5b4f-67a6-44f8-9e1a-9108341f41df',
+
+  ORGANIZATIONS: {
+    LIST: '/organizations',
+    CREATE: '/organizations',
+    UPDATE: '/organizations',
+    DETAIL: '/organizations',
+  },
+
+  ORGANIZATION_INVITES: {
+    SEND: '/organization-invites',
+    ACCEPT: '/organization-invites',
+    CHECK: '/organization-invites',
+  },
+
+  DOCUMENTS: {
+    LIST: '/documents',
+    CREATE: '/documents',
+    UPDATE: '/documents',
+    DETAIL: '/documents',
+  },
+
+  DOCUMENT_TEMPLATES: {
+    LIST: '/document-templates',
+    CREATE: '/document-templates',
+    UPDATE: '/document-templates',
+    DETAIL: '/document-templates',
+  },
+
+  DOCUMENT_SIGNATURES: {
+    CREATE: '/document-signatures',
+    SIGN: '/document-signatures',
+    PENDING: '/document-signatures',
+  },
 } as const;

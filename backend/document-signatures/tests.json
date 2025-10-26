@@ -1,0 +1,38 @@
+{
+  "tests": [
+    {
+      "name": "Create signature request",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "body": {
+        "document_id": 1,
+        "signer_id": 2,
+        "signature_type": "sms"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "signature": {
+          "id": "number",
+          "status": "string"
+        }
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get pending signatures",
+      "method": "GET",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "pending_signatures": "array"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

@@ -8,6 +8,9 @@ import contractorsReducer from './slices/contractorsSlice';
 import defectReportsReducer from './slices/defectReportsSlice';
 import chatMessagesReducer from './slices/chatMessagesSlice';
 import infoPostsReducer from './slices/infoPostsSlice';
+import organizationsReducer from './slices/organizationsSlice';
+import documentsReducer from './slices/documentsSlice';
+import documentTemplatesReducer from './slices/documentTemplatesSlice';
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +23,9 @@ export const store = configureStore({
     defectReports: defectReportsReducer,
     chatMessages: chatMessagesReducer,
     infoPosts: infoPostsReducer,
+    organizations: organizationsReducer,
+    documents: documentsReducer,
+    documentTemplates: documentTemplatesReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

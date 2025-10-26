@@ -1,0 +1,25 @@
+{
+  "tests": [
+    {
+      "name": "Send invite",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "body": {
+        "organization_id": 1,
+        "email": "contractor@example.com"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "invite": {
+          "id": "number",
+          "email": "string",
+          "token": "string"
+        }
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

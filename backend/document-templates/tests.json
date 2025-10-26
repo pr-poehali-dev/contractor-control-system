@@ -1,0 +1,57 @@
+{
+  "tests": [
+    {
+      "name": "Create template",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "body": {
+        "name": "Акт проверки работ",
+        "description": "Шаблон для проверки выполненных работ",
+        "template_type": "inspection_act",
+        "content": {
+          "blocks": [
+            {
+              "type": "header",
+              "text": "АКТ ПРОВЕРКИ РАБОТ"
+            },
+            {
+              "type": "field",
+              "label": "Номер акта",
+              "value": "{{document.number}}"
+            },
+            {
+              "type": "field",
+              "label": "Дата проверки",
+              "value": "{{inspection.date}}"
+            }
+          ]
+        }
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "template": {
+          "id": "number",
+          "name": "string",
+          "template_type": "string"
+        }
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get templates list",
+      "method": "GET",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "templates": "array"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
