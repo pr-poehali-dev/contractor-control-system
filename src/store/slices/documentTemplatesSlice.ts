@@ -49,10 +49,17 @@ const initialState: DocumentTemplatesState = {
 
 export const fetchTemplates = createAsyncThunk(
   'documentTemplates/fetchAll',
-  async (type?: string) => {
-    const params = type ? { type } : undefined;
-    const response = await apiClient.get(ENDPOINTS.DOCUMENT_TEMPLATES.LIST, { params });
-    return response.data.templates;
+  async (type?: string, { rejectWithValue }) => {
+    try {
+      const params = type ? { type } : undefined;
+      const response = await apiClient.get(ENDPOINTS.DOCUMENT_TEMPLATES.LIST, { 
+        params,
+        skipAuthRedirect: true 
+      });
+      return response.data.templates;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to fetch templates');
+    }
   }
 );
 

@@ -20,7 +20,9 @@ const Documents = () => {
   
   useEffect(() => {
     if (isAuthenticated) {
-      dispatch(fetchDocuments());
+      dispatch(fetchDocuments()).catch((error) => {
+        console.log('Documents API not ready yet:', error);
+      });
     }
   }, [dispatch, isAuthenticated]);
 

@@ -56,9 +56,15 @@ const initialState: OrganizationsState = {
 
 export const fetchOrganizations = createAsyncThunk(
   'organizations/fetchAll',
-  async () => {
-    const response = await apiClient.get(ENDPOINTS.ORGANIZATIONS.LIST);
-    return response.data.organizations;
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.get(ENDPOINTS.ORGANIZATIONS.LIST, {
+        skipAuthRedirect: true
+      });
+      return response.data.organizations;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to fetch organizations');
+    }
   }
 );
 

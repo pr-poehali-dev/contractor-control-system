@@ -70,7 +70,9 @@ export default function DocumentTemplates() {
   const [templates, setTemplates] = useState<DocumentTemplate[]>(mockTemplatesForFallback);
   
   useEffect(() => {
-    dispatch(fetchTemplates());
+    dispatch(fetchTemplates()).catch((error) => {
+      console.log('Document templates API not ready yet:', error);
+    });
   }, [dispatch]);
   
   useEffect(() => {

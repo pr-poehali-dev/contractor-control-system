@@ -71,9 +71,16 @@ const initialState: DocumentsState = {
 
 export const fetchDocuments = createAsyncThunk(
   'documents/fetchAll',
-  async (params?: { work_id?: number; status?: string }) => {
-    const response = await apiClient.get(ENDPOINTS.DOCUMENTS.LIST, { params });
-    return response.data.documents;
+  async (params?: { work_id?: number; status?: string }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.get(ENDPOINTS.DOCUMENTS.LIST, { 
+        params,
+        skipAuthRedirect: true 
+      });
+      return response.data.documents;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to fetch documents');
+    }
   }
 );
 
