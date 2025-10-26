@@ -39,6 +39,7 @@ import MyTasks from "./pages/MyTasks";
 import NotFound from "./pages/NotFound";
 import DocumentTemplates from "./pages/DocumentTemplates";
 import DocumentTemplateEditor from "./pages/DocumentTemplateEditor";
+import OrganizationPage from "./pages/OrganizationPage";
 
 const queryClient = new QueryClient();
 
@@ -112,6 +113,7 @@ const App = () => (
               <Route path="/pricing" element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
               <Route path="/document-templates" element={<ProtectedRoute><DocumentTemplates /></ProtectedRoute>} />
               <Route path="/document-templates/:templateId" element={<ProtectedRoute><DocumentTemplateEditor /></ProtectedRoute>} />
+              <Route path="/organization" element={<ProtectedRoute><OrganizationPage /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

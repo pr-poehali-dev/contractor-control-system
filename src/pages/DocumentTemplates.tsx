@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,14 @@ import {
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import {
+  fetchTemplates,
+  createTemplate,
+  updateTemplate,
+  selectTemplates,
+  selectTemplatesLoading,
+} from '@/store/slices/documentTemplatesSlice';
 import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
@@ -32,7 +40,7 @@ interface DocumentTemplate {
   updatedAt: string;
 }
 
-const mockTemplates: DocumentTemplate[] = [
+const mockTemplatesForFallback: DocumentTemplate[] = [
   {
     id: 1,
     name: 'Акт выполненных работ',
@@ -56,7 +64,46 @@ const mockTemplates: DocumentTemplate[] = [
 export default function DocumentTemplates() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [templates, setTemplates] = useState<DocumentTemplate[]>(mockTemplates);
+  const dispatch = useAppDispatch();
+  const templatesFromRedux = useAppSelector(selectTemplates);
+  const loading = useAppSelector(selectTemplatesLoading);
+  const [templates, setTemplates] = useState<DocumentTemplate[]>(mockTemplatesForFallback);
+  
+  useEffect(() => {
+    dispatch(fetchTemplates());
+  }, [dispatch]);
+  
+  useEffect(() => {
+    if (templatesFromRedux.length > 0) {
+      setTemplates(templatesFromRedux.map(t => ({
+        id: t.id,
+        name: t.name,
+        description: t.description || '',
+        content: JSON.stringify(t.content),
+        variables: extractVariablesFromContent(t.content),
+        createdAt: t.created_at,
+        updatedAt: t.updated_at
+      })));
+    }
+  }, [templatesFromRedux]);
+  
+  const extractVariablesFromContent = (content: any): string[] => {
+    const vars: string[] = [];
+    if (content.blocks) {
+      content.blocks.forEach((block: any) => {
+        if (block.value && block.value.includes('{{')) {
+          const matches = block.value.match(/\{\{([^}]+)\}\}/g);
+          if (matches) {
+            matches.forEach((m: string) => {
+              const varName = m.replace(/[{}]/g, '').trim();
+              if (!vars.includes(varName)) vars.push(varName);
+            });
+          }
+        }
+      });
+    }
+    return vars;
+  };
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [templateToDelete, setTemplateToDelete] = useState<number | null>(null);
@@ -72,7 +119,7 @@ export default function DocumentTemplates() {
       template.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleCreateTemplate = () => {
+  const handleCreateTemplate = async () => {
     if (!newTemplate.name.trim()) {
       toast({
         title: 'Ошибка',
@@ -82,26 +129,30 @@ export default function DocumentTemplates() {
       return;
     }
 
-    const template: DocumentTemplate = {
-      id: Date.now(),
-      name: newTemplate.name,
-      description: newTemplate.description,
-      content: '',
-      variables: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    try {
+      const result = await dispatch(createTemplate({
+        name: newTemplate.name,
+        description: newTemplate.description,
+        template_type: 'custom',
+        content: { blocks: [] }
+      })).unwrap();
+      
+      setIsCreateDialogOpen(false);
+      setNewTemplate({ name: '', description: '' });
+      
+      toast({
+        title: 'Шаблон создан',
+        description: 'Теперь вы можете настроить его содержимое',
+      });
 
-    setTemplates((prev) => [template, ...prev]);
-    setIsCreateDialogOpen(false);
-    setNewTemplate({ name: '', description: '' });
-    
-    toast({
-      title: 'Шаблон создан',
-      description: 'Теперь вы можете настроить его содержимое',
-    });
-
-    navigate(`/document-templates/${template.id}`);
+      navigate(`/document-templates/${result.id}`);
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось создать шаблон',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleDeleteTemplate = () => {

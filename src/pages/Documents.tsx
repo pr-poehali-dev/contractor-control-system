@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { Card } from '@/components/ui/card';
@@ -7,11 +7,20 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { fetchDocuments, selectDocuments, selectDocumentsLoading } from '@/store/slices/documentsSlice';
 
 const Documents = () => {
   const { userData } = useAuthRedux();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const documentsFromRedux = useAppSelector(selectDocuments);
+  const loading = useAppSelector(selectDocumentsLoading);
   const [filter, setFilter] = useState<'all' | 'defect_reports' | 'acts' | 'protocols'>('all');
+  
+  useEffect(() => {
+    dispatch(fetchDocuments());
+  }, [dispatch]);
 
   const getDocumentTypeLabel = (type: string) => {
     const types: Record<string, string> = {
@@ -72,8 +81,20 @@ const Documents = () => {
     },
   ];
 
+  const documentsFromBackend = documentsFromRedux.map(doc => ({
+    ...doc,
+    type: doc.document_type,
+    document_date: doc.created_at,
+    report_number: doc.document_number,
+    object_id: 1,
+    work_id: doc.work_id,
+    total_defects: 0,
+    critical_defects: 0
+  }));
+  
   const allDocuments = [
     ...mockDocuments,
+    ...documentsFromBackend,
     ...(userData?.defect_reports || []).map((report: any) => ({
       ...report,
       type: 'defect_report',
