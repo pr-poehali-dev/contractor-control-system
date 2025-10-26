@@ -65,11 +65,16 @@ export const fetchTemplates = createAsyncThunk(
 
 export const fetchTemplateDetail = createAsyncThunk(
   'documentTemplates/fetchDetail',
-  async (id: number) => {
-    const response = await apiClient.get(ENDPOINTS.DOCUMENT_TEMPLATES.DETAIL, {
-      params: { id }
-    });
-    return response.data.template;
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.get(ENDPOINTS.DOCUMENT_TEMPLATES.DETAIL, {
+        params: { id },
+        skipAuthRedirect: true
+      });
+      return response.data.template;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to fetch template detail');
+    }
   }
 );
 
@@ -80,9 +85,15 @@ export const createTemplate = createAsyncThunk(
     description?: string;
     template_type: string;
     content: { blocks: TemplateBlock[] };
-  }) => {
-    const response = await apiClient.post(ENDPOINTS.DOCUMENT_TEMPLATES.CREATE, data);
-    return response.data.template;
+  }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.post(ENDPOINTS.DOCUMENT_TEMPLATES.CREATE, data, {
+        skipAuthRedirect: true
+      });
+      return response.data.template;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to create template');
+    }
   }
 );
 
@@ -94,9 +105,15 @@ export const updateTemplate = createAsyncThunk(
     description?: string;
     content?: { blocks: TemplateBlock[] };
     is_active?: boolean;
-  }) => {
-    const response = await apiClient.put(ENDPOINTS.DOCUMENT_TEMPLATES.UPDATE, data);
-    return response.data.template;
+  }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.put(ENDPOINTS.DOCUMENT_TEMPLATES.UPDATE, data, {
+        skipAuthRedirect: true
+      });
+      return response.data.template;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to update template');
+    }
   }
 );
 

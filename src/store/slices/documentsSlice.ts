@@ -86,11 +86,16 @@ export const fetchDocuments = createAsyncThunk(
 
 export const fetchDocumentDetail = createAsyncThunk(
   'documents/fetchDetail',
-  async (id: number) => {
-    const response = await apiClient.get(ENDPOINTS.DOCUMENTS.DETAIL, {
-      params: { id }
-    });
-    return response.data.document;
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.get(ENDPOINTS.DOCUMENTS.DETAIL, {
+        params: { id },
+        skipAuthRedirect: true
+      });
+      return response.data.document;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to fetch document detail');
+    }
   }
 );
 
@@ -102,17 +107,29 @@ export const createDocument = createAsyncThunk(
     document_type: string;
     title: string;
     content: Record<string, any>;
-  }) => {
-    const response = await apiClient.post(ENDPOINTS.DOCUMENTS.CREATE, data);
-    return response.data.document;
+  }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.post(ENDPOINTS.DOCUMENTS.CREATE, data, {
+        skipAuthRedirect: true
+      });
+      return response.data.document;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to create document');
+    }
   }
 );
 
 export const updateDocumentStatus = createAsyncThunk(
   'documents/updateStatus',
-  async (data: { id: number; status: string }) => {
-    const response = await apiClient.put(ENDPOINTS.DOCUMENTS.UPDATE, data);
-    return response.data.document;
+  async (data: { id: number; status: string }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.put(ENDPOINTS.DOCUMENTS.UPDATE, data, {
+        skipAuthRedirect: true
+      });
+      return response.data.document;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to update document status');
+    }
   }
 );
 
@@ -122,9 +139,15 @@ export const createSignatureRequest = createAsyncThunk(
     document_id: number;
     signer_id: number;
     signature_type: 'sms' | 'ecp';
-  }) => {
-    const response = await apiClient.post(ENDPOINTS.DOCUMENT_SIGNATURES.CREATE, data);
-    return response.data.signature;
+  }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.post(ENDPOINTS.DOCUMENT_SIGNATURES.CREATE, data, {
+        skipAuthRedirect: true
+      });
+      return response.data.signature;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to create signature request');
+    }
   }
 );
 
@@ -135,17 +158,29 @@ export const signDocument = createAsyncThunk(
     action: 'sign' | 'reject';
     signature_data?: string;
     rejection_reason?: string;
-  }) => {
-    const response = await apiClient.put(ENDPOINTS.DOCUMENT_SIGNATURES.SIGN, data);
-    return response.data.signature;
+  }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.put(ENDPOINTS.DOCUMENT_SIGNATURES.SIGN, data, {
+        skipAuthRedirect: true
+      });
+      return response.data.signature;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to sign document');
+    }
   }
 );
 
 export const fetchPendingSignatures = createAsyncThunk(
   'documents/fetchPendingSignatures',
-  async () => {
-    const response = await apiClient.get(ENDPOINTS.DOCUMENT_SIGNATURES.PENDING);
-    return response.data.pending_signatures;
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.get(ENDPOINTS.DOCUMENT_SIGNATURES.PENDING, {
+        skipAuthRedirect: true
+      });
+      return response.data.pending_signatures;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to fetch pending signatures');
+    }
   }
 );
 
