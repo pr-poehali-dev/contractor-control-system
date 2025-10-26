@@ -164,7 +164,7 @@ export default function DocumentTemplates() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             {filteredTemplates.map((template) => (
               <Card key={template.id} className="hover:shadow-lg transition-shadow cursor-pointer group">
                 <CardHeader className="pb-3">

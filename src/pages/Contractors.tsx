@@ -136,19 +136,20 @@ const Contractors = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Подрядчики</h1>
-          <p className="text-slate-600">Организации, выполняющие работы по вашим проектам</p>
-        </div>
-        <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Icon name="UserPlus" size={18} className="mr-2" />
-              Пригласить подрядчика
-            </Button>
-          </DialogTrigger>
+    <div className="flex-1 overflow-y-auto bg-slate-50 w-full overflow-x-hidden">
+      <div className="px-3 py-4 md:p-8 lg:p-12 max-w-7xl mx-auto w-full">
+        <div className="mb-6 md:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">Подрядчики</h1>
+            <p className="text-slate-600">Организации, выполняющие работы по вашим проектам</p>
+          </div>
+          <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2">
+                <Icon name="UserPlus" size={18} />
+                <span className="hidden sm:inline">Пригласить подрядчика</span>
+              </Button>
+            </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Пригласить подрядчика</DialogTitle>
@@ -277,7 +278,7 @@ const Contractors = () => {
           <p className="text-slate-500">Пригласите подрядчиков для работы над проектами</p>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {contractors.map((contractor, index) => (
             <Card 
               key={contractor.id}

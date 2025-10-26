@@ -33,7 +33,47 @@ const Documents = () => {
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
+  const mockDocuments = [
+    {
+      id: 1021,
+      type: 'defect_report',
+      report_number: 'NPDR-25-51-20251021',
+      document_date: '2025-10-21T06:02:00',
+      status: 'active',
+      object_id: 1,
+      work_id: 1,
+      total_defects: 2,
+      critical_defects: 0,
+      description: 'Дом Пушкина → Монтаж вентиляционной системы'
+    },
+    {
+      id: 1020,
+      type: 'defect_report',
+      report_number: 'NPDR-25-51-20251020',
+      document_date: '2025-10-20T14:58:00',
+      status: 'active',
+      object_id: 1,
+      work_id: 1,
+      total_defects: 2,
+      critical_defects: 0,
+      description: 'Дом Пушкина → Монтаж вентиляционной системы'
+    },
+    {
+      id: 1016,
+      type: 'defect_report',
+      report_number: 'NPDR-25-51-20251016',
+      document_date: '2025-10-16T14:44:00',
+      status: 'active',
+      object_id: 1,
+      work_id: 1,
+      total_defects: 2,
+      critical_defects: 0,
+      description: 'Дом Пушкина → Монтаж вентиляционной системы'
+    },
+  ];
+
   const allDocuments = [
+    ...mockDocuments,
     ...(userData?.defect_reports || []).map((report: any) => ({
       ...report,
       type: 'defect_report',
@@ -54,17 +94,15 @@ const Documents = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="sticky top-0 bg-white border-b z-10 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-slate-900">Документы</h1>
-          <p className="text-sm text-slate-500 mt-1">
+    <div className="flex-1 overflow-y-auto bg-slate-50 w-full overflow-x-hidden">
+      <div className="px-3 py-4 md:p-8 lg:p-12 max-w-7xl mx-auto w-full">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">Документы</h1>
+          <p className="text-slate-600">
             Все сформированные документы по проектам
           </p>
         </div>
-      </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-6">
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
           <Button
             variant={filter === 'all' ? 'default' : 'outline'}
