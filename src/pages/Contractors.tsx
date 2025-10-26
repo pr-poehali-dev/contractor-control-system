@@ -265,9 +265,9 @@ const Contractors = () => {
             )}
           </DialogContent>
         </Dialog>
-      </div>
+        </div>
 
-      {isLoading ? (
+        {isLoading ? (
         <div className="text-center py-12">
           <Icon name="Loader2" size={48} className="animate-spin text-slate-400 mx-auto" />
         </div>
