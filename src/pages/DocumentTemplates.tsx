@@ -14,11 +14,10 @@ import {
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   fetchTemplates,
   createTemplate,
-  updateTemplate,
   selectTemplates,
   selectTemplatesLoading,
 } from '@/store/slices/documentTemplatesSlice';
