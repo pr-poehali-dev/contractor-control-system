@@ -56,35 +56,35 @@ export const ENDPOINTS = {
   MARK_SEEN: '/e9dd5b4f-67a6-44f8-9e1a-9108341f41df',
 
   ORGANIZATIONS: {
-    LIST: '/organizations',
-    CREATE: '/organizations',
-    UPDATE: '/organizations',
-    DETAIL: '/organizations',
+    LIST: '/b2540d24-831a-4ac0-b3e8-b128f51c0033',
+    CREATE: '/b2540d24-831a-4ac0-b3e8-b128f51c0033',
+    UPDATE: '/b2540d24-831a-4ac0-b3e8-b128f51c0033',
+    DETAIL: '/b2540d24-831a-4ac0-b3e8-b128f51c0033',
   },
 
   ORGANIZATION_INVITES: {
-    SEND: '/organization-invites',
-    ACCEPT: '/organization-invites',
-    CHECK: '/organization-invites',
+    SEND: '/654d7aa7-8c67-40a4-af12-8c70b817b9b9',
+    ACCEPT: '/654d7aa7-8c67-40a4-af12-8c70b817b9b9',
+    CHECK: '/654d7aa7-8c67-40a4-af12-8c70b817b9b9',
   },
 
   DOCUMENTS: {
-    LIST: '/documents',
-    CREATE: '/documents',
-    UPDATE: '/documents',
-    DETAIL: '/documents',
+    LIST: '/7b29a4ff-66e5-43e7-a740-b7dbab4a384c',
+    CREATE: '/7b29a4ff-66e5-43e7-a740-b7dbab4a384c',
+    UPDATE: '/7b29a4ff-66e5-43e7-a740-b7dbab4a384c',
+    DETAIL: '/7b29a4ff-66e5-43e7-a740-b7dbab4a384c',
   },
 
   DOCUMENT_TEMPLATES: {
-    LIST: '/document-templates',
-    CREATE: '/document-templates',
-    UPDATE: '/document-templates',
-    DETAIL: '/document-templates',
+    LIST: '/1d72211d-c1da-4633-b2e7-c5344fcc43b7',
+    CREATE: '/1d72211d-c1da-4633-b2e7-c5344fcc43b7',
+    UPDATE: '/1d72211d-c1da-4633-b2e7-c5344fcc43b7',
+    DETAIL: '/1d72211d-c1da-4633-b2e7-c5344fcc43b7',
   },
 
   DOCUMENT_SIGNATURES: {
-    CREATE: '/document-signatures',
-    SIGN: '/document-signatures',
-    PENDING: '/document-signatures',
+    CREATE: '/11c2229d-1b77-4e5e-837b-b8c8977c0b5f',
+    SIGN: '/11c2229d-1b77-4e5e-837b-b8c8977c0b5f',
+    PENDING: '/11c2229d-1b77-4e5e-837b-b8c8977c0b5f',
   },
 } as const;
