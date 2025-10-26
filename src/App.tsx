@@ -39,6 +39,7 @@ import MyTasks from "./pages/MyTasks";
 import NotFound from "./pages/NotFound";
 import DocumentTemplates from "./pages/DocumentTemplates";
 import DocumentTemplateEditor from "./pages/DocumentTemplateEditor";
+import DocumentView from "./pages/DocumentView";
 import OrganizationPage from "./pages/OrganizationPage";
 
 const queryClient = new QueryClient();
@@ -100,6 +101,7 @@ const App = () => (
               <Route path="/defect-report/:reportId" element={<ProtectedRoute><DefectReportDetail /></ProtectedRoute>} />
               <Route path="/defects" element={<ProtectedRoute><Defects /></ProtectedRoute>} />
               <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
+              <Route path="/document/:id" element={<ProtectedRoute><DocumentView /></ProtectedRoute>} />
               <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
               <Route path="/contractors" element={<ProtectedRoute><Contractors /></ProtectedRoute>} />
               <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
