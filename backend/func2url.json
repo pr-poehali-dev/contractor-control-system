@@ -1,4 +1,9 @@
 {
+  "documents": "https://functions.poehali.dev/7b29a4ff-66e5-43e7-a740-b7dbab4a384c",
+  "document-signatures": "https://functions.poehali.dev/11c2229d-1b77-4e5e-837b-b8c8977c0b5f",
+  "organization-invites": "https://functions.poehali.dev/654d7aa7-8c67-40a4-af12-8c70b817b9b9",
+  "document-templates": "https://functions.poehali.dev/1d72211d-c1da-4633-b2e7-c5344fcc43b7",
+  "organizations": "https://functions.poehali.dev/b2540d24-831a-4ac0-b3e8-b128f51c0033",
   "get-contractor-tasks": "https://functions.poehali.dev/facbe7eb-8f9d-4e2a-840a-9404ec0c5715",
   "defect-reports": "https://functions.poehali.dev/d230b3d9-8dbd-410c-b023-9c021131a15b",
   "defect-remediation": "https://functions.poehali.dev/ef8edfd4-ef48-48a9-95fb-78f5a4982949",
@@ -11,17 +16,11 @@
   "work-types": "https://functions.poehali.dev/f7c65aa6-e261-44c6-a6cb-65fd7bac3fdf",
   "user-data": "https://functions.poehali.dev/bdee636b-a6c0-42d0-8f77-23c316751e34",
   "admin-users": "https://functions.poehali.dev/3f6bb7ff-3e84-4770-8884-3e96062db7f2",
-  "link-contractor": "https://functions.poehali.dev/f25f4572-bf91-47c2-aca5-059ebc3b870e",
-  "invite-contractor": "https://functions.poehali.dev/5865695e-cb4a-4795-bc42-5465c2b7ad0b",
-  "fix-passwords": "https://functions.poehali.dev/e87a7836-9857-420b-8638-12d75d4c13c8",
-  "generate-hash": "https://functions.poehali.dev/e4ad083b-2691-481c-9763-e85542c84186",
-  "admin": "https://functions.poehali.dev/0b65962d-5a9a-40b3-8108-41e8d32b4a76",
   "works": "https://functions.poehali.dev/3910c724-a679-45d8-abd9-2c463bcc525a",
   "objects": "https://functions.poehali.dev/354c1d24-5775-4678-ba82-bb1acd986337",
   "contractors": "https://functions.poehali.dev/4bcd4efc-3b22-4eea-9434-44cc201a86f8",
   "register": "https://functions.poehali.dev/448ad9ac-b820-4587-b3cc-0a988ebaa4e8",
   "update-data": "https://functions.poehali.dev/b69598bf-df90-4a71-93a1-6108c6c39317",
   "create-data": "https://functions.poehali.dev/8d57b03e-49c5-4589-abfb-691e6e084c6a",
-  "auth": "https://functions.poehali.dev/b9d6731e-788e-476b-bad5-047bd3d6adc1",
-  "data": "https://functions.poehali.dev/c30e1bf9-0423-48e8-b295-07120e205fa7"
+  "auth": "https://functions.poehali.dev/b9d6731e-788e-476b-bad5-047bd3d6adc1"
 }

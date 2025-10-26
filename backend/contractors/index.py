@@ -209,6 +209,48 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             }
                         })
                     }
+            
+            elif action == 'link':
+                client_id = body.get('client_id')
+                contractor_id = body.get('contractor_id')
+                
+                if not client_id or not contractor_id:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'success': False, 'error': 'client_id and contractor_id are required'}),
+                        'isBase64Encoded': False
+                    }
+                
+                cur.execute(
+                    f"SELECT id FROM t_p8942561_contractor_control_s.client_contractors WHERE client_id = {client_id} AND contractor_id = {contractor_id}"
+                )
+                existing = cur.fetchone()
+                
+                if existing:
+                    cur.close()
+                    conn.close()
+                    return {
+                        'statusCode': 200,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'success': True, 'message': 'Already linked'}),
+                        'isBase64Encoded': False
+                    }
+                
+                cur.execute(
+                    f"INSERT INTO t_p8942561_contractor_control_s.client_contractors (client_id, contractor_id) VALUES ({client_id}, {contractor_id})"
+                )
+                
+                conn.commit()
+                cur.close()
+                conn.close()
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'success': True, 'message': 'Contractor linked successfully'}),
+                    'isBase64Encoded': False
+                }
         
         elif method == 'GET':
             params = event.get('queryStringParameters', {}) or {}
