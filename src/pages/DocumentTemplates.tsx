@@ -166,16 +166,17 @@ export default function DocumentTemplates() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
             {filteredTemplates.map((template) => (
-              <Card key={template.id} className="hover:shadow-lg transition-shadow cursor-pointer group">
+              <Card
+                key={template.id}
+                className="hover:shadow-md transition-all cursor-pointer"
+                onClick={() => navigate(`/document-templates/${template.id}`)}
+              >
                 <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-lg text-slate-900 truncate">{template.name}</h3>
-                      <p className="text-sm text-slate-600 line-clamp-2 mt-1">{template.description}</p>
-                    </div>
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="font-semibold text-lg text-slate-900">{template.name}</h3>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 flex-shrink-0">
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                           <Icon name="MoreVertical" size={16} />
                         </Button>
                       </DropdownMenuTrigger>
@@ -183,10 +184,6 @@ export default function DocumentTemplates() {
                         <DropdownMenuItem onClick={() => navigate(`/document-templates/${template.id}`)}>
                           <Icon name="Edit" size={16} className="mr-2" />
                           Редактировать
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(template.content)}>
-                          <Icon name="Copy" size={16} className="mr-2" />
-                          Копировать текст
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => openDeleteDialog(template.id)}
@@ -198,23 +195,23 @@ export default function DocumentTemplates() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
+                  <p className="text-sm text-slate-600 mt-1">{template.description}</p>
                 </CardHeader>
-                <CardContent className="pt-0" onClick={() => navigate(`/document-templates/${template.id}`)}>
+                <CardContent className="pt-0">
                   <div className="flex flex-wrap gap-1.5 mb-3">
-                    {template.variables.slice(0, 3).map((variable) => (
-                      <Badge key={variable} variant="secondary" className="text-xs">
+                    {template.variables.slice(0, 5).map((variable) => (
+                      <Badge key={variable} variant="secondary" className="text-xs font-mono">
                         {`{{${variable}}}`}
                       </Badge>
                     ))}
-                    {template.variables.length > 3 && (
+                    {template.variables.length > 5 && (
                       <Badge variant="secondary" className="text-xs">
-                        +{template.variables.length - 3}
+                        +{template.variables.length - 5}
                       </Badge>
                     )}
                   </div>
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span>Обновлён {new Date(template.updatedAt).toLocaleDateString('ru-RU')}</span>
-                    <Icon name="ChevronRight" size={16} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
+                  <div className="text-xs text-slate-500">
+                    Обновлён {new Date(template.updatedAt).toLocaleDateString('ru-RU')}
                   </div>
                 </CardContent>
               </Card>

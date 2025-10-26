@@ -36,7 +36,17 @@ const Contractors = () => {
     setIsLoading(true);
     try {
       const response = await apiClient.get(ENDPOINTS.CONTRACTORS.LIST + '?client_id=' + user.id);
-      setContractors(response.data?.contractors || []);
+      const mockContractor = {
+        id: 999,
+        name: 'ООО Строй Подряд',
+        inn: '123456789',
+        user: {
+          email: 'test1',
+          phone: '8999999999'
+        },
+        added_at: '2025-10-09T00:00:00'
+      };
+      setContractors([mockContractor, ...(response.data?.contractors || [])]);
     } catch (error) {
       console.error('Failed to load contractors:', error);
     } finally {
