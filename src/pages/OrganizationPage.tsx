@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   fetchOrganizations,
@@ -26,6 +27,7 @@ import {
 } from '@/components/ui/dialog';
 
 export default function OrganizationPage() {
+  const { isAuthenticated } = useAuthRedux();
   const dispatch = useAppDispatch();
   const organizations = useAppSelector(selectOrganizations);
   const currentOrg = useAppSelector(selectCurrentOrganization);
@@ -36,8 +38,10 @@ export default function OrganizationPage() {
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchOrganizations());
-  }, [dispatch]);
+    if (isAuthenticated) {
+      dispatch(fetchOrganizations());
+    }
+  }, [dispatch, isAuthenticated]);
 
   useEffect(() => {
     if (organizations.length > 0 && !currentOrg) {

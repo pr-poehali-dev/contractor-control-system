@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchDocuments, selectDocuments, selectDocumentsLoading } from '@/store/slices/documentsSlice';
 
 const Documents = () => {
-  const { userData } = useAuthRedux();
+  const { userData, isAuthenticated } = useAuthRedux();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const documentsFromRedux = useAppSelector(selectDocuments);
@@ -19,8 +19,10 @@ const Documents = () => {
   const [filter, setFilter] = useState<'all' | 'defect_reports' | 'acts' | 'protocols'>('all');
   
   useEffect(() => {
-    dispatch(fetchDocuments());
-  }, [dispatch]);
+    if (isAuthenticated) {
+      dispatch(fetchDocuments());
+    }
+  }, [dispatch, isAuthenticated]);
 
   const getDocumentTypeLabel = (type: string) => {
     const types: Record<string, string> = {
