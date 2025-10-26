@@ -272,13 +272,13 @@ const Contractors = () => {
           <Icon name="Loader2" size={48} className="animate-spin text-slate-400 mx-auto" />
         </div>
       ) : contractors.length === 0 ? (
-          <Card className="p-12 text-center">
-            <Icon name="Users" size={64} className="mx-auto text-slate-300 mb-4" />
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">Нет подрядчиков</h3>
-            <p className="text-slate-500">Пригласите подрядчиков для работы над проектами</p>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Card className="p-12 text-center">
+          <Icon name="Users" size={64} className="mx-auto text-slate-300 mb-4" />
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">Нет подрядчиков</h3>
+          <p className="text-slate-500">Пригласите подрядчиков для работы над проектами</p>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {contractors.map((contractor, index) => (
             <Card 
               key={contractor.id}
@@ -341,15 +341,14 @@ const Contractors = () => {
               </CardContent>
             </Card>
           ))}
-          </div>
-        )}
+        </div>
+      )}
 
-        <ContractorDetailsModal
-          open={detailsOpen}
-          onOpenChange={setDetailsOpen}
-          contractor={selectedContractor}
-        />
-      </div>
+      <ContractorDetailsModal
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+        contractor={selectedContractor}
+      />
     </div>
   );
 };
