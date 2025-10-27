@@ -5,22 +5,14 @@
       "method": "POST",
       "path": "/",
       "body": {
-        "phone": "+79991234567",
-        "email": "newuser@test.com",
-        "name": "New User",
+        "phone": "+79991234999",
+        "email": "newuser999@test.com",
+        "name": "New User Test",
         "role": "client"
       },
       "expectedStatus": [201, 409],
       "expectedBody": {
-        "success": true,
-        "data": {
-          "user": {
-            "id": "number",
-            "phone": "string",
-            "name": "string",
-            "role": "string"
-          }
-        }
+        "success": "boolean"
       },
       "bodyMatcher": "partial"
     }

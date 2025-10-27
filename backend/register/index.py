@@ -80,6 +80,26 @@ def handler(event, context):
             """)
         
         new_user = cur.fetchone()
+        user_id = new_user['id']
+        
+        # Копируем системные шаблоны новому клиенту
+        if role == 'client':
+            cur.execute(f"""
+                INSERT INTO {SCHEMA}.document_templates 
+                  (client_id, name, description, template_type, content, version, is_active, is_system)
+                SELECT 
+                  {user_id},
+                  name,
+                  description,
+                  template_type,
+                  content,
+                  1,
+                  true,
+                  false
+                FROM {SCHEMA}.document_templates
+                WHERE is_system = true
+            """)
+        
         conn.commit()
         
         result = dict(new_user)
