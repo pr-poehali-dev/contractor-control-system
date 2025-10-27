@@ -9,13 +9,11 @@ const WorkDetail = () => {
   const { objectId, workId } = useParams();
   const navigate = useNavigate();
   const { isLoading, userData } = useAuthRedux();
-  const works = useAppSelector((state) => 
-    state.works.items.filter(w => w.object_id === Number(objectId))
-  );
-  const work = works.find(w => w.id === Number(workId));
   
   const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
   const currentObject = objects.find(o => o.id === Number(objectId));
+  const works = currentObject?.works || [];
+  const work = works.find(w => w.id === Number(workId));
 
   if (isLoading) {
     return (

@@ -214,8 +214,11 @@ export const loadUserData = createAsyncThunk(
         const { setDefectReports } = await import('./defectReportsSlice');
         const { setChatMessages } = await import('./chatMessagesSlice');
         
+        // Извлекаем все работы из объектов
+        const allWorks = (data.objects || []).flatMap((obj: any) => obj.works || []);
+        
         dispatch(setObjects(data.objects || []));
-        dispatch(setWorks(data.works || []));
+        dispatch(setWorks(allWorks));
         dispatch(setWorkLogs(data.workLogs || []));
         dispatch(setInspections(data.inspections || []));
         dispatch(setContractors(data.contractors || []));
