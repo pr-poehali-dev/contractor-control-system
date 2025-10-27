@@ -83,9 +83,29 @@ export default function DocumentTemplateEditorNew() {
     }
   };
 
-  const handlePdfTemplateSave = (newTemplate: Template) => {
+  const handlePdfTemplateSave = async (newTemplate: Template) => {
     setPdfTemplate(newTemplate);
     console.log('PDF template updated:', newTemplate);
+    
+    if (!templateId || !template) return;
+    
+    try {
+      await dispatch(
+        updateTemplate({
+          id: parseInt(templateId),
+          name: templateName,
+          description: templateDescription,
+          content: newTemplate,
+        })
+      ).unwrap();
+      
+      toast({
+        title: 'Автосохранение',
+        description: 'Шаблон сохранён',
+      });
+    } catch (error) {
+      console.error('Autosave failed:', error);
+    }
   };
 
   if (loading && !template) {
