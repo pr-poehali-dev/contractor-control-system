@@ -140,39 +140,33 @@ export default function OrganizationPage() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 gap-3 md:gap-6 mb-4 md:mb-6">
+        <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4 md:mb-6">
           <Card>
-            <CardContent className="p-4 md:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs md:text-sm text-slate-500">Сотрудников</p>
-                  <p className="text-2xl md:text-3xl font-bold">{currentOrg.employees?.length || 0}</p>
-                </div>
-                <Icon name="Users" size={28} className="text-blue-500 md:w-8 md:h-8" />
+            <CardContent className="p-3 md:p-4">
+              <div className="text-center">
+                <p className="text-xs text-slate-500 mb-1">Сотрудников</p>
+                <p className="text-xl md:text-2xl font-bold">{currentOrg.employees?.length || 0}</p>
+                <Icon name="Users" size={20} className="text-blue-500 mx-auto mt-2" />
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-4 md:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs md:text-sm text-slate-500">Активных работ</p>
-                  <p className="text-2xl md:text-3xl font-bold">{currentOrg.works_count || 0}</p>
-                </div>
-                <Icon name="Briefcase" size={28} className="text-green-500 md:w-8 md:h-8" />
+            <CardContent className="p-3 md:p-4">
+              <div className="text-center">
+                <p className="text-xs text-slate-500 mb-1">Активных работ</p>
+                <p className="text-xl md:text-2xl font-bold">{currentOrg.works_count || 0}</p>
+                <Icon name="Briefcase" size={20} className="text-green-500 mx-auto mt-2" />
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-4 md:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs md:text-sm text-slate-500">Ожидают приглашения</p>
-                  <p className="text-2xl md:text-3xl font-bold">{currentOrg.pending_invites?.length || 0}</p>
-                </div>
-                <Icon name="Mail" size={28} className="text-amber-500 md:w-8 md:h-8" />
+            <CardContent className="p-3 md:p-4">
+              <div className="text-center">
+                <p className="text-xs text-slate-500 mb-1">Ожидают приглашения</p>
+                <p className="text-xl md:text-2xl font-bold">{currentOrg.pending_invites?.length || 0}</p>
+                <Icon name="Mail" size={20} className="text-amber-500 mx-auto mt-2" />
               </div>
             </CardContent>
           </Card>
