@@ -79,8 +79,19 @@ export const fetchDocuments = createAsyncThunk(
         params,
         skipAuthRedirect: true 
       });
-      return response.data.documents;
+      console.log('📥 fetchDocuments response:', response);
+      
+      if (response.data.documents) {
+        return response.data.documents;
+      }
+      
+      if (Array.isArray(response.data)) {
+        return response.data;
+      }
+      
+      return [];
     } catch (error: any) {
+      console.error('❌ fetchDocuments error:', error);
       return rejectWithValue(error.message || 'Failed to fetch documents');
     }
   }

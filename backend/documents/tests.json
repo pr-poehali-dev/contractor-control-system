@@ -16,7 +16,7 @@
       "path": "/",
       "body": {
         "title": "Тестовый документ",
-        "templateId": 1,
+        "templateId": 2,
         "templateName": "Тестовый шаблон",
         "contentData": {
           "field1": "value1"
