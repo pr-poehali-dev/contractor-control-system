@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Designer } from '@pdfme/ui';
-import { Template, Font, Schema } from '@pdfme/common';
+import { Template, Font, Schema, BLANK_PDF } from '@pdfme/common';
 import { text, image, barcodes } from '@pdfme/schemas';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
@@ -14,42 +14,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { jsPDF } from 'jspdf';
 
 interface PdfTemplateDesignerProps {
   template: Template | null;
   onSave: (template: Template) => void;
 }
 
-const generateBlankPdf = (): string => {
-  try {
-    const doc = new jsPDF({
-      format: 'a4',
-      unit: 'mm',
-    });
-    
-    doc.setFillColor(255, 255, 255);
-    doc.rect(0, 0, 210, 297, 'F');
-    
-    doc.setDrawColor(229, 231, 235);
-    doc.setLineWidth(0.5);
-    doc.rect(5, 5, 200, 287, 'S');
-    
-    doc.setTextColor(156, 163, 175);
-    doc.setFontSize(16);
-    doc.text('Пустой документ A4', 105, 140, { align: 'center' });
-    
-    doc.setFontSize(12);
-    doc.text('Добавьте поля через панель ниже', 105, 150, { align: 'center' });
-    
-    const pdfData = doc.output('datauristring');
-    const base64 = pdfData.split(',')[1];
-    console.log('✅ Generated blank PDF, base64 length:', base64.length);
-    return base64;
-  } catch (error) {
-    console.error('❌ Failed to generate blank PDF:', error);
-    return '';
-  }
+const getBlankPdf = (): string => {
+  console.log('✅ Using BLANK_PDF from @pdfme/common');
+  return BLANK_PDF;
 };
 
 export function PdfTemplateDesigner({ template, onSave }: PdfTemplateDesignerProps) {
@@ -65,13 +38,8 @@ export function PdfTemplateDesigner({ template, onSave }: PdfTemplateDesignerPro
     const initDesigner = async () => {
       console.log('🔍 Initializing PDF Designer with template:', template);
       
-      const blankPdfBase64 = generateBlankPdf();
-      console.log('📄 Generated blank PDF (length):', blankPdfBase64.length);
-      
-      if (!blankPdfBase64) {
-        console.error('❌ Failed to generate blank PDF!');
-        return;
-      }
+      const blankPdfBase64 = getBlankPdf();
+      console.log('📄 Using blank PDF (length):', blankPdfBase64.length);
       
       let defaultTemplate: Template;
       let useBlankPdf = true;
