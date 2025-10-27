@@ -79,11 +79,17 @@ export default function TopNavigation() {
           <div className="md:flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 hidden">
             <Icon name="Building2" size={24} className="text-white" />
           </div>
-          <div className="flex md:hidden items-center justify-center w-10 h-10 rounded-full relative" title={isOnline ? 'В сети' : 'Нет соединения'}>
+          <div className="flex md:hidden items-center gap-2">
             {isOnline ? (
-              <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
+              <>
+                <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-sm text-green-600 font-medium">В сети</span>
+              </>
             ) : (
-              <div className="w-3 h-3 rounded-full bg-red-500" />
+              <>
+                <div className="w-3 h-3 rounded-full bg-red-500" />
+                <span className="text-sm text-red-600 font-medium">Оффлайн</span>
+              </>
             )}
           </div>
           <span className="font-bold text-lg hidden md:inline">Подряд-ПРО</span>
