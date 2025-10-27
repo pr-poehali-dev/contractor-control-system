@@ -10,6 +10,7 @@ import jwt
 from psycopg2.extras import RealDictCursor
 
 JWT_SECRET = os.environ.get('JWT_SECRET', 'default-secret-change-in-production')
+SCHEMA = 't_p8942561_contractor_control_s'
 
 def verify_jwt_token(token):
     try:
@@ -84,89 +85,89 @@ def handler(event, context):
                 project_filter = f"WHERE id = {int(item_id)}" if is_admin else f"WHERE id = {int(item_id)} AND client_id = {user_id_int}"
                 
                 cur.execute(f"""
-                    DELETE FROM remarks 
+                    DELETE FROM {SCHEMA}.remarks 
                     WHERE inspection_id IN (
-                        SELECT i.id FROM inspections i
-                        JOIN works w ON i.work_id = w.id
-                        JOIN objects o ON w.object_id = o.id
+                        SELECT i.id FROM {SCHEMA}.inspections i
+                        JOIN {SCHEMA}.works w ON i.work_id = w.id
+                        JOIN {SCHEMA}.objects o ON w.object_id = o.id
                         WHERE o.project_id = {int(item_id)}
                     )
                 """)
                 cur.execute(f"""
-                    DELETE FROM inspection_checkpoints 
+                    DELETE FROM {SCHEMA}.inspection_checkpoints 
                     WHERE inspection_id IN (
-                        SELECT i.id FROM inspections i
-                        JOIN works w ON i.work_id = w.id
-                        JOIN objects o ON w.object_id = o.id
+                        SELECT i.id FROM {SCHEMA}.inspections i
+                        JOIN {SCHEMA}.works w ON i.work_id = w.id
+                        JOIN {SCHEMA}.objects o ON w.object_id = o.id
                         WHERE o.project_id = {int(item_id)}
                     )
                 """)
                 cur.execute(f"""
-                    DELETE FROM inspections 
+                    DELETE FROM {SCHEMA}.inspections 
                     WHERE work_id IN (
-                        SELECT w.id FROM works w
-                        JOIN objects o ON w.object_id = o.id
+                        SELECT w.id FROM {SCHEMA}.works w
+                        JOIN {SCHEMA}.objects o ON w.object_id = o.id
                         WHERE o.project_id = {int(item_id)}
                     )
                 """)
                 cur.execute(f"""
-                    DELETE FROM work_logs 
+                    DELETE FROM {SCHEMA}.work_logs 
                     WHERE work_id IN (
-                        SELECT w.id FROM works w
-                        JOIN objects o ON w.object_id = o.id
+                        SELECT w.id FROM {SCHEMA}.works w
+                        JOIN {SCHEMA}.objects o ON w.object_id = o.id
                         WHERE o.project_id = {int(item_id)}
                     )
                 """)
                 cur.execute(f"""
-                    DELETE FROM estimates 
+                    DELETE FROM {SCHEMA}.estimates 
                     WHERE work_id IN (
-                        SELECT w.id FROM works w
-                        JOIN objects o ON w.object_id = o.id
+                        SELECT w.id FROM {SCHEMA}.works w
+                        JOIN {SCHEMA}.objects o ON w.object_id = o.id
                         WHERE o.project_id = {int(item_id)}
                     )
                 """)
-                cur.execute(f"DELETE FROM works WHERE object_id IN (SELECT id FROM objects WHERE project_id = {int(item_id)})")
-                cur.execute(f"DELETE FROM objects WHERE project_id = {int(item_id)}")
-                cur.execute(f"DELETE FROM projects {project_filter}")
+                cur.execute(f"DELETE FROM {SCHEMA}.works WHERE object_id IN (SELECT id FROM {SCHEMA}.objects WHERE project_id = {int(item_id)})")
+                cur.execute(f"DELETE FROM {SCHEMA}.objects WHERE project_id = {int(item_id)}")
+                cur.execute(f"DELETE FROM {SCHEMA}.projects {project_filter}")
             elif item_type == 'object':
-                object_filter = f"WHERE id = {int(item_id)}" if is_admin else f"WHERE id = {int(item_id)} AND (client_id = {user_id_int} OR project_id IN (SELECT id FROM projects WHERE client_id = {user_id_int}))"
+                object_filter = f"WHERE id = {int(item_id)}" if is_admin else f"WHERE id = {int(item_id)} AND (client_id = {user_id_int} OR project_id IN (SELECT id FROM {SCHEMA}.projects WHERE client_id = {user_id_int}))"
                 
                 cur.execute(f"""
-                    DELETE FROM remarks 
+                    DELETE FROM {SCHEMA}.remarks 
                     WHERE inspection_id IN (
-                        SELECT i.id FROM inspections i
-                        JOIN works w ON i.work_id = w.id
+                        SELECT i.id FROM {SCHEMA}.inspections i
+                        JOIN {SCHEMA}.works w ON i.work_id = w.id
                         WHERE w.object_id = {int(item_id)}
                     )
                 """)
                 cur.execute(f"""
-                    DELETE FROM inspection_checkpoints 
+                    DELETE FROM {SCHEMA}.inspection_checkpoints 
                     WHERE inspection_id IN (
-                        SELECT i.id FROM inspections i
-                        JOIN works w ON i.work_id = w.id
+                        SELECT i.id FROM {SCHEMA}.inspections i
+                        JOIN {SCHEMA}.works w ON i.work_id = w.id
                         WHERE w.object_id = {int(item_id)}
                     )
                 """)
-                cur.execute(f"DELETE FROM work_logs WHERE work_id IN (SELECT id FROM works WHERE object_id = {int(item_id)})")
-                cur.execute(f"DELETE FROM chat_messages WHERE work_id IN (SELECT id FROM works WHERE object_id = {int(item_id)})")
-                cur.execute(f"DELETE FROM work_views WHERE work_id IN (SELECT id FROM works WHERE object_id = {int(item_id)})")
-                cur.execute(f"DELETE FROM inspections WHERE work_id IN (SELECT id FROM works WHERE object_id = {int(item_id)})")
-                cur.execute(f"DELETE FROM estimates WHERE work_id IN (SELECT id FROM works WHERE object_id = {int(item_id)})")
-                cur.execute(f"DELETE FROM works WHERE object_id = {int(item_id)}")
-                cur.execute(f"DELETE FROM objects {object_filter}")
+                cur.execute(f"DELETE FROM {SCHEMA}.work_logs WHERE work_id IN (SELECT id FROM {SCHEMA}.works WHERE object_id = {int(item_id)})")
+                cur.execute(f"DELETE FROM {SCHEMA}.chat_messages WHERE work_id IN (SELECT id FROM {SCHEMA}.works WHERE object_id = {int(item_id)})")
+                cur.execute(f"DELETE FROM {SCHEMA}.work_views WHERE work_id IN (SELECT id FROM {SCHEMA}.works WHERE object_id = {int(item_id)})")
+                cur.execute(f"DELETE FROM {SCHEMA}.inspections WHERE work_id IN (SELECT id FROM {SCHEMA}.works WHERE object_id = {int(item_id)})")
+                cur.execute(f"DELETE FROM {SCHEMA}.estimates WHERE work_id IN (SELECT id FROM {SCHEMA}.works WHERE object_id = {int(item_id)})")
+                cur.execute(f"DELETE FROM {SCHEMA}.works WHERE object_id = {int(item_id)}")
+                cur.execute(f"DELETE FROM {SCHEMA}.objects {object_filter}")
             elif item_type == 'work':
                 work_filter = f"WHERE id = {int(item_id)}" if is_admin else f"""WHERE id = {int(item_id)} AND object_id IN (
-                    SELECT o.id FROM objects o 
-                    JOIN projects p ON o.project_id = p.id 
+                    SELECT o.id FROM {SCHEMA}.objects o 
+                    JOIN {SCHEMA}.projects p ON o.project_id = p.id 
                     WHERE p.client_id = {user_id_int}
                 )"""
                 
-                cur.execute(f"DELETE FROM remarks WHERE inspection_id IN (SELECT id FROM inspections WHERE work_id = {int(item_id)})")
-                cur.execute(f"DELETE FROM inspection_checkpoints WHERE inspection_id IN (SELECT id FROM inspections WHERE work_id = {int(item_id)})")
-                cur.execute(f"DELETE FROM inspections WHERE work_id = {int(item_id)}")
-                cur.execute(f"DELETE FROM work_logs WHERE work_id = {int(item_id)}")
-                cur.execute(f"DELETE FROM estimates WHERE work_id = {int(item_id)}")
-                cur.execute(f"DELETE FROM works {work_filter}")
+                cur.execute(f"DELETE FROM {SCHEMA}.remarks WHERE inspection_id IN (SELECT id FROM {SCHEMA}.inspections WHERE work_id = {int(item_id)})")
+                cur.execute(f"DELETE FROM {SCHEMA}.inspection_checkpoints WHERE inspection_id IN (SELECT id FROM {SCHEMA}.inspections WHERE work_id = {int(item_id)})")
+                cur.execute(f"DELETE FROM {SCHEMA}.inspections WHERE work_id = {int(item_id)}")
+                cur.execute(f"DELETE FROM {SCHEMA}.work_logs WHERE work_id = {int(item_id)}")
+                cur.execute(f"DELETE FROM {SCHEMA}.estimates WHERE work_id = {int(item_id)}")
+                cur.execute(f"DELETE FROM {SCHEMA}.works {work_filter}")
             else:
                 cur.close()
                 conn.close()
@@ -189,182 +190,105 @@ def handler(event, context):
                 
                 if is_admin:
                     cur.execute(f"""
-                        UPDATE projects 
+                        UPDATE {SCHEMA}.projects 
                         SET title = '{title}', description = '{description}', status = '{status}'
                         WHERE id = {int(item_id)}
                         RETURNING id, title, description, status, created_at
                     """)
                 else:
                     cur.execute(f"""
-                        UPDATE projects 
+                        UPDATE {SCHEMA}.projects 
                         SET title = '{title}', description = '{description}', status = '{status}'
                         WHERE id = {int(item_id)} AND client_id = {user_id_int}
                         RETURNING id, title, description, status, created_at
                     """)
-                result_data = cur.fetchone()
+                
+                result_row = cur.fetchone()
+                if not result_row:
+                    return {
+                        'statusCode': 404,
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'body': json.dumps({'success': False, 'error': 'Project not found or access denied'})
+                    }
+                
+                conn.commit()
+                result = {'success': True, 'data': dict(result_row)}
                 
             elif item_type == 'object':
                 title = data.get('title', '').replace("'", "''")
                 address = data.get('address', '').replace("'", "''")
+                description = data.get('description', '').replace("'", "''")
                 status = data.get('status', 'active')
                 
-                if is_admin:
-                    cur.execute(f"""
-                        UPDATE objects 
-                        SET title = '{title}', address = '{address}', status = '{status}'
-                        WHERE id = {int(item_id)}
-                        RETURNING id, title, address, project_id, status
-                    """)
-                else:
-                    cur.execute(f"""
-                        UPDATE objects 
-                        SET title = '{title}', address = '{address}', status = '{status}'
-                        WHERE id = {int(item_id)}
-                        AND project_id IN (SELECT id FROM projects WHERE client_id = {user_id_int})
-                        RETURNING id, title, address, project_id, status
-                    """)
-                result_data = cur.fetchone()
+                object_filter = f"WHERE id = {int(item_id)}" if is_admin else f"WHERE id = {int(item_id)} AND client_id = {user_id_int}"
+                
+                cur.execute(f"""
+                    UPDATE {SCHEMA}.objects 
+                    SET title = '{title}', address = '{address}', description = '{description}', status = '{status}'
+                    {object_filter}
+                    RETURNING id, title, address, description, status, client_id, created_at
+                """)
+                
+                result_row = cur.fetchone()
+                if not result_row:
+                    return {
+                        'statusCode': 404,
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'body': json.dumps({'success': False, 'error': 'Object not found or access denied'})
+                    }
+                
+                conn.commit()
+                result = {'success': True, 'data': dict(result_row)}
                 
             elif item_type == 'work':
-                from datetime import datetime, date
-                
-                title = data.get('title')
-                description = data.get('description')
-                status = data.get('status')
+                title = data.get('title', '').replace("'", "''")
+                description = data.get('description', '').replace("'", "''")
+                status = data.get('status', 'pending')
                 contractor_id = data.get('contractor_id')
-                start_date = data.get('start_date')
-                end_date = data.get('end_date')
                 planned_start_date = data.get('planned_start_date')
                 planned_end_date = data.get('planned_end_date')
                 completion_percentage = data.get('completion_percentage')
                 
-                today_date = date.today()
+                update_parts = [f"title = '{title}'", f"description = '{description}'", f"status = '{status}'"]
+                
+                if contractor_id is not None:
+                    update_parts.append(f"contractor_id = {int(contractor_id)}" if contractor_id else "contractor_id = NULL")
                 
                 if planned_start_date:
-                    planned_start = datetime.fromisoformat(planned_start_date.replace('Z', '+00:00')).date()
-                    if planned_start <= today_date and not start_date and status == 'pending':
-                        status = 'active'
+                    update_parts.append(f"planned_start_date = '{planned_start_date}'")
                 
-                set_parts = []
-                if title is not None:
-                    set_parts.append(f"title = '{title.replace(chr(39), chr(39)+chr(39))}'")
-                if description is not None:
-                    set_parts.append(f"description = '{description.replace(chr(39), chr(39)+chr(39))}'")
-                if status is not None:
-                    set_parts.append(f"status = '{status}'")
-                if contractor_id is not None:
-                    set_parts.append(f"contractor_id = {int(contractor_id)}")
-                if start_date is not None:
-                    set_parts.append(f"start_date = '{start_date}'")
-                if end_date is not None:
-                    set_parts.append(f"end_date = '{end_date}'")
-                if planned_start_date is not None:
-                    set_parts.append(f"planned_start_date = '{planned_start_date}'")
-                if planned_end_date is not None:
-                    set_parts.append(f"planned_end_date = '{planned_end_date}'")
+                if planned_end_date:
+                    update_parts.append(f"planned_end_date = '{planned_end_date}'")
+                
                 if completion_percentage is not None:
-                    set_parts.append(f"completion_percentage = {int(completion_percentage)}")
+                    update_parts.append(f"completion_percentage = {int(completion_percentage)}")
                 
-                if not set_parts:
-                    cur.close()
-                    conn.close()
+                update_sql = ', '.join(update_parts)
+                
+                work_filter = f"WHERE id = {int(item_id)}" if is_admin else f"""WHERE id = {int(item_id)} AND object_id IN (
+                    SELECT o.id FROM {SCHEMA}.objects o 
+                    JOIN {SCHEMA}.projects p ON o.project_id = p.id 
+                    WHERE p.client_id = {user_id_int}
+                )"""
+                
+                cur.execute(f"""
+                    UPDATE {SCHEMA}.works 
+                    SET {update_sql}
+                    {work_filter}
+                    RETURNING id, title, description, object_id, contractor_id, status, 
+                              planned_start_date, planned_end_date, completion_percentage, created_at
+                """)
+                
+                result_row = cur.fetchone()
+                if not result_row:
                     return {
-                        'statusCode': 400,
+                        'statusCode': 404,
                         'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                        'body': json.dumps({'success': False, 'error': 'No fields to update'})
+                        'body': json.dumps({'success': False, 'error': 'Work not found or access denied'})
                     }
                 
-                set_clause = ', '.join(set_parts)
-                
-                if is_admin:
-                    cur.execute(f"""
-                        UPDATE works 
-                        SET {set_clause}
-                        WHERE id = {int(item_id)}
-                        RETURNING id, title, description, object_id, contractor_id, status, start_date, end_date, planned_start_date, planned_end_date, completion_percentage
-                    """)
-                elif user_role == 'contractor':
-                    cur.execute(f"""
-                        SELECT id FROM contractors WHERE user_id = {user_id_int}
-                    """)
-                    contractor_row = cur.fetchone()
-                    contractor_id_val = contractor_row['id'] if contractor_row else None
-                    
-                    if contractor_id_val:
-                        cur.execute(f"""
-                            UPDATE works 
-                            SET {set_clause}
-                            WHERE id = {int(item_id)} AND contractor_id = {contractor_id_val}
-                            RETURNING id, title, description, object_id, contractor_id, status, start_date, end_date, planned_start_date, planned_end_date, completion_percentage
-                        """)
-                    else:
-                        result_data = None
-                else:
-                    cur.execute(f"""
-                        UPDATE works 
-                        SET {set_clause}
-                        WHERE id = {int(item_id)}
-                        AND object_id IN (
-                            SELECT o.id FROM objects o 
-                            JOIN projects p ON o.project_id = p.id 
-                            WHERE p.client_id = {user_id_int}
-                        )
-                        RETURNING id, title, description, object_id, contractor_id, status, start_date, end_date, planned_start_date, planned_end_date, completion_percentage
-                    """)
-                
-                if user_role != 'contractor' or (user_role == 'contractor' and contractor_id_val):
-                    result_data = cur.fetchone()
-                else:
-                    result_data = None
-            
-            elif item_type == 'inspection':
-                status = data.get('status')
-                defects = data.get('defects')
-                notes = data.get('notes')
-                description = data.get('description')
-                completed_at = data.get('completed_at')
-                
-                set_parts = []
-                if status is not None:
-                    set_parts.append(f"status = '{status}'")
-                if defects is not None:
-                    set_parts.append(f"defects = '{defects.replace(chr(39), chr(39)+chr(39))}'")
-                if notes is not None:
-                    set_parts.append(f"notes = '{notes.replace(chr(39), chr(39)+chr(39))}'")
-                if description is not None:
-                    set_parts.append(f"description = '{description.replace(chr(39), chr(39)+chr(39))}'")
-                if completed_at is not None:
-                    set_parts.append(f"completed_at = '{completed_at}'")
-                
-                set_parts.append("updated_at = NOW()")
-                
-                if not set_parts:
-                    cur.close()
-                    conn.close()
-                    return {
-                        'statusCode': 400,
-                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                        'body': json.dumps({'success': False, 'error': 'No fields to update'})
-                    }
-                
-                set_clause = ', '.join(set_parts)
-                
-                if is_admin:
-                    cur.execute(f"""
-                        UPDATE inspections 
-                        SET {set_clause}
-                        WHERE id = {int(item_id)}
-                        RETURNING id, work_id, status, defects, notes, description, completed_at
-                    """)
-                else:
-                    cur.execute(f"""
-                        UPDATE inspections 
-                        SET {set_clause}
-                        WHERE id = {int(item_id)} AND created_by = {user_id_int}
-                        RETURNING id, work_id, status, defects, notes, description, completed_at
-                    """)
-                
-                result_data = cur.fetchone()
+                conn.commit()
+                result = {'success': True, 'data': dict(result_row)}
             
             else:
                 cur.close()
@@ -374,16 +298,19 @@ def handler(event, context):
                     'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
                     'body': json.dumps({'success': False, 'error': f'Unknown type: {item_type}'})
                 }
-            
-            conn.commit()
-            
-            if result_data:
-                for key, value in result_data.items():
-                    if hasattr(value, 'isoformat'):
-                        result_data[key] = value.isoformat()
-                result = {'success': True, 'data': dict(result_data)}
-            else:
-                result = {'success': False, 'error': 'Not found or no permission'}
+        
+        else:
+            return {
+                'statusCode': 405,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({'success': False, 'error': 'Method not allowed'})
+            }
+        
+        # Convert datetime objects to ISO format
+        if 'data' in result:
+            for key, value in result['data'].items():
+                if hasattr(value, 'isoformat'):
+                    result['data'][key] = value.isoformat()
         
         cur.close()
         conn.close()
@@ -395,6 +322,9 @@ def handler(event, context):
         }
         
     except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"ERROR: {error_trace}")
         conn.rollback()
         cur.close()
         conn.close()

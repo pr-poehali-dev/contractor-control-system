@@ -14,6 +14,7 @@ from collections import defaultdict
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
 JWT_SECRET = os.environ.get('JWT_SECRET', 'default-secret-change-in-production')
+SCHEMA = 't_p8942561_contractor_control_s'
 
 def get_db_connection():
     conn = psycopg2.connect(DATABASE_URL)
@@ -144,8 +145,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         # Проверяем пользователя
         cur.execute(
-            "SELECT id, role, is_active, name, email FROM users WHERE id = %s",
-            (user_id,)
+            f"SELECT id, role, is_active, name, email FROM {SCHEMA}.users WHERE id = {user_id}"
         )
         user = cur.fetchone()
         
@@ -163,81 +163,82 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         # Получаем objects и works в зависимости от роли
         if role == 'admin':
             # Админ видит все
-            cur.execute("""
+            cur.execute(f"""
                 SELECT id, title, address, description, client_id, status, created_at, updated_at
-                FROM objects
+                FROM {SCHEMA}.objects
                 ORDER BY created_at DESC
             """)
             objects = cur.fetchall()
             
-            cur.execute("""
+            cur.execute(f"""
                 SELECT w.id, w.title, w.description, w.object_id, w.contractor_id,
                        c.name as contractor_name, w.status, w.start_date, w.end_date,
                        w.planned_start_date, w.planned_end_date, w.completion_percentage,
                        w.created_at, w.updated_at
-                FROM works w
-                LEFT JOIN contractors c ON w.contractor_id = c.id
+                FROM {SCHEMA}.works w
+                LEFT JOIN {SCHEMA}.contractors c ON w.contractor_id = c.id
                 ORDER BY w.created_at DESC
             """)
             works = cur.fetchall()
             
         elif role == 'contractor':
             # Подрядчик видит только свои работы
-            cur.execute("""
+            cur.execute(f"""
                 SELECT id as contractor_id
-                FROM contractors
-                WHERE user_id = %s
-            """, (user_id,))
+                FROM {SCHEMA}.contractors
+                WHERE user_id = {user_id}
+            """)
             contractor = cur.fetchone()
             contractor_id = contractor['contractor_id'] if contractor else None
             
             if contractor_id:
-                cur.execute("""
+                cur.execute(f"""
                     SELECT DISTINCT o.id, o.title, o.address, o.description, o.client_id, 
                            o.status, o.created_at, o.updated_at
-                    FROM objects o
-                    JOIN works w ON w.object_id = o.id
-                    WHERE w.contractor_id = %s
+                    FROM {SCHEMA}.objects o
+                    JOIN {SCHEMA}.works w ON w.object_id = o.id
+                    WHERE w.contractor_id = {contractor_id}
                     ORDER BY o.created_at DESC
-                """, (contractor_id,))
+                """)
                 objects = cur.fetchall()
                 
-                cur.execute("""
+                cur.execute(f"""
                     SELECT w.id, w.title, w.description, w.object_id, w.contractor_id,
                            c.name as contractor_name, w.status, w.start_date, w.end_date,
                            w.planned_start_date, w.planned_end_date, w.completion_percentage,
                            w.created_at, w.updated_at
-                    FROM works w
-                    LEFT JOIN contractors c ON w.contractor_id = c.id
-                    WHERE w.contractor_id = %s
+                    FROM {SCHEMA}.works w
+                    LEFT JOIN {SCHEMA}.contractors c ON w.contractor_id = c.id
+                    WHERE w.contractor_id = {contractor_id}
                     ORDER BY w.created_at DESC
-                """, (contractor_id,))
+                """)
                 works = cur.fetchall()
             else:
                 objects, works = [], []
         else:
             # Клиент видит только свои объекты
-            cur.execute("""
+            cur.execute(f"""
                 SELECT id, title, address, description, client_id, status, created_at, updated_at
-                FROM objects
-                WHERE client_id = %s
+                FROM {SCHEMA}.objects
+                WHERE client_id = {user_id}
                 ORDER BY created_at DESC
-            """, (user_id,))
+            """)
             objects = cur.fetchall()
             
             object_ids = [o['id'] for o in objects]
             
             if object_ids:
-                cur.execute("""
+                object_ids_str = ','.join(str(oid) for oid in object_ids)
+                cur.execute(f"""
                     SELECT w.id, w.title, w.description, w.object_id, w.contractor_id,
                            c.name as contractor_name, w.status, w.start_date, w.end_date,
                            w.planned_start_date, w.planned_end_date, w.completion_percentage,
                            w.created_at, w.updated_at
-                    FROM works w
-                    LEFT JOIN contractors c ON w.contractor_id = c.id
-                    WHERE w.object_id = ANY(%s)
+                    FROM {SCHEMA}.works w
+                    LEFT JOIN {SCHEMA}.contractors c ON w.contractor_id = c.id
+                    WHERE w.object_id IN ({object_ids_str})
                     ORDER BY w.created_at DESC
-                """, (object_ids,))
+                """)
                 works = cur.fetchall()
             else:
                 works = []
@@ -253,116 +254,120 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         defect_remediations = []
         
         if work_ids:
+            work_ids_str = ','.join(str(wid) for wid in work_ids)
+            
             # Загружаем inspections с автором
-            cur.execute("""
+            cur.execute(f"""
                 SELECT i.id, i.work_id, i.work_log_id, i.inspection_number, i.created_by, i.status,
                        i.notes, i.description, i.defects, i.photo_urls, i.created_at, i.completed_at,
                        i.scheduled_date, i.title, i.type,
                        u.name as author_name, u.role as author_role
-                FROM inspections i
-                LEFT JOIN users u ON i.created_by = u.id
-                WHERE i.work_id = ANY(%s)
+                FROM {SCHEMA}.inspections i
+                LEFT JOIN {SCHEMA}.users u ON i.created_by = u.id
+                WHERE i.work_id IN ({work_ids_str})
                 ORDER BY i.created_at DESC
-            """, (work_ids,))
+            """)
             inspections = cur.fetchall()
             
             inspection_ids = [i['id'] for i in inspections]
             
             # Загружаем remarks если есть inspections
             if inspection_ids:
-                cur.execute("""
+                inspection_ids_str = ','.join(str(iid) for iid in inspection_ids)
+                cur.execute(f"""
                     SELECT id, inspection_id, checkpoint_id, description,
                            normative_ref, photo_urls, status, created_at, resolved_at
-                    FROM remarks
-                    WHERE inspection_id = ANY(%s)
+                    FROM {SCHEMA}.remarks
+                    WHERE inspection_id IN ({inspection_ids_str})
                     ORDER BY created_at DESC
-                """, (inspection_ids,))
+                """)
                 remarks = cur.fetchall()
             
             # Загружаем work_logs
-            cur.execute("""
+            cur.execute(f"""
                 SELECT wl.id, wl.work_id, wl.description, wl.volume, wl.materials,
                        wl.photo_urls, wl.created_at, wl.created_by,
                        u.name as author_name
-                FROM work_logs wl
-                LEFT JOIN users u ON wl.created_by = u.id
-                WHERE wl.work_id = ANY(%s)
+                FROM {SCHEMA}.work_logs wl
+                LEFT JOIN {SCHEMA}.users u ON wl.created_by = u.id
+                WHERE wl.work_id IN ({work_ids_str})
                 ORDER BY wl.created_at DESC
-            """, (work_ids,))
+            """)
             work_logs = cur.fetchall()
             
             # Загружаем chat messages
-            cur.execute("""
+            cur.execute(f"""
                 SELECT cm.id, cm.work_id, cm.message_type, cm.message, cm.photo_urls,
                        cm.created_at, cm.created_by,
                        u.name as author_name, u.role as author_role
-                FROM chat_messages cm
-                LEFT JOIN users u ON cm.created_by = u.id
-                WHERE cm.work_id = ANY(%s)
+                FROM {SCHEMA}.chat_messages cm
+                LEFT JOIN {SCHEMA}.users u ON cm.created_by = u.id
+                WHERE cm.work_id IN ({work_ids_str})
                 ORDER BY cm.created_at DESC
-            """, (work_ids,))
+            """)
             chat_messages = cur.fetchall()
             
             # Загружаем defect reports
-            cur.execute("""
+            cur.execute(f"""
                 SELECT dr.id, dr.work_id, dr.object_id, dr.inspection_id, dr.report_number,
                        dr.status, dr.created_at, dr.created_by, dr.total_defects, dr.critical_defects,
                        dr.report_data, dr.pdf_url, dr.notes,
                        u.name as author_name
-                FROM defect_reports dr
-                LEFT JOIN users u ON dr.created_by = u.id
-                WHERE dr.work_id = ANY(%s)
+                FROM {SCHEMA}.defect_reports dr
+                LEFT JOIN {SCHEMA}.users u ON dr.created_by = u.id
+                WHERE dr.work_id IN ({work_ids_str})
                 ORDER BY dr.created_at DESC
-            """, (work_ids,))
+            """)
             defect_reports = cur.fetchall()
             
             report_ids = [r['id'] for r in defect_reports]
             
             # Загружаем defect remediations
             if report_ids:
-                cur.execute("""
+                report_ids_str = ','.join(str(rid) for rid in report_ids)
+                cur.execute(f"""
                     SELECT rem.id, rem.defect_report_id, rem.defect_id, rem.contractor_id,
                            rem.remediation_description, rem.remediation_photos, rem.status,
                            rem.created_at, rem.completed_at, rem.verified_at, rem.verified_by,
                            c.name as contractor_name
-                    FROM defect_remediations rem
-                    LEFT JOIN contractors c ON rem.contractor_id = c.id
-                    WHERE rem.defect_report_id = ANY(%s)
+                    FROM {SCHEMA}.defect_remediations rem
+                    LEFT JOIN {SCHEMA}.contractors c ON rem.contractor_id = c.id
+                    WHERE rem.defect_report_id IN ({report_ids_str})
                     ORDER BY rem.created_at DESC
-                """, (report_ids,))
+                """)
                 defect_remediations = cur.fetchall()
         
         # Загружаем contractors для пользователя
         if role == 'admin':
-            cur.execute("""
+            cur.execute(f"""
                 SELECT id, name, inn, contact_info, phone, email, user_id, created_at
-                FROM contractors
+                FROM {SCHEMA}.contractors
                 ORDER BY name
             """)
             contractors = cur.fetchall()
         else:
-            cur.execute("""
+            cur.execute(f"""
                 SELECT DISTINCT c.id, c.name, c.inn, c.contact_info, c.phone, c.email, c.user_id, c.created_at
-                FROM contractors c
-                LEFT JOIN client_contractors cc ON c.id = cc.contractor_id
-                WHERE cc.client_id = %s OR c.user_id = %s
+                FROM {SCHEMA}.contractors c
+                LEFT JOIN {SCHEMA}.client_contractors cc ON c.id = cc.contractor_id
+                WHERE cc.client_id = {user_id} OR c.user_id = {user_id}
                 ORDER BY c.name
-            """, (user_id, user_id))
+            """)
             contractors = cur.fetchall()
         
         # Загружаем info_posts
-        cur.execute("""
+        cur.execute(f"""
             SELECT id, title, content, link, created_at
-            FROM info_posts
+            FROM {SCHEMA}.info_posts
             ORDER BY created_at DESC
             LIMIT 50
         """)
         info_posts = cur.fetchall()
         
         # Загружаем work_templates
-        cur.execute("""
+        cur.execute(f"""
             SELECT id, title, category, description
-            FROM work_templates
+            FROM {SCHEMA}.work_templates
             ORDER BY category, title
         """)
         work_templates = cur.fetchall()
@@ -370,11 +375,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         # Загружаем last_seen_at для каждой работы
         work_views = {}
         if work_ids:
-            cur.execute("""
+            work_ids_str = ','.join(str(wid) for wid in work_ids)
+            cur.execute(f"""
                 SELECT work_id, last_seen_at
-                FROM work_views
-                WHERE user_id = %s AND work_id = ANY(%s)
-            """, (user_id, work_ids))
+                FROM {SCHEMA}.work_views
+                WHERE user_id = {user_id} AND work_id IN ({work_ids_str})
+            """)
             views_result = cur.fetchall()
             for view in views_result:
                 work_views[view['work_id']] = view['last_seen_at']
@@ -419,54 +425,46 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     if insp['work_id'] == work_id and insp.get('status') in ['active', 'pending']
                 ])
             
-            # Добавляем только если есть непрочитанные
-            if unread_messages > 0 or unread_logs > 0 or unread_inspections > 0:
-                unread_counts[work_id] = {
-                    'messages': unread_messages,
-                    'logs': unread_logs,
-                    'inspections': unread_inspections
-                }
+            unread_counts[work_id] = {
+                'messages': unread_messages,
+                'logs': unread_logs,
+                'inspections': unread_inspections,
+                'total': unread_messages + unread_logs + unread_inspections
+            }
+        
+        # Строим иерархию данных
+        objects_with_works = build_hierarchy(
+            objects, works, inspections, remarks, work_logs, 
+            chat_messages, defect_reports, defect_remediations
+        )
         
         cur.close()
         conn.close()
         
-        # Формируем ответ с плоскими списками для Redux
-        response_data = {
-            'id': user['id'],
-            'role': user['role'],
-            'name': user['name'],
-            'email': user.get('email'),
-            'objects': [dict(o) for o in objects],
-            'works': [dict(w) for w in works],
-            'inspections': [dict(i) for i in inspections],
-            'remarks': [dict(r) for r in remarks],
-            'workLogs': [dict(wl) for wl in work_logs],
-            'chatMessages': [dict(cm) for cm in chat_messages],
-            'defect_reports': [dict(dr) for dr in defect_reports],
-            'contractors': [dict(c) for c in contractors],
-            'infoPosts': [dict(p) for p in info_posts],
-            'work_templates': [dict(wt) for wt in work_templates],
-            'unreadCounts': unread_counts
-        }
-        
         return {
             'statusCode': 200,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            },
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'body': json.dumps({
-                'success': True,
-                'data': response_data
+                'objects': objects_with_works,
+                'contractors': [dict(c) for c in contractors],
+                'infoPosts': [dict(ip) for ip in info_posts],
+                'workTemplates': [dict(wt) for wt in work_templates],
+                'unreadCounts': unread_counts,
+                'user': {
+                    'id': user['id'],
+                    'name': user['name'],
+                    'email': user['email'],
+                    'role': user['role']
+                }
             }, default=str)
         }
-        
+    
     except Exception as e:
-        print(f"ERROR in user-data: {str(e)}")
         import traceback
-        traceback.print_exc()
+        error_trace = traceback.format_exc()
+        print(f"ERROR in user-data: {error_trace}")
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': f'Server error: {str(e)}'})
+            'body': json.dumps({'error': str(e)})
         }

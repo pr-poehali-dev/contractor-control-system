@@ -10,6 +10,7 @@ import psycopg2
 from typing import Dict, Any
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
+SCHEMA = 't_p8942561_contractor_control_s'
 
 def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
@@ -60,17 +61,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             if work_id:
                 cur.execute(
-                    """
+                    f"""
                     SELECT w.id, w.title, w.description, w.object_id, w.contractor_id, 
                            w.status, w.created_at, w.updated_at,
                            c.name as contractor_name, c.inn
-                    FROM works w
-                    LEFT JOIN contractors c ON w.contractor_id = c.id
-                    INNER JOIN objects o ON w.object_id = o.id
-                    INNER JOIN projects p ON o.project_id = p.id
-                    WHERE w.id = %s AND (p.client_id = %s OR c.user_id = %s OR %s = 'admin')
-                    """,
-                    (work_id, user_id, user_id, user_role)
+                    FROM {SCHEMA}.works w
+                    LEFT JOIN {SCHEMA}.contractors c ON w.contractor_id = c.id
+                    INNER JOIN {SCHEMA}.objects o ON w.object_id = o.id
+                    INNER JOIN {SCHEMA}.projects p ON o.project_id = p.id
+                    WHERE w.id = {work_id} AND (p.client_id = {user_id} OR c.user_id = {user_id} OR '{user_role}' = 'admin')
+                    """
                 )
                 work = cur.fetchone()
                 
@@ -104,18 +104,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             elif object_id:
                 cur.execute(
-                    """
+                    f"""
                     SELECT w.id, w.title, w.description, w.object_id, w.contractor_id,
                            w.status, w.created_at, w.updated_at,
                            c.name as contractor_name, c.inn
-                    FROM works w
-                    LEFT JOIN contractors c ON w.contractor_id = c.id
-                    INNER JOIN objects o ON w.object_id = o.id
-                    INNER JOIN projects p ON o.project_id = p.id
-                    WHERE w.object_id = %s AND (p.client_id = %s OR c.user_id = %s OR %s = 'admin')
+                    FROM {SCHEMA}.works w
+                    LEFT JOIN {SCHEMA}.contractors c ON w.contractor_id = c.id
+                    INNER JOIN {SCHEMA}.objects o ON w.object_id = o.id
+                    INNER JOIN {SCHEMA}.projects p ON o.project_id = p.id
+                    WHERE w.object_id = {object_id} AND (p.client_id = {user_id} OR c.user_id = {user_id} OR '{user_role}' = 'admin')
                     ORDER BY w.created_at DESC
-                    """,
-                    (object_id, user_id, user_id, user_role)
+                    """
                 )
                 works = cur.fetchall()
                 works_list = []
@@ -152,8 +151,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         elif method == 'POST':
             body = json.loads(event.get('body', '{}'))
             object_id = body.get('object_id')
-            title = body.get('title', '').strip()
-            description = body.get('description', '').strip()
+            title = body.get('title', '').strip().replace("'", "''")
+            description = body.get('description', '').strip().replace("'", "''")
             contractor_id = body.get('contractor_id')
             status = body.get('status', 'pending')
             
@@ -165,13 +164,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             cur.execute(
-                """
+                f"""
                 SELECT p.client_id
-                FROM objects o
-                INNER JOIN projects p ON o.project_id = p.id
-                WHERE o.id = %s
-                """,
-                (object_id,)
+                FROM {SCHEMA}.objects o
+                INNER JOIN {SCHEMA}.projects p ON o.project_id = p.id
+                WHERE o.id = {object_id}
+                """
             )
             obj = cur.fetchone()
             
@@ -189,13 +187,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'success': False, 'error': 'Access denied'})
                 }
             
+            contractor_clause = f"{contractor_id}" if contractor_id else "NULL"
+            
             cur.execute(
-                """
-                INSERT INTO works (title, description, object_id, contractor_id, status, created_at, updated_at)
-                VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                f"""
+                INSERT INTO {SCHEMA}.works (title, description, object_id, contractor_id, status, created_at, updated_at)
+                VALUES ('{title}', '{description}', {object_id}, {contractor_clause}, '{status}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                 RETURNING id, title, description, object_id, contractor_id, status, created_at, updated_at
-                """,
-                (title, description, object_id, contractor_id, status)
+                """
             )
             work = cur.fetchone()
             conn.commit()
@@ -223,28 +222,26 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         elif method == 'PUT':
             body = json.loads(event.get('body', '{}'))
             work_id = body.get('id')
-            title = body.get('title')
-            description = body.get('description')
+            title = body.get('title', '').strip().replace("'", "''")
+            description = body.get('description', '').strip().replace("'", "''")
             contractor_id = body.get('contractor_id')
-            status = body.get('status')
+            status = body.get('status', 'pending')
             
             if not work_id:
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'success': False, 'error': 'Work ID is required'})
+                    'body': json.dumps({'success': False, 'error': 'work_id is required'})
                 }
             
             cur.execute(
+                f"""
+                SELECT o.id, p.client_id
+                FROM {SCHEMA}.works w
+                INNER JOIN {SCHEMA}.objects o ON w.object_id = o.id
+                INNER JOIN {SCHEMA}.projects p ON o.project_id = p.id
+                WHERE w.id = {work_id}
                 """
-                SELECT p.client_id, c.user_id
-                FROM works w
-                INNER JOIN objects o ON w.object_id = o.id
-                INNER JOIN projects p ON o.project_id = p.id
-                LEFT JOIN contractors c ON w.contractor_id = c.id
-                WHERE w.id = %s
-                """,
-                (work_id,)
             )
             work = cur.fetchone()
             
@@ -255,53 +252,35 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'success': False, 'error': 'Work not found'})
                 }
             
-            if work[0] != user_id and work[1] != user_id and user_role != 'admin':
+            if work[1] != user_id and user_role != 'admin':
                 return {
                     'statusCode': 403,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                     'body': json.dumps({'success': False, 'error': 'Access denied'})
                 }
             
-            updates = []
-            params = []
-            
-            if title is not None:
-                updates.append("title = %s")
-                params.append(title)
-            if description is not None:
-                updates.append("description = %s")
-                params.append(description)
-            if contractor_id is not None:
-                updates.append("contractor_id = %s")
-                params.append(contractor_id)
-            if status is not None:
-                updates.append("status = %s")
-                params.append(status)
-            
-            updates.append("updated_at = CURRENT_TIMESTAMP")
-            params.append(work_id)
+            contractor_clause = f"contractor_id = {contractor_id}" if contractor_id else "contractor_id = NULL"
             
             cur.execute(
                 f"""
-                UPDATE works
-                SET {', '.join(updates)}
-                WHERE id = %s
+                UPDATE {SCHEMA}.works
+                SET title = '{title}', description = '{description}', {contractor_clause}, status = '{status}', updated_at = CURRENT_TIMESTAMP
+                WHERE id = {work_id}
                 RETURNING id, title, description, object_id, contractor_id, status, created_at, updated_at
-                """,
-                params
+                """
             )
-            updated_work = cur.fetchone()
+            work = cur.fetchone()
             conn.commit()
             
             work_data = {
-                'id': updated_work[0],
-                'title': updated_work[1],
-                'description': updated_work[2],
-                'object_id': updated_work[3],
-                'contractor_id': updated_work[4],
-                'status': updated_work[5],
-                'created_at': updated_work[6].isoformat() if updated_work[6] else None,
-                'updated_at': updated_work[7].isoformat() if updated_work[7] else None
+                'id': work[0],
+                'title': work[1],
+                'description': work[2],
+                'object_id': work[3],
+                'contractor_id': work[4],
+                'status': work[5],
+                'created_at': work[6].isoformat() if work[6] else None,
+                'updated_at': work[7].isoformat() if work[7] else None
             }
             
             cur.close()
@@ -311,6 +290,54 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'statusCode': 200,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                 'body': json.dumps({'success': True, 'data': work_data})
+            }
+        
+        elif method == 'DELETE':
+            body = json.loads(event.get('body', '{}'))
+            work_id = body.get('id')
+            
+            if not work_id:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'success': False, 'error': 'work_id is required'})
+                }
+            
+            cur.execute(
+                f"""
+                SELECT o.id, p.client_id
+                FROM {SCHEMA}.works w
+                INNER JOIN {SCHEMA}.objects o ON w.object_id = o.id
+                INNER JOIN {SCHEMA}.projects p ON o.project_id = p.id
+                WHERE w.id = {work_id}
+                """
+            )
+            work = cur.fetchone()
+            
+            if not work:
+                return {
+                    'statusCode': 404,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'success': False, 'error': 'Work not found'})
+                }
+            
+            if work[1] != user_id and user_role != 'admin':
+                return {
+                    'statusCode': 403,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'success': False, 'error': 'Access denied'})
+                }
+            
+            cur.execute(f"DELETE FROM {SCHEMA}.works WHERE id = {work_id}")
+            conn.commit()
+            
+            cur.close()
+            conn.close()
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'success': True, 'message': 'Work deleted successfully'})
             }
         
         else:

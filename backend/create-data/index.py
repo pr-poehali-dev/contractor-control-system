@@ -10,6 +10,7 @@ import jwt
 from psycopg2.extras import RealDictCursor
 
 JWT_SECRET = os.environ.get('JWT_SECRET', 'default-secret-change-in-production')
+SCHEMA = 't_p8942561_contractor_control_s'
 
 def verify_jwt_token(token):
     try:
@@ -91,7 +92,7 @@ def handler(event, context):
                 status = data.get('status', 'active')
                 
                 cur.execute(f"""
-                    INSERT INTO projects (title, description, status, client_id, created_at)
+                    INSERT INTO {SCHEMA}.projects (title, description, status, client_id, created_at)
                     VALUES ('{title}', '{description}', '{status}', {user_id_int}, NOW())
                     RETURNING id, title, description, status, created_at
                 """)
@@ -105,12 +106,12 @@ def handler(event, context):
                 status = data.get('status', 'active')
                 
                 # Получаем или создаем дефолтный project_id для обратной совместимости
-                cur.execute(f"SELECT id FROM projects WHERE client_id = {user_id_int} LIMIT 1")
+                cur.execute(f"SELECT id FROM {SCHEMA}.projects WHERE client_id = {user_id_int} LIMIT 1")
                 project_row = cur.fetchone()
                 
                 if not project_row:
                     cur.execute(f"""
-                        INSERT INTO projects (title, description, status, client_id, created_at)
+                        INSERT INTO {SCHEMA}.projects (title, description, status, client_id, created_at)
                         VALUES ('Основной', 'Автоматически созданный проект', 'active', {user_id_int}, NOW())
                         RETURNING id
                     """)
@@ -133,7 +134,7 @@ def handler(event, context):
                 values_str = ', '.join(values)
                 
                 cur.execute(f"""
-                    INSERT INTO objects ({fields_str})
+                    INSERT INTO {SCHEMA}.objects ({fields_str})
                     VALUES ({values_str})
                     RETURNING id, title, address, description, status, client_id, created_at, updated_at
                 """)
@@ -168,7 +169,7 @@ def handler(event, context):
                 values_str = ', '.join(values)
                 
                 cur.execute(f"""
-                    INSERT INTO works ({fields_str})
+                    INSERT INTO {SCHEMA}.works ({fields_str})
                     VALUES ({values_str})
                     RETURNING id, title, description, object_id, contractor_id, status, planned_start_date, planned_end_date, completion_percentage
                 """)
@@ -194,93 +195,51 @@ def handler(event, context):
                 if volume:
                     fields.append('volume')
                     values.append(f"'{volume}'")
+                
                 if materials:
                     fields.append('materials')
                     values.append(f"'{materials}'")
+                
                 if photo_urls:
                     fields.append('photo_urls')
                     values.append(f"'{photo_urls}'")
+                
                 if is_work_start:
                     fields.append('is_work_start')
                     values.append('TRUE')
+                
                 if inspection_id:
                     fields.append('inspection_id')
                     values.append(str(int(inspection_id)))
+                
                 if defects_count is not None:
                     fields.append('defects_count')
                     values.append(str(int(defects_count)))
+                
                 if progress is not None:
-                    fields.append('completion_percentage')
+                    fields.append('progress')
                     values.append(str(int(progress)))
                 
                 fields_str = ', '.join(fields)
                 values_str = ', '.join(values)
                 
                 cur.execute(f"""
-                    INSERT INTO work_logs ({fields_str})
+                    INSERT INTO {SCHEMA}.work_logs ({fields_str})
                     VALUES ({values_str})
-                    RETURNING id, work_id, description, volume, materials, photo_urls, created_by, created_at, is_work_start, inspection_id, defects_count, completion_percentage
+                    RETURNING id, work_id, description, volume, materials, photo_urls, created_at, created_by
                 """)
                 result = cur.fetchone()
-                
-                if progress is not None:
-                    cur.execute(f"""
-                        UPDATE works 
-                        SET completion_percentage = {int(progress)}
-                        WHERE id = {work_id}
-                    """)
-                
                 conn.commit()
                 
-            elif item_type == 'inspection':
+            elif item_type == 'chat_message':
                 work_id = int(data.get('work_id', 0))
-                work_log_id = data.get('work_log_id')
-                title = data.get('title', '').replace("'", "''") if data.get('title') else None
-                description = data.get('description', '').replace("'", "''") if data.get('description') else ''
-                inspection_type = data.get('type', 'scheduled')
-                status = data.get('status', 'pending')
-                notes = data.get('notes', '').replace("'", "''") if data.get('notes') else None
-                scheduled_date = data.get('scheduled_date')
-                defects_raw = data.get('defects', '[]')
-                defects = defects_raw.replace("'", "''") if isinstance(defects_raw, str) else '[]'
-                photo_urls_raw = data.get('photo_urls', '')
-                photo_urls = photo_urls_raw.replace("'", "''") if photo_urls_raw else None
+                message = data.get('message', '').replace("'", "''")
+                message_type = data.get('message_type', 'text')
+                photo_urls = data.get('photo_urls', '').replace("'", "''") if data.get('photo_urls') else None
                 
-                # Generate inspection number - get last number after last dash
-                cur.execute(f"""
-                    SELECT COALESCE(
-                        MAX(
-                            CAST(
-                                SUBSTRING(inspection_number FROM 'INS-{work_id}-([0-9]+)') 
-                                AS INTEGER
-                            )
-                        ), 0
-                    ) + 1 as next_num
-                    FROM inspections
-                    WHERE work_id = {work_id}
-                """)
-                next_num = cur.fetchone()['next_num']
-                inspection_number = f'INS-{work_id}-{next_num}'
+                fields = ['work_id', 'message', 'message_type', 'created_by', 'created_at']
+                values = [str(work_id), f"'{message}'", f"'{message_type}'", str(user_id_int), 'NOW()']
                 
-                # Build SQL dynamically based on available fields
-                fields = ['work_id', 'inspection_number', 'type', 'status', 'defects', 'created_by', 'created_at', 'updated_at']
-                values = [str(work_id), f"'{inspection_number}'", f"'{inspection_type}'", f"'{status}'", f"'{defects}'", str(user_id_int), 'NOW()', 'NOW()']
-                
-                if work_log_id:
-                    fields.append('work_log_id')
-                    values.append(str(int(work_log_id)))
-                if title:
-                    fields.append('title')
-                    values.append(f"'{title}'")
-                if description:
-                    fields.append('description')
-                    values.append(f"'{description}'")
-                if notes:
-                    fields.append('notes')
-                    values.append(f"'{notes}'")
-                if scheduled_date:
-                    fields.append('scheduled_date')
-                    values.append(f"'{scheduled_date}'")
                 if photo_urls:
                     fields.append('photo_urls')
                     values.append(f"'{photo_urls}'")
@@ -289,68 +248,9 @@ def handler(event, context):
                 values_str = ', '.join(values)
                 
                 cur.execute(f"""
-                    INSERT INTO inspections ({fields_str})
+                    INSERT INTO {SCHEMA}.chat_messages ({fields_str})
                     VALUES ({values_str})
-                    RETURNING id, work_id, work_log_id, inspection_number, title, type, description, status, notes, scheduled_date, defects, photo_urls, created_by, created_at
-                """)
-                result = cur.fetchone()
-                
-                # Create inspection event based on type
-                if inspection_type == 'scheduled' and scheduled_date:
-                    # For scheduled inspections - create 'scheduled' event
-                    metadata = json.dumps({'scheduled_date': scheduled_date})
-                    cur.execute(f"""
-                        INSERT INTO inspection_events (inspection_id, event_type, created_by, metadata)
-                        VALUES ({result['id']}, 'scheduled', {user_id_int}, '{metadata}')
-                    """)
-                elif inspection_type == 'unscheduled' and status == 'active':
-                    # For unscheduled inspections - create 'started' event
-                    metadata = json.dumps({})
-                    cur.execute(f"""
-                        INSERT INTO inspection_events (inspection_id, event_type, created_by, metadata)
-                        VALUES ({result['id']}, 'started', {user_id_int}, '{metadata}')
-                    """)
-                
-                conn.commit()
-                
-            elif item_type == 'chat_message':
-                work_id = int(data.get('work_id', 0))
-                message = data.get('message', '').strip().replace("'", "''")
-                
-                if not message:
-                    print("ERROR: Message cannot be empty")
-                    return error_response(400, 'Message is required')
-                
-                print(f"DEBUG: Inserting chat_message: work_id={work_id}, message='{message}', user_id={user_id_int}")
-                
-                cur.execute(f"""
-                    INSERT INTO chat_messages (work_id, message, created_by)
-                    VALUES ({work_id}, '{message}', {user_id_int})
-                    RETURNING id, work_id, message, created_by, created_at
-                """)
-                result = cur.fetchone()
-                conn.commit()
-                print(f"DEBUG: Chat message created successfully: {result}")
-                
-            elif item_type == 'info_post':
-                title = data.get('title', '').replace("'", "''")
-                content = data.get('content', '').replace("'", "''")
-                link = data.get('link', '').replace("'", "''") if data.get('link') else None
-                
-                fields = ['title', 'content', 'created_by', 'created_at', 'updated_at']
-                values = [f"'{title}'", f"'{content}'", str(user_id_int), 'NOW()', 'NOW()']
-                
-                if link:
-                    fields.append('link')
-                    values.append(f"'{link}'")
-                
-                fields_str = ', '.join(fields)
-                values_str = ', '.join(values)
-                
-                cur.execute(f"""
-                    INSERT INTO t_p8942561_contractor_control_s.info_posts ({fields_str})
-                    VALUES ({values_str})
-                    RETURNING id, title, content, link, created_by, created_at, updated_at
+                    RETURNING id, work_id, message, message_type, photo_urls, created_at, created_by
                 """)
                 result = cur.fetchone()
                 conn.commit()
@@ -364,43 +264,37 @@ def handler(event, context):
                     'body': json.dumps({'success': False, 'error': f'Unknown type: {item_type}'})
                 }
             
+            result_dict = dict(result) if result else {}
+            
+            # Convert datetime objects to ISO format strings
+            for key, value in result_dict.items():
+                if hasattr(value, 'isoformat'):
+                    result_dict[key] = value.isoformat()
+            
             cur.close()
             conn.close()
-            
-            for key, value in result.items():
-                if hasattr(value, 'isoformat'):
-                    result[key] = value.isoformat()
             
             return {
                 'statusCode': 201,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                'body': json.dumps({'success': True, 'data': dict(result)})
+                'body': json.dumps({'success': True, 'data': result_dict})
             }
             
         except Exception as e:
             import traceback
-            error_msg = str(e)
-            trace = traceback.format_exc()
-            print(f"ERROR: {error_msg}")
-            print(f"TRACEBACK: {trace}")
-            
-            error_details = {
-                'success': False,
-                'error': error_msg,
-                'traceback': trace,
-                'item_type': item_type
-            }
+            error_trace = traceback.format_exc()
+            print(f"ERROR: {error_trace}")
             conn.rollback()
             cur.close()
             conn.close()
             return {
                 'statusCode': 500,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                'body': json.dumps(error_details)
+                'body': json.dumps({'success': False, 'error': str(e)})
             }
     
     return {
         'statusCode': 405,
-        'headers': {'Access-Control-Allow-Origin': '*'},
+        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
         'body': json.dumps({'success': False, 'error': 'Method not allowed'})
     }

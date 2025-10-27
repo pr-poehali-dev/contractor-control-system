@@ -10,6 +10,8 @@ from datetime import datetime
 from typing import Dict, Any
 import psycopg2
 
+SCHEMA = 't_p8942561_contractor_control_s'
+
 def get_db_connection():
     conn = psycopg2.connect(os.environ['DATABASE_URL'])
     conn.set_session(autocommit=False)
@@ -76,11 +78,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                            dr.status, dr.remediation_description, dr.remediation_photos,
                            dr.completed_at, dr.verified_at, dr.verified_by, dr.verification_notes,
                            dr.created_at, dr.updated_at,
-                           u.full_name as contractor_name,
-                           v.full_name as verified_by_name
-                    FROM defect_remediations dr
-                    LEFT JOIN users u ON dr.contractor_id = u.id
-                    LEFT JOIN users v ON dr.verified_by = v.id
+                           u.name as contractor_name,
+                           v.name as verified_by_name
+                    FROM {SCHEMA}.defect_remediations dr
+                    LEFT JOIN {SCHEMA}.users u ON dr.contractor_id = u.id
+                    LEFT JOIN {SCHEMA}.users v ON dr.verified_by = v.id
                     WHERE dr.defect_report_id = {report_id}
                     ORDER BY dr.created_at
                 """)
@@ -95,12 +97,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                            rep.work_id,
                            w.title as work_title,
                            o.title as object_title,
-                           v.full_name as verified_by_name
-                    FROM defect_remediations dr
-                    JOIN defect_reports rep ON dr.defect_report_id = rep.id
-                    JOIN works w ON rep.work_id = w.id
-                    JOIN objects o ON rep.object_id = o.id
-                    LEFT JOIN users v ON dr.verified_by = v.id
+                           v.name as verified_by_name
+                    FROM {SCHEMA}.defect_remediations dr
+                    JOIN {SCHEMA}.defect_reports rep ON dr.defect_report_id = rep.id
+                    JOIN {SCHEMA}.works w ON rep.work_id = w.id
+                    JOIN {SCHEMA}.objects o ON rep.object_id = o.id
+                    LEFT JOIN {SCHEMA}.users v ON dr.verified_by = v.id
                     WHERE dr.contractor_id = {contractor_id}
                     ORDER BY dr.created_at DESC
                 """)
@@ -187,7 +189,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             update_sql = ', '.join(update_parts)
             
             cur.execute(f"""
-                UPDATE defect_remediations
+                UPDATE {SCHEMA}.defect_remediations
                 SET {update_sql}
                 WHERE id = {remediation_id}
                 RETURNING id, defect_report_id, defect_id, contractor_id, status,
@@ -204,69 +206,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
-            remediation = {
-                'id': row[0],
-                'defect_report_id': row[1],
-                'defect_id': row[2],
-                'contractor_id': row[3],
-                'status': row[4],
-                'remediation_description': row[5],
-                'remediation_photos': row[6],
-                'completed_at': row[7].isoformat() if row[7] else None,
-                'verified_at': row[8].isoformat() if row[8] else None,
-                'verified_by': row[9],
-                'verification_notes': row[10],
-                'created_at': row[11].isoformat() if row[11] else None,
-                'updated_at': row[12].isoformat() if row[12] else None
-            }
-            
             conn.commit()
-            
-            return {
-                'statusCode': 200,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps(remediation),
-                'isBase64Encoded': False
-            }
-        
-        elif method == 'POST':
-            # Verify remediation (by client/inspector)
-            body_data = json.loads(event.get('body', '{}'))
-            remediation_id = int(body_data.get('remediation_id', 0))
-            approved = body_data.get('approved', False)
-            notes = body_data.get('verification_notes', '').replace("'", "''")
-            
-            if not remediation_id:
-                return {
-                    'statusCode': 400,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'remediation_id is required'}),
-                    'isBase64Encoded': False
-                }
-            
-            new_status = 'completed' if approved else 'rejected'
-            
-            cur.execute(f"""
-                UPDATE defect_remediations
-                SET status = '{new_status}',
-                    verified_at = CURRENT_TIMESTAMP,
-                    verified_by = {user_id},
-                    verification_notes = '{notes}',
-                    updated_at = CURRENT_TIMESTAMP
-                WHERE id = {remediation_id}
-                RETURNING id, defect_report_id, defect_id, contractor_id, status,
-                          remediation_description, remediation_photos, completed_at,
-                          verified_at, verified_by, verification_notes, created_at, updated_at
-            """)
-            
-            row = cur.fetchone()
-            if not row:
-                return {
-                    'statusCode': 404,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Remediation not found'}),
-                    'isBase64Encoded': False
-                }
             
             remediation = {
                 'id': row[0],
@@ -283,8 +223,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'created_at': row[11].isoformat() if row[11] else None,
                 'updated_at': row[12].isoformat() if row[12] else None
             }
-            
-            conn.commit()
             
             return {
                 'statusCode': 200,
@@ -301,6 +239,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"ERROR: {error_trace}")
         conn.rollback()
         return {
             'statusCode': 500,
@@ -308,7 +249,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'error': str(e)}),
             'isBase64Encoded': False
         }
-    
     finally:
         cur.close()
         conn.close()

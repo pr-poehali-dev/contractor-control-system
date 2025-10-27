@@ -15,6 +15,7 @@ from typing import Dict, Any
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
 JWT_SECRET = os.environ.get('JWT_SECRET', 'default-secret-change-in-production')
+SCHEMA = 't_p8942561_contractor_control_s'
 
 def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
@@ -66,19 +67,19 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     try:
-        path = event.get('queryStringParameters', {}).get('action', '')
+        path = event.get('queryStringParameters', {}).get('action', '') if event.get('queryStringParameters') else ''
         
         conn = get_db_connection()
         cur = conn.cursor()
         
         if method == 'POST' and path == 'register':
             body = json.loads(event.get('body', '{}'))
-            email = body.get('email')
-            phone = body.get('phone')
+            email = body.get('email', '').replace("'", "''") if body.get('email') else None
+            phone = body.get('phone', '').replace("'", "''") if body.get('phone') else None
             password = body.get('password')
-            name = body.get('name')
+            name = body.get('name', '').replace("'", "''")
             role = body.get('role', 'client')
-            organization = body.get('organization')
+            organization = body.get('organization', '').replace("'", "''") if body.get('organization') else None
             
             if not password or not name or not (email or phone):
                 return {
@@ -94,9 +95,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'error': 'Invalid role'})
                 }
             
+            email_check = f"'{email}'" if email else 'NULL'
+            phone_check = f"'{phone}'" if phone else 'NULL'
+            
             cur.execute(
-                "SELECT id FROM users WHERE email = %s OR phone = %s",
-                (email, phone)
+                f"SELECT id FROM {SCHEMA}.users WHERE email = {email_check} OR phone = {phone_check}"
             )
             if cur.fetchone():
                 return {
@@ -105,15 +108,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'error': 'User already exists'})
                 }
             
-            password_hash = hash_password(password)
+            password_hash = hash_password(password).replace("'", "''")
+            
+            email_val = f"'{email}'" if email else 'NULL'
+            phone_val = f"'{phone}'" if phone else 'NULL'
+            org_val = f"'{organization}'" if organization else 'NULL'
             
             cur.execute(
-                """
-                INSERT INTO users (email, phone, password_hash, name, role, organization, is_active, created_at, updated_at)
-                VALUES (%s, %s, %s, %s, %s, %s, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                f"""
+                INSERT INTO {SCHEMA}.users (email, phone, password_hash, name, role, organization, is_active, created_at, updated_at)
+                VALUES ({email_val}, {phone_val}, '{password_hash}', '{name}', '{role}', {org_val}, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                 RETURNING id, email, phone, name, role, organization, created_at
-                """,
-                (email, phone, password_hash, name, role, organization)
+                """
             )
             user = cur.fetchone()
             conn.commit()
@@ -147,8 +153,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         elif method == 'POST' and path == 'login':
             body = json.loads(event.get('body', '{}'))
-            email = body.get('email')
-            phone = body.get('phone')
+            email = body.get('email', '').replace("'", "''") if body.get('email') else ''
+            phone = body.get('phone', '').replace("'", "''") if body.get('phone') else ''
             password = body.get('password')
             
             print(f"DEBUG LOGIN: email={email}, phone={phone}, has_password={bool(password)}")
@@ -160,14 +166,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'error': 'Missing email/phone or password'})
                 }
             
+            email_cond = f"email = '{email}'" if email else "1=0"
+            phone_cond = f"phone = '{phone}'" if phone else "1=0"
+            
             cur.execute(
-                """
+                f"""
                 SELECT id, email, phone, name, role, organization, password_hash, is_active, created_at
-                FROM users
-                WHERE ((email IS NOT NULL AND email = %s) OR (phone IS NOT NULL AND phone = %s)) 
+                FROM {SCHEMA}.users
+                WHERE ({email_cond} OR {phone_cond}) 
                   AND password_hash IS NOT NULL
-                """,
-                (email or '', phone or '')
+                """
             )
             user = cur.fetchone()
             
@@ -202,8 +210,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             cur.execute(
-                "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = %s",
-                (user_id,)
+                f"UPDATE {SCHEMA}.users SET last_login = CURRENT_TIMESTAMP WHERE id = {user_id}"
             )
             conn.commit()
             
@@ -235,7 +242,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         elif method == 'GET' and path == 'verify':
-            auth_header = event.get('headers', {}).get('X-Auth-Token') or event.get('headers', {}).get('x-auth-token')
+            auth_header = event.get('headers', {}).get('x-auth-token') or event.get('headers', {}).get('X-Auth-Token')
             
             if not auth_header:
                 return {
@@ -249,15 +256,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 user_id = payload['user_id']
                 
                 cur.execute(
-                    """
+                    f"""
                     SELECT id, email, phone, name, role, organization, is_active, created_at
-                    FROM users WHERE id = %s
-                    """,
-                    (user_id,)
+                    FROM {SCHEMA}.users
+                    WHERE id = {user_id}
+                    """
                 )
                 user = cur.fetchone()
                 
-                if not user or not user[6]:
+                if not user or not user[6]:  # is_active
                     return {
                         'statusCode': 401,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
@@ -282,116 +289,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                     'body': json.dumps({
                         'success': True,
-                        'data': {'user': user_data}
+                        'data': {
+                            'user': user_data
+                        }
                     })
                 }
-            
-            except ValueError as e:
-                return {
-                    'statusCode': 401,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': str(e)})
-                }
-        
-        elif method == 'GET' and path == 'work-types':
-            cur.execute(
-                """
-                SELECT id, name, description, category, unit, created_at
-                FROM work_types
-                ORDER BY category, name
-                """
-            )
-            work_types = cur.fetchall()
-            
-            work_types_list = []
-            for wt in work_types:
-                work_types_list.append({
-                    'id': wt[0],
-                    'name': wt[1],
-                    'description': wt[2],
-                    'category': wt[3],
-                    'unit': wt[4],
-                    'created_at': wt[5].isoformat() if wt[5] else None
-                })
-            
-            cur.close()
-            conn.close()
-            
-            return {
-                'statusCode': 200,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({
-                    'success': True,
-                    'data': {'work_types': work_types_list}
-                })
-            }
-        
-        elif method == 'POST' and path == 'work-types':
-            body = json.loads(event.get('body', '{}'))
-            auth_header = event.get('headers', {}).get('X-Auth-Token') or event.get('headers', {}).get('x-auth-token')
-            
-            if not auth_header:
-                return {
-                    'statusCode': 401,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'No token provided'})
-                }
-            
-            try:
-                payload = verify_jwt_token(auth_header)
-                user_role = payload['role']
                 
-                if user_role != 'admin':
-                    return {
-                        'statusCode': 403,
-                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Only admins can add work types'})
-                    }
-                
-                name = body.get('name')
-                description = body.get('description', '')
-                category = body.get('category')
-                unit = body.get('unit')
-                
-                if not name or not category or not unit:
-                    return {
-                        'statusCode': 400,
-                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Missing required fields'})
-                    }
-                
-                cur.execute(
-                    """
-                    INSERT INTO work_types (name, description, category, unit, created_at)
-                    VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP)
-                    RETURNING id, name, description, category, unit, created_at
-                    """,
-                    (name, description, category, unit)
-                )
-                work_type = cur.fetchone()
-                conn.commit()
-                
-                work_type_data = {
-                    'id': work_type[0],
-                    'name': work_type[1],
-                    'description': work_type[2],
-                    'category': work_type[3],
-                    'unit': work_type[4],
-                    'created_at': work_type[5].isoformat() if work_type[5] else None
-                }
-                
-                cur.close()
-                conn.close()
-                
-                return {
-                    'statusCode': 201,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({
-                        'success': True,
-                        'data': work_type_data
-                    })
-                }
-            
             except ValueError as e:
                 return {
                     'statusCode': 401,
@@ -403,15 +306,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return {
                 'statusCode': 404,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Not found'})
+                'body': json.dumps({'error': 'Endpoint not found'})
             }
     
     except Exception as e:
         import traceback
-        print(f"ERROR: {str(e)}")
-        print(f"TRACEBACK: {traceback.format_exc()}")
+        error_trace = traceback.format_exc()
+        print(f"ERROR: {error_trace}")
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': str(e), 'traceback': traceback.format_exc()})
+            'body': json.dumps({'error': str(e)})
         }

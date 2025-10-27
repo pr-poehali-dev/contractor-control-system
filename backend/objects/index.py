@@ -95,15 +95,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             if object_id:
+                schema = 't_p8942561_contractor_control_s'
                 cur.execute(
-                    """
+                    f"""
                     SELECT o.id, o.title, o.address, o.project_id, o.status, o.created_at, o.updated_at,
                            p.client_id
-                    FROM objects o
-                    INNER JOIN projects p ON o.project_id = p.id
-                    WHERE o.id = %s AND (p.client_id = %s OR %s = 'admin')
-                    """,
-                    (object_id, user_id, user_role)
+                    FROM {schema}.objects o
+                    INNER JOIN {schema}.projects p ON o.project_id = p.id
+                    WHERE o.id = {object_id} AND (p.client_id = {user_id} OR '{user_role}' = 'admin')
+                    """
                 )
                 obj = cur.fetchone()
                 
@@ -133,15 +133,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'success': True, 'data': object_data})
                 }
             elif project_id:
+                schema = 't_p8942561_contractor_control_s'
                 cur.execute(
-                    """
+                    f"""
                     SELECT o.id, o.title, o.address, o.project_id, o.status, o.created_at, o.updated_at
-                    FROM objects o
-                    INNER JOIN projects p ON o.project_id = p.id
-                    WHERE o.project_id = %s AND (p.client_id = %s OR %s = 'admin')
+                    FROM {schema}.objects o
+                    INNER JOIN {schema}.projects p ON o.project_id = p.id
+                    WHERE o.project_id = {project_id} AND (p.client_id = {user_id} OR '{user_role}' = 'admin')
                     ORDER BY o.created_at DESC
-                    """,
-                    (project_id, user_id, user_role)
+                    """
                 )
                 objects = cur.fetchall()
                 objects_list = []
@@ -186,9 +186,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'success': False, 'error': 'project_id, title, and address are required'})
                 }
             
+            schema = 't_p8942561_contractor_control_s'
             cur.execute(
-                "SELECT client_id FROM projects WHERE id = %s",
-                (project_id,)
+                f"SELECT client_id FROM {schema}.projects WHERE id = {project_id}"
             )
             project = cur.fetchone()
             
@@ -207,12 +207,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             cur.execute(
-                """
-                INSERT INTO objects (title, address, project_id, status, created_at, updated_at)
-                VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                f"""
+                INSERT INTO {schema}.objects (title, address, project_id, status, created_at, updated_at)
+                VALUES ('{title}', '{address}', {project_id}, '{status}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                 RETURNING id, title, address, project_id, status, created_at, updated_at
-                """,
-                (title, address, project_id, status)
+                """
             )
             obj = cur.fetchone()
             conn.commit()
@@ -250,14 +249,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'success': False, 'error': 'Object ID is required'})
                 }
             
+            schema = 't_p8942561_contractor_control_s'
             cur.execute(
-                """
+                f"""
                 SELECT p.client_id
-                FROM objects o
-                INNER JOIN projects p ON o.project_id = p.id
-                WHERE o.id = %s
-                """,
-                (object_id,)
+                FROM {schema}.objects o
+                INNER JOIN {schema}.projects p ON o.project_id = p.id
+                WHERE o.id = {object_id}
+                """
             )
             obj = cur.fetchone()
             
@@ -276,29 +275,23 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             updates = []
-            params = []
             
             if title is not None:
-                updates.append("title = %s")
-                params.append(title)
+                updates.append(f"title = '{title}'")
             if address is not None:
-                updates.append("address = %s")
-                params.append(address)
+                updates.append(f"address = '{address}'")
             if status is not None:
-                updates.append("status = %s")
-                params.append(status)
+                updates.append(f"status = '{status}'")
             
             updates.append("updated_at = CURRENT_TIMESTAMP")
-            params.append(object_id)
             
             cur.execute(
                 f"""
-                UPDATE objects
+                UPDATE {schema}.objects
                 SET {', '.join(updates)}
-                WHERE id = %s
+                WHERE id = {object_id}
                 RETURNING id, title, address, project_id, status, created_at, updated_at
-                """,
-                params
+                """
             )
             updated_obj = cur.fetchone()
             conn.commit()

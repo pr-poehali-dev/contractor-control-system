@@ -11,6 +11,8 @@ from psycopg2.extras import RealDictCursor
 import jwt
 from typing import Dict, Any
 
+SCHEMA = 't_p8942561_contractor_control_s'
+
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method: str = event.get('httpMethod', 'POST')
     
@@ -62,12 +64,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         conn = psycopg2.connect(dsn)
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
-        cur.execute("""
-            INSERT INTO work_views (user_id, work_id, last_seen_at)
-            VALUES (%s, %s, CURRENT_TIMESTAMP)
+        cur.execute(f"""
+            INSERT INTO {SCHEMA}.work_views (user_id, work_id, last_seen_at)
+            VALUES ({user_id}, {work_id}, CURRENT_TIMESTAMP)
             ON CONFLICT (user_id, work_id) 
             DO UPDATE SET last_seen_at = CURRENT_TIMESTAMP
-        """, (user_id, work_id))
+        """)
         
         conn.commit()
         cur.close()

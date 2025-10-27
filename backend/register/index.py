@@ -8,6 +8,8 @@ import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
+SCHEMA = 't_p8942561_contractor_control_s'
+
 def handler(event, context):
     method = event.get('httpMethod', 'POST')
     
@@ -49,7 +51,7 @@ def handler(event, context):
     
     try:
         phone_escaped = phone.replace("'", "''")
-        cur.execute(f"SELECT id FROM users WHERE phone = '{phone_escaped}'")
+        cur.execute(f"SELECT id FROM {SCHEMA}.users WHERE phone = '{phone_escaped}'")
         existing = cur.fetchone()
         
         if existing:
@@ -66,13 +68,13 @@ def handler(event, context):
         
         if email:
             cur.execute(f"""
-                INSERT INTO users (phone, email, name, role) 
+                INSERT INTO {SCHEMA}.users (phone, email, name, role) 
                 VALUES ('{phone_escaped}', '{email_escaped}', '{name_escaped}', '{role}')
                 RETURNING id, phone, email, name, role, created_at
             """)
         else:
             cur.execute(f"""
-                INSERT INTO users (phone, name, role) 
+                INSERT INTO {SCHEMA}.users (phone, name, role) 
                 VALUES ('{phone_escaped}', '{name_escaped}', '{role}')
                 RETURNING id, phone, email, name, role, created_at
             """)
