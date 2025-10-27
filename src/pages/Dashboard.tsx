@@ -120,6 +120,7 @@ const Dashboard = () => {
           }
           return event;
         }) || [];
+        console.log('📋 Feed events loaded:', normalizedEvents);
         setFeed(normalizedEvents);
       }
     } catch (error) {
