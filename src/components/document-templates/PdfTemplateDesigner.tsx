@@ -32,16 +32,40 @@ export function PdfTemplateDesigner({ template, onSave }: PdfTemplateDesignerPro
     if (!designerRef.current) return;
 
     const initDesigner = async () => {
+      console.log('🔍 Initializing PDF Designer with template:', template);
+      
       const blankPdfBase64 = await generateBlankPdf();
+      console.log('📄 Generated blank PDF (length):', blankPdfBase64.length);
       
       let defaultTemplate: Template;
+      let useBlankPdf = true;
       
-      if (template && template.basePdf && typeof template.basePdf === 'string' && template.basePdf.length > 100) {
-        defaultTemplate = {
-          ...template,
-          basePdf: template.basePdf.includes('data:') ? template.basePdf.split(',')[1] : template.basePdf,
-        };
-      } else {
+      if (template && template.basePdf) {
+        console.log('📦 Template has basePdf, type:', typeof template.basePdf, 'length:', String(template.basePdf).length);
+        
+        if (typeof template.basePdf === 'string' && template.basePdf.length > 100) {
+          let pdfData = template.basePdf;
+          
+          if (pdfData.includes('data:')) {
+            pdfData = pdfData.split(',')[1];
+            console.log('🔄 Removed data URI prefix');
+          }
+          
+          if (pdfData.startsWith('JVBERi0')) {
+            console.log('✅ Valid PDF Base64 detected');
+            useBlankPdf = false;
+            defaultTemplate = {
+              ...template,
+              basePdf: pdfData,
+            };
+          } else {
+            console.log('❌ Invalid PDF Base64, using blank PDF');
+          }
+        }
+      }
+      
+      if (useBlankPdf) {
+        console.log('🆕 Using blank PDF template');
         defaultTemplate = {
           basePdf: blankPdfBase64,
           schemas: template?.schemas || [
@@ -80,6 +104,8 @@ export function PdfTemplateDesigner({ template, onSave }: PdfTemplateDesignerPro
           ],
         };
       }
+      
+      console.log('🎯 Final template to use:', defaultTemplate);
 
       const font: Font = {
         Roboto: {
