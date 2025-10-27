@@ -9,6 +9,7 @@ import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import TiptapEditor from '@/components/TiptapEditor';
 import {
   Dialog,
   DialogContent,
@@ -56,6 +57,8 @@ export default function DocumentTemplateEditor() {
   
   const [templateName, setTemplateName] = useState('');
   const [templateDescription, setTemplateDescription] = useState('');
+  const [documentContent, setDocumentContent] = useState('');
+  const [documentVariables, setDocumentVariables] = useState<string[]>([]);
 
   useEffect(() => {
     if (templateId) {
@@ -68,8 +71,16 @@ export default function DocumentTemplateEditor() {
       setTemplateName(template.name);
       setTemplateDescription(template.description || '');
       
-      if (template.content && template.content.blocks) {
-        setBlocks(template.content.blocks);
+      if (template.content) {
+        if (template.content.blocks) {
+          setBlocks(template.content.blocks);
+        }
+        if (template.content.html) {
+          setDocumentContent(template.content.html);
+        }
+        if (template.content.variables) {
+          setDocumentVariables(template.content.variables);
+        }
       }
     }
   }, [template]);
@@ -115,12 +126,16 @@ export default function DocumentTemplateEditor() {
     if (!templateId || !template) return;
 
     try {
+      const content = template.template_type === 'document' 
+        ? { html: documentContent, variables: documentVariables }
+        : { blocks };
+
       await dispatch(
         updateTemplate({
           id: parseInt(templateId),
           name: templateName,
           description: templateDescription,
-          content: { blocks },
+          content,
         })
       ).unwrap();
 
@@ -240,18 +255,33 @@ export default function DocumentTemplateEditor() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Содержимое шаблона</CardTitle>
-                  <Button variant="outline" size="sm" onClick={() => setIsAddBlockDialogOpen(true)}>
-                    <Icon name="Plus" size={16} className="mr-2" />
-                    Добавить блок
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {blocks.length === 0 ? (
+            {template.template_type === 'document' ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Редактор документа</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <TiptapEditor
+                    content={documentContent}
+                    onChange={setDocumentContent}
+                    placeholder="Начните писать документ..."
+                    variables={documentVariables}
+                  />
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Содержимое шаблона</CardTitle>
+                    <Button variant="outline" size="sm" onClick={() => setIsAddBlockDialogOpen(true)}>
+                      <Icon name="Plus" size={16} className="mr-2" />
+                      Добавить блок
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {blocks.length === 0 ? (
                   <div className="text-center py-12">
                     <Icon name="FileText" size={48} className="mx-auto text-slate-300 mb-4" />
                     <p className="text-slate-500 mb-4">Шаблон пуст</p>
@@ -329,34 +359,78 @@ export default function DocumentTemplateEditor() {
                 )}
               </CardContent>
             </Card>
+            )}
           </div>
 
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Переменные ({variables.length})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {variables.length === 0 ? (
-                  <p className="text-sm text-slate-500">
-                    Используйте переменные в формате <code className="bg-slate-100 px-1 rounded">{'{{name}}'}</code>
-                  </p>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {variables.map((variable, idx) => (
-                      <Badge
-                        key={idx}
-                        variant="outline"
-                        className="font-mono text-xs cursor-pointer hover:bg-blue-50"
-                        onClick={() => editingBlock && handleInsertVariable(variable)}
-                      >
-                        {`{{${variable}}}`}
-                      </Badge>
-                    ))}
+            {template.template_type === 'document' ? (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Переменные</CardTitle>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        const varName = prompt('Название переменной:');
+                        if (varName && !documentVariables.includes(varName)) {
+                          setDocumentVariables([...documentVariables, varName]);
+                        }
+                      }}
+                    >
+                      <Icon name="Plus" size={16} className="mr-2" />
+                      Добавить
+                    </Button>
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent>
+                  {documentVariables.length === 0 ? (
+                    <p className="text-sm text-slate-500">Добавьте переменные для шаблона</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {documentVariables.map((variable) => (
+                        <div key={variable} className="flex items-center justify-between p-2 border rounded hover:bg-slate-50">
+                          <code className="text-sm font-mono">{`{{${variable}}}`}</code>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setDocumentVariables(documentVariables.filter(v => v !== variable))}
+                          >
+                            <Icon name="Trash2" size={14} />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm">Переменные ({variables.length})</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {variables.length === 0 ? (
+                    <p className="text-sm text-slate-500">
+                      Используйте переменные в формате <code className="bg-slate-100 px-1 rounded">{'{{name}}'}</code>
+                    </p>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {variables.map((variable, idx) => (
+                        <Badge
+                          key={idx}
+                          variant="outline"
+                          className="font-mono text-xs cursor-pointer hover:bg-blue-50"
+                          onClick={() => editingBlock && handleInsertVariable(variable)}
+                        >
+                          {`{{${variable}}}`}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             <Card>
               <CardHeader>
