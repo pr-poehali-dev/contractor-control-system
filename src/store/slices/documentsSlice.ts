@@ -5,16 +5,18 @@ import { RootState } from '../store';
 
 export interface Document {
   id: number;
-  work_id: number;
-  template_id?: number;
-  document_number: string;
-  document_type: string;
+  work_id?: number;
+  templateId?: number;
+  templateName?: string;
+  document_number?: string;
+  document_type?: string;
   title: string;
-  content: Record<string, any>;
-  status: 'draft' | 'pending_signature' | 'signed' | 'rejected';
-  created_by: number;
-  created_at: string;
-  updated_at: string;
+  contentData?: Record<string, any>;
+  htmlContent?: string;
+  status: 'draft' | 'pending' | 'signed' | 'archived';
+  created_by?: number;
+  createdAt: string;
+  updatedAt: string;
   work_title?: string;
   object_title?: string;
   created_by_name?: string;
@@ -102,33 +104,40 @@ export const fetchDocumentDetail = createAsyncThunk(
 export const createDocument = createAsyncThunk(
   'documents/create',
   async (data: {
-    work_id: number;
-    template_id?: number;
-    document_type: string;
     title: string;
-    content: Record<string, any>;
+    templateId: number;
+    templateName: string;
+    contentData?: Record<string, any>;
+    htmlContent?: string;
+    status?: string;
   }, { rejectWithValue }) => {
     try {
       const response = await apiClient.post(ENDPOINTS.DOCUMENTS.CREATE, data, {
         skipAuthRedirect: true
       });
-      return response.data.document;
+      return response.data;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to create document');
     }
   }
 );
 
-export const updateDocumentStatus = createAsyncThunk(
-  'documents/updateStatus',
-  async (data: { id: number; status: string }, { rejectWithValue }) => {
+export const updateDocument = createAsyncThunk(
+  'documents/update',
+  async (data: { 
+    id: number; 
+    title?: string;
+    status?: string; 
+    contentData?: Record<string, any>;
+    htmlContent?: string;
+  }, { rejectWithValue }) => {
     try {
-      const response = await apiClient.put(ENDPOINTS.DOCUMENTS.UPDATE, data, {
+      const response = await apiClient.put(`${ENDPOINTS.DOCUMENTS.UPDATE}/${data.id}`, data, {
         skipAuthRedirect: true
       });
-      return response.data.document;
+      return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to update document status');
+      return rejectWithValue(error.message || 'Failed to update document');
     }
   }
 );
@@ -237,7 +246,7 @@ const documentsSlice = createSlice({
         state.error = action.error.message || 'Failed to create document';
       })
       
-      .addCase(updateDocumentStatus.fulfilled, (state, action) => {
+      .addCase(updateDocument.fulfilled, (state, action) => {
         const index = state.items.findIndex(doc => doc.id === action.payload.id);
         if (index !== -1) {
           state.items[index] = { ...state.items[index], ...action.payload };

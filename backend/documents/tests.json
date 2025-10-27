@@ -1,0 +1,33 @@
+{
+  "tests": [
+    {
+      "name": "Get all documents (empty list)",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "documents": []
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Create new document (draft)",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "title": "Тестовый документ",
+        "templateId": 1,
+        "templateName": "Тестовый шаблон",
+        "contentData": {
+          "field1": "value1"
+        }
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "title": "Тестовый документ",
+        "status": "draft"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

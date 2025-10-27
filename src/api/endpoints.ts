@@ -69,10 +69,10 @@ export const ENDPOINTS = {
   },
 
   DOCUMENTS: {
-    LIST: '/7b29a4ff-66e5-43e7-a740-b7dbab4a384c',
-    CREATE: '/7b29a4ff-66e5-43e7-a740-b7dbab4a384c',
-    UPDATE: '/7b29a4ff-66e5-43e7-a740-b7dbab4a384c',
-    DETAIL: '/7b29a4ff-66e5-43e7-a740-b7dbab4a384c',
+    LIST: '/b12e1795-0474-4db7-90d4-c95c29efd2d9',
+    CREATE: '/b12e1795-0474-4db7-90d4-c95c29efd2d9',
+    UPDATE: '/b12e1795-0474-4db7-90d4-c95c29efd2d9',
+    DETAIL: '/b12e1795-0474-4db7-90d4-c95c29efd2d9',
   },
 
   DOCUMENT_TEMPLATES: {

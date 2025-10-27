@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchTemplateDetail, selectCurrentTemplate, selectTemplatesLoading } from '@/store/slices/documentTemplatesSlice';
+import { createDocument, updateDocument } from '@/store/slices/documentsSlice';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import DocumentPreview from '@/components/DocumentPreview';
@@ -18,11 +19,14 @@ export default function NewDocument() {
   const { toast } = useToast();
   
   const templateId = searchParams.get('templateId');
+  const docId = searchParams.get('docId');
   const template = useAppSelector(selectCurrentTemplate);
   const loading = useAppSelector(selectTemplatesLoading);
 
   const [documentData, setDocumentData] = useState<Record<string, string>>({});
   const [documentTitle, setDocumentTitle] = useState('');
+  const [currentDocId, setCurrentDocId] = useState<number | null>(docId ? parseInt(docId) : null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (templateId) {
@@ -41,6 +45,53 @@ export default function NewDocument() {
       setDocumentTitle(`${template.name} - ${new Date().toLocaleDateString('ru-RU')}`);
     }
   }, [template]);
+
+  const saveAsDraft = useCallback(async () => {
+    if (!template || isSaving) return;
+    
+    setIsSaving(true);
+    try {
+      let html = template.content?.html || '';
+      Object.entries(documentData).forEach(([key, value]) => {
+        const regex = new RegExp(`{{${key}}}`, 'g');
+        html = html.replace(regex, value || `[${key}]`);
+      });
+
+      if (currentDocId) {
+        await dispatch(updateDocument({
+          id: currentDocId,
+          title: documentTitle,
+          contentData: documentData,
+          htmlContent: html,
+          status: 'draft'
+        })).unwrap();
+      } else {
+        const result = await dispatch(createDocument({
+          title: documentTitle,
+          templateId: template.id,
+          templateName: template.name,
+          contentData: documentData,
+          htmlContent: html,
+          status: 'draft'
+        })).unwrap();
+        setCurrentDocId(result.id);
+      }
+    } catch (error) {
+      console.error('Ошибка автосохранения:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [template, documentData, documentTitle, currentDocId, dispatch, isSaving]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (documentTitle.trim()) {
+        saveAsDraft();
+      }
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [documentData, documentTitle, saveAsDraft]);
 
   if (loading) {
     return (
@@ -84,17 +135,21 @@ export default function NewDocument() {
     const emptyFields = Object.entries(documentData).filter(([_, value]) => !value.trim());
     if (emptyFields.length > 0) {
       toast({
-        title: 'Предупреждение',
-        description: `Не заполнены поля: ${emptyFields.map(([key]) => key).join(', ')}`,
-        variant: 'destructive',
+        title: 'Документ сохранён как черновик',
+        description: `Не все поля заполнены. Вы можете вернуться к редактированию позже.`,
       });
-      return;
     }
 
+    await saveAsDraft();
+    
     toast({
-      title: 'Сохранение...',
-      description: 'Функция сохранения в разработке',
+      title: 'Успешно!',
+      description: 'Документ сохранён',
     });
+    
+    setTimeout(() => {
+      navigate('/documents');
+    }, 500);
   };
 
   return (
@@ -112,11 +167,20 @@ export default function NewDocument() {
             </div>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            {isSaving && (
+              <span className="text-sm text-slate-500 mr-2">Сохранение...</span>
+            )}
+            {currentDocId && !isSaving && (
+              <span className="text-sm text-green-600 mr-2 flex items-center gap-1">
+                <Icon name="Check" size={16} />
+                Черновик сохранён
+              </span>
+            )}
             <Button variant="outline" onClick={() => navigate('/documents')}>
               Отмена
             </Button>
-            <Button onClick={handleSaveDocument}>
+            <Button onClick={handleSaveDocument} disabled={isSaving}>
               <Icon name="Save" size={18} className="mr-2" />
               Сохранить
             </Button>
