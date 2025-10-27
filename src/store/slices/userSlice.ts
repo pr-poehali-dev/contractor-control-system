@@ -9,6 +9,7 @@ export interface User {
   email?: string;
   phone?: string;
   organization?: string;
+  avatar_url?: string;
   created_at?: string;
 }
 
@@ -251,11 +252,12 @@ export const loadUserData = createAsyncThunk(
  * @param {string} [data.name] - Новое имя
  * @param {string} [data.email] - Новый email
  * @param {string} [data.phone] - Новый телефон
+ * @param {string} [data.avatar_url] - URL аватарки
  * @returns {Promise<User>} Обновленные данные пользователя
  */
 export const updateProfile = createAsyncThunk(
   'user/updateProfile',
-  async (data: { name?: string; email?: string; phone?: string }, { rejectWithValue }) => {
+  async (data: { name?: string; email?: string; phone?: string; avatar_url?: string }, { rejectWithValue }) => {
     try {
       const response = await apiClient.put(ENDPOINTS.ENTITIES.UPDATE, {
         type: 'user',

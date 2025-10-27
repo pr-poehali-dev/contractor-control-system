@@ -14,6 +14,7 @@ interface ObjectData {
   address: string;
   customer: string;
   description: string;
+  photo_url?: string;
 }
 
 export const useWorkForm = (objectId: string | undefined) => {
@@ -29,6 +30,7 @@ export const useWorkForm = (objectId: string | undefined) => {
     address: '',
     customer: '',
     description: '',
+    photo_url: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,6 +72,7 @@ export const useWorkForm = (objectId: string | undefined) => {
         address: currentObject.address || '',
         customer: currentObject.customer || '',
         description: currentObject.description || '',
+        photo_url: currentObject.photo_url || '',
       };
       console.log('✅ Setting object data:', newObjectData);
       setObjectData(newObjectData);

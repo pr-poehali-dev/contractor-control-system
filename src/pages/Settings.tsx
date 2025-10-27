@@ -28,7 +28,9 @@ const Settings = () => {
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [phone, setPhone] = useState(user?.phone || '');
+  const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url || '');
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && user?.role === 'contractor') {
@@ -41,6 +43,7 @@ const Settings = () => {
       setName(user.name || '');
       setEmail(user.email || '');
       setPhone(user.phone || '');
+      setAvatarUrl(user.avatar_url || '');
     }
   }, [user]);
 
@@ -52,12 +55,51 @@ const Settings = () => {
   const handleSaveProfile = async () => {
     setIsLoading(true);
     try {
-      await dispatch(updateProfile({ name, email, phone })).unwrap();
+      await dispatch(updateProfile({ name, email, phone, avatar_url: avatarUrl })).unwrap();
       toast.success('Профиль успешно обновлён');
     } catch (error) {
       toast.error('Ошибка при обновлении профиля');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Выберите изображение');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Размер файла не должен превышать 5 МБ');
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('https://cdn.poehali.dev/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('Ошибка загрузки');
+
+      const data = await response.json();
+      const uploadedUrl = data.url;
+
+      setAvatarUrl(uploadedUrl);
+      await dispatch(updateProfile({ avatar_url: uploadedUrl })).unwrap();
+      toast.success('Аватарка обновлена');
+    } catch (error) {
+      toast.error('Не удалось загрузить изображение');
+    } finally {
+      setIsUploadingAvatar(false);
     }
   };
 
@@ -80,8 +122,32 @@ const Settings = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-6 mb-6">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold text-2xl">
-                {user ? getInitials(user.name) : 'U'}
+              <div className="relative group">
+                {avatarUrl ? (
+                  <img 
+                    src={avatarUrl} 
+                    alt="Avatar" 
+                    className="h-20 w-20 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold text-2xl">
+                    {user ? getInitials(user.name) : 'U'}
+                  </div>
+                )}
+                <label 
+                  htmlFor="avatar-upload" 
+                  className="absolute inset-0 flex items-center justify-center rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                >
+                  <Icon name={isUploadingAvatar ? "Loader2" : "Camera"} size={24} className={`text-white ${isUploadingAvatar ? 'animate-spin' : ''}`} />
+                </label>
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarUpload}
+                  disabled={isUploadingAvatar}
+                />
               </div>
               <div className="flex-1">
                 <h3 className="text-xl font-semibold text-slate-900">{user?.name}</h3>

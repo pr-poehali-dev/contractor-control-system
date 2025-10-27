@@ -79,13 +79,24 @@ const ObjectPublicPage = () => {
               )}
             </div>
 
-            <Button
-              onClick={() => navigate(`/objects/${objectId}`)}
-              variant="outline"
-            >
-              К работам
-              <Icon name="ChevronRight" size={16} className="ml-2" />
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => navigate(`/objects/${objectId}/works/create`)}
+                variant="ghost"
+                size="icon"
+                title="Настройки объекта"
+              >
+                <Icon name="Settings" size={20} />
+              </Button>
+              
+              <Button
+                onClick={() => navigate(`/objects/${objectId}`)}
+                variant="outline"
+              >
+                К работам
+                <Icon name="ChevronRight" size={16} className="ml-2" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
