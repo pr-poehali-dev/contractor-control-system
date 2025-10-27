@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { jsPDF } from 'jspdf';
 
 interface PdfTemplateDesignerProps {
   template: Template | null;
@@ -114,31 +115,27 @@ export function PdfTemplateDesigner({ template, onSave }: PdfTemplateDesignerPro
   }, [template, onSave]);
 
   const generateBlankPdf = async (): Promise<string> => {
-    const width = 210;
-    const height = 297;
+    const doc = new jsPDF({
+      format: 'a4',
+      unit: 'mm',
+    });
     
-    const canvas = document.createElement('canvas');
-    canvas.width = width * 2.835;
-    canvas.height = height * 2.835;
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, 0, 210, 297, 'F');
     
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return '';
+    doc.setDrawColor(229, 231, 235);
+    doc.setLineWidth(0.5);
+    doc.rect(5, 5, 200, 287, 'S');
     
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    doc.setTextColor(156, 163, 175);
+    doc.setFontSize(16);
+    doc.text('Пустой документ A4', 105, 140, { align: 'center' });
     
-    ctx.strokeStyle = '#e5e7eb';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(0, 0, canvas.width, canvas.height);
+    doc.setFontSize(12);
+    doc.text('Добавьте поля через панель ниже', 105, 150, { align: 'center' });
     
-    ctx.fillStyle = '#f3f4f6';
-    ctx.font = '20px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('Пустой документ A4', canvas.width / 2, canvas.height / 2);
-    ctx.font = '14px Arial';
-    ctx.fillText('Добавьте поля через панель справа', canvas.width / 2, canvas.height / 2 + 30);
-    
-    return canvas.toDataURL('image/png');
+    const pdfData = doc.output('datauristring');
+    return pdfData.split(',')[1];
   };
 
   const addField = () => {
