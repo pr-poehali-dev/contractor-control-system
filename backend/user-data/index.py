@@ -145,7 +145,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         # Проверяем пользователя
         cur.execute(
-            f"SELECT id, role, is_active, name, email FROM {SCHEMA}.users WHERE id = {user_id}"
+            f"SELECT id, role, is_active, name, email, phone, organization FROM {SCHEMA}.users WHERE id = {user_id}"
         )
         user = cur.fetchone()
         
@@ -454,6 +454,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'id': user['id'],
                     'name': user['name'],
                     'email': user['email'],
+                    'phone': user.get('phone'),
+                    'organization': user.get('organization'),
                     'role': user['role']
                 }
             }, default=str)

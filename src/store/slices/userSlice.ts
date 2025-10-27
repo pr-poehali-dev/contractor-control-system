@@ -40,6 +40,7 @@ export interface UserData {
   chatMessages?: any[];
   unreadCounts?: Record<number, { logs?: number; messages?: number; inspections?: number }>;
   defect_reports?: any[];
+  user?: User;
 }
 
 interface UserState {
@@ -430,6 +431,11 @@ const userSlice = createSlice({
       .addCase(loadUserData.fulfilled, (state, action) => {
         state.isLoading = false;
         state.userData = action.payload;
+        // Update user data from response if available
+        if (action.payload && (action.payload as any).user) {
+          state.user = (action.payload as any).user;
+          localStorage.setItem('user', JSON.stringify((action.payload as any).user));
+        }
         state.error = null;
       })
       .addCase(loadUserData.rejected, (state, action) => {
