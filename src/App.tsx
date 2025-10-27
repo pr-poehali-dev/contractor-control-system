@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuthRedux } from "./hooks/useAuthRedux";
+import { useInitTemplates } from "./hooks/useInitTemplates";
 import Layout from "./components/Layout";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Login from "./pages/Login";
@@ -48,6 +49,8 @@ const queryClient = new QueryClient();
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading, token, verifyToken, loadUserData, userData } = useAuthRedux();
   const initRef = useRef(false);
+  
+  useInitTemplates(userData?.id || null);
   
   useEffect(() => {
     if (!initRef.current && token) {

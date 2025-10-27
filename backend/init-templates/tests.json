@@ -1,0 +1,25 @@
+{
+  "tests": [
+    {
+      "name": "Initialize templates for user",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "user_id": 1
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "created_count": "number",
+        "templates": "array"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Handle OPTIONS request",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}
