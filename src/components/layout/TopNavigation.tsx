@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
@@ -38,6 +39,20 @@ export default function TopNavigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthRedux();
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   const visibleNavItems = navItems.filter(
     (item) => !item.roles || item.roles.includes(user?.role as any || 'contractor')
@@ -61,8 +76,15 @@ export default function TopNavigation() {
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <div className="flex h-16 items-center px-4 md:px-6">
         <div className="flex items-center gap-2 mr-8">
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600">
+          <div className="md:flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 hidden">
             <Icon name="Building2" size={24} className="text-white" />
+          </div>
+          <div className="flex md:hidden items-center justify-center w-10 h-10 rounded-full relative" title={isOnline ? 'В сети' : 'Нет соединения'}>
+            {isOnline ? (
+              <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
+            ) : (
+              <div className="w-3 h-3 rounded-full bg-red-500" />
+            )}
           </div>
           <span className="font-bold text-lg hidden md:inline">Подряд-ПРО</span>
         </div>
