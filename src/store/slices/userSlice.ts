@@ -431,10 +431,9 @@ const userSlice = createSlice({
       .addCase(loadUserData.fulfilled, (state, action) => {
         state.isLoading = false;
         state.userData = action.payload;
-        // Update user data from response if available
-        if (action.payload && (action.payload as any).user) {
-          state.user = (action.payload as any).user;
-          localStorage.setItem('user', JSON.stringify((action.payload as any).user));
+        if (action.payload?.user) {
+          state.user = action.payload.user;
+          localStorage.setItem('user', JSON.stringify(action.payload.user));
         }
         state.error = null;
       })
