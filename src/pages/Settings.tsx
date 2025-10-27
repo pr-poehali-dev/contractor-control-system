@@ -79,7 +79,6 @@ const Settings = () => {
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>Персональная информация</CardTitle>
             <CardDescription>Ваши основные данные в системе</CardDescription>
           </CardHeader>
           <CardContent>
