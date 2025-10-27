@@ -99,7 +99,7 @@ export default function OrganizationPage() {
         <div className="mb-4 md:mb-8">
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl md:text-3xl font-bold truncate">Моя организация</h1>
+              <h1 className="text-2xl md:text-3xl font-bold truncate">Моя организация</h1>
               <p className="text-slate-500 mt-1 text-sm md:text-base truncate">{currentOrg.name}</p>
             </div>
           </div>
