@@ -30,7 +30,6 @@ const navItems: NavItem[] = [
   { id: 'defects', label: 'Проверки', icon: 'ClipboardCheck', path: '/defects', roles: ['client', 'admin'] },
   { id: 'documents', label: 'Документы', icon: 'FileText', path: '/documents', roles: ['client', 'contractor', 'admin'] },
   { id: 'document-templates', label: 'Шаблоны', icon: 'FileType', path: '/document-templates', roles: ['client', 'contractor', 'admin'] },
-  { id: 'organization', label: 'Организация', icon: 'Building', path: '/organization', roles: ['contractor'] },
   { id: 'analytics', label: 'Аналитика', icon: 'BarChart3', path: '/analytics', roles: ['client', 'admin'] },
   { id: 'contractors', label: 'Подрядчики', icon: 'Users', path: '/contractors', roles: ['client', 'admin'] },
 ];
@@ -140,6 +139,12 @@ export default function TopNavigation() {
                 <Icon name="User" size={16} className="mr-2" />
                 Профиль
               </DropdownMenuItem>
+              {user?.role === 'contractor' && (
+                <DropdownMenuItem onClick={() => navigate('/organization')}>
+                  <Icon name="Building" size={16} className="mr-2" />
+                  Организация
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={() => navigate('/settings')}>
                 <Icon name="Settings" size={16} className="mr-2" />
                 Настройки

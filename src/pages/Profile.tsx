@@ -101,6 +101,39 @@ const Profile = () => {
                   <span className="text-xs">Справочники</span>
                 </Button>
               </div>
+            ) : user?.role === 'contractor' ? (
+              <>
+                <div className="grid grid-cols-3 gap-4 md:gap-8">
+                  <div className="text-center">
+                    <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
+                      {getRatingData(user?.role, reliabilityRating, qualityRating).primary.value}%
+                    </div>
+                    <p className="text-xs md:text-sm text-slate-600">
+                      {getRatingData(user?.role, reliabilityRating, qualityRating).primary.label}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
+                      {getRatingData(user?.role, reliabilityRating, qualityRating).secondary.value}%
+                    </div>
+                    <p className="text-xs md:text-sm text-slate-600">
+                      {getRatingData(user?.role, reliabilityRating, qualityRating).secondary.label}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">{daysInSystem}</div>
+                    <p className="text-xs md:text-sm text-slate-600">дней в системе</p>
+                  </div>
+                </div>
+                <Button 
+                  onClick={() => navigate('/organization')}
+                  variant="outline"
+                  className="w-full mt-6"
+                >
+                  <Icon name="Building" size={18} className="mr-2" />
+                  Моя организация
+                </Button>
+              </>
             ) : (
               <div className="grid grid-cols-3 gap-4 md:gap-8">
                 <div className="text-center">
