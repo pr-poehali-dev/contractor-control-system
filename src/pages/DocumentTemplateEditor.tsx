@@ -272,7 +272,7 @@ export default function DocumentTemplateEditor() {
                   {documentVariables.map((variable) => (
                     <div key={variable} className="group">
                       <div className="flex items-center justify-between p-2 rounded-lg border bg-white hover:border-blue-200 transition-colors">
-                        <code className="text-xs font-mono text-blue-600">{{variable}}</code>
+                        <code className="text-xs font-mono text-blue-600">{variable}</code>
                         <Button
                           variant="ghost"
                           size="sm"
