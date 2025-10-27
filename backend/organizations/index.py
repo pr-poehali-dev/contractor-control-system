@@ -73,7 +73,7 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
     actual_address = body.get('actual_address', '').strip()
     phone = body.get('phone', '').strip()
     email = body.get('email', '').strip()
-    first_user_email = body.get('first_user_email', '').strip()
+    first_user_phone = body.get('first_user_phone', '').strip()
     
     if not name or not inn:
         return {
@@ -106,15 +106,15 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
     organization = cursor.fetchone()
     conn.commit()
     
-    if first_user_email:
+    if first_user_phone:
         token = secrets.token_urlsafe(32)
         expires_at = datetime.now() + timedelta(days=7)
         
         cursor.execute(f"""
             INSERT INTO {SCHEMA}.organization_invites 
-            (organization_id, email, invited_by, token, expires_at)
-            VALUES ({organization['id']}, '{first_user_email}', {user_id}, '{token}', '{expires_at.isoformat()}')
-            RETURNING id, email, token, expires_at
+            (organization_id, phone, invited_by, token, expires_at)
+            VALUES ({organization['id']}, '{first_user_phone}', {user_id}, '{token}', '{expires_at.isoformat()}')
+            RETURNING id, phone, token, expires_at
         """)
         
         invite = cursor.fetchone()

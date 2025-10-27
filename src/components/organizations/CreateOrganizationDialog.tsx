@@ -38,7 +38,7 @@ export default function CreateOrganizationDialog({
     actual_address: '',
     phone: '',
     email: '',
-    first_user_email: '',
+    first_user_phone: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,7 +55,7 @@ export default function CreateOrganizationDialog({
         actual_address: '',
         phone: '',
         email: '',
-        first_user_email: '',
+        first_user_phone: '',
       });
       onOpenChange(false);
       onSuccess?.();
@@ -165,18 +165,18 @@ export default function CreateOrganizationDialog({
               Пригласить первого сотрудника
             </h4>
             <div>
-              <Label htmlFor="first_user_email">
-                Email первого сотрудника (станет администратором)
+              <Label htmlFor="first_user_phone">
+                Мобильный телефон первого сотрудника (станет администратором)
               </Label>
               <Input
-                id="first_user_email"
-                type="email"
-                value={formData.first_user_email}
-                onChange={(e) => setFormData({ ...formData, first_user_email: e.target.value })}
-                placeholder="director@stroitech.ru"
+                id="first_user_phone"
+                type="tel"
+                value={formData.first_user_phone}
+                onChange={(e) => setFormData({ ...formData, first_user_phone: e.target.value })}
+                placeholder="+7 (999) 123-45-67"
               />
               <p className="text-sm text-slate-500 mt-1">
-                На этот email будет отправлено приглашение. После регистрации этот пользователь получит роль администратора.
+                На этот номер будет отправлено SMS с кодом приглашения. После регистрации этот пользователь получит роль администратора.
               </p>
             </div>
           </div>

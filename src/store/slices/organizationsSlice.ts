@@ -104,7 +104,7 @@ export const createOrganization = createAsyncThunk(
     actual_address?: string;
     phone?: string;
     email?: string;
-    first_user_email?: string;
+    first_user_phone?: string;
   }) => {
     const response = await apiClient.post(ENDPOINTS.ORGANIZATIONS.CREATE, data);
     return response.data.organization;
