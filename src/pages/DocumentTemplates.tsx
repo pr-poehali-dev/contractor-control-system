@@ -81,7 +81,9 @@ export default function DocumentTemplates() {
 
   const extractVariablesFromContent = (content: any): string[] => {
     if (content.variables && Array.isArray(content.variables)) {
-      return content.variables;
+      return content.variables.map((v: any) => 
+        typeof v === 'string' ? v : (v.variable || v.name || '')
+      ).filter((v: string) => v);
     }
     
     const vars: string[] = [];
