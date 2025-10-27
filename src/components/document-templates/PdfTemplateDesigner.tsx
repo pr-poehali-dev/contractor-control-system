@@ -34,43 +34,52 @@ export function PdfTemplateDesigner({ template, onSave }: PdfTemplateDesignerPro
     const initDesigner = async () => {
       const blankPdfBase64 = await generateBlankPdf();
       
-      const defaultTemplate: Template = template && template.basePdf ? template : {
-        basePdf: blankPdfBase64,
-        schemas: [
-          [
-            {
-              name: 'title',
-              type: 'text',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-              fontSize: 24,
-              fontColor: '#000000',
-              alignment: 'left',
-            },
-            {
-              name: 'date',
-              type: 'text',
-              position: { x: 20, y: 40 },
-              width: 80,
-              height: 10,
-              fontSize: 12,
-              fontColor: '#666666',
-              alignment: 'left',
-            },
-            {
-              name: 'content',
-              type: 'text',
-              position: { x: 20, y: 60 },
-              width: 170,
-              height: 100,
-              fontSize: 14,
-              fontColor: '#000000',
-              alignment: 'left',
-            },
+      let defaultTemplate: Template;
+      
+      if (template && template.basePdf && typeof template.basePdf === 'string' && template.basePdf.length > 100) {
+        defaultTemplate = {
+          ...template,
+          basePdf: template.basePdf.includes('data:') ? template.basePdf.split(',')[1] : template.basePdf,
+        };
+      } else {
+        defaultTemplate = {
+          basePdf: blankPdfBase64,
+          schemas: template?.schemas || [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+                fontSize: 24,
+                fontColor: '#000000',
+                alignment: 'left',
+              },
+              {
+                name: 'date',
+                type: 'text',
+                position: { x: 20, y: 40 },
+                width: 80,
+                height: 10,
+                fontSize: 12,
+                fontColor: '#666666',
+                alignment: 'left',
+              },
+              {
+                name: 'content',
+                type: 'text',
+                position: { x: 20, y: 60 },
+                width: 170,
+                height: 100,
+                fontSize: 14,
+                fontColor: '#000000',
+                alignment: 'left',
+              },
+            ],
           ],
-        ],
-      };
+        };
+      }
 
       const font: Font = {
         Roboto: {
