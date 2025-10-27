@@ -107,7 +107,8 @@ const Dashboard = () => {
       const response = await apiClient.get(url);
       
       if (response.success) {
-        const rawEvents = (response as any).events || [];
+        const responseData = (response as any).data || response;
+        const rawEvents = responseData.events || [];
         
         const normalizedEvents = rawEvents.map((event: any) => {
           if (event.photoUrls && typeof event.photoUrls === 'string') {
