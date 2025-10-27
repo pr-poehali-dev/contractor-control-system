@@ -92,7 +92,7 @@ export default function InspectionHintsCard() {
           <div className="h-8 w-8 rounded-lg bg-blue-100 flex items-center justify-center">
             <Icon name="Lightbulb" size={18} className="text-blue-600" />
           </div>
-          <h2 className="text-lg font-semibold text-slate-900">Подсказки для проверки</h2>
+          <h2 className="text-lg font-semibold text-slate-900">Подсказки от ИИ</h2>
         </div>
         <p className="text-sm text-slate-600 mb-4">
           ГОСТы, СНиПы и нормативы для правильной оценки выполненных работ
