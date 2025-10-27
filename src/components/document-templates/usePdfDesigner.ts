@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Designer } from '@pdfme/ui';
 import { Template, Font, Schema, BLANK_PDF } from '@pdfme/common';
 import { text, image, barcodes } from '@pdfme/schemas';
@@ -20,6 +20,12 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
   const [fieldType, setFieldType] = useState<string>('text');
   const [fieldName, setFieldName] = useState('');
   const [showPresets, setShowPresets] = useState(false);
+  const [currentTemplate, setCurrentTemplate] = useState<Template | null>(null);
+  const onSaveRef = useRef(onSave);
+
+  useEffect(() => {
+    onSaveRef.current = onSave;
+  }, [onSave]);
 
   useEffect(() => {
     if (!designerRef.current) return;
@@ -28,9 +34,10 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
       const blankPdfBase64 = getBlankPdf();
       
       let defaultTemplate: Template;
-      let useBlankPdf = true;
       
-      if (template && template.basePdf) {
+      if (currentTemplate && currentTemplate.basePdf) {
+        defaultTemplate = currentTemplate;
+      } else if (template && template.basePdf) {
         if (typeof template.basePdf === 'string' && template.basePdf.length > 100) {
           let pdfData = template.basePdf;
           
@@ -39,16 +46,23 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
           }
           
           if (pdfData.startsWith('JVBERi0')) {
-            useBlankPdf = false;
             defaultTemplate = {
               ...template,
               basePdf: pdfData,
             };
+          } else {
+            defaultTemplate = {
+              basePdf: blankPdfBase64,
+              schemas: template?.schemas || [[]],
+            };
           }
+        } else {
+          defaultTemplate = {
+            basePdf: blankPdfBase64,
+            schemas: template?.schemas || [[]],
+          };
         }
-      }
-      
-      if (useBlankPdf) {
+      } else {
         defaultTemplate = {
           basePdf: blankPdfBase64,
           schemas: template?.schemas || [[]],
@@ -80,7 +94,12 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
           },
         });
 
-        designerInstance.current.onSaveTemplate(onSave);
+        designerInstance.current.onSaveTemplate((updatedTemplate) => {
+          setCurrentTemplate(updatedTemplate);
+          onSaveRef.current(updatedTemplate);
+        });
+        
+        setCurrentTemplate(defaultTemplate);
         setIsReady(true);
       } catch (error) {
         console.error('Failed to initialize PDF designer:', error);
@@ -95,17 +114,21 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
         designerInstance.current = null;
       }
     };
-  }, [template, onSave]);
+  }, [template]);
 
-  const addField = () => {
+  const addField = useCallback(() => {
     if (!designerInstance.current || !fieldName.trim()) return;
     
-    const currentTemplate = designerInstance.current.getTemplate();
+    const template = designerInstance.current.getTemplate();
     const currentPage = 0;
+    
+    if (!template.schemas[currentPage]) {
+      template.schemas[currentPage] = [];
+    }
     
     const baseConfig = {
       name: fieldName.trim(),
-      position: { x: 20, y: 80 + (currentTemplate.schemas[currentPage]?.length || 0) * 15 },
+      position: { x: 20, y: 80 + (template.schemas[currentPage].length) * 15 },
     };
 
     let newField: Schema;
@@ -142,48 +165,75 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
         return;
     }
     
-    currentTemplate.schemas[currentPage].push(newField);
-    designerInstance.current.updateTemplate(currentTemplate);
+    template.schemas[currentPage].push(newField);
+    designerInstance.current.updateTemplate(template);
     setFieldName('');
-  };
+  }, [fieldType, fieldName]);
 
-  const addPage = () => {
+  const addPage = useCallback(() => {
     if (!designerInstance.current) return;
     
-    const currentTemplate = designerInstance.current.getTemplate();
-    currentTemplate.schemas.push([]);
-    designerInstance.current.updateTemplate(currentTemplate);
-  };
-
-  const removePage = () => {
-    if (!designerInstance.current) return;
+    const template = designerInstance.current.getTemplate();
     
-    const currentTemplate = designerInstance.current.getTemplate();
-    if (currentTemplate.schemas.length > 1) {
-      currentTemplate.schemas.pop();
-      designerInstance.current.updateTemplate(currentTemplate);
+    let basePdfArray: string[];
+    if (Array.isArray(template.basePdf)) {
+      basePdfArray = [...template.basePdf];
+    } else {
+      basePdfArray = [template.basePdf];
     }
-  };
+    
+    basePdfArray.push(basePdfArray[0]);
+    
+    const newTemplate = {
+      ...template,
+      basePdf: basePdfArray,
+      schemas: [...template.schemas, []],
+    };
+    
+    designerInstance.current.updateTemplate(newTemplate);
+  }, []);
 
-  const loadPreset = (presetKey: keyof typeof PRESET_TEMPLATES) => {
+  const removePage = useCallback(() => {
+    if (!designerInstance.current) return;
+    
+    const template = designerInstance.current.getTemplate();
+    if (template.schemas.length <= 1) return;
+    
+    let basePdfArray: string[];
+    if (Array.isArray(template.basePdf)) {
+      basePdfArray = template.basePdf.slice(0, -1);
+    } else {
+      basePdfArray = [template.basePdf];
+    }
+    
+    const newTemplate = {
+      ...template,
+      basePdf: basePdfArray.length === 1 ? basePdfArray[0] : basePdfArray,
+      schemas: template.schemas.slice(0, -1),
+    };
+    
+    designerInstance.current.updateTemplate(newTemplate);
+  }, []);
+
+  const loadPreset = useCallback((presetKey: keyof typeof PRESET_TEMPLATES) => {
     if (!designerInstance.current) return;
     
     const preset = PRESET_TEMPLATES[presetKey];
-    const currentTemplate = designerInstance.current.getTemplate();
+    const template = designerInstance.current.getTemplate();
     
     const newTemplate = {
-      ...currentTemplate,
+      ...template,
       schemas: preset.schemas,
     };
     
     designerInstance.current.updateTemplate(newTemplate);
     setShowPresets(false);
-  };
+  }, []);
 
-  const getCurrentTemplate = (): Template | null => {
-    if (!designerInstance.current) return null;
+  const getCurrentTemplate = useCallback((): Template | null => {
+    if (!designerInstance.current) return currentTemplate;
     return designerInstance.current.getTemplate();
-  };
+  }, [currentTemplate]);
 
   return {
     designerRef,
