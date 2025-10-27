@@ -176,9 +176,24 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
         """)
         invites = cursor.fetchall()
         
+        # Получаем работы организации с информацией об объектах
+        cursor.execute(f"""
+            SELECT w.id, w.name, w.status, w.start_date, w.end_date,
+                   w.progress, w.created_at,
+                   o.id as object_id, o.name as object_name, o.address as object_address,
+                   c.name as contractor_name, c.id as contractor_id
+            FROM {SCHEMA}.works w
+            JOIN {SCHEMA}.contractors c ON w.contractor_id = c.id
+            JOIN {SCHEMA}.objects o ON w.object_id = o.id
+            WHERE c.organization_id = {org_id}
+            ORDER BY w.created_at DESC
+        """)
+        works = cursor.fetchall()
+        
         organization = dict(organization)
         organization['employees'] = [dict(emp) for emp in employees]
         organization['pending_invites'] = [dict(inv) for inv in invites]
+        organization['works'] = [dict(work) for work in works]
         
         return {
             'statusCode': 200,

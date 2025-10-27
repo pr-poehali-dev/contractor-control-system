@@ -11,6 +11,7 @@ import {
   selectOrganizationsLoading 
 } from '@/store/slices/organizationsSlice';
 import CreateOrganizationDialog from '@/components/organizations/CreateOrganizationDialog';
+import OrganizationDetailDialog from '@/components/organizations/OrganizationDetailDialog';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +22,7 @@ const Contractors = () => {
   const organizations = useAppSelector(selectOrganizations);
   const loading = useAppSelector(selectOrganizationsLoading);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -139,7 +141,11 @@ const Contractors = () => {
         ) : (
           <div className="grid gap-4">
             {organizations.map((org) => (
-              <Card key={org.id} className="hover:shadow-md transition-all">
+              <Card 
+                key={org.id} 
+                className="hover:shadow-md transition-all cursor-pointer"
+                onClick={() => setSelectedOrgId(org.id)}
+              >
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     <div className="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -217,6 +223,12 @@ const Contractors = () => {
           open={createDialogOpen}
           onOpenChange={setCreateDialogOpen}
           onSuccess={handleCreateSuccess}
+        />
+
+        <OrganizationDetailDialog
+          organizationId={selectedOrgId}
+          open={selectedOrgId !== null}
+          onOpenChange={(open) => !open && setSelectedOrgId(null)}
         />
       </div>
     </div>

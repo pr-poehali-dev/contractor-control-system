@@ -3,6 +3,21 @@ import { apiClient } from '@/api/apiClient';
 import { ENDPOINTS } from '@/api/endpoints';
 import { RootState } from '../store';
 
+export interface OrganizationWork {
+  id: number;
+  name: string;
+  status: string;
+  start_date?: string;
+  end_date?: string;
+  progress?: number;
+  created_at: string;
+  object_id: number;
+  object_name: string;
+  object_address?: string;
+  contractor_name: string;
+  contractor_id: number;
+}
+
 export interface Organization {
   id: number;
   name: string;
@@ -20,6 +35,7 @@ export interface Organization {
   works_count?: number;
   employees?: OrganizationEmployee[];
   pending_invites?: OrganizationInvite[];
+  works?: OrganizationWork[];
 }
 
 export interface OrganizationEmployee {
