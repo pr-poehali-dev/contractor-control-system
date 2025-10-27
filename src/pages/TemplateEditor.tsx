@@ -189,15 +189,15 @@ export default function TemplateEditor() {
                     <h3 className="font-semibold mb-4">Системные поля</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex items-center gap-2 p-2 bg-slate-50 rounded">
-                        <code className="bg-white px-2 py-1 rounded text-xs">{'{'}{'{'}}date{'}'}{'}'}</code>
+                        <code className="bg-white px-2 py-1 rounded text-xs">{'{{date}}'}</code>
                         <span className="text-slate-600">- Текущая дата</span>
                       </div>
                       <div className="flex items-center gap-2 p-2 bg-slate-50 rounded">
-                        <code className="bg-white px-2 py-1 rounded text-xs">{'{'}{'{'}}objectName{'}'}{'}'}</code>
+                        <code className="bg-white px-2 py-1 rounded text-xs">{'{{objectName}}'}</code>
                         <span className="text-slate-600">- Название объекта</span>
                       </div>
                       <div className="flex items-center gap-2 p-2 bg-slate-50 rounded">
-                        <code className="bg-white px-2 py-1 rounded text-xs">{'{'}{'{'}}workName{'}'}{'}'}</code>
+                        <code className="bg-white px-2 py-1 rounded text-xs">{'{{workName}}'}</code>
                         <span className="text-slate-600">- Название работы</span>
                       </div>
                     </div>
@@ -294,7 +294,7 @@ export default function TemplateEditor() {
                   placeholder="Введите содержимое шаблона. Используйте {{fieldName}} для вставки полей"
                 />
                 <p className="text-xs text-slate-500 mt-2">
-                  Используйте переменные в формате {'{'}{'{'}}название{'}'}{'}'} для подстановки значений
+                  Используйте переменные в формате {'{{название}}'} для подстановки значений
                 </p>
               </CardContent>
             </Card>
