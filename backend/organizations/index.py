@@ -178,9 +178,9 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
         
         # Получаем работы организации с информацией об объектах
         cursor.execute(f"""
-            SELECT w.id, w.name, w.status, w.start_date, w.end_date,
-                   w.progress, w.created_at,
-                   o.id as object_id, o.name as object_name, o.address as object_address,
+            SELECT w.id, w.title as name, w.status, w.start_date, w.end_date,
+                   w.completion_percentage as progress, w.created_at,
+                   o.id as object_id, o.title as object_name, o.address as object_address,
                    c.name as contractor_name, c.id as contractor_id
             FROM {SCHEMA}.works w
             JOIN {SCHEMA}.contractors c ON w.contractor_id = c.id
