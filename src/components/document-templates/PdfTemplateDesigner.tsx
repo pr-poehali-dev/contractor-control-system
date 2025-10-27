@@ -21,6 +21,37 @@ interface PdfTemplateDesignerProps {
   onSave: (template: Template) => void;
 }
 
+const generateBlankPdf = (): string => {
+  try {
+    const doc = new jsPDF({
+      format: 'a4',
+      unit: 'mm',
+    });
+    
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, 0, 210, 297, 'F');
+    
+    doc.setDrawColor(229, 231, 235);
+    doc.setLineWidth(0.5);
+    doc.rect(5, 5, 200, 287, 'S');
+    
+    doc.setTextColor(156, 163, 175);
+    doc.setFontSize(16);
+    doc.text('Пустой документ A4', 105, 140, { align: 'center' });
+    
+    doc.setFontSize(12);
+    doc.text('Добавьте поля через панель ниже', 105, 150, { align: 'center' });
+    
+    const pdfData = doc.output('datauristring');
+    const base64 = pdfData.split(',')[1];
+    console.log('✅ Generated blank PDF, base64 length:', base64.length);
+    return base64;
+  } catch (error) {
+    console.error('❌ Failed to generate blank PDF:', error);
+    return '';
+  }
+};
+
 export function PdfTemplateDesigner({ template, onSave }: PdfTemplateDesignerProps) {
   const designerRef = useRef<HTMLDivElement>(null);
   const designerInstance = useRef<Designer | null>(null);
@@ -34,8 +65,13 @@ export function PdfTemplateDesigner({ template, onSave }: PdfTemplateDesignerPro
     const initDesigner = async () => {
       console.log('🔍 Initializing PDF Designer with template:', template);
       
-      const blankPdfBase64 = await generateBlankPdf();
+      const blankPdfBase64 = generateBlankPdf();
       console.log('📄 Generated blank PDF (length):', blankPdfBase64.length);
+      
+      if (!blankPdfBase64) {
+        console.error('❌ Failed to generate blank PDF!');
+        return;
+      }
       
       let defaultTemplate: Template;
       let useBlankPdf = true;
@@ -148,30 +184,6 @@ export function PdfTemplateDesigner({ template, onSave }: PdfTemplateDesignerPro
       }
     };
   }, [template, onSave]);
-
-  const generateBlankPdf = async (): Promise<string> => {
-    const doc = new jsPDF({
-      format: 'a4',
-      unit: 'mm',
-    });
-    
-    doc.setFillColor(255, 255, 255);
-    doc.rect(0, 0, 210, 297, 'F');
-    
-    doc.setDrawColor(229, 231, 235);
-    doc.setLineWidth(0.5);
-    doc.rect(5, 5, 200, 287, 'S');
-    
-    doc.setTextColor(156, 163, 175);
-    doc.setFontSize(16);
-    doc.text('Пустой документ A4', 105, 140, { align: 'center' });
-    
-    doc.setFontSize(12);
-    doc.text('Добавьте поля через панель ниже', 105, 150, { align: 'center' });
-    
-    const pdfData = doc.output('datauristring');
-    return pdfData.split(',')[1];
-  };
 
   const addField = () => {
     if (!designerInstance.current || !fieldName.trim()) return;
