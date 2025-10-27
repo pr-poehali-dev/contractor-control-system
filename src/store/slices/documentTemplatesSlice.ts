@@ -13,6 +13,7 @@ export interface DocumentTemplate {
   version: number;
   is_active: boolean;
   is_system?: boolean;
+  source_template_id?: number;
   created_at: string;
   updated_at: string;
   created_by_name?: string;

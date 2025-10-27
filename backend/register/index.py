@@ -86,7 +86,7 @@ def handler(event, context):
         if role == 'client':
             cur.execute(f"""
                 INSERT INTO {SCHEMA}.document_templates 
-                  (client_id, name, description, template_type, content, version, is_active, is_system)
+                  (client_id, name, description, template_type, content, version, is_active, is_system, source_template_id)
                 SELECT 
                   {user_id},
                   name,
@@ -95,7 +95,8 @@ def handler(event, context):
                   content,
                   1,
                   true,
-                  false
+                  false,
+                  id
                 FROM {SCHEMA}.document_templates
                 WHERE is_system = true
             """)

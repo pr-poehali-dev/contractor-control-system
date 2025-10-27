@@ -113,8 +113,8 @@ export default function DocumentTemplates() {
     return matchesSearch && matchesType;
   });
 
-  const systemTemplates = filteredTemplates.filter(t => t.is_system);
-  const userTemplates = filteredTemplates.filter(t => !t.is_system);
+  const systemTemplates = filteredTemplates.filter(t => t.is_system || t.source_template_id);
+  const userTemplates = filteredTemplates.filter(t => !t.is_system && !t.source_template_id);
 
   const handleCreateTemplate = async () => {
     if (!newTemplate.name.trim()) {
