@@ -78,9 +78,6 @@ const Settings = () => {
 
       <div className="space-y-6">
         <Card>
-          <CardHeader>
-            <CardDescription>Ваши основные данные в системе</CardDescription>
-          </CardHeader>
           <CardContent>
             <div className="flex items-center gap-6 mb-6">
               <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold text-2xl">
