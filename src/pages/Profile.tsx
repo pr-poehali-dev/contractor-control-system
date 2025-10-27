@@ -78,7 +78,9 @@ const Profile = () => {
                 {user ? getInitials(user.name) : 'U'}
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">{user?.name}</h1>
-              <p className="text-slate-600 mb-3">К какой подрядной организации привязан</p>
+              {user?.role === 'contractor' && user?.organization && (
+                <p className="text-slate-600 mb-3">{user.organization}</p>
+              )}
               <Badge variant="outline" className="mb-4">
                 {getRoleLabel(user?.role)}
               </Badge>
