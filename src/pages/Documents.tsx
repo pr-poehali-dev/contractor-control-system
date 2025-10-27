@@ -74,7 +74,7 @@ const Documents = () => {
   });
 
   const handleCreateDocument = () => {
-    navigate('/document-templates');
+    setCreateDialogOpen(true);
   };
 
   if (loading && documents.length === 0) {
@@ -113,6 +113,52 @@ const Documents = () => {
             Создать документ
           </Button>
         </div>
+
+        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Создать документ</DialogTitle>
+              <DialogDescription>
+                Выберите действие для создания документа
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3 py-4">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start h-auto p-4"
+                onClick={() => {
+                  setCreateDialogOpen(false);
+                  navigate('/document-templates');
+                }}
+              >
+                <div className="flex items-start gap-3 text-left">
+                  <Icon name="FileText" size={24} className="text-blue-600 flex-shrink-0" />
+                  <div>
+                    <div className="font-semibold">Создать из шаблона</div>
+                    <div className="text-sm text-slate-500">Выберите готовый шаблон документа</div>
+                  </div>
+                </div>
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                className="w-full justify-start h-auto p-4"
+                onClick={() => {
+                  setCreateDialogOpen(false);
+                  navigate('/document/new');
+                }}
+              >
+                <div className="flex items-start gap-3 text-left">
+                  <Icon name="FilePlus" size={24} className="text-green-600 flex-shrink-0" />
+                  <div>
+                    <div className="font-semibold">Создать пустой документ</div>
+                    <div className="text-sm text-slate-500">Начните с чистого листа</div>
+                  </div>
+                </div>
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Card>
