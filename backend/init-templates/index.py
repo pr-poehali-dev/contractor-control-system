@@ -195,9 +195,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     conn = psycopg2.connect(dsn)
     cur = conn.cursor()
     
-    cur.execute('''
-        SELECT id FROM t_p8942561_contractor_control_s.users WHERE id = %s
-    ''', (user_id,))
+    cur.execute(f'''
+        SELECT id FROM t_p8942561_contractor_control_s.users WHERE id = {user_id}
+    ''')
     
     user_exists = cur.fetchone()
     if not user_exists:
@@ -212,27 +212,25 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     created_templates = []
     
     for template in default_templates:
-        cur.execute('''
+        template_name_escaped = template['name'].replace("'", "''")
+        
+        cur.execute(f'''
             SELECT id FROM t_p8942561_contractor_control_s.document_templates 
-            WHERE client_id = %s AND name = %s AND is_system = true
-        ''', (user_id, template['name']))
+            WHERE client_id = {user_id} AND name = '{template_name_escaped}' AND is_system = true
+        ''')
         
         existing = cur.fetchone()
         
         if not existing:
-            cur.execute('''
+            description_escaped = template['description'].replace("'", "''")
+            content_json = json.dumps(template['content']).replace("'", "''")
+            
+            cur.execute(f'''
                 INSERT INTO t_p8942561_contractor_control_s.document_templates 
                 (client_id, name, description, template_type, content, is_system, version, is_active)
-                VALUES (%s, %s, %s, %s, %s, %s, 1, true)
+                VALUES ({user_id}, '{template_name_escaped}', '{description_escaped}', '{template['template_type']}', '{content_json}', true, 1, true)
                 RETURNING id, name, description, template_type, created_at
-            ''', (
-                user_id,
-                template['name'],
-                template['description'],
-                template['template_type'],
-                json.dumps(template['content']),
-                template['is_system']
-            ))
+            ''')
             
             result = cur.fetchone()
             created_templates.append({
@@ -240,7 +238,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'name': result[1],
                 'description': result[2],
                 'template_type': result[3],
-                'created_at': result[4].isoformat()
+                'created_at': str(result[4])
             })
     
     conn.commit()

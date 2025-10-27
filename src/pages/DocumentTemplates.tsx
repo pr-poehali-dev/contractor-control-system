@@ -52,6 +52,12 @@ export default function DocumentTemplates() {
 
   useEffect(() => {
     dispatch(fetchTemplates());
+    
+    (window as any).resetTemplateInit = () => {
+      const keys = Object.keys(localStorage).filter(k => k.startsWith('templates_initialized_'));
+      keys.forEach(k => localStorage.removeItem(k));
+      console.log('✅ Сброшен флаг инициализации шаблонов. Перезагрузите страницу.');
+    };
   }, [dispatch]);
 
   const extractVariablesFromContent = (content: any): string[] => {
@@ -81,6 +87,9 @@ export default function DocumentTemplates() {
     
     return matchesSearch && matchesType;
   });
+
+  const systemTemplates = filteredTemplates.filter(t => t.is_system);
+  const userTemplates = filteredTemplates.filter(t => !t.is_system);
 
   const handleCreateTemplate = async () => {
     if (!newTemplate.name.trim()) {
@@ -213,9 +222,19 @@ export default function DocumentTemplates() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
-            {filteredTemplates.map((template) => {
-              const variables = extractVariablesFromContent(template.content);
+          <div className="space-y-8">
+            {systemTemplates.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Icon name="Shield" size={20} className="text-blue-600" />
+                  <h2 className="text-lg font-semibold text-slate-900">Системные шаблоны</h2>
+                  <Badge variant="secondary" className="text-xs">
+                    {systemTemplates.length}
+                  </Badge>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
+                  {systemTemplates.map((template) => {
+                    const variables = extractVariablesFromContent(template.content);
 
               return (
                 <Card
@@ -303,6 +322,112 @@ export default function DocumentTemplates() {
                 </Card>
               );
             })}
+                </div>
+              </div>
+            )}
+
+            {userTemplates.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Icon name="User" size={20} className="text-slate-600" />
+                  <h2 className="text-lg font-semibold text-slate-900">Пользовательские шаблоны</h2>
+                  <Badge variant="secondary" className="text-xs">
+                    {userTemplates.length}
+                  </Badge>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
+                  {userTemplates.map((template) => {
+                    const variables = extractVariablesFromContent(template.content);
+
+              return (
+                <Card
+                  key={template.id}
+                  className="hover:shadow-md transition-all cursor-pointer group"
+                  onClick={() => navigate(`/document-templates/${template.id}`)}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors">
+                        <Icon name="FileType" size={24} className="text-blue-600" />
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <h3 className="font-semibold text-lg text-slate-900">{template.name}</h3>
+                          <Icon name="ChevronRight" size={20} className="text-slate-400 flex-shrink-0" />
+                        </div>
+
+                        <p className="text-sm text-slate-600 mb-3 line-clamp-2">
+                          {template.description || 'Описание отсутствует'}
+                        </p>
+
+                        <div className="flex items-center gap-2 mb-3">
+                          <Badge variant="secondary" className="text-xs">
+                            {getTemplateTypeLabel(template.template_type)}
+                          </Badge>
+                          {template.is_active ? (
+                            <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                              Активен
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-xs">
+                              Неактивен
+                            </Badge>
+                          )}
+                        </div>
+
+                        {variables.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 mb-3">
+                            {variables.slice(0, 5).map((variable, idx) => (
+                              <Badge
+                                key={idx}
+                                variant="outline"
+                                className="text-xs bg-slate-50 text-slate-600 font-mono"
+                              >
+                                {`{{${variable}}}`}
+                              </Badge>
+                            ))}
+                            {variables.length > 5 && (
+                              <Badge variant="outline" className="text-xs bg-slate-50 text-slate-600">
+                                +{variables.length - 5}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-4 text-xs text-slate-500 pt-3 border-t">
+                          {template.updated_at && (
+                            <div className="flex items-center gap-1">
+                              <Icon name="Calendar" size={12} />
+                              <span>
+                                Обновлён{' '}
+                                {(() => {
+                                  try {
+                                    const date = new Date(template.updated_at);
+                                    return isNaN(date.getTime()) ? 'недавно' : format(date, 'd.MM.yyyy', { locale: ru });
+                                  } catch {
+                                    return 'недавно';
+                                  }
+                                })()}
+                              </span>
+                            </div>
+                          )}
+                          {template.usage_count !== undefined && (
+                            <div className="flex items-center gap-1">
+                              <Icon name="FileText" size={12} />
+                              <span>Использован {template.usage_count} раз</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

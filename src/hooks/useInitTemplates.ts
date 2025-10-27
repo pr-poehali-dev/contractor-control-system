@@ -15,8 +15,11 @@ export const useInitTemplates = (userId: number | null) => {
       
       const hasInitialized = localStorage.getItem(`templates_initialized_${userId}`);
       
+      console.log('🔧 Initializing templates for user:', userId, 'hasInitialized:', hasInitialized);
+      
       if (!hasInitialized) {
         try {
+          console.log('📡 Calling init-templates API...');
           const response = await fetch(FUNC_URLS['init-templates'], {
             method: 'POST',
             headers: {
@@ -25,17 +28,21 @@ export const useInitTemplates = (userId: number | null) => {
             body: JSON.stringify({ user_id: userId }),
           });
 
-          if (response.ok) {
-            const result = await response.json();
-            if (result.success) {
-              localStorage.setItem(`templates_initialized_${userId}`, 'true');
-              dispatch(fetchTemplates());
-            }
+          const result = await response.json();
+          console.log('📥 Init templates response:', result);
+
+          if (response.ok && result.success) {
+            localStorage.setItem(`templates_initialized_${userId}`, 'true');
+            console.log('✅ Templates initialized successfully');
+            dispatch(fetchTemplates());
+          } else {
+            console.error('❌ Failed to initialize templates:', result);
           }
         } catch (error) {
-          console.error('Failed to initialize templates:', error);
+          console.error('❌ Failed to initialize templates:', error);
         }
       } else {
+        console.log('⏭️ Templates already initialized, just fetching...');
         dispatch(fetchTemplates());
       }
     };
