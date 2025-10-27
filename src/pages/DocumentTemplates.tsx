@@ -110,6 +110,12 @@ export default function DocumentTemplates() {
     
     const matchesType = typeFilter === 'all' || template.template_type === typeFilter;
     
+    // Скрываем эталоны (is_system=true) для обычных пользователей
+    const isAdmin = userData?.id === 6;
+    if (template.is_system && !isAdmin) {
+      return false;
+    }
+    
     return matchesSearch && matchesType;
   });
 
