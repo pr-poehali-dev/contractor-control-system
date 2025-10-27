@@ -32,6 +32,7 @@ export default function DocumentTemplateEditorNew() {
   const [templateDescription, setTemplateDescription] = useState('');
   const [pdfTemplate, setPdfTemplate] = useState<Template | null>(null);
   const [editorMode, setEditorMode] = useState<'visual' | 'json'>('visual');
+  const [isInfoExpanded, setIsInfoExpanded] = useState(false);
 
   useEffect(() => {
     if (templateId) {
@@ -153,32 +154,37 @@ export default function DocumentTemplateEditorNew() {
 
         <div className="space-y-6">
           <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Основная информация</CardTitle>
+            <CardHeader className="pb-3 cursor-pointer" onClick={() => setIsInfoExpanded(!isInfoExpanded)}>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base">Основная информация</CardTitle>
+                <Icon name={isInfoExpanded ? "ChevronUp" : "ChevronDown"} size={20} />
+              </div>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="template-name" className="text-sm">Название шаблона</Label>
-                <Input
-                  id="template-name"
-                  value={templateName}
-                  onChange={(e) => setTemplateName(e.target.value)}
-                  placeholder="Название шаблона"
-                  className="h-9"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="template-description" className="text-sm">Описание</Label>
-                <Textarea
-                  id="template-description"
-                  value={templateDescription}
-                  onChange={(e) => setTemplateDescription(e.target.value)}
-                  placeholder="Краткое описание"
-                  rows={2}
-                  className="text-sm resize-none"
-                />
-              </div>
-            </CardContent>
+            {isInfoExpanded && (
+              <CardContent className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="template-name" className="text-sm">Название шаблона</Label>
+                  <Input
+                    id="template-name"
+                    value={templateName}
+                    onChange={(e) => setTemplateName(e.target.value)}
+                    placeholder="Название шаблона"
+                    className="h-9"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="template-description" className="text-sm">Описание</Label>
+                  <Textarea
+                    id="template-description"
+                    value={templateDescription}
+                    onChange={(e) => setTemplateDescription(e.target.value)}
+                    placeholder="Краткое описание"
+                    rows={2}
+                    className="text-sm resize-none"
+                  />
+                </div>
+              </CardContent>
+            )}
           </Card>
 
           <Card>
