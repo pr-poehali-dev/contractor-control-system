@@ -115,47 +115,63 @@ const Documents = () => {
         </div>
 
         <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-          <DialogContent>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Создать документ</DialogTitle>
+              <DialogTitle>Создать документ из шаблона</DialogTitle>
               <DialogDescription>
-                Выберите действие для создания документа
+                Выберите шаблон для создания документа
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-3 py-4">
-              <Button 
-                variant="outline" 
-                className="w-full justify-start h-auto p-4"
-                onClick={() => {
-                  setCreateDialogOpen(false);
-                  navigate('/document-templates');
-                }}
-              >
-                <div className="flex items-start gap-3 text-left">
-                  <Icon name="FileText" size={24} className="text-blue-600 flex-shrink-0" />
-                  <div>
-                    <div className="font-semibold">Создать из шаблона</div>
-                    <div className="text-sm text-slate-500">Выберите готовый шаблон документа</div>
-                  </div>
-                </div>
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                className="w-full justify-start h-auto p-4"
-                onClick={() => {
-                  setCreateDialogOpen(false);
-                  navigate('/document/new');
-                }}
-              >
-                <div className="flex items-start gap-3 text-left">
-                  <Icon name="FilePlus" size={24} className="text-green-600 flex-shrink-0" />
-                  <div>
-                    <div className="font-semibold">Создать пустой документ</div>
-                    <div className="text-sm text-slate-500">Начните с чистого листа</div>
-                  </div>
-                </div>
-              </Button>
+            <div className="space-y-2 py-4">
+              {(() => {
+                const storedTemplates = localStorage.getItem('templates');
+                const templates = storedTemplates ? JSON.parse(storedTemplates) : [];
+                
+                if (templates.length === 0) {
+                  return (
+                    <div className="text-center py-8">
+                      <Icon name="FileText" size={48} className="mx-auto mb-3 text-slate-300" />
+                      <p className="text-slate-600 mb-4">Нет доступных шаблонов</p>
+                      <Button onClick={() => {
+                        setCreateDialogOpen(false);
+                        navigate('/document-templates');
+                      }}>
+                        Перейти к шаблонам
+                      </Button>
+                    </div>
+                  );
+                }
+                
+                return templates.map((template: any) => (
+                  <Button 
+                    key={template.id}
+                    variant="outline" 
+                    className="w-full justify-start h-auto p-4"
+                    onClick={() => {
+                      setCreateDialogOpen(false);
+                      navigate(`/document/new?templateId=${template.id}`);
+                    }}
+                  >
+                    <div className="flex items-start gap-3 text-left w-full">
+                      <Icon 
+                        name={template.isSystem ? "FileCheck" : "FileText"} 
+                        size={24} 
+                        className={template.isSystem ? "text-blue-600" : "text-green-600"}
+                        className="flex-shrink-0"
+                      />
+                      <div className="flex-1">
+                        <div className="font-semibold">{template.name}</div>
+                        {template.description && (
+                          <div className="text-sm text-slate-500 mt-1">{template.description}</div>
+                        )}
+                        {template.isSystem && (
+                          <div className="text-xs text-blue-600 mt-1">Системный шаблон</div>
+                        )}
+                      </div>
+                    </div>
+                  </Button>
+                ));
+              })()}
             </div>
           </DialogContent>
         </Dialog>
