@@ -119,16 +119,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 w.title as work_title,
                 w.object_id,
                 o.title as object_title,
-                o.project_id,
-                p.title as project_title,
+                o.title as project_title,
                 u.name as author_name
             FROM {SCHEMA}.work_logs wl
             JOIN {SCHEMA}.works w ON wl.work_id = w.id
             JOIN {SCHEMA}.objects o ON w.object_id = o.id
-            JOIN {SCHEMA}.projects p ON o.project_id = p.id
             JOIN {SCHEMA}.users u ON wl.created_by = u.id
             WHERE w.contractor_id = (
-                SELECT contractor_id FROM {SCHEMA}.users WHERE id = {user_id}
+                SELECT id FROM {SCHEMA}.contractors WHERE user_id = {user_id}
             )
             AND (wl.is_inspection_start IS NULL OR wl.is_inspection_start = FALSE)
             AND (wl.is_inspection_completed IS NULL OR wl.is_inspection_completed = FALSE)
@@ -136,7 +134,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             LIMIT 20
         '''
     elif user_role == 'admin':
-        # Admin sees ALL events from all projects
+        # Admin sees ALL events
         work_logs_query = f'''
             SELECT 
                 wl.id,
@@ -149,13 +147,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 w.title as work_title,
                 w.object_id,
                 o.title as object_title,
-                o.project_id,
-                p.title as project_title,
+                o.title as project_title,
                 u.name as author_name
             FROM {SCHEMA}.work_logs wl
             JOIN {SCHEMA}.works w ON wl.work_id = w.id
             JOIN {SCHEMA}.objects o ON w.object_id = o.id
-            JOIN {SCHEMA}.projects p ON o.project_id = p.id
             JOIN {SCHEMA}.users u ON wl.created_by = u.id
             WHERE (wl.is_inspection_start IS NULL OR wl.is_inspection_start = FALSE)
             AND (wl.is_inspection_completed IS NULL OR wl.is_inspection_completed = FALSE)
@@ -163,7 +159,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             LIMIT 30
         '''
     else:
-        # Client sees only events for their projects
+        # Client sees only events for their objects
         work_logs_query = f'''
             SELECT 
                 wl.id,
@@ -176,15 +172,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 w.title as work_title,
                 w.object_id,
                 o.title as object_title,
-                o.project_id,
-                p.title as project_title,
+                o.title as project_title,
                 u.name as author_name
             FROM {SCHEMA}.work_logs wl
             JOIN {SCHEMA}.works w ON wl.work_id = w.id
             JOIN {SCHEMA}.objects o ON w.object_id = o.id
-            JOIN {SCHEMA}.projects p ON o.project_id = p.id
             JOIN {SCHEMA}.users u ON wl.created_by = u.id
-            WHERE p.client_id = {user_id}
+            WHERE o.client_id = {user_id}
             AND (wl.is_inspection_start IS NULL OR wl.is_inspection_start = FALSE)
             AND (wl.is_inspection_completed IS NULL OR wl.is_inspection_completed = FALSE)
             ORDER BY wl.created_at DESC
