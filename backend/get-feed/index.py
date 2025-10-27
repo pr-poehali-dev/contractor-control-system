@@ -211,7 +211,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'timestamp': log['created_at'].isoformat() if hasattr(log['created_at'], 'isoformat') else str(log['created_at']),
             'workId': log['work_id'],
             'objectId': log['object_id'],
-            'projectId': log['project_id'],
             'objectTitle': log['object_title'],
             'projectTitle': log['project_title'],
             'workTitle': log['work_title'],
