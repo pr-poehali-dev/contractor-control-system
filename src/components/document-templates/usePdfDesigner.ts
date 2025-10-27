@@ -25,7 +25,18 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
   const currentTemplateRef = useRef<Template | null>(null);
 
   useEffect(() => {
-    if (!designerRef.current || isInitialized.current) return;
+    if (!designerRef.current) return;
+    if (isInitialized.current && designerInstance.current) {
+      if (template && template.basePdf) {
+        const currentDesignerTemplate = designerInstance.current.getTemplate();
+        if (JSON.stringify(currentDesignerTemplate) !== JSON.stringify(template)) {
+          console.log('Updating designer with new template from props');
+          designerInstance.current.updateTemplate(template);
+          currentTemplateRef.current = template;
+        }
+      }
+      return;
+    }
 
     const initDesigner = async () => {
       const blankPdfBase64 = getBlankPdf();
@@ -94,7 +105,9 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
         designerInstance.current.onSaveTemplate((updatedTemplate) => {
           console.log('Template auto-saved:', updatedTemplate.schemas.length, 'pages');
           currentTemplateRef.current = updatedTemplate;
-          onSave(updatedTemplate);
+          if (onSave) {
+            onSave(updatedTemplate);
+          }
         });
         
         isInitialized.current = true;
@@ -114,7 +127,7 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
         isInitialized.current = false;
       }
     };
-  }, []);
+  }, [template]);
 
   const addField = useCallback(() => {
     if (!designerInstance.current || !fieldName.trim()) return;
@@ -171,9 +184,12 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
     currentTemplate.schemas[currentPage].push(newField);
     designerInstance.current.updateTemplate(currentTemplate);
     currentTemplateRef.current = currentTemplate;
+    if (onSave) {
+      onSave(currentTemplate);
+    }
     setFieldName('');
     console.log('Field added:', newField.name);
-  }, [fieldType, fieldName]);
+  }, [fieldType, fieldName, onSave]);
 
   const addPage = useCallback(async () => {
     if (!designerInstance.current) return;
@@ -221,6 +237,9 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
         
         designerInstance.current?.updateTemplate(newTemplate);
         currentTemplateRef.current = newTemplate;
+        if (onSave) {
+          onSave(newTemplate);
+        }
         console.log('Page added successfully. Total pages:', newTemplate.schemas.length);
       };
       
@@ -228,7 +247,7 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
     } catch (error) {
       console.error('Failed to add page:', error);
     }
-  }, []);
+  }, [onSave]);
 
   const removePage = useCallback(async () => {
     if (!designerInstance.current) return;
@@ -281,6 +300,9 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
         
         designerInstance.current?.updateTemplate(newTemplate);
         currentTemplateRef.current = newTemplate;
+        if (onSave) {
+          onSave(newTemplate);
+        }
         console.log('Page removed successfully. Total pages:', newTemplate.schemas.length);
       };
       
@@ -288,7 +310,7 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
     } catch (error) {
       console.error('Failed to remove page:', error);
     }
-  }, []);
+  }, [onSave]);
 
   const loadPreset = useCallback((presetKey: keyof typeof PRESET_TEMPLATES) => {
     if (!designerInstance.current) return;
@@ -303,9 +325,12 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
     
     designerInstance.current.updateTemplate(newTemplate);
     currentTemplateRef.current = newTemplate;
+    if (onSave) {
+      onSave(newTemplate);
+    }
     setShowPresets(false);
     console.log('Preset loaded:', presetKey);
-  }, []);
+  }, [onSave]);
 
   const getCurrentTemplate = useCallback((): Template | null => {
     if (!designerInstance.current) return currentTemplateRef.current;

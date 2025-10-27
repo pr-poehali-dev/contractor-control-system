@@ -9,9 +9,7 @@ export interface DocumentTemplate {
   name: string;
   description?: string;
   template_type: string;
-  content: {
-    blocks: TemplateBlock[];
-  };
+  content: any;
   version: number;
   is_active: boolean;
   is_system?: boolean;
@@ -85,7 +83,7 @@ export const createTemplate = createAsyncThunk(
     name: string;
     description?: string;
     template_type: string;
-    content: { blocks: TemplateBlock[] };
+    content: any;
   }, { rejectWithValue }) => {
     try {
       const response = await apiClient.post(ENDPOINTS.DOCUMENT_TEMPLATES.CREATE, data, {
@@ -104,7 +102,7 @@ export const updateTemplate = createAsyncThunk(
     id: number;
     name?: string;
     description?: string;
-    content?: { blocks: TemplateBlock[] };
+    content?: any;
     is_active?: boolean;
   }, { rejectWithValue }) => {
     try {
