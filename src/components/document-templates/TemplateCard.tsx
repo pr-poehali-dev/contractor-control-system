@@ -1,3 +1,4 @@
+import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
@@ -13,6 +14,11 @@ interface TemplateCardProps {
 }
 
 export function TemplateCard({ template, variables, onClick, getTemplateTypeLabel }: TemplateCardProps) {
+  const safeVariables = React.useMemo(() => {
+    if (!Array.isArray(variables)) return [];
+    return variables.filter(v => typeof v === 'string' && v.length > 0);
+  }, [variables]);
+
   return (
     <Card
       className="hover:shadow-md transition-all cursor-pointer group"
@@ -49,20 +55,20 @@ export function TemplateCard({ template, variables, onClick, getTemplateTypeLabe
               )}
             </div>
 
-            {Array.isArray(variables) && variables.length > 0 && (
+            {safeVariables.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-3">
-                {variables.slice(0, 5).map((variable, idx) => (
+                {safeVariables.slice(0, 5).map((variable, idx) => (
                   <Badge
                     key={idx}
                     variant="outline"
                     className="text-xs bg-slate-50 text-slate-600 font-mono"
                   >
-                    {typeof variable === 'string' ? `{{${variable}}}` : ''}
+                    {`{{${variable}}}`}
                   </Badge>
                 ))}
-                {variables.length > 5 && (
+                {safeVariables.length > 5 && (
                   <Badge variant="outline" className="text-xs bg-slate-50 text-slate-600">
-                    +{variables.length - 5}
+                    +{safeVariables.length - 5}
                   </Badge>
                 )}
               </div>

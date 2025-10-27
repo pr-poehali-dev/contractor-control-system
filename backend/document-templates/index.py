@@ -143,13 +143,13 @@ def get_templates(cursor, user_id: str, event: dict) -> dict:
                    (SELECT COUNT(*) FROM {SCHEMA}.documents WHERE template_id = t.id) as usage_count
             FROM {SCHEMA}.document_templates t
             LEFT JOIN {SCHEMA}.users u ON t.client_id = u.id
-            WHERE t.client_id = {user_id} AND t.is_active = true
+            WHERE (t.client_id = {user_id} OR t.is_system = true) AND t.is_active = true
         """
         
         if template_type:
             query += f" AND t.template_type = '{template_type}'"
         
-        query += " ORDER BY t.created_at DESC"
+        query += " ORDER BY t.is_system DESC, t.created_at DESC"
         
         cursor.execute(query)
         templates = cursor.fetchall()
