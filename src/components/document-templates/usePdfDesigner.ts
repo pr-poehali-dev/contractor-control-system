@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { Designer } from '@pdfme/ui';
 import { Template, Font, Schema, BLANK_PDF } from '@pdfme/common';
 import { text, image, barcodes } from '@pdfme/schemas';
+import { generate } from '@pdfme/generator';
 import { PRESET_TEMPLATES } from './pdf-presets';
 
 const getBlankPdf = (): string => {
@@ -20,24 +21,18 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
   const [fieldType, setFieldType] = useState<string>('text');
   const [fieldName, setFieldName] = useState('');
   const [showPresets, setShowPresets] = useState(false);
-  const [currentTemplate, setCurrentTemplate] = useState<Template | null>(null);
-  const onSaveRef = useRef(onSave);
+  const isInitialized = useRef(false);
+  const currentTemplateRef = useRef<Template | null>(null);
 
   useEffect(() => {
-    onSaveRef.current = onSave;
-  }, [onSave]);
-
-  useEffect(() => {
-    if (!designerRef.current) return;
+    if (!designerRef.current || isInitialized.current) return;
 
     const initDesigner = async () => {
       const blankPdfBase64 = getBlankPdf();
       
       let defaultTemplate: Template;
       
-      if (currentTemplate && currentTemplate.basePdf) {
-        defaultTemplate = currentTemplate;
-      } else if (template && template.basePdf) {
+      if (template && template.basePdf) {
         if (typeof template.basePdf === 'string' && template.basePdf.length > 100) {
           let pdfData = template.basePdf;
           
@@ -65,7 +60,7 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
       } else {
         defaultTemplate = {
           basePdf: blankPdfBase64,
-          schemas: template?.schemas || [[]],
+          schemas: [[]],
         };
       }
 
@@ -94,13 +89,17 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
           },
         });
 
+        currentTemplateRef.current = defaultTemplate;
+
         designerInstance.current.onSaveTemplate((updatedTemplate) => {
-          setCurrentTemplate(updatedTemplate);
-          onSaveRef.current(updatedTemplate);
+          console.log('Template auto-saved:', updatedTemplate.schemas.length, 'pages');
+          currentTemplateRef.current = updatedTemplate;
+          onSave(updatedTemplate);
         });
         
-        setCurrentTemplate(defaultTemplate);
+        isInitialized.current = true;
         setIsReady(true);
+        console.log('PDF Designer initialized with', defaultTemplate.schemas.length, 'page(s)');
       } catch (error) {
         console.error('Failed to initialize PDF designer:', error);
       }
@@ -112,23 +111,27 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
       if (designerInstance.current) {
         designerInstance.current.destroy();
         designerInstance.current = null;
+        isInitialized.current = false;
       }
     };
-  }, [template]);
+  }, []);
 
   const addField = useCallback(() => {
     if (!designerInstance.current || !fieldName.trim()) return;
     
-    const template = designerInstance.current.getTemplate();
+    const currentTemplate = designerInstance.current.getTemplate();
     const currentPage = 0;
     
-    if (!template.schemas[currentPage]) {
-      template.schemas[currentPage] = [];
+    if (!currentTemplate.schemas[currentPage]) {
+      currentTemplate.schemas[currentPage] = [];
     }
     
     const baseConfig = {
       name: fieldName.trim(),
-      position: { x: 20, y: 80 + (template.schemas[currentPage].length) * 15 },
+      position: { 
+        x: 20, 
+        y: 80 + (currentTemplate.schemas[currentPage].length) * 15 
+      },
     };
 
     let newField: Schema;
@@ -165,75 +168,149 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
         return;
     }
     
-    template.schemas[currentPage].push(newField);
-    designerInstance.current.updateTemplate(template);
+    currentTemplate.schemas[currentPage].push(newField);
+    designerInstance.current.updateTemplate(currentTemplate);
+    currentTemplateRef.current = currentTemplate;
     setFieldName('');
+    console.log('Field added:', newField.name);
   }, [fieldType, fieldName]);
 
-  const addPage = useCallback(() => {
+  const addPage = useCallback(async () => {
     if (!designerInstance.current) return;
     
-    const template = designerInstance.current.getTemplate();
-    
-    let basePdfArray: string[];
-    if (Array.isArray(template.basePdf)) {
-      basePdfArray = [...template.basePdf];
-    } else {
-      basePdfArray = [template.basePdf];
+    try {
+      const currentTemplate = designerInstance.current.getTemplate();
+      console.log('Adding page. Current pages:', currentTemplate.schemas.length);
+      
+      let basePdfData = currentTemplate.basePdf;
+      if (typeof basePdfData === 'string') {
+        basePdfData = basePdfData.includes('data:') 
+          ? basePdfData.split(',')[1] 
+          : basePdfData;
+      }
+
+      const plugins = {
+        text,
+        image,
+        qrcode: barcodes.qrcode,
+      };
+
+      const dummyInputs = currentTemplate.schemas.map(() => ({}));
+      dummyInputs.push({});
+
+      const multiPagePdf = await generate({
+        template: {
+          basePdf: basePdfData,
+          schemas: [...currentTemplate.schemas, []],
+        },
+        inputs: dummyInputs,
+        plugins,
+      });
+
+      const pdfBlob = new Blob([multiPagePdf.buffer], { type: 'application/pdf' });
+      const reader = new FileReader();
+      
+      reader.onload = () => {
+        const base64 = (reader.result as string).split(',')[1];
+        
+        const newTemplate = {
+          ...currentTemplate,
+          basePdf: base64,
+          schemas: [...currentTemplate.schemas, []],
+        };
+        
+        designerInstance.current?.updateTemplate(newTemplate);
+        currentTemplateRef.current = newTemplate;
+        console.log('Page added successfully. Total pages:', newTemplate.schemas.length);
+      };
+      
+      reader.readAsDataURL(pdfBlob);
+    } catch (error) {
+      console.error('Failed to add page:', error);
     }
-    
-    basePdfArray.push(basePdfArray[0]);
-    
-    const newTemplate = {
-      ...template,
-      basePdf: basePdfArray,
-      schemas: [...template.schemas, []],
-    };
-    
-    designerInstance.current.updateTemplate(newTemplate);
   }, []);
 
-  const removePage = useCallback(() => {
+  const removePage = useCallback(async () => {
     if (!designerInstance.current) return;
     
-    const template = designerInstance.current.getTemplate();
-    if (template.schemas.length <= 1) return;
-    
-    let basePdfArray: string[];
-    if (Array.isArray(template.basePdf)) {
-      basePdfArray = template.basePdf.slice(0, -1);
-    } else {
-      basePdfArray = [template.basePdf];
+    const currentTemplate = designerInstance.current.getTemplate();
+    if (currentTemplate.schemas.length <= 1) {
+      console.log('Cannot remove the last page');
+      return;
     }
     
-    const newTemplate = {
-      ...template,
-      basePdf: basePdfArray.length === 1 ? basePdfArray[0] : basePdfArray,
-      schemas: template.schemas.slice(0, -1),
-    };
-    
-    designerInstance.current.updateTemplate(newTemplate);
+    try {
+      console.log('Removing page. Current pages:', currentTemplate.schemas.length);
+      
+      let basePdfData = currentTemplate.basePdf;
+      if (typeof basePdfData === 'string') {
+        basePdfData = basePdfData.includes('data:') 
+          ? basePdfData.split(',')[1] 
+          : basePdfData;
+      }
+
+      const plugins = {
+        text,
+        image,
+        qrcode: barcodes.qrcode,
+      };
+
+      const newSchemas = currentTemplate.schemas.slice(0, -1);
+      const dummyInputs = newSchemas.map(() => ({}));
+
+      const multiPagePdf = await generate({
+        template: {
+          basePdf: basePdfData,
+          schemas: newSchemas,
+        },
+        inputs: dummyInputs,
+        plugins,
+      });
+
+      const pdfBlob = new Blob([multiPagePdf.buffer], { type: 'application/pdf' });
+      const reader = new FileReader();
+      
+      reader.onload = () => {
+        const base64 = (reader.result as string).split(',')[1];
+        
+        const newTemplate = {
+          ...currentTemplate,
+          basePdf: base64,
+          schemas: newSchemas,
+        };
+        
+        designerInstance.current?.updateTemplate(newTemplate);
+        currentTemplateRef.current = newTemplate;
+        console.log('Page removed successfully. Total pages:', newTemplate.schemas.length);
+      };
+      
+      reader.readAsDataURL(pdfBlob);
+    } catch (error) {
+      console.error('Failed to remove page:', error);
+    }
   }, []);
 
   const loadPreset = useCallback((presetKey: keyof typeof PRESET_TEMPLATES) => {
     if (!designerInstance.current) return;
     
     const preset = PRESET_TEMPLATES[presetKey];
-    const template = designerInstance.current.getTemplate();
+    const currentTemplate = designerInstance.current.getTemplate();
     
     const newTemplate = {
-      ...template,
+      ...currentTemplate,
       schemas: preset.schemas,
     };
     
     designerInstance.current.updateTemplate(newTemplate);
+    currentTemplateRef.current = newTemplate;
     setShowPresets(false);
+    console.log('Preset loaded:', presetKey);
   }, []);
 
   const getCurrentTemplate = useCallback((): Template | null => {
-    if (!designerInstance.current) return currentTemplate;
+    if (!designerInstance.current) return currentTemplateRef.current;
     return designerInstance.current.getTemplate();
-  }, [currentTemplate]);
+  }, []);
 
   return {
     designerRef,
