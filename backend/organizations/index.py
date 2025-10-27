@@ -133,6 +133,13 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
     params = event.get('queryStringParameters', {}) or {}
     org_id = params.get('id')
     
+    # Получаем роль пользователя
+    cursor.execute(f"""
+        SELECT role FROM {SCHEMA}.users WHERE id = {user_id}
+    """)
+    user_role_result = cursor.fetchone()
+    user_role = user_role_result['role'] if user_role_result else 'contractor'
+    
     if org_id:
         cursor.execute(f"""
             SELECT o.*,
@@ -180,18 +187,49 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
             'body': json.dumps({'organization': organization}, default=str)
         }
     else:
-        cursor.execute(f"""
-            SELECT o.*,
-                   (SELECT COUNT(*) FROM {SCHEMA}.user_organizations WHERE organization_id = o.id) as employees_count,
-                   (SELECT COUNT(*) FROM {SCHEMA}.works WHERE contractor_id IN (
-                       SELECT id FROM {SCHEMA}.contractors WHERE organization_id = o.id
-                   )) as works_count
-            FROM {SCHEMA}.organizations o
-            WHERE o.created_by = {user_id} OR o.id IN (
-                SELECT organization_id FROM {SCHEMA}.user_organizations WHERE user_id = {user_id}
-            )
-            ORDER BY o.created_at DESC
-        """)
+        # Админ видит все организации
+        if user_role == 'admin':
+            cursor.execute(f"""
+                SELECT o.*,
+                       (SELECT COUNT(*) FROM {SCHEMA}.user_organizations WHERE organization_id = o.id) as employees_count,
+                       (SELECT COUNT(*) FROM {SCHEMA}.works WHERE contractor_id IN (
+                           SELECT id FROM {SCHEMA}.contractors WHERE organization_id = o.id
+                       )) as works_count
+                FROM {SCHEMA}.organizations o
+                ORDER BY o.created_at DESC
+            """)
+        # Заказчик видит только организации своих подрядчиков
+        elif user_role == 'client':
+            cursor.execute(f"""
+                SELECT DISTINCT o.*,
+                       (SELECT COUNT(*) FROM {SCHEMA}.user_organizations WHERE organization_id = o.id) as employees_count,
+                       (SELECT COUNT(*) FROM {SCHEMA}.works WHERE contractor_id IN (
+                           SELECT id FROM {SCHEMA}.contractors WHERE organization_id = o.id
+                       )) as works_count
+                FROM {SCHEMA}.organizations o
+                WHERE o.id IN (
+                    SELECT DISTINCT c.organization_id 
+                    FROM {SCHEMA}.client_contractors cc
+                    JOIN {SCHEMA}.contractors c ON cc.contractor_id = c.id
+                    WHERE cc.client_id = {user_id} AND c.organization_id IS NOT NULL
+                )
+                ORDER BY o.created_at DESC
+            """)
+        # Подрядчик видит только свою организацию
+        else:
+            cursor.execute(f"""
+                SELECT o.*,
+                       (SELECT COUNT(*) FROM {SCHEMA}.user_organizations WHERE organization_id = o.id) as employees_count,
+                       (SELECT COUNT(*) FROM {SCHEMA}.works WHERE contractor_id IN (
+                           SELECT id FROM {SCHEMA}.contractors WHERE organization_id = o.id
+                       )) as works_count
+                FROM {SCHEMA}.organizations o
+                WHERE o.id IN (
+                    SELECT organization_id FROM {SCHEMA}.user_organizations WHERE user_id = {user_id}
+                )
+                ORDER BY o.created_at DESC
+            """)
+        
         organizations = cursor.fetchall()
         
         return {
