@@ -91,11 +91,15 @@ def create_template(cursor, conn, user_id: str, event: dict) -> dict:
     template = cursor.fetchone()
     conn.commit()
     
+    template_dict = dict(template)
+    if isinstance(template_dict.get('content'), str):
+        template_dict['content'] = json.loads(template_dict['content'])
+    
     return {
         'statusCode': 200,
         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
         'isBase64Encoded': False,
-        'body': json.dumps({'template': dict(template)}, default=str)
+        'body': json.dumps({'template': template_dict}, default=str)
     }
 
 def get_templates(cursor, user_id: str, event: dict) -> dict:
@@ -130,6 +134,9 @@ def get_templates(cursor, user_id: str, event: dict) -> dict:
         template = dict(template)
         template['usage_count'] = usage['usage_count']
         
+        if isinstance(template.get('content'), str):
+            template['content'] = json.loads(template['content'])
+        
         return {
             'statusCode': 200,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
@@ -154,11 +161,18 @@ def get_templates(cursor, user_id: str, event: dict) -> dict:
         cursor.execute(query)
         templates = cursor.fetchall()
         
+        templates_list = []
+        for t in templates:
+            template_dict = dict(t)
+            if isinstance(template_dict.get('content'), str):
+                template_dict['content'] = json.loads(template_dict['content'])
+            templates_list.append(template_dict)
+        
         return {
             'statusCode': 200,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
-            'body': json.dumps({'templates': [dict(t) for t in templates]}, default=str)
+            'body': json.dumps({'templates': templates_list}, default=str)
         }
 
 def update_template(cursor, conn, user_id: str, event: dict) -> dict:
@@ -225,9 +239,13 @@ def update_template(cursor, conn, user_id: str, event: dict) -> dict:
     updated_template = cursor.fetchone()
     conn.commit()
     
+    template_dict = dict(updated_template)
+    if isinstance(template_dict.get('content'), str):
+        template_dict['content'] = json.loads(template_dict['content'])
+    
     return {
         'statusCode': 200,
         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
         'isBase64Encoded': False,
-        'body': json.dumps({'template': dict(updated_template)}, default=str)
+        'body': json.dumps({'template': template_dict}, default=str)
     }
