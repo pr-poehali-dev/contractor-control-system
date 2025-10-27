@@ -55,7 +55,6 @@ export const useWorkForm = (objectId: string | undefined) => {
   const processWorks = () => {
     if (!userData || !objectId) return;
     
-    const freshWorks = userData.works || [];
     const freshTemplates = userData.work_templates || [];
     const freshObjects = userData.objects || [];
     const currentObject = freshObjects.find((obj: any) => obj.id === Number(objectId));
@@ -76,7 +75,7 @@ export const useWorkForm = (objectId: string | undefined) => {
       setObjectData(newObjectData);
     }
     
-    const objectWorks = freshWorks.filter((work: any) => work.object_id === Number(objectId));
+    const objectWorks = currentObject?.works || [];
     
     console.log('🔍 Filtered works for object', objectId, ':', objectWorks);
     console.log('🔍 Available templates:', freshTemplates.length);

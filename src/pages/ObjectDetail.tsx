@@ -30,12 +30,11 @@ const ObjectDetail = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
   const objects = (userData?.objects && Array.isArray(userData.objects)) ? userData.objects : [];
-  const works = (userData?.works && Array.isArray(userData.works)) ? userData.works : [];
   const unreadCounts = userData?.unreadCounts || {};
   const isContractor = user?.role === 'contractor';
   
   const object = objects.find(s => s.id === Number(objectId));
-  let objectWorks = works.filter(w => w.object_id === Number(objectId));
+  let objectWorks = object?.works || [];
 
   // Фильтрация по статусу
   if (statusFilter !== 'all') {
