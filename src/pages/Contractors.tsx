@@ -16,7 +16,7 @@ import { ru } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
 
 const Contractors = () => {
-  const { isAuthenticated } = useAuthRedux();
+  const { isAuthenticated, user } = useAuthRedux();
   const dispatch = useAppDispatch();
   const organizations = useAppSelector(selectOrganizations);
   const loading = useAppSelector(selectOrganizationsLoading);
@@ -61,8 +61,8 @@ const Contractors = () => {
           </div>
           
           <Button onClick={() => setCreateDialogOpen(true)}>
-            <Icon name="Building" size={18} className="mr-2" />
-            Создать организацию
+            <Icon name={user?.role === 'admin' ? "Building" : "UserPlus"} size={18} className="mr-2" />
+            {user?.role === 'admin' ? 'Создать организацию' : 'Пригласить подрядчика'}
           </Button>
         </div>
 
@@ -128,11 +128,11 @@ const Contractors = () => {
               <Icon name="Building" size={64} className="mx-auto mb-4 text-slate-300" />
               <h3 className="text-xl font-semibold mb-2">Нет подрядных организаций</h3>
               <p className="text-slate-500 mb-6">
-                Создайте первую организацию для начала работы
+                {user?.role === 'admin' ? 'Создайте первую организацию для начала работы' : 'Пригласите первого подрядчика для начала работы'}
               </p>
               <Button onClick={() => setCreateDialogOpen(true)}>
                 <Icon name="Plus" size={18} className="mr-2" />
-                Создать организацию
+                {user?.role === 'admin' ? 'Создать организацию' : 'Пригласить подрядчика'}
               </Button>
             </CardContent>
           </Card>

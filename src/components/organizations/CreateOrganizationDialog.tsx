@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { createOrganization, selectOrganizationsLoading } from '@/store/slices/organizationsSlice';
 import {
@@ -25,6 +26,7 @@ export default function CreateOrganizationDialog({
   onOpenChange,
   onSuccess,
 }: CreateOrganizationDialogProps) {
+  const { user } = useAuthRedux();
   const dispatch = useAppDispatch();
   const loading = useAppSelector(selectOrganizationsLoading);
 
@@ -64,7 +66,9 @@ export default function CreateOrganizationDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Создать подрядную организацию</DialogTitle>
+          <DialogTitle>
+            {user?.role === 'admin' ? 'Создать подрядную организацию' : 'Пригласить подрядчика'}
+          </DialogTitle>
           <DialogDescription>
             Заполните данные организации и пригласите первого сотрудника
           </DialogDescription>
@@ -179,7 +183,7 @@ export default function CreateOrganizationDialog({
 
           <div className="flex gap-3 pt-4">
             <Button type="submit" className="flex-1" disabled={loading}>
-              {loading ? 'Создание...' : 'Создать организацию'}
+              {loading ? 'Создание...' : (user?.role === 'admin' ? 'Создать организацию' : 'Пригласить подрядчика')}
             </Button>
             <Button
               type="button"
