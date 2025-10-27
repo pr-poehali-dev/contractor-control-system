@@ -270,7 +270,11 @@ export const useWorkForm = (objectId: string | undefined) => {
   };
 
   const handleCancel = () => {
-    navigate(`/objects/${objectId}`);
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate(`/objects/${objectId}`);
+    }
   };
 
   return {
