@@ -310,13 +310,27 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             except Exception:
                 defects_count = 0
         
+        # Determine event type based on inspection status
+        event_type = 'inspection_scheduled'
+        event_description = 'Проверка запланирована'
+        
+        if inspection['status'] == 'active':
+            event_type = 'inspection_started'
+            event_description = 'Проверка начата'
+        elif inspection['status'] == 'completed':
+            event_type = 'inspection_completed'
+            if defects_count > 0:
+                event_description = f"Проверка завершена. Найдено {defects_count} {('замечание' if defects_count == 1 else 'замечаний')}"
+            else:
+                event_description = 'Проверка завершена. Замечаний не найдено'
+        
         events.append({
             'id': f"inspection_{inspection['id']}",
-            'type': 'inspection',
+            'type': event_type,
             'inspectionType': inspection['type'],
             'inspectionNumber': inspection['inspection_number'],
             'title': inspection['work_title'],
-            'description': inspection['description'] or inspection['title'] or 'Проверка',
+            'description': event_description,
             'timestamp': inspection['created_at'].isoformat() if hasattr(inspection['created_at'], 'isoformat') else str(inspection['created_at']),
             'status': inspection['status'],
             'workId': inspection['work_id'],
