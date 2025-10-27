@@ -153,27 +153,29 @@ export default function DocumentTemplateEditorNew() {
 
         <div className="space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Основная информация</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Основная информация</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="template-name">Название шаблона</Label>
+            <CardContent className="space-y-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="template-name" className="text-sm">Название шаблона</Label>
                 <Input
                   id="template-name"
                   value={templateName}
                   onChange={(e) => setTemplateName(e.target.value)}
                   placeholder="Название шаблона"
+                  className="h-9"
                 />
               </div>
-              <div>
-                <Label htmlFor="template-description">Описание</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="template-description" className="text-sm">Описание</Label>
                 <Textarea
                   id="template-description"
                   value={templateDescription}
                   onChange={(e) => setTemplateDescription(e.target.value)}
                   placeholder="Краткое описание"
                   rows={2}
+                  className="text-sm resize-none"
                 />
               </div>
             </CardContent>
