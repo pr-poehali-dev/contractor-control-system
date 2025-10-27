@@ -144,7 +144,7 @@ export default function OrganizationPage() {
           <Card>
             <CardContent className="p-3 md:p-4">
               <div className="text-center">
-                <p className="text-xs text-slate-500 mb-1">Сотрудников</p>
+                <p className="text-xs text-slate-500 mb-1">Активных сотрудников</p>
                 <p className="text-xl md:text-2xl font-bold">{currentOrg.employees?.length || 0}</p>
                 <Icon name="Users" size={20} className="text-blue-500 mx-auto mt-2" />
               </div>
