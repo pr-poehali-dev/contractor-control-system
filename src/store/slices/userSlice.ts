@@ -217,13 +217,19 @@ export const loadUserData = createAsyncThunk(
         // Извлекаем все работы из объектов
         const allWorks = (data.objects || []).flatMap((obj: any) => obj.works || []);
         
+        // Извлекаем workLogs, inspections, chatMessages из работ
+        const allWorkLogs = allWorks.flatMap((work: any) => work.workLogs || []);
+        const allInspections = allWorks.flatMap((work: any) => work.inspections || []);
+        const allChatMessages = allWorks.flatMap((work: any) => work.chatMessages || []);
+        const allDefectReports = allWorks.flatMap((work: any) => work.defectReports || []);
+        
         dispatch(setObjects(data.objects || []));
         dispatch(setWorks(allWorks));
-        dispatch(setWorkLogs(data.workLogs || []));
-        dispatch(setInspections(data.inspections || []));
+        dispatch(setWorkLogs(allWorkLogs));
+        dispatch(setInspections(allInspections));
         dispatch(setContractors(data.contractors || []));
-        dispatch(setDefectReports(data.defect_reports || []));
-        dispatch(setChatMessages(data.chatMessages || []));
+        dispatch(setDefectReports(allDefectReports));
+        dispatch(setChatMessages(allChatMessages));
       } catch (importError) {
         const errorMessage = importError instanceof Error ? importError.message : String(importError);
         console.error('Failed to import slices:', errorMessage);
