@@ -1,5 +1,8 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { fetchOrganizations, selectOrganizations } from '@/store/slices/organizationsSlice';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,8 +18,16 @@ const getRoleLabel = (role?: string): string => {
 };
 
 const Settings = () => {
-  const { user, logout } = useAuthRedux();
+  const { user, logout, isAuthenticated } = useAuthRedux();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const organizations = useAppSelector(selectOrganizations);
+
+  useEffect(() => {
+    if (isAuthenticated && user?.role === 'contractor') {
+      dispatch(fetchOrganizations());
+    }
+  }, [dispatch, isAuthenticated, user?.role]);
 
   const handleLogout = () => {
     logout();
@@ -72,10 +83,17 @@ const Settings = () => {
                 <Label htmlFor="phone">Телефон</Label>
                 <Input id="phone" defaultValue={user?.phone || '+7 (900) 123-45-67'} />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="organization">Организация</Label>
-                <Input id="organization" defaultValue={user?.organization || 'ООО "Строительная компания"'} />
-              </div>
+              {user?.role === 'contractor' && (
+                <div className="grid gap-2">
+                  <Label htmlFor="organization">Организация</Label>
+                  <Input 
+                    id="organization" 
+                    defaultValue={organizations[0]?.name || 'Не указана'} 
+                    disabled
+                    className="bg-slate-50"
+                  />
+                </div>
+              )}
             </div>
 
             <Button className="w-full mt-6">
