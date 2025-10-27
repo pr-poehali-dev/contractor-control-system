@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import TiptapEditor from '@/components/TiptapEditor';
+import DocumentPreview from '@/components/DocumentPreview';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   fetchTemplateDetail,
@@ -23,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function DocumentTemplateEditor() {
   const { templateId } = useParams();
@@ -34,11 +34,12 @@ export default function DocumentTemplateEditor() {
   const loading = useAppSelector(selectTemplatesLoading);
   
   const [templateName, setTemplateName] = useState('');
-  const [templateDescription, setTemplateDescription] = useState('');
   const [documentContent, setDocumentContent] = useState('');
   const [documentVariables, setDocumentVariables] = useState<string[]>([]);
   const [fieldType, setFieldType] = useState<'text' | 'number' | 'date' | 'email'>('text');
   const [fieldName, setFieldName] = useState('');
+  const [previewData, setPreviewData] = useState<Record<string, string>>({});
+  const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
 
   useEffect(() => {
     if (templateId) {
@@ -49,7 +50,6 @@ export default function DocumentTemplateEditor() {
   useEffect(() => {
     if (template) {
       setTemplateName(template.name);
-      setTemplateDescription(template.description || '');
       
       if (template.content) {
         if (template.content.html) {
@@ -57,6 +57,11 @@ export default function DocumentTemplateEditor() {
         }
         if (template.content.variables) {
           setDocumentVariables(template.content.variables);
+          const initialData: Record<string, string> = {};
+          template.content.variables.forEach((v: string) => {
+            initialData[v] = '';
+          });
+          setPreviewData(initialData);
         }
       }
     }
@@ -70,7 +75,6 @@ export default function DocumentTemplateEditor() {
         updateTemplate({
           id: parseInt(templateId),
           name: templateName,
-          description: templateDescription,
           content: { 
             html: documentContent, 
             variables: documentVariables 
@@ -111,19 +115,23 @@ export default function DocumentTemplateEditor() {
     }
 
     setDocumentVariables([...documentVariables, fieldName]);
+    setPreviewData({ ...previewData, [fieldName]: '' });
     setFieldName('');
   };
 
   const handleDeleteField = (variable: string) => {
     setDocumentVariables(documentVariables.filter(v => v !== variable));
+    const newData = { ...previewData };
+    delete newData[variable];
+    setPreviewData(newData);
   };
 
   if (loading && !template) {
     return (
-      <div className="flex-1 overflow-y-auto bg-slate-50 w-full">
-        <div className="px-3 py-4 md:p-8 lg:p-12 max-w-7xl mx-auto">
-          <Skeleton className="h-10 w-64 mb-6" />
-          <Skeleton className="h-96 w-full" />
+      <div className="flex-1 flex items-center justify-center bg-slate-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-slate-600">Загрузка шаблона...</p>
         </div>
       </div>
     );
@@ -144,77 +152,79 @@ export default function DocumentTemplateEditor() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto bg-slate-50 w-full">
-      <div className="px-3 py-4 md:p-8 lg:p-12 max-w-7xl mx-auto">
-        <div className="mb-6">
-          <div className="flex items-center gap-3 mb-6">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/document-templates')}>
-              <Icon name="ArrowLeft" size={18} />
-            </Button>
-            <div className="flex-1">
-              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Редактор шаблона</h1>
-            </div>
-            <Button onClick={handleSave}>
-              <Icon name="Save" size={18} className="mr-2" />
-              Сохранить
-            </Button>
+    <div className="flex-1 flex flex-col h-screen overflow-hidden bg-white">
+      <div className="border-b bg-white px-6 py-4 flex items-center justify-between sticky top-0 z-20">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/document-templates')}>
+            <Icon name="ArrowLeft" size={18} />
+          </Button>
+          <div>
+            <Input
+              value={templateName}
+              onChange={(e) => setTemplateName(e.target.value)}
+              className="text-xl font-semibold border-0 px-0 focus-visible:ring-0 h-auto"
+              placeholder="Название шаблона"
+            />
           </div>
         </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => navigate('/document-templates')}>
+            Отмена
+          </Button>
+          <Button onClick={handleSave}>
+            <Icon name="Save" size={18} className="mr-2" />
+            Сохранить
+          </Button>
+        </div>
+      </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Основная информация</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="template-name">Название шаблона</Label>
-                  <Input
-                    id="template-name"
-                    value={templateName}
-                    onChange={(e) => setTemplateName(e.target.value)}
-                    placeholder="Название шаблона"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="template-description">Описание</Label>
-                  <Textarea
-                    id="template-description"
-                    value={templateDescription}
-                    onChange={(e) => setTemplateDescription(e.target.value)}
-                    placeholder="Краткое описание"
-                    rows={2}
-                  />
-                </div>
-              </CardContent>
-            </Card>
+      <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex flex-col">
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="flex-1 flex flex-col">
+            <div className="border-b px-6">
+              <TabsList className="h-12">
+                <TabsTrigger value="editor" className="gap-2">
+                  <Icon name="Edit" size={16} />
+                  Редактор
+                </TabsTrigger>
+                <TabsTrigger value="preview" className="gap-2">
+                  <Icon name="Eye" size={16} />
+                  Предпросмотр
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Редактор документа</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <TiptapEditor
-                  content={documentContent}
-                  onChange={setDocumentContent}
-                  placeholder="Начните писать документ..."
-                  variables={documentVariables}
-                />
-              </CardContent>
-            </Card>
-          </div>
+            <TabsContent value="editor" className="flex-1 m-0 p-6 overflow-hidden">
+              <TiptapEditor
+                content={documentContent}
+                onChange={setDocumentContent}
+                variables={documentVariables}
+                className="h-full"
+              />
+            </TabsContent>
 
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Добавить поле</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <TabsContent value="preview" className="flex-1 m-0 overflow-hidden">
+              <DocumentPreview
+                html={documentContent}
+                variables={previewData}
+                templateName={templateName}
+              />
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        <div className="w-80 border-l bg-slate-50 overflow-y-auto">
+          <div className="p-6 space-y-6">
+            <div>
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Icon name="Plus" size={18} />
+                Добавить поле
+              </h3>
+              <div className="space-y-3">
                 <div>
-                  <Label htmlFor="field-type">Тип поля</Label>
+                  <Label htmlFor="field-type" className="text-xs">Тип поля</Label>
                   <Select value={fieldType} onValueChange={(val: any) => setFieldType(val)}>
-                    <SelectTrigger id="field-type" className="mt-2">
+                    <SelectTrigger id="field-type" className="mt-1.5">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -227,13 +237,13 @@ export default function DocumentTemplateEditor() {
                 </div>
                 
                 <div>
-                  <Label htmlFor="field-name">Имя поля</Label>
+                  <Label htmlFor="field-name" className="text-xs">Имя поля</Label>
                   <Input
                     id="field-name"
                     value={fieldName}
                     onChange={(e) => setFieldName(e.target.value)}
-                    placeholder="Например: company_name"
-                    className="mt-2"
+                    placeholder="company_name"
+                    className="mt-1.5"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -243,67 +253,48 @@ export default function DocumentTemplateEditor() {
                   />
                 </div>
 
-                <Button 
-                  onClick={handleAddField}
-                  className="w-full"
-                >
+                <Button onClick={handleAddField} className="w-full" size="sm">
                   <Icon name="Plus" size={16} className="mr-2" />
                   Добавить
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Поля ({documentVariables.length})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {documentVariables.length === 0 ? (
-                  <p className="text-sm text-slate-500">Добавьте поля для шаблона</p>
-                ) : (
-                  <div className="space-y-2">
-                    {documentVariables.map((variable) => (
-                      <div 
-                        key={variable} 
-                        className="flex items-center justify-between p-3 border rounded hover:bg-slate-50 transition-colors"
-                      >
-                        <code className="text-sm font-mono text-blue-600">{`{{${variable}}}`}</code>
+            <div className="border-t pt-6">
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
+                <Icon name="List" size={18} />
+                Поля ({documentVariables.length})
+              </h3>
+              {documentVariables.length === 0 ? (
+                <p className="text-sm text-slate-500">Нет полей</p>
+              ) : (
+                <div className="space-y-2">
+                  {documentVariables.map((variable) => (
+                    <div key={variable} className="group">
+                      <div className="flex items-center justify-between p-2 rounded-lg border bg-white hover:border-blue-200 transition-colors">
+                        <code className="text-xs font-mono text-blue-600">{{variable}}</code>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteField(variable)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                         >
-                          <Icon name="Trash2" size={14} />
+                          <Icon name="X" size={14} />
                         </Button>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Подсказки</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm text-slate-600">
-                <div>
-                  <strong className="block mb-1">Форматирование</strong>
-                  <p className="text-xs">Используйте панель инструментов для форматирования текста</p>
+                      {activeTab === 'preview' && (
+                        <Input
+                          value={previewData[variable] || ''}
+                          onChange={(e) => setPreviewData({ ...previewData, [variable]: e.target.value })}
+                          placeholder={`Значение для ${variable}`}
+                          className="mt-1.5 text-sm"
+                        />
+                      )}
+                    </div>
+                  ))}
                 </div>
-                <div>
-                  <strong className="block mb-1">Вставка полей</strong>
-                  <p className="text-xs">Нажмите на поле в панели инструментов, чтобы вставить его в текст</p>
-                </div>
-                <div>
-                  <strong className="block mb-1">Переменные</strong>
-                  <p className="text-xs">
-                    Формат: <code className="bg-slate-100 px-1 rounded">{'{{имя_поля}}'}</code>
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+              )}
+            </div>
           </div>
         </div>
       </div>
