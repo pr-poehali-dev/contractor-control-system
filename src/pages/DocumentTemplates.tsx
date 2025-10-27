@@ -80,6 +80,10 @@ export default function DocumentTemplates() {
   }, [dispatch, userData]);
 
   const extractVariablesFromContent = (content: any): string[] => {
+    if (content.variables && Array.isArray(content.variables)) {
+      return content.variables;
+    }
+    
     const vars: string[] = [];
     if (content.blocks) {
       content.blocks.forEach((block: any) => {
@@ -154,6 +158,9 @@ export default function DocumentTemplates() {
       act: 'Акт работ',
       inspection: 'Акт проверки',
       defect_report: 'Акт о дефектах',
+      defect_detection: 'Обнаружение дефектов',
+      defect_resolution: 'Устранение дефектов',
+      work_acceptance: 'Приёмка работ',
       completion: 'Акт приёмки',
       protocol: 'Протокол',
       contract: 'Договор',
