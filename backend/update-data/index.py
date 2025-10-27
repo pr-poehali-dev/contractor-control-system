@@ -80,6 +80,40 @@ def handler(event, context):
     is_admin = user_role == 'admin'
     
     try:
+        if item_type == 'user' and method == 'PUT':
+            data = body.get('data', {})
+            update_fields = []
+            
+            if 'name' in data:
+                update_fields.append(f"name = '{data['name']}'")
+            if 'phone' in data:
+                update_fields.append(f"phone = '{data['phone']}'")
+            if 'email' in data:
+                update_fields.append(f"email = '{data['email']}'")
+            
+            if not update_fields:
+                cur.close()
+                conn.close()
+                return {
+                    'statusCode': 400,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'success': False, 'error': 'No fields to update'})
+                }
+            
+            update_query = f"UPDATE {SCHEMA}.users SET {', '.join(update_fields)} WHERE id = {user_id_int} RETURNING id, name, email, phone, role"
+            cur.execute(update_query)
+            updated_user = cur.fetchone()
+            conn.commit()
+            
+            cur.close()
+            conn.close()
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({'success': True, 'data': {'user': dict(updated_user)}})
+            }
+        
         if method == 'DELETE':
             if item_type == 'project':
                 project_filter = f"WHERE id = {int(item_id)}" if is_admin else f"WHERE id = {int(item_id)} AND client_id = {user_id_int}"

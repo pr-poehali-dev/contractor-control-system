@@ -1,8 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchOrganizations, selectOrganizations } from '@/store/slices/organizationsSlice';
+import { updateProfile } from '@/store/slices/userSlice';
+import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,16 +24,41 @@ const Settings = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const organizations = useAppSelector(selectOrganizations);
+  
+  const [name, setName] = useState(user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [phone, setPhone] = useState(user?.phone || '');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && user?.role === 'contractor') {
       dispatch(fetchOrganizations());
     }
   }, [dispatch, isAuthenticated, user?.role]);
+  
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setEmail(user.email || '');
+      setPhone(user.phone || '');
+    }
+  }, [user]);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+  
+  const handleSaveProfile = async () => {
+    setIsLoading(true);
+    try {
+      await dispatch(updateProfile({ name, email, phone })).unwrap();
+      toast.success('Профиль успешно обновлён');
+    } catch (error) {
+      toast.error('Ошибка при обновлении профиля');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getInitials = (name: string) => {
@@ -73,22 +100,38 @@ const Settings = () => {
             <div className="space-y-4">
               <div className="grid gap-2">
                 <Label htmlFor="name">Имя</Label>
-                <Input id="name" defaultValue={user?.name} />
+                <Input 
+                  id="name" 
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Введите имя"
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" defaultValue={user?.email} />
+                <Input 
+                  id="email" 
+                  type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="email@example.com"
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="phone">Телефон</Label>
-                <Input id="phone" defaultValue={user?.phone || '+7 (900) 123-45-67'} />
+                <Input 
+                  id="phone" 
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+7 (999) 123-45-67"
+                />
               </div>
               {user?.role === 'contractor' && (
                 <div className="grid gap-2">
                   <Label htmlFor="organization">Организация</Label>
                   <Input 
                     id="organization" 
-                    defaultValue={organizations[0]?.name || 'Не указана'} 
+                    value={organizations[0]?.name || 'Не указана'} 
                     disabled
                     className="bg-slate-50"
                   />
@@ -96,9 +139,13 @@ const Settings = () => {
               )}
             </div>
 
-            <Button className="w-full mt-6">
+            <Button 
+              className="w-full mt-6" 
+              onClick={handleSaveProfile}
+              disabled={isLoading}
+            >
               <Icon name="Save" size={18} className="mr-2" />
-              Сохранить изменения
+              {isLoading ? 'Сохранение...' : 'Сохранить изменения'}
             </Button>
           </CardContent>
         </Card>

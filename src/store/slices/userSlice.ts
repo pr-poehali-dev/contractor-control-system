@@ -245,6 +245,40 @@ export const loadUserData = createAsyncThunk(
 );
 
 /**
+ * Обновление данных профиля пользователя
+ * @param {Object} data - Данные для обновления
+ * @param {string} [data.name] - Новое имя
+ * @param {string} [data.email] - Новый email
+ * @param {string} [data.phone] - Новый телефон
+ * @returns {Promise<User>} Обновленные данные пользователя
+ */
+export const updateProfile = createAsyncThunk(
+  'user/updateProfile',
+  async (data: { name?: string; email?: string; phone?: string }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.put(ENDPOINTS.ENTITIES.UPDATE, {
+        type: 'user',
+        id: 1, // ID не используется, обновляем текущего пользователя
+        data
+      });
+      
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to update profile');
+      }
+
+      const updatedUser = response.data.user;
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+
+      return updatedUser;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update profile';
+      console.error('Update profile error:', errorMessage);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+/**
  * Проверка валидности токена авторизации
  * При неудаче автоматически очищает localStorage
  * @returns {Promise<boolean>} true если токен валиден
@@ -399,6 +433,21 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(loadUserData.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+
+      // Update profile
+      .addCase(updateProfile.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
+        state.error = null;
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       })
