@@ -498,6 +498,9 @@ const userSlice = createSlice({
 
 export const { logout, setUserData, clearError } = userSlice.actions;
 
+// Селекторы
+export const selectUserData = (state: any) => state.user.userData;
+
 // Экспорт для обратной совместимости с AuthContext
 export const loginUser = login;
 export const registerUser = register;
