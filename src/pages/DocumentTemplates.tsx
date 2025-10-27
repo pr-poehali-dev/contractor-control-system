@@ -33,6 +33,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useInitTemplates } from '@/hooks/useInitTemplates';
+import { selectUserData } from '@/store/slices/userSlice';
 
 export default function DocumentTemplates() {
   const navigate = useNavigate();
@@ -40,6 +42,9 @@ export default function DocumentTemplates() {
   const dispatch = useAppDispatch();
   const templates = useAppSelector(selectTemplates);
   const loading = useAppSelector(selectTemplatesLoading);
+  const userData = useAppSelector(selectUserData);
+  
+  useInitTemplates(userData?.id || null);
   
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -58,7 +63,41 @@ export default function DocumentTemplates() {
       keys.forEach(k => localStorage.removeItem(k));
       console.log('✅ Сброшен флаг инициализации шаблонов. Перезагрузите страницу.');
     };
-  }, [dispatch]);
+    
+    (window as any).forceInitTemplates = async () => {
+      const userId = userData?.id;
+      if (!userId) {
+        console.error('❌ Пользователь не авторизован');
+        return;
+      }
+      
+      console.log('🚀 Принудительная инициализация шаблонов для user_id:', userId);
+      
+      try {
+        const FUNC_URLS = (await import('../../backend/func2url.json')).default;
+        const response = await fetch(FUNC_URLS['init-templates'], {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ user_id: userId }),
+        });
+        
+        const result = await response.json();
+        console.log('📥 Ответ сервера:', result);
+        
+        if (response.ok) {
+          localStorage.setItem(`templates_initialized_${userId}`, 'true');
+          dispatch(fetchTemplates());
+          console.log('✅ Шаблоны инициализированы!');
+        } else {
+          console.error('❌ Ошибка:', result);
+        }
+      } catch (error) {
+        console.error('❌ Ошибка запроса:', error);
+      }
+    };
+  }, [dispatch, userData]);
 
   const extractVariablesFromContent = (content: any): string[] => {
     const vars: string[] = [];
