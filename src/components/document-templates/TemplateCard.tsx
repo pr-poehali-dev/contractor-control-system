@@ -49,7 +49,7 @@ export function TemplateCard({ template, variables, onClick, getTemplateTypeLabe
               )}
             </div>
 
-            {variables.length > 0 && (
+            {Array.isArray(variables) && variables.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-3">
                 {variables.slice(0, 5).map((variable, idx) => (
                   <Badge
@@ -57,7 +57,7 @@ export function TemplateCard({ template, variables, onClick, getTemplateTypeLabe
                     variant="outline"
                     className="text-xs bg-slate-50 text-slate-600 font-mono"
                   >
-                    {`{{${variable}}}`}
+                    {typeof variable === 'string' ? `{{${variable}}}` : ''}
                   </Badge>
                 ))}
                 {variables.length > 5 && (
