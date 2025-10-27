@@ -34,7 +34,7 @@ export default function OrganizationPage() {
   const loading = useAppSelector(selectOrganizationsLoading);
   const user = useAppSelector((state) => state.user.user);
   
-  const [inviteEmail, setInviteEmail] = useState('');
+  const [invitePhone, setInvitePhone] = useState('');
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -50,14 +50,14 @@ export default function OrganizationPage() {
   }, [organizations, currentOrg, dispatch]);
 
   const handleSendInvite = async () => {
-    if (!currentOrg || !inviteEmail) return;
+    if (!currentOrg || !invitePhone) return;
     
     await dispatch(sendInvite({
       organization_id: currentOrg.id,
-      email: inviteEmail,
+      phone: invitePhone,
     }));
     
-    setInviteEmail('');
+    setInvitePhone('');
     setInviteDialogOpen(false);
     dispatch(fetchOrganizationDetail(currentOrg.id));
   };
@@ -114,18 +114,18 @@ export default function OrganizationPage() {
                 <DialogHeader>
                   <DialogTitle>Пригласить сотрудника</DialogTitle>
                   <DialogDescription>
-                    Отправьте приглашение по электронной почте
+                    На указанный номер будет отправлено SMS с кодом приглашения
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
-                    <Label htmlFor="invite-email">Email сотрудника</Label>
+                    <Label htmlFor="invite-phone">Мобильный телефон сотрудника</Label>
                     <Input
-                      id="invite-email"
-                      type="email"
-                      placeholder="employee@example.com"
-                      value={inviteEmail}
-                      onChange={(e) => setInviteEmail(e.target.value)}
+                      id="invite-phone"
+                      type="tel"
+                      placeholder="+7 (999) 123-45-67"
+                      value={invitePhone}
+                      onChange={(e) => setInvitePhone(e.target.value)}
                     />
                   </div>
                   <Button onClick={handleSendInvite} className="w-full">
@@ -269,7 +269,7 @@ export default function OrganizationPage() {
                     className="flex items-center justify-between p-3 bg-amber-50 rounded-lg"
                   >
                     <div>
-                      <p className="font-medium">{invite.email}</p>
+                      <p className="font-medium">{invite.phone}</p>
                       <p className="text-sm text-slate-500">
                         Отправлено {format(new Date(invite.created_at), 'dd MMMM yyyy', { locale: ru })}
                       </p>

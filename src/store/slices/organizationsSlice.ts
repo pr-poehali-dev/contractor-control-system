@@ -49,7 +49,7 @@ export interface OrganizationEmployee {
 
 export interface OrganizationInvite {
   id: number;
-  email: string;
+  phone: string;
   token: string;
   status: 'pending' | 'accepted' | 'expired';
   expires_at: string;
@@ -128,7 +128,7 @@ export const updateOrganization = createAsyncThunk(
 
 export const sendInvite = createAsyncThunk(
   'organizations/sendInvite',
-  async (data: { organization_id: number; email: string }) => {
+  async (data: { organization_id: number; phone: string }) => {
     const response = await apiClient.post(ENDPOINTS.ORGANIZATION_INVITES.SEND, data);
     return response.data.invite;
   }
