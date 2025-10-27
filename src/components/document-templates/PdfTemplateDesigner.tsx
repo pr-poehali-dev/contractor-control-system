@@ -23,6 +23,7 @@ export function PdfTemplateDesigner({ template, onSave }: PdfTemplateDesignerPro
     addPage,
     removePage,
     loadPreset,
+    getCurrentTemplate,
   } = usePdfDesigner({ template, onSave });
 
   return (
@@ -31,6 +32,7 @@ export function PdfTemplateDesigner({ template, onSave }: PdfTemplateDesignerPro
         showPresets={showPresets}
         onShowPresetsChange={setShowPresets}
         onLoadPreset={loadPreset}
+        currentTemplate={getCurrentTemplate()}
       />
 
       <FieldControls

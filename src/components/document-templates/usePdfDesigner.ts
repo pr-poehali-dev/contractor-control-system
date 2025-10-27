@@ -180,6 +180,11 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
     setShowPresets(false);
   };
 
+  const getCurrentTemplate = (): Template | null => {
+    if (!designerInstance.current) return null;
+    return designerInstance.current.getTemplate();
+  };
+
   return {
     designerRef,
     isReady,
@@ -193,5 +198,6 @@ export function usePdfDesigner({ template, onSave }: UsePdfDesignerProps) {
     addPage,
     removePage,
     loadPreset,
+    getCurrentTemplate,
   };
 }

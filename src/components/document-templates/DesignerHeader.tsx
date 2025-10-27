@@ -1,18 +1,22 @@
+import { Template } from '@pdfme/common';
 import Icon from '@/components/ui/icon';
 import { Card } from '@/components/ui/card';
 import { TemplatePresetsDialog } from './TemplatePresetsDialog';
+import { PdfPreviewDialog } from './PdfPreviewDialog';
 import { PRESET_TEMPLATES } from './pdf-presets';
 
 interface DesignerHeaderProps {
   showPresets: boolean;
   onShowPresetsChange: (show: boolean) => void;
   onLoadPreset: (presetKey: keyof typeof PRESET_TEMPLATES) => void;
+  currentTemplate: Template | null;
 }
 
 export function DesignerHeader({ 
   showPresets, 
   onShowPresetsChange, 
-  onLoadPreset 
+  onLoadPreset,
+  currentTemplate,
 }: DesignerHeaderProps) {
   return (
     <Card className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
@@ -26,11 +30,14 @@ export function DesignerHeader({
             <li>Настраивайте свойства элементов в боковой панели</li>
           </ul>
         </div>
-        <TemplatePresetsDialog
-          open={showPresets}
-          onOpenChange={onShowPresetsChange}
-          onSelectPreset={onLoadPreset}
-        />
+        <div className="flex gap-2 flex-shrink-0">
+          <PdfPreviewDialog template={currentTemplate} />
+          <TemplatePresetsDialog
+            open={showPresets}
+            onOpenChange={onShowPresetsChange}
+            onSelectPreset={onLoadPreset}
+          />
+        </div>
       </div>
     </Card>
   );
