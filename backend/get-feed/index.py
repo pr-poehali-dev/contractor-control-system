@@ -220,6 +220,145 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'photoUrls': photo_urls
         })
     
+    # Get inspections
+    if user_role == 'contractor':
+        inspections_query = f'''
+            SELECT 
+                i.id,
+                i.work_id,
+                i.inspection_number,
+                i.title,
+                i.description,
+                i.status,
+                i.type,
+                i.scheduled_date,
+                i.created_at,
+                i.defects,
+                w.title as work_title,
+                w.object_id,
+                o.title as object_title,
+                u.name as author_name
+            FROM {SCHEMA}.inspections i
+            JOIN {SCHEMA}.works w ON i.work_id = w.id
+            JOIN {SCHEMA}.objects o ON w.object_id = o.id
+            JOIN {SCHEMA}.users u ON i.created_by = u.id
+            WHERE w.contractor_id = (
+                SELECT id FROM {SCHEMA}.contractors WHERE user_id = {user_id}
+            )
+            ORDER BY i.created_at DESC
+            LIMIT 20
+        '''
+    elif user_role == 'admin':
+        inspections_query = f'''
+            SELECT 
+                i.id,
+                i.work_id,
+                i.inspection_number,
+                i.title,
+                i.description,
+                i.status,
+                i.type,
+                i.scheduled_date,
+                i.created_at,
+                i.defects,
+                w.title as work_title,
+                w.object_id,
+                o.title as object_title,
+                u.name as author_name
+            FROM {SCHEMA}.inspections i
+            JOIN {SCHEMA}.works w ON i.work_id = w.id
+            JOIN {SCHEMA}.objects o ON w.object_id = o.id
+            JOIN {SCHEMA}.users u ON i.created_by = u.id
+            ORDER BY i.created_at DESC
+            LIMIT 30
+        '''
+    else:
+        inspections_query = f'''
+            SELECT 
+                i.id,
+                i.work_id,
+                i.inspection_number,
+                i.title,
+                i.description,
+                i.status,
+                i.type,
+                i.scheduled_date,
+                i.created_at,
+                i.defects,
+                w.title as work_title,
+                w.object_id,
+                o.title as object_title,
+                u.name as author_name
+            FROM {SCHEMA}.inspections i
+            JOIN {SCHEMA}.works w ON i.work_id = w.id
+            JOIN {SCHEMA}.objects o ON w.object_id = o.id
+            JOIN {SCHEMA}.users u ON i.created_by = u.id
+            WHERE o.client_id = {user_id}
+            ORDER BY i.created_at DESC
+            LIMIT 20
+        '''
+    
+    cur.execute(inspections_query)
+    inspections = cur.fetchall()
+    
+    for inspection in inspections:
+        defects_count = 0
+        if inspection['defects']:
+            try:
+                defects = json.loads(inspection['defects']) if isinstance(inspection['defects'], str) else inspection['defects']
+                defects_count = len(defects) if isinstance(defects, list) else 0
+            except Exception:
+                defects_count = 0
+        
+        events.append({
+            'id': f"inspection_{inspection['id']}",
+            'type': 'inspection',
+            'inspectionType': inspection['type'],
+            'inspectionNumber': inspection['inspection_number'],
+            'title': inspection['work_title'],
+            'description': inspection['description'] or inspection['title'] or 'Проверка',
+            'timestamp': inspection['created_at'].isoformat() if hasattr(inspection['created_at'], 'isoformat') else str(inspection['created_at']),
+            'status': inspection['status'],
+            'workId': inspection['work_id'],
+            'objectId': inspection['object_id'],
+            'objectTitle': inspection['object_title'],
+            'workTitle': inspection['work_title'],
+            'author': inspection['author_name'],
+            'defectsCount': defects_count,
+            'scheduledDate': inspection['scheduled_date'].isoformat() if inspection['scheduled_date'] and hasattr(inspection['scheduled_date'], 'isoformat') else None
+        })
+    
+    # Get info posts (visible to all users)
+    info_posts_query = f'''
+        SELECT 
+            ip.id,
+            ip.title,
+            ip.content,
+            ip.link,
+            ip.created_at,
+            u.name as author_name
+        FROM {SCHEMA}.info_posts ip
+        JOIN {SCHEMA}.users u ON ip.created_by = u.id
+        ORDER BY ip.created_at DESC
+        LIMIT 10
+    '''
+    
+    cur.execute(info_posts_query)
+    info_posts = cur.fetchall()
+    
+    for post in info_posts:
+        events.append({
+            'id': f"info_post_{post['id']}",
+            'type': 'info_post',
+            'title': post['title'],
+            'description': post['content'],
+            'timestamp': post['created_at'].isoformat() if hasattr(post['created_at'], 'isoformat') else str(post['created_at']),
+            'author': post['author_name']
+        })
+    
+    # Sort all events by timestamp
+    events.sort(key=lambda x: x['timestamp'], reverse=True)
+    
     cur.close()
     conn.close()
     
