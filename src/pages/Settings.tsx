@@ -69,8 +69,7 @@ const Settings = () => {
     <div className="container max-w-4xl mx-auto p-4 md:p-8 pb-24 md:pb-10">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Настройки</h1>
-          <p className="text-slate-600">Управление профилем и настройками</p>
+          <h1 className="text-3xl font-bold text-slate-900">Настройки</h1>
         </div>
         <Button variant="ghost" size="icon" onClick={() => navigate('/profile')} className="h-10 w-10 rounded-full">
           <Icon name="X" size={20} />
