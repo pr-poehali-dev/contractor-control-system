@@ -9,6 +9,7 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchDocuments, selectDocuments, selectDocumentsLoading } from '@/store/slices/documentsSlice';
+import { fetchTemplates, selectTemplates } from '@/store/slices/documentTemplatesSlice';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select,
@@ -34,6 +35,7 @@ const Documents = () => {
   const dispatch = useAppDispatch();
   const documents = useAppSelector(selectDocuments);
   const loading = useAppSelector(selectDocumentsLoading);
+  const templates = useAppSelector(selectTemplates);
   
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -42,6 +44,7 @@ const Documents = () => {
   useEffect(() => {
     if (isAuthenticated) {
       dispatch(fetchDocuments());
+      dispatch(fetchTemplates());
     }
   }, [dispatch, isAuthenticated]);
 
@@ -115,63 +118,70 @@ const Documents = () => {
         </div>
 
         <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Создать документ из шаблона</DialogTitle>
               <DialogDescription>
                 Выберите шаблон для создания документа
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-2 py-4">
-              {(() => {
-                const storedTemplates = localStorage.getItem('templates');
-                const templates = storedTemplates ? JSON.parse(storedTemplates) : [];
-                
-                if (templates.length === 0) {
-                  return (
-                    <div className="text-center py-8">
-                      <Icon name="FileText" size={48} className="mx-auto mb-3 text-slate-300" />
-                      <p className="text-slate-600 mb-4">Нет доступных шаблонов</p>
-                      <Button onClick={() => {
-                        setCreateDialogOpen(false);
-                        navigate('/document-templates');
-                      }}>
-                        Перейти к шаблонам
-                      </Button>
-                    </div>
-                  );
-                }
-                
-                return templates.map((template: any) => (
-                  <Button 
+            <div className="space-y-3 py-4">
+              {templates.length === 0 ? (
+                <div className="text-center py-8">
+                  <Icon name="FileText" size={48} className="mx-auto mb-3 text-slate-300" />
+                  <p className="text-slate-600 mb-4">Нет доступных шаблонов</p>
+                  <Button onClick={() => {
+                    setCreateDialogOpen(false);
+                    navigate('/document-templates');
+                  }}>
+                    Перейти к шаблонам
+                  </Button>
+                </div>
+              ) : (
+                templates.map((template) => (
+                  <Card
                     key={template.id}
-                    variant="outline" 
-                    className="w-full justify-start h-auto p-4"
+                    className="cursor-pointer hover:bg-slate-50 transition-colors"
                     onClick={() => {
                       setCreateDialogOpen(false);
                       navigate(`/document/new?templateId=${template.id}`);
                     }}
                   >
-                    <div className="flex items-start gap-3 text-left w-full">
-                      <Icon 
-                        name={template.isSystem ? "FileCheck" : "FileText"} 
-                        size={24} 
-                        className={template.isSystem ? "text-blue-600" : "text-green-600"}
-                        className="flex-shrink-0"
-                      />
-                      <div className="flex-1">
-                        <div className="font-semibold">{template.name}</div>
-                        {template.description && (
-                          <div className="text-sm text-slate-500 mt-1">{template.description}</div>
-                        )}
-                        {template.isSystem && (
-                          <div className="text-xs text-blue-600 mt-1">Системный шаблон</div>
-                        )}
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-4">
+                        <div className="p-3 bg-blue-50 rounded-lg">
+                          <Icon 
+                            name="FileText" 
+                            size={24} 
+                            className="text-blue-600"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-base mb-1">{template.name}</h3>
+                              {template.description && (
+                                <p className="text-sm text-slate-500 mb-2">{template.description}</p>
+                              )}
+                              <div className="flex gap-2">
+                                <Badge variant="secondary" className="text-xs">
+                                  {template.template_type}
+                                </Badge>
+                                {template.usage_count !== undefined && template.usage_count > 0 && (
+                                  <span className="text-xs text-slate-500">
+                                    Использован {template.usage_count} раз
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <Icon name="ChevronRight" size={20} className="text-slate-400 flex-shrink-0" />
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </Button>
-                ));
-              })()}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
           </DialogContent>
         </Dialog>

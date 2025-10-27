@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuthRedux } from "./hooks/useAuthRedux";
 import Layout from "./components/Layout";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { initializeDefaultTemplates } from "./utils/initializeTemplates";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -42,7 +41,6 @@ import DocumentTemplates from "./pages/DocumentTemplates";
 import DocumentTemplateEditor from "./pages/DocumentTemplateEditor";
 import DocumentView from "./pages/DocumentView";
 import OrganizationPage from "./pages/OrganizationPage";
-import TemplateEditor from "./pages/TemplateEditor";
 import NewDocument from "./pages/NewDocument";
 
 const queryClient = new QueryClient();
@@ -54,7 +52,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!initRef.current && token) {
       initRef.current = true;
-      initializeDefaultTemplates();
       verifyToken().then((result: any) => {
         if (result.payload === true || result.meta?.requestStatus === 'fulfilled') {
           loadUserData();
@@ -119,7 +116,6 @@ const App = () => (
               <Route path="/pricing" element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
               <Route path="/document-templates" element={<ProtectedRoute><DocumentTemplates /></ProtectedRoute>} />
               <Route path="/document-templates/:templateId" element={<ProtectedRoute><DocumentTemplateEditor /></ProtectedRoute>} />
-              <Route path="/template/:id" element={<ProtectedRoute><TemplateEditor /></ProtectedRoute>} />
               <Route path="/document/new" element={<ProtectedRoute><NewDocument /></ProtectedRoute>} />
               <Route path="/organization" element={<ProtectedRoute><OrganizationPage /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
