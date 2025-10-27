@@ -38,7 +38,7 @@ import Documents from "./pages/Documents";
 import MyTasks from "./pages/MyTasks";
 import NotFound from "./pages/NotFound";
 import DocumentTemplates from "./pages/DocumentTemplates";
-import DocumentTemplateEditor from "./pages/DocumentTemplateEditor";
+import DocumentTemplateEditorNew from "./pages/DocumentTemplateEditorNew";
 import DocumentView from "./pages/DocumentView";
 import OrganizationPage from "./pages/OrganizationPage";
 import NewDocument from "./pages/NewDocument";
@@ -115,7 +115,7 @@ const App = () => (
               <Route path="/my-tasks" element={<ProtectedRoute><MyTasks /></ProtectedRoute>} />
               <Route path="/pricing" element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
               <Route path="/document-templates" element={<ProtectedRoute><DocumentTemplates /></ProtectedRoute>} />
-              <Route path="/document-templates/:templateId" element={<ProtectedRoute><DocumentTemplateEditor /></ProtectedRoute>} />
+              <Route path="/document-templates/:templateId" element={<ProtectedRoute><DocumentTemplateEditorNew /></ProtectedRoute>} />
               <Route path="/document/new" element={<ProtectedRoute><NewDocument /></ProtectedRoute>} />
               <Route path="/organization" element={<ProtectedRoute><OrganizationPage /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
