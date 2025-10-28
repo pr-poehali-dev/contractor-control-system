@@ -85,9 +85,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 SELECT i.id, i.work_id, i.inspection_number, i.created_by, i.created_at, i.defects,
                        w.object_id, w.title as work_title,
                        o.title as object_title, o.address
-                FROM {SCHEMA}.inspections i
-                JOIN {SCHEMA}.works w ON i.work_id = w.id
-                JOIN {SCHEMA}.objects o ON w.object_id = o.id
+                FROM "{SCHEMA}".inspections i
+                JOIN "{SCHEMA}".works w ON i.work_id = w.id
+                JOIN "{SCHEMA}".objects o ON w.object_id = o.id
                 WHERE i.id = {inspection_id}
             """)
             print(f"Inspection query executed")
@@ -153,7 +153,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             # Create defect report
             print(f"Inserting defect report...")
             cur.execute(f"""
-                INSERT INTO {SCHEMA}.defect_reports 
+                INSERT INTO "{SCHEMA}".defect_reports 
                 (inspection_id, report_number, work_id, object_id, created_by, 
                  status, total_defects, critical_defects, report_data, notes)
                 VALUES ({inspection_id}, '{report_number}', {inspection['work_id']}, 
@@ -179,7 +179,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             # Get contractor for work
             print(f"Fetching contractor...")
-            cur.execute(f"SELECT contractor_id FROM {SCHEMA}.works WHERE id = {inspection['work_id']}")
+            cur.execute(f"SELECT contractor_id FROM \"{SCHEMA}\".works WHERE id = {inspection['work_id']}")
             print(f"Contractor query executed")
             contractor_row = cur.fetchone()
             contractor_id = contractor_row[0] if contractor_row else None
@@ -189,7 +189,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 for defect in defects:
                     defect_id = str(defect.get('id', '')).replace("'", "''")
                     cur.execute(f"""
-                        INSERT INTO {SCHEMA}.defect_remediations
+                        INSERT INTO \"{SCHEMA}\".defect_remediations
                         (defect_report_id, defect_id, contractor_id, status)
                         VALUES ({report['id']}, '{defect_id}', {contractor_id}, 'pending')
                     """)
@@ -217,8 +217,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                            dr.created_by, dr.created_at, dr.status, dr.total_defects, dr.critical_defects,
                            dr.report_data, dr.pdf_url, dr.notes,
                            u.name as author_name
-                    FROM {SCHEMA}.defect_reports dr
-                    LEFT JOIN {SCHEMA}.users u ON dr.created_by = u.id
+                    FROM \"{SCHEMA}\".defect_reports dr
+                    LEFT JOIN \"{SCHEMA}\".users u ON dr.created_by = u.id
                     WHERE dr.id = {report_id}
                 """)
                 row = cur.fetchone()
@@ -260,8 +260,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     SELECT dr.id, dr.inspection_id, dr.report_number, dr.work_id, dr.object_id,
                            dr.created_by, dr.created_at, dr.status, dr.total_defects, dr.critical_defects,
                            u.name as author_name
-                    FROM {SCHEMA}.defect_reports dr
-                    LEFT JOIN {SCHEMA}.users u ON dr.created_by = u.id
+                    FROM \"{SCHEMA}\".defect_reports dr
+                    LEFT JOIN \"{SCHEMA}\".users u ON dr.created_by = u.id
                     WHERE dr.work_id = {work_id}
                     ORDER BY dr.created_at DESC
                 """)
