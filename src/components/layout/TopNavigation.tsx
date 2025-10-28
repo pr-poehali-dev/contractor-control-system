@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useAppSelector } from '@/store/hooks';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
 import ProBadgeWithTimer from './ProBadgeWithTimer';
