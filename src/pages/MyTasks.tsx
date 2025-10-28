@@ -54,8 +54,11 @@ const MyTasks = () => {
       if (response.success && response.data) {
         const allTasks: Task[] = [];
         
+        console.log('[MyTasks] Current user:', { id: user.id, role: user.role });
+        
         for (const obj of response.data.objects || []) {
           for (const work of obj.works || []) {
+            console.log('[MyTasks] Checking work:', { work_id: work.id, contractor_id: work.contractor_id, user_id: user.id });
             if (work.contractor_id === user.id) {
               for (const inspection of work.inspections || []) {
                 if (inspection.status === 'completed' && inspection.defects) {
