@@ -146,10 +146,6 @@ export default function NewDocument() {
       title: 'Успешно!',
       description: 'Документ сохранён',
     });
-    
-    setTimeout(() => {
-      navigate('/documents');
-    }, 500);
   };
 
   return (
