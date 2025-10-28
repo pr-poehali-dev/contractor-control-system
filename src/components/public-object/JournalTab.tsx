@@ -101,35 +101,26 @@ const JournalTab = ({ objectId }: JournalTabProps) => {
       ) : (
         <div className="space-y-3">
           {allActivity.map((item) => (
-            <Card key={item.id} className="hover:shadow-md transition-shadow">
+            <Card 
+              key={item.id} 
+              className={`hover:shadow-md transition-shadow ${item.type === 'work' ? 'cursor-pointer' : ''}`}
+              onClick={() => {
+                if (item.type === 'work' && (item as any).workLog) {
+                  setSelectedWorkLog((item as any).workLog);
+                  setIsWorkReportModalOpen(true);
+                }
+              }}
+            >
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getIconColor(item.type)}`}>
                     <Icon name={getIcon(item.type) as any} size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2 mb-1">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-slate-900">{item.title}</h3>
-                        {item.type === 'work' && (item as any).workLogNumber && (
-                          <p className="text-xs text-slate-500">№{(item as any).workLogNumber}</p>
-                        )}
-                      </div>
-                      {item.type === 'work' && (item as any).workLog && (
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => {
-                            setSelectedWorkLog((item as any).workLog);
-                            setIsWorkReportModalOpen(true);
-                          }}
-                          className="text-xs"
-                        >
-                          <Icon name="Eye" size={14} className="mr-1" />
-                          Открыть
-                        </Button>
-                      )}
-                    </div>
+                    <h3 className="font-semibold text-slate-900 mb-1">{item.title}</h3>
+                    {item.type === 'work' && (item as any).workLogNumber && (
+                      <p className="text-xs text-slate-500 mb-2">№{(item as any).workLogNumber}</p>
+                    )}
                     <p className="text-sm text-slate-600 mb-2">{item.description}</p>
                     {item.workTitle && (
                       <div className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 rounded text-xs text-slate-700 mb-2">

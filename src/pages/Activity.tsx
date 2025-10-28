@@ -250,7 +250,15 @@ const Activity = () => {
                   </div>
                 )}
                 
-                <CardContent className="p-6">
+                <CardContent 
+                  className={`p-6 ${item.type === 'work' ? 'cursor-pointer hover:bg-slate-50 transition-colors' : ''}`}
+                  onClick={() => {
+                    if (item.type === 'work' && (item as any).workLog) {
+                      setSelectedWorkLog((item as any).workLog);
+                      setIsWorkReportModalOpen(true);
+                    }
+                  }}
+                >
                   <div className="flex items-start gap-4">
                     {item.type !== 'check' && (
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getIconColor(item.type)}`}>
@@ -258,57 +266,39 @@ const Activity = () => {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          {item.type !== 'check' && (
-                            <h3 className="font-semibold text-slate-900 mb-1">{item.title}</h3>
-                          )}
-                          
-                          {item.type === 'check' && item.workId && (
-                            <div className="flex items-center gap-2 mb-2">
-                              <Icon name="Wrench" size={14} className="text-slate-500" />
-                              <span className="text-sm font-medium text-slate-700">Работа: {getWorkTitle(item.workId)}</span>
-                            </div>
-                          )}
-                          
-                          <p className="text-sm text-slate-600 mb-2">{item.description}</p>
-                          
-                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
-                            <span className="flex items-center gap-1">
-                              <Icon name="User" size={12} />
-                              {item.user}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Icon name="Clock" size={12} />
-                              {formatTimestamp(item.timestamp)}
-                            </span>
-                            {item.type !== 'check' && item.objectId && (
-                              <span className="flex items-center gap-1">
-                                <Icon name="Building" size={12} />
-                                {getObjectTitle(item.objectId)}
-                              </span>
-                            )}
-                            {item.type !== 'check' && item.workId && (
-                              <span className="flex items-center gap-1">
-                                <Icon name="Briefcase" size={12} />
-                                {getWorkTitle(item.workId)}
-                              </span>
-                            )}
-                          </div>
+                      {item.type !== 'check' && (
+                        <h3 className="font-semibold text-slate-900 mb-1">{item.title}</h3>
+                      )}
+                      
+                      {item.type === 'check' && item.workId && (
+                        <div className="flex items-center gap-2 mb-2">
+                          <Icon name="Wrench" size={14} className="text-slate-500" />
+                          <span className="text-sm font-medium text-slate-700">Работа: {getWorkTitle(item.workId)}</span>
                         </div>
-                        {item.type === 'work' && (item as any).workLog && (
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => {
-                              setSelectedWorkLog((item as any).workLog);
-                              setIsWorkReportModalOpen(true);
-                            }}
-                            className="text-xs"
-                          >
-                            <Icon name="Eye" size={14} className="mr-1" />
-                            Открыть
-                          </Button>
+                      )}
+                      
+                      <p className="text-sm text-slate-600 mb-2">{item.description}</p>
+                      
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+                        <span className="flex items-center gap-1">
+                          <Icon name="User" size={12} />
+                          {item.user}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Icon name="Clock" size={12} />
+                          {formatTimestamp(item.timestamp)}
+                        </span>
+                        {item.type !== 'check' && item.objectId && (
+                          <span className="flex items-center gap-1">
+                            <Icon name="Building" size={12} />
+                            {getObjectTitle(item.objectId)}
+                          </span>
+                        )}
+                        {item.type !== 'check' && item.workId && (
+                          <span className="flex items-center gap-1">
+                            <Icon name="Briefcase" size={12} />
+                            {getWorkTitle(item.workId)}
+                          </span>
                         )}
                       </div>
                     </div>

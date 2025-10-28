@@ -44,29 +44,21 @@ export default function EventItem({
     switch (event.type) {
       case 'work_entry':
         return (
-          <>
+          <div 
+            className="cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => setIsWorkLogModalOpen(true)}
+          >
             {event.work_data && (
-              <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-slate-200">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Icon name="Wrench" size={16} className="text-green-600" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm sm:text-base font-semibold text-green-700">Отчёт о работе</span>
-                    {event.work_data.workLogNumber && (
-                      <span className="text-xs text-slate-500">№{event.work_data.workLogNumber}</span>
-                    )}
-                  </div>
+              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-200">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Icon name="Wrench" size={16} className="text-green-600" />
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => setIsWorkLogModalOpen(true)}
-                  className="text-xs"
-                >
-                  <Icon name="Eye" size={14} className="mr-1" />
-                  Открыть
-                </Button>
+                <div className="flex flex-col">
+                  <span className="text-sm sm:text-base font-semibold text-green-700">Отчёт о работе</span>
+                  {event.work_data.workLogNumber && (
+                    <span className="text-xs text-slate-500">№{event.work_data.workLogNumber}</span>
+                  )}
+                </div>
               </div>
             )}
             <p className="text-[13px] sm:text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap break-words">{event.content}</p>
@@ -117,7 +109,7 @@ export default function EventItem({
                 />
               </div>
             )}
-          </>
+          </div>
         );
         
       case 'inspection':
