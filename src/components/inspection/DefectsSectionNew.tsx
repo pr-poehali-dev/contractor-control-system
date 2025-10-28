@@ -27,6 +27,7 @@ interface DefectsSectionProps {
   draftDefects: DraftDefect[];
   isDraft: boolean;
   isClient: boolean;
+  isCompleted?: boolean;
   onAddDraft: () => void;
   onDraftChange: (tempId: string, field: keyof Defect, value: string) => void;
   onDraftPhotoAdd: (tempId: string, photos: string[]) => void;
@@ -34,6 +35,7 @@ interface DefectsSectionProps {
   onRemoveDraft: (tempId: string) => void;
   onSaveDefects: () => void;
   onRemoveDefect: (id: string) => void;
+  onRemediate?: (defectId: string) => void;
 }
 
 export default function DefectsSectionNew({
@@ -41,13 +43,15 @@ export default function DefectsSectionNew({
   draftDefects,
   isDraft,
   isClient,
+  isCompleted,
   onAddDraft,
   onDraftChange,
   onDraftPhotoAdd,
   onDraftPhotoRemove,
   onRemoveDraft,
   onSaveDefects,
-  onRemoveDefect
+  onRemoveDefect,
+  onRemediate
 }: DefectsSectionProps) {
   const [uploadingPhotos, setUploadingPhotos] = useState<Record<string, boolean>>({});
   const [expandedDrafts, setExpandedDrafts] = useState<Record<string, boolean>>({});
@@ -125,7 +129,9 @@ export default function DefectsSectionNew({
               index={index}
               isDraft={isDraft}
               isClient={isClient}
+              isCompleted={isCompleted}
               onRemove={onRemoveDefect}
+              onRemediate={onRemediate}
             />
           ))}
         </div>

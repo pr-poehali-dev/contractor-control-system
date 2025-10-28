@@ -11,10 +11,12 @@ interface DefectCardProps {
   index: number;
   isDraft: boolean;
   isClient: boolean;
+  isCompleted?: boolean;
   onRemove: (id: string) => void;
+  onRemediate?: (defectId: string) => void;
 }
 
-export function DefectCard({ defect, index, isDraft, isClient, onRemove }: DefectCardProps) {
+export function DefectCard({ defect, index, isDraft, isClient, isCompleted, onRemove, onRemediate }: DefectCardProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const getSeverityConfig = (severity?: string) => {
@@ -153,6 +155,21 @@ export function DefectCard({ defect, index, isDraft, isClient, onRemove }: Defec
                 >
                   <Icon name="Trash2" size={14} className="mr-1" />
                   Удалить
+                </Button>
+              </div>
+            )}
+
+            {isCompleted && !isClient && onRemediate && (
+              <div className="flex items-center gap-2 pl-8 mt-3">
+                <Button
+                  type="button"
+                  variant="default"
+                  size="sm"
+                  className="h-8 text-xs bg-green-600 hover:bg-green-700"
+                  onClick={() => onRemediate(defect.id)}
+                >
+                  <Icon name="CheckCircle2" size={14} className="mr-1" />
+                  Заявить об устранении
                 </Button>
               </div>
             )}

@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { useToast } from '@/hooks/use-toast';
+import { apiClient } from '@/api/apiClient';
 import { InspectionInfoCard } from '@/components/inspection/InspectionInfoCard';
 import DefectsSectionNew, { Defect } from '@/components/inspection/DefectsSectionNew';
 import InspectionActions from '@/components/inspection/InspectionActions';
@@ -93,6 +95,42 @@ const InspectionDetail = () => {
     setDraftDefects([]);
   };
 
+  const [remediating, setRemediating] = useState<Record<string, boolean>>({});
+  const { toast } = useToast();
+
+  const handleRemediate = async (defectId: string) => {
+    if (!inspection || !user) return;
+
+    setRemediating(prev => ({ ...prev, [defectId]: true }));
+
+    try {
+      const response = await apiClient.post('/ef8edfd4-ef48-48a9-95fb-78f5a4982949', {
+        inspection_id: inspection.id,
+        defect_id: defectId,
+        status: 'completed',
+        description: 'Замечание устранено подрядчиком'
+      });
+
+      if (response.success) {
+        toast({
+          title: 'Успешно',
+          description: 'Заявление об устранении отправлено'
+        });
+      } else {
+        throw new Error(response.error || 'Ошибка отправки');
+      }
+    } catch (error: any) {
+      console.error('[InspectionDetail] Remediate error:', error);
+      toast({
+        title: 'Ошибка',
+        description: error.message || 'Не удалось отправить заявление',
+        variant: 'destructive'
+      });
+    } finally {
+      setRemediating(prev => ({ ...prev, [defectId]: false }));
+    }
+  };
+
   if (!inspection) {
     return (
       <div className="min-h-screen bg-slate-50 p-4 md:p-8">
@@ -169,6 +207,7 @@ const InspectionDetail = () => {
             draftDefects={draftDefects}
             isDraft={canEdit}
             isClient={isClient}
+            isCompleted={inspection.status === 'completed'}
             onAddDraft={handleAddDraft}
             onDraftChange={handleDraftChange}
             onDraftPhotoAdd={handleDraftPhotoAdd}
@@ -176,12 +215,13 @@ const InspectionDetail = () => {
             onRemoveDraft={handleRemoveDraft}
             onSaveDefects={handleSaveDefects}
             onRemoveDefect={handleRemoveDefect}
+            onRemediate={handleRemediate}
           />
         </div>
 
 
 
-        {inspection.status === 'completed' && defects.length > 0 && (
+        {inspection.status === 'completed' && defects.length > 0 && isClient && (
           <DefectReportCard
             defectReport={defectReport}
             loadingReport={loadingReport}
