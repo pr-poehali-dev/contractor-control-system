@@ -211,6 +211,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             params = event.get('queryStringParameters', {}) or {}
             report_id = params.get('id')
             work_id = params.get('work_id')
+            inspection_id = params.get('inspection_id')
             
             if report_id:
                 schema = SCHEMA
@@ -257,15 +258,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
-            elif work_id:
+            elif work_id or inspection_id:
                 schema = SCHEMA
+                where_clause = f"dr.work_id = {work_id}" if work_id else f"dr.inspection_id = {inspection_id}"
+                
                 cur.execute(f"""
                     SELECT dr.id, dr.inspection_id, dr.report_number, dr.work_id, dr.object_id,
                            dr.created_by, dr.created_at, dr.status, dr.total_defects, dr.critical_defects,
                            u.name as author_name
                     FROM {schema}.defect_reports dr
                     LEFT JOIN {schema}.users u ON dr.created_by = u.id
-                    WHERE dr.work_id = {work_id}
+                    WHERE {where_clause}
                     ORDER BY dr.created_at DESC
                 """)
                 rows = cur.fetchall()
@@ -296,7 +299,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return {
                 'statusCode': 400,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'success': False, 'error': 'id or work_id required'}),
+                'body': json.dumps({'success': False, 'error': 'id, work_id or inspection_id required'}),
                 'isBase64Encoded': False
             }
         

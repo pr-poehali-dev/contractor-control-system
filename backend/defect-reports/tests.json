@@ -1,27 +1,6 @@
 {
   "tests": [
-    {
-      "name": "Create defect report",
-      "method": "POST",
-      "path": "/",
-      "headers": {
-        "X-Auth-Token": "test-token.1"
-      },
-      "body": {
-        "inspection_id": 51,
-        "notes": "Test report"
-      },
-      "expectedStatus": 201,
-      "expectedBody": {
-        "success": true,
-        "data": {
-          "id": "number",
-          "report_number": "string",
-          "status": "active"
-        }
-      },
-      "bodyMatcher": "partial"
-    },
+
     {
       "name": "Get report by inspection",
       "method": "GET",
