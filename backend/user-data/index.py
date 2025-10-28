@@ -432,19 +432,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'total': unread_messages + unread_logs + unread_inspections
             }
         
-        # Строим иерархию данных
-        objects_with_works = build_hierarchy(
-            objects, works, inspections, remarks, work_logs, 
-            chat_messages, defect_reports, defect_remediations
-        )
-        
-        cur.close()
-        conn.close()
-        
-        # Получаем contractor_id для пользователя-подрядчика
+        # Получаем contractor_id для пользователя-подрядчика ПЕРЕД закрытием соединения
         user_contractor_id = None
         if role == 'contractor':
-            cur = conn.cursor(cursor_factory=RealDictCursor)
             cur.execute(f"""
                 SELECT id as contractor_id
                 FROM {SCHEMA}.contractors
@@ -453,7 +443,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             contractor_result = cur.fetchone()
             if contractor_result:
                 user_contractor_id = contractor_result['contractor_id']
-            cur.close()
+        
+        # Строим иерархию данных
+        objects_with_works = build_hierarchy(
+            objects, works, inspections, remarks, work_logs, 
+            chat_messages, defect_reports, defect_remediations
+        )
+        
+        cur.close()
+        conn.close()
         
         return {
             'statusCode': 200,
