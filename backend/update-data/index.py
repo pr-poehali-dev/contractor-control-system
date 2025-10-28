@@ -349,6 +349,13 @@ def handler(event, context):
                     else:
                         update_parts.append(f"scheduled_date = '{scheduled_date}'")
                 
+                if 'defect_report_document_id' in data:
+                    doc_id = data['defect_report_document_id']
+                    if doc_id is None or doc_id == 'NULL':
+                        update_parts.append(f"defect_report_document_id = NULL")
+                    else:
+                        update_parts.append(f"defect_report_document_id = {int(doc_id)}")
+                
                 if not update_parts:
                     cur.close()
                     conn.close()
@@ -364,7 +371,7 @@ def handler(event, context):
                     UPDATE {SCHEMA}.inspections 
                     SET {update_sql}
                     WHERE id = {int(item_id)}
-                    RETURNING id, work_id, inspection_number, type, status, defects, scheduled_date, completed_at, created_by, created_at
+                    RETURNING id, work_id, inspection_number, type, status, defects, scheduled_date, completed_at, defect_report_document_id, created_by, created_at
                 """)
                 
                 result_row = cur.fetchone()
