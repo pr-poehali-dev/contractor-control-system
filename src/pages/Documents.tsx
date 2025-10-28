@@ -161,14 +161,16 @@ const Documents = () => {
                   <SelectContent>
                     {templatesLoading ? (
                       <SelectItem value="loading" disabled>Загрузка...</SelectItem>
-                    ) : templates.length === 0 ? (
+                    ) : templates.filter(t => !t.is_system).length === 0 ? (
                       <SelectItem value="empty" disabled>Нет доступных шаблонов</SelectItem>
                     ) : (
-                      templates.map((template) => (
-                        <SelectItem key={template.id} value={template.id.toString()}>
-                          {template.name}
-                        </SelectItem>
-                      ))
+                      templates
+                        .filter(template => !template.is_system)
+                        .map((template) => (
+                          <SelectItem key={template.id} value={template.id.toString()}>
+                            {template.name}
+                          </SelectItem>
+                        ))
                     )}
                   </SelectContent>
                 </Select>
