@@ -210,36 +210,75 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     created_templates = []
+    admin_user_id = 6  # ID администратора
     
+    # Шаг 1: Проверяем/создаем эталонные шаблоны (только для админа)
+    master_template_ids = {}
     for template in default_templates:
         template_name_escaped = template['name'].replace("'", "''")
         
+        # Ищем эталонный шаблон (у админа с is_system=true и без source_template_id)
         cur.execute(f'''
             SELECT id FROM t_p8942561_contractor_control_s.document_templates 
-            WHERE client_id = {user_id} AND name = '{template_name_escaped}' AND is_system = true
+            WHERE client_id = {admin_user_id} 
+              AND name = '{template_name_escaped}' 
+              AND is_system = true
+              AND source_template_id IS NULL
         ''')
         
-        existing = cur.fetchone()
+        master = cur.fetchone()
         
-        if not existing:
+        if not master:
+            # Создаем эталонный шаблон для админа
             description_escaped = template['description'].replace("'", "''")
             content_json = json.dumps(template['content']).replace("'", "''")
             
             cur.execute(f'''
                 INSERT INTO t_p8942561_contractor_control_s.document_templates 
-                (client_id, name, description, template_type, content, is_system, version, is_active)
-                VALUES ({user_id}, '{template_name_escaped}', '{description_escaped}', '{template['template_type']}', '{content_json}', true, 1, true)
-                RETURNING id, name, description, template_type, created_at
+                (client_id, name, description, template_type, content, is_system, version, is_active, source_template_id)
+                VALUES ({admin_user_id}, '{template_name_escaped}', '{description_escaped}', '{template['template_type']}', '{content_json}', true, 1, true, NULL)
+                RETURNING id
             ''')
             
-            result = cur.fetchone()
-            created_templates.append({
-                'id': result[0],
-                'name': result[1],
-                'description': result[2],
-                'template_type': result[3],
-                'created_at': str(result[4])
-            })
+            master = cur.fetchone()
+        
+        master_template_ids[template['template_type']] = master[0]
+    
+    # Шаг 2: Создаем копии эталонов для текущего пользователя (если это не админ)
+    if user_id != admin_user_id:
+        for template in default_templates:
+            template_name_escaped = template['name'].replace("'", "''")
+            master_id = master_template_ids[template['template_type']]
+            
+            # Проверяем, есть ли уже копия у пользователя
+            cur.execute(f'''
+                SELECT id FROM t_p8942561_contractor_control_s.document_templates 
+                WHERE client_id = {user_id} 
+                  AND source_template_id = {master_id}
+            ''')
+            
+            existing_copy = cur.fetchone()
+            
+            if not existing_copy:
+                # Создаем копию эталона для пользователя
+                description_escaped = template['description'].replace("'", "''")
+                content_json = json.dumps(template['content']).replace("'", "''")
+                
+                cur.execute(f'''
+                    INSERT INTO t_p8942561_contractor_control_s.document_templates 
+                    (client_id, name, description, template_type, content, is_system, version, is_active, source_template_id)
+                    VALUES ({user_id}, '{template_name_escaped}', '{description_escaped}', '{template['template_type']}', '{content_json}', false, 1, true, {master_id})
+                    RETURNING id, name, description, template_type, created_at
+                ''')
+                
+                result = cur.fetchone()
+                created_templates.append({
+                    'id': result[0],
+                    'name': result[1],
+                    'description': result[2],
+                    'template_type': result[3],
+                    'created_at': str(result[4])
+                })
     
     conn.commit()
     cur.close()

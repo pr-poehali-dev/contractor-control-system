@@ -46,7 +46,12 @@ export function TemplateCard({ template, variables, onClick, getTemplateTypeLabe
               <Badge variant="secondary" className="text-xs">
                 {getTemplateTypeLabel(template.template_type)}
               </Badge>
-              {template.is_system && (
+              {template.is_system && !template.source_template_id && (
+                <Badge className="text-xs bg-amber-600 text-white border-0">
+                  Эталон
+                </Badge>
+              )}
+              {template.source_template_id && (
                 <Badge className="text-xs bg-purple-600 text-white border-0">
                   Системный
                 </Badge>

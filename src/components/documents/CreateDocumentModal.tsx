@@ -15,6 +15,7 @@ interface Template {
   htmlContent?: string;
   is_system?: boolean;
   template_type?: string;
+  source_template_id?: number | null;
 }
 
 interface CreateDocumentModalProps {
@@ -32,10 +33,16 @@ export default function CreateDocumentModal({
   loading = false,
   onSelectTemplate
 }: CreateDocumentModalProps) {
-  // Показываем только пользовательские шаблоны (НЕ системные)
-  // Убираем дубликаты по имени - берем только первый шаблон с каждым уникальным именем
+  // Системные = копии эталонов (с source_template_id)
+  const systemTemplates = templates
+    .filter(t => t.source_template_id !== null && t.source_template_id !== undefined)
+    .filter((template, index, self) => 
+      index === self.findIndex(t => t.name === template.name)
+    );
+  
+  // Пользовательские = обычные шаблоны (без is_system и без source_template_id)
   const userTemplates = templates
-    .filter(t => !t.is_system)
+    .filter(t => !t.is_system && !t.source_template_id)
     .filter((template, index, self) => 
       index === self.findIndex(t => t.name === template.name)
     );
@@ -68,6 +75,51 @@ export default function CreateDocumentModal({
           ) : (
             <ScrollArea className="h-[50vh]">
               <div className="space-y-6 pr-4">
+                {/* Системные шаблоны */}
+                {systemTemplates.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Icon name="Shield" size={18} className="text-purple-600" />
+                      <h3 className="font-semibold text-slate-900">Системные шаблоны</h3>
+                      <Badge variant="secondary" className="text-xs">{systemTemplates.length}</Badge>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {systemTemplates.map((template) => (
+                        <Card
+                          key={template.id}
+                          className="p-4 hover:shadow-lg transition-all cursor-pointer border-2 hover:border-purple-300 group"
+                          onClick={() => {
+                            onSelectTemplate(template.id, template.name);
+                            onClose();
+                          }}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-purple-200 transition-colors">
+                              <Icon name="FileType" size={20} className="text-purple-600" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-purple-600 transition-colors">
+                                {template.name}
+                              </h3>
+                              {template.description && (
+                                <p className="text-xs text-slate-600 line-clamp-2">
+                                  {template.description}
+                                </p>
+                              )}
+                            </div>
+                            <Icon 
+                              name="ChevronRight" 
+                              size={20} 
+                              className="text-slate-400 group-hover:text-purple-600 transition-colors" 
+                            />
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Пользовательские шаблоны */}
                 {userTemplates.length > 0 ? (
                   <div>
                     <div className="flex items-center gap-2 mb-3">
@@ -109,13 +161,13 @@ export default function CreateDocumentModal({
                       ))}
                     </div>
                   </div>
-                ) : (
+                ) : systemTemplates.length === 0 ? (
                   <div className="text-center py-12">
                     <Icon name="FileX" size={48} className="mx-auto mb-4 text-slate-300" />
-                    <p className="text-slate-500">Нет пользовательских шаблонов</p>
+                    <p className="text-slate-500">Нет доступных шаблонов</p>
                     <p className="text-sm text-slate-400 mt-2">Создайте шаблон в разделе "Шаблоны"</p>
                   </div>
-                )}
+                ) : null}
               </div>
             </ScrollArea>
           )}

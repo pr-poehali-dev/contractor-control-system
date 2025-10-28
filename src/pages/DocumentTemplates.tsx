@@ -110,12 +110,24 @@ export default function DocumentTemplates() {
     
     const matchesType = typeFilter === 'all' || template.template_type === typeFilter;
     
+    const isAdmin = userData?.id === 6;
+    
+    // Эталоны видят только админы
+    if (template.is_system && !template.source_template_id && !isAdmin) {
+      return false;
+    }
+    
     return matchesSearch && matchesType;
   });
 
-  // Системные шаблоны видны всем, редактировать могут только админы
-  const systemTemplates = filteredTemplates.filter(t => t.is_system);
-  const userTemplates = filteredTemplates.filter(t => !t.is_system);
+  // Системные = эталоны (для админа) + копии эталонов (для всех)
+  const systemTemplates = filteredTemplates.filter(t => 
+    (t.is_system && !t.source_template_id) || // Эталоны
+    t.source_template_id !== null && t.source_template_id !== undefined // Копии эталонов
+  );
+  const userTemplates = filteredTemplates.filter(t => 
+    !t.is_system && !t.source_template_id // Обычные пользовательские
+  );
 
   const handleCreateTemplate = async () => {
     if (!newTemplate.name.trim()) {
