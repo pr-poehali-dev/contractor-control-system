@@ -31,21 +31,44 @@ export function TemplateCard({ template, variables, onClick, getTemplateTypeLabe
           </div>
 
           <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2 mb-3">
+            <div className="flex items-start justify-between gap-2 mb-2">
               <h3 className="font-semibold text-lg text-slate-900">{template.name}</h3>
               <Icon name="ChevronRight" size={20} className="text-slate-400 flex-shrink-0" />
             </div>
 
-            <div className="flex items-center gap-2">
+            {template.description && (
+              <p className="text-sm text-slate-600 mb-3 line-clamp-2">
+                {template.description}
+              </p>
+            )}
+
+            <div className="flex items-center gap-2 mb-3">
               <Badge variant="secondary" className="text-xs">
                 {getTemplateTypeLabel(template.template_type)}
               </Badge>
-              {template.is_system ? (
+              {template.is_system && (
                 <Badge className="text-xs bg-purple-600 text-white border-0">
                   Системный
                 </Badge>
-              ) : null}
+              )}
             </div>
+
+            {template.updated_at && (
+              <div className="flex items-center gap-1 text-xs text-slate-500">
+                <Icon name="Calendar" size={12} />
+                <span>
+                  Обновлён{' '}
+                  {(() => {
+                    try {
+                      const date = new Date(template.updated_at);
+                      return isNaN(date.getTime()) ? 'недавно' : format(date, 'd.MM.yyyy', { locale: ru });
+                    } catch {
+                      return 'недавно';
+                    }
+                  })()}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
