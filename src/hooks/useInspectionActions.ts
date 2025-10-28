@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 import { Defect } from '@/components/inspection/DefectsSection';
 import { apiClient } from '@/api/apiClient';
 import { ENDPOINTS } from '@/api/endpoints';
@@ -215,10 +216,14 @@ export function useInspectionActions(
       toast({ 
         title: 'Акт создан!', 
         description: `Акт №${reportNumber} сохранён`,
-        action: {
-          label: 'Открыть',
-          onClick: () => navigate(`/document/${docResponse.data.id}`)
-        }
+        action: (
+          <ToastAction 
+            altText="Открыть документ"
+            onClick={() => navigate(`/document/${docResponse.data.id}`)}
+          >
+            Открыть
+          </ToastAction>
+        )
       });
       
     } catch (error: any) {
