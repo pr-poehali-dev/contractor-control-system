@@ -110,9 +110,14 @@ export default function DocumentTemplates() {
     
     const matchesType = typeFilter === 'all' || template.template_type === typeFilter;
     
-    // Скрываем эталоны (is_system=true) для обычных пользователей
     const isAdmin = userData?.id === 6;
+    
     if (template.is_system && !isAdmin) {
+      return false;
+    }
+    
+    const hiddenTypes = ['work_acceptance', 'defect_detection', 'defect_resolution'];
+    if (hiddenTypes.includes(template.template_type) && !isAdmin) {
       return false;
     }
     
@@ -166,6 +171,9 @@ export default function DocumentTemplates() {
       act: 'Акт работ',
       inspection: 'Акт проверки',
       defect_elimination: 'Акт о дефектах',
+      defect_detection: 'Обнаружение дефектов',
+      defect_resolution: 'Устранение дефектов',
+      work_acceptance: 'Приёмка работ',
       completion: 'Акт приёмки',
       protocol: 'Протокол',
       contract: 'Договор',
