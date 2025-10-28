@@ -324,6 +324,60 @@ def handler(event, context):
                 conn.commit()
                 result = {'success': True, 'data': dict(result_row)}
             
+            elif item_type == 'inspection':
+                update_parts = []
+                
+                if 'status' in data:
+                    status = data['status'].replace("'", "''")
+                    update_parts.append(f"status = '{status}'")
+                
+                if 'defects' in data:
+                    defects = data['defects'].replace("'", "''") if isinstance(data['defects'], str) else json.dumps(data['defects'], ensure_ascii=False).replace("'", "''")
+                    update_parts.append(f"defects = '{defects}'::jsonb")
+                
+                if 'completed_at' in data:
+                    completed_at = data['completed_at'].replace("'", "''") if data['completed_at'] else 'NULL'
+                    if completed_at == 'NULL':
+                        update_parts.append(f"completed_at = NULL")
+                    else:
+                        update_parts.append(f"completed_at = '{completed_at}'")
+                
+                if 'scheduled_date' in data:
+                    scheduled_date = data['scheduled_date'].replace("'", "''") if data['scheduled_date'] else 'NULL'
+                    if scheduled_date == 'NULL':
+                        update_parts.append(f"scheduled_date = NULL")
+                    else:
+                        update_parts.append(f"scheduled_date = '{scheduled_date}'")
+                
+                if not update_parts:
+                    cur.close()
+                    conn.close()
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'body': json.dumps({'success': False, 'error': 'No fields to update'})
+                    }
+                
+                update_sql = ', '.join(update_parts)
+                
+                cur.execute(f"""
+                    UPDATE {SCHEMA}.inspections 
+                    SET {update_sql}
+                    WHERE id = {int(item_id)}
+                    RETURNING id, work_id, inspection_number, type, status, defects, scheduled_date, completed_at, created_by, created_at
+                """)
+                
+                result_row = cur.fetchone()
+                if not result_row:
+                    return {
+                        'statusCode': 404,
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'body': json.dumps({'success': False, 'error': 'Inspection not found'})
+                    }
+                
+                conn.commit()
+                result = {'success': True, 'data': dict(result_row)}
+            
             else:
                 cur.close()
                 conn.close()
