@@ -239,12 +239,12 @@ def handler(event, context):
                 
                 # Генерируем inspection_number на основе work_id
                 cur.execute(f"""
-                    SELECT COALESCE(MAX(CAST(SUBSTRING(inspection_number FROM 'INS-{work_id}-(\\d+)') AS INTEGER)), 0) + 1
+                    SELECT COALESCE(MAX(CAST(SUBSTRING(inspection_number FROM 'INS-{work_id}-(\\d+)') AS INTEGER)), 0) + 1 as next_num
                     FROM {SCHEMA}.inspections
                     WHERE work_id = {work_id}
                 """)
                 next_number_row = cur.fetchone()
-                next_number = next_number_row[0] if next_number_row and next_number_row[0] else 1
+                next_number = next_number_row['next_num'] if next_number_row and next_number_row['next_num'] else 1
                 inspection_number = f"INS-{work_id}-{next_number}"
                 
                 fields = ['work_id', 'inspection_number', 'type', 'status', 'created_by', 'created_at']
