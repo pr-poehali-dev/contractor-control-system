@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   fetchDocumentDetail,
   createSignatureRequest,
   signDocument,
+  updateDocument,
   selectCurrentDocument,
   selectDocumentsLoading,
 } from '@/store/slices/documentsSlice';
@@ -16,6 +17,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import DocumentEditor from './DocumentEditor';
+import { useToast } from '@/hooks/use-toast';
 
 interface DocumentViewerProps {
   documentId: number;
@@ -26,10 +29,18 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
   const document = useAppSelector(selectCurrentDocument);
   const loading = useAppSelector(selectDocumentsLoading);
   const user = useAppSelector((state) => state.user.user);
+  const { toast } = useToast();
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     dispatch(fetchDocumentDetail(documentId));
   }, [dispatch, documentId]);
+
+  useEffect(() => {
+    if (document && document.status === 'draft') {
+      setIsEditing(true);
+    }
+  }, [document]);
 
   const handleSign = async (signatureId: number) => {
     await dispatch(signDocument({
@@ -52,6 +63,34 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
     }));
     
     dispatch(fetchDocumentDetail(documentId));
+  };
+
+  const handleSaveData = async (data: Record<string, any>) => {
+    try {
+      await dispatch(updateDocument({
+        id: documentId,
+        contentData: data,
+      })).unwrap();
+
+      toast({
+        title: 'Данные сохранены',
+        description: 'Документ успешно обновлён',
+      });
+
+      dispatch(fetchDocumentDetail(documentId));
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось сохранить данные',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const extractVariables = (html: string): string[] => {
+    const matches = html.match(/\{\{([^}]+)\}\}/g);
+    if (!matches) return [];
+    return [...new Set(matches.map(m => m.replace(/[{}]/g, '').trim()))];
   };
 
   if (loading && !document) {
@@ -139,16 +178,31 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
             )}
           </div>
 
-          <Separator />
+        </CardContent>
+      </Card>
 
-          <div>
-            <h3 className="font-semibold mb-3">Содержание документа</h3>
+      {isEditing && document.status === 'draft' ? (
+        <DocumentEditor
+          htmlContent={document.htmlContent || ''}
+          variables={extractVariables(document.htmlContent || '')}
+          contentData={document.contentData || {}}
+          onSave={handleSaveData}
+        />
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Icon name="FileText" size={20} />
+              Содержание документа
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
             <div className="bg-white p-6 rounded-lg border prose max-w-none">
               <div dangerouslySetInnerHTML={{ __html: document.htmlContent || 'Нет содержимого' }} />
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {canSign && mySignature && (
         <Card className="border-amber-200 bg-amber-50">
