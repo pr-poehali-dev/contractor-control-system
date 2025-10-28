@@ -88,9 +88,9 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
   };
 
   const extractVariables = (html: string): string[] => {
-    const matches = html.match(/\{\{([^}]+)\}\}/g);
+    const matches = html.match(/\[([^\]]+)\]/g);
     if (!matches) return [];
-    return [...new Set(matches.map(m => m.replace(/[{}]/g, '').trim()))];
+    return [...new Set(matches.map(m => m.replace(/[\[\]]/g, '').trim()))];
   };
 
   const handleDownloadPDF = () => {
@@ -98,7 +98,7 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
     const data = document?.contentData || {};
 
     Object.entries(data).forEach(([key, value]) => {
-      const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+      const regex = new RegExp(`\\[${key}\\]`, 'g');
       content = content.replace(regex, String(value || ''));
     });
 

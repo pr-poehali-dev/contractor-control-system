@@ -40,13 +40,13 @@ export default function DocumentEditor({
     let preview = htmlContent || '';
     
     Object.entries(formData).forEach(([key, value]) => {
-      const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+      const regex = new RegExp(`\\[${key}\\]`, 'g');
       preview = preview.replace(regex, value || `[${key}]`);
     });
 
     variables.forEach(variable => {
       if (!formData[variable]) {
-        const regex = new RegExp(`\\{\\{${variable}\\}\\}`, 'g');
+        const regex = new RegExp(`\\[${variable}\\]`, 'g');
         preview = preview.replace(regex, `<span class="bg-yellow-100 px-1 rounded">[${variable}]</span>`);
       }
     });
