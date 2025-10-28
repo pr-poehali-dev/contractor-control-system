@@ -36,12 +36,6 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
     dispatch(fetchDocumentDetail(documentId));
   }, [dispatch, documentId]);
 
-  useEffect(() => {
-    if (document && document.status === 'draft') {
-      setIsEditing(true);
-    }
-  }, [document]);
-
   const handleSign = async (signatureId: number) => {
     await dispatch(signDocument({
       signature_id: signatureId,
@@ -225,28 +219,78 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
         </CardContent>
       </Card>
 
-      {isEditing && document.status === 'draft' ? (
+      {isEditing ? (
         <DocumentEditor
           htmlContent={document.htmlContent || ''}
           variables={extractVariables(document.htmlContent || '')}
           contentData={document.contentData || {}}
-          onSave={handleSaveData}
+          onSave={(data) => {
+            handleSaveData(data);
+            setIsEditing(false);
+          }}
           onDownload={handleDownloadPDF}
         />
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Icon name="FileText" size={20} />
-              Содержание документа
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-white p-6 rounded-lg border prose max-w-none">
-              <div dangerouslySetInnerHTML={{ __html: document.htmlContent || 'Нет содержимого' }} />
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="FileText" size={20} />
+                  Превью документа
+                </CardTitle>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={handleDownloadPDF}>
+                    <Icon name="Printer" size={16} className="mr-2" />
+                    Печать
+                  </Button>
+                  <Button size="sm" onClick={() => setIsEditing(true)}>
+                    <Icon name="Edit" size={16} className="mr-2" />
+                    Редактировать
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-white p-8 rounded-lg border shadow-sm">
+                <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: document.htmlContent || 'Нет содержимого' }} />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Действия с документом</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button variant="outline" className="w-full justify-start" onClick={handleDownloadPDF}>
+                <Icon name="Download" size={18} className="mr-3" />
+                Скачать
+              </Button>
+              <Button variant="outline" className="w-full justify-start">
+                <Icon name="Mail" size={18} className="mr-3" />
+                Отправить клиенту
+              </Button>
+              <Button variant="outline" className="w-full justify-start">
+                <Icon name="Clock" size={18} className="mr-3" />
+                Напомнить об оплате
+              </Button>
+              <Button variant="outline" className="w-full justify-start">
+                <Icon name="Link" size={18} className="mr-3" />
+                Включить доступ по ссылке
+              </Button>
+              <Separator />
+              <Button variant="outline" className="w-full justify-start" onClick={() => setIsEditing(true)}>
+                <Icon name="Edit" size={18} className="mr-3" />
+                Редактировать
+              </Button>
+              <Button variant="outline" className="w-full justify-start text-red-600 hover:text-red-700">
+                <Icon name="Trash2" size={18} className="mr-3" />
+                Удалить
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {canSign && mySignature && (

@@ -13,6 +13,8 @@ interface Template {
   description?: string;
   category?: string;
   htmlContent?: string;
+  is_system?: boolean;
+  template_type?: string;
 }
 
 interface CreateDocumentModalProps {
@@ -30,13 +32,8 @@ export default function CreateDocumentModal({
   loading = false,
   onSelectTemplate
 }: CreateDocumentModalProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-
-  const categories = ['all', ...Array.from(new Set(templates.map(t => t.category).filter(Boolean)))];
-  
-  const filteredTemplates = selectedCategory === 'all' 
-    ? templates 
-    : templates.filter(t => t.category === selectedCategory);
+  const systemTemplates = templates.filter(t => t.is_system);
+  const userTemplates = templates.filter(t => !t.is_system);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -65,43 +62,92 @@ export default function CreateDocumentModal({
             </div>
           ) : (
             <ScrollArea className="h-[50vh]">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-4">
-                {filteredTemplates.map((template) => (
-                  <Card
-                    key={template.id}
-                    className="p-4 hover:shadow-lg transition-all cursor-pointer border-2 hover:border-blue-300 group"
-                    onClick={() => {
-                      onSelectTemplate(template.id, template.name);
-                      onClose();
-                    }}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
-                        <Icon name="FileText" size={20} className="text-blue-600" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">
-                          {template.name}
-                        </h3>
-                        {template.description && (
-                          <p className="text-xs text-slate-600 line-clamp-2">
-                            {template.description}
-                          </p>
-                        )}
-                        {template.category && (
-                          <Badge variant="outline" className="mt-2 text-[10px]">
-                            {template.category}
-                          </Badge>
-                        )}
-                      </div>
-                      <Icon 
-                        name="ChevronRight" 
-                        size={20} 
-                        className="text-slate-400 group-hover:text-blue-600 transition-colors" 
-                      />
+              <div className="space-y-6 pr-4">
+                {systemTemplates.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Icon name="Shield" size={18} className="text-purple-600" />
+                      <h3 className="font-semibold text-slate-900">Системные шаблоны</h3>
+                      <Badge variant="secondary" className="text-xs">{systemTemplates.length}</Badge>
                     </div>
-                  </Card>
-                ))}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {systemTemplates.map((template) => (
+                        <Card
+                          key={template.id}
+                          className="p-4 hover:shadow-lg transition-all cursor-pointer border-2 hover:border-blue-300 group"
+                          onClick={() => {
+                            onSelectTemplate(template.id, template.name);
+                            onClose();
+                          }}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
+                              <Icon name="FileText" size={20} className="text-blue-600" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">
+                                {template.name}
+                              </h3>
+                              {template.description && (
+                                <p className="text-xs text-slate-600 line-clamp-2">
+                                  {template.description}
+                                </p>
+                              )}
+                            </div>
+                            <Icon 
+                              name="ChevronRight" 
+                              size={20} 
+                              className="text-slate-400 group-hover:text-blue-600 transition-colors" 
+                            />
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {userTemplates.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Icon name="User" size={18} className="text-slate-600" />
+                      <h3 className="font-semibold text-slate-900">Пользовательские шаблоны</h3>
+                      <Badge variant="secondary" className="text-xs">{userTemplates.length}</Badge>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {userTemplates.map((template) => (
+                        <Card
+                          key={template.id}
+                          className="p-4 hover:shadow-lg transition-all cursor-pointer border-2 hover:border-blue-300 group"
+                          onClick={() => {
+                            onSelectTemplate(template.id, template.name);
+                            onClose();
+                          }}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
+                              <Icon name="FileText" size={20} className="text-blue-600" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">
+                                {template.name}
+                              </h3>
+                              {template.description && (
+                                <p className="text-xs text-slate-600 line-clamp-2">
+                                  {template.description}
+                                </p>
+                              )}
+                            </div>
+                            <Icon 
+                              name="ChevronRight" 
+                              size={20} 
+                              className="text-slate-400 group-hover:text-blue-600 transition-colors" 
+                            />
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </ScrollArea>
           )}

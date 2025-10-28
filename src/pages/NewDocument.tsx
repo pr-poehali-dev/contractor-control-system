@@ -142,10 +142,15 @@ export default function NewDocument() {
 
     await saveAsDraft();
     
-    toast({
-      title: 'Успешно!',
-      description: 'Документ сохранён',
-    });
+    if (currentDocId) {
+      navigate(`/document/${currentDocId}`);
+    } else {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось создать документ',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
