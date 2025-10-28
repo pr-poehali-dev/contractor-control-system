@@ -40,15 +40,17 @@ export default function DocumentEditor({
   const renderPreview = () => {
     let preview = htmlContent || '';
     
+    // Заменяем переменные в формате {{key}}
     Object.entries(formData).forEach(([key, value]) => {
-      const regex = new RegExp(`\\[${key}\\]`, 'g');
-      preview = preview.replace(regex, value || `[${key}]`);
-    });
-
-    variables.forEach(variable => {
-      if (!formData[variable]) {
-        const regex = new RegExp(`\\[${variable}\\]`, 'g');
-        preview = preview.replace(regex, `<span class="bg-yellow-100 px-1 rounded">[${variable}]</span>`);
+      const regex1 = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
+      const regex2 = new RegExp(`\\[${key}\\]`, 'g');
+      
+      if (value) {
+        preview = preview.replace(regex1, `<span class="bg-blue-100 px-2 py-0.5 rounded text-blue-900 font-medium">${value}</span>`);
+        preview = preview.replace(regex2, `<span class="bg-blue-100 px-2 py-0.5 rounded text-blue-900 font-medium">${value}</span>`);
+      } else {
+        preview = preview.replace(regex1, `<span class="bg-yellow-100 px-2 py-0.5 rounded text-yellow-900">{{${key}}}</span>`);
+        preview = preview.replace(regex2, `<span class="bg-yellow-100 px-2 py-0.5 rounded text-yellow-900">[${key}]</span>`);
       }
     });
 

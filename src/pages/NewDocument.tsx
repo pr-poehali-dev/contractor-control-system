@@ -69,18 +69,15 @@ export default function NewDocument() {
     
     setIsSaving(true);
     try {
-      let html = template.content?.html || '';
-      Object.entries(documentData).forEach(([key, value]) => {
-        const regex = new RegExp(`{{${key}}}`, 'g');
-        html = html.replace(regex, value || `{{${key}}}`);
-      });
+      // Сохраняем оригинальный HTML с переменными (не заменяем их!)
+      const originalHtml = template.content?.html || '';
 
       if (currentDocId) {
         await dispatch(updateDocument({
           id: currentDocId,
           title: documentTitle,
           contentData: documentData,
-          htmlContent: html,
+          htmlContent: originalHtml,
           status: 'draft'
         })).unwrap();
       } else {
@@ -89,7 +86,7 @@ export default function NewDocument() {
           templateId: template.id,
           templateName: template.name,
           contentData: documentData,
-          htmlContent: html,
+          htmlContent: originalHtml,
           status: 'draft'
         })).unwrap();
         setCurrentDocId(result.id);
