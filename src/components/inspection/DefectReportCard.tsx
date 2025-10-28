@@ -49,7 +49,7 @@ export default function DefectReportCard({
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => navigate(`/defect-report/${defectReport.id}`)}
+                    onClick={() => navigate(`/document/${defectReport.id}`)}
                     className="flex-1 sm:flex-none"
                   >
                     <Icon name="Eye" size={16} className="mr-2" />

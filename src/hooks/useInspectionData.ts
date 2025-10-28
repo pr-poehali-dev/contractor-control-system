@@ -89,13 +89,25 @@ export function useInspectionData(inspectionId: string | undefined) {
     if (!token) return;
     
     try {
-      const response = await apiClient.get(
-        `${ENDPOINTS.DEFECTS.REPORTS}?inspection_id=${inspectionId}`
-      );
+      const response = await apiClient.get(ENDPOINTS.DOCUMENTS.BASE);
       
       if (response.success && response.data) {
-        const reports = Array.isArray(response.data) ? response.data : [response.data];
-        setDefectReport(reports.length > 0 ? reports[0] : null);
+        const documents = Array.isArray(response.data) ? response.data : [];
+        const defectDoc = documents.find((doc: any) => 
+          doc.document_type === 'defect_act' && 
+          doc.content?.inspectionNumber?.includes(inspectionId.toString())
+        );
+        
+        if (defectDoc) {
+          setDefectReport({
+            id: defectDoc.id,
+            report_number: defectDoc.content?.reportNumber || defectDoc.title,
+            total_defects: defectDoc.content?.totalDefects || 0,
+            critical_defects: defectDoc.content?.criticalDefects || 0,
+            created_at: defectDoc.created_at,
+            status: defectDoc.status
+          });
+        }
       }
     } catch (error) {
       console.error('Failed to load defect report:', error instanceof Error ? error.message : String(error));
