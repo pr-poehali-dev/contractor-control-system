@@ -11,14 +11,16 @@ import { apiClient } from '@/api/apiClient';
 import { ENDPOINTS } from '@/api/endpoints';
 
 interface Task {
-  id: number;
-  report_id: number;
-  report_number: string;
-  defect_id: string;
+  id: string;
+  inspection_id: number;
+  inspection_number: string;
   defect_description: string;
   defect_location?: string;
   defect_severity?: string;
+  defect_deadline?: string;
+  defect_responsible?: string;
   status: string;
+  work_id: number;
   work_title: string;
   object_title: string;
   created_at: string;
@@ -47,12 +49,47 @@ const MyTasks = () => {
     
     setLoading(true);
     try {
-      const response = await apiClient.get(
-        `${ENDPOINTS.CONTRACTORS.TASKS}?contractor_id=${user.id}`
-      );
+      const response = await apiClient.get(ENDPOINTS.USER.DATA);
       
-      if (response.success) {
-        setTasks(response.data?.tasks || []);
+      if (response.success && response.data) {
+        const allTasks: Task[] = [];
+        
+        for (const obj of response.data.objects || []) {
+          for (const work of obj.works || []) {
+            if (work.contractor_id === user.id) {
+              for (const inspection of work.inspections || []) {
+                if (inspection.status === 'completed' && inspection.defects) {
+                  try {
+                    const defects = JSON.parse(inspection.defects);
+                    if (Array.isArray(defects) && defects.length > 0) {
+                      for (const defect of defects) {
+                        allTasks.push({
+                          id: defect.id || defect.tempId,
+                          inspection_id: inspection.id,
+                          inspection_number: inspection.inspection_number,
+                          defect_description: defect.description,
+                          defect_location: defect.location,
+                          defect_severity: defect.severity,
+                          defect_deadline: defect.deadline,
+                          defect_responsible: defect.responsible,
+                          status: defect.remediation_status || 'pending',
+                          work_id: work.id,
+                          work_title: work.title,
+                          object_title: obj.title,
+                          created_at: inspection.created_at
+                        });
+                      }
+                    }
+                  } catch (e) {
+                    console.error('Failed to parse defects:', e);
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        setTasks(allTasks);
       } else {
         console.error('[MyTasks] Error response:', response.error);
       }
@@ -104,7 +141,7 @@ const MyTasks = () => {
     const matchesFilter = filter === 'all' || task.status === filter;
     const matchesSearch = searchQuery === '' || 
       task.defect_description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      task.report_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.inspection_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.object_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.work_title.toLowerCase().includes(searchQuery.toLowerCase());
     
@@ -194,7 +231,7 @@ const MyTasks = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-3">
                           <span className="text-xs font-medium text-slate-500">
-                            Акт: {task.report_number}
+                            Проверка: {task.inspection_number}
                           </span>
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(task.defect_severity)}`}>
                             {task.defect_severity || 'Не указано'}
@@ -229,11 +266,11 @@ const MyTasks = () => {
 
                       <div className="flex md:flex-col gap-2">
                         <Button
-                          onClick={() => navigate(`/defect-report/${task.report_id}`)}
+                          onClick={() => navigate(`/inspection/${task.inspection_id}`)}
                           className="flex-1 md:flex-none"
                         >
                           <Icon name="ExternalLink" size={16} className="mr-2" />
-                          Открыть акт
+                          Открыть проверку
                         </Button>
                       </div>
                     </div>

@@ -201,9 +201,19 @@ export function useInspectionActions(
         const docResponse = await apiClient.post(ENDPOINTS.DOCUMENTS.BASE, documentData);
         
         if (docResponse.success) {
+          // 6. Сохранить ссылку на документ в проверке
+          await dispatch(updateInspection({
+            id: inspection.id,
+            data: {
+              defect_report_document_id: docResponse.data.id
+            }
+          })).unwrap();
+          
+          await loadUserData();
+          
           toast({ 
-            title: 'Документ создан!', 
-            description: `Акт №${defectReportData.report_number} сохранён в разделе "Документы"`,
+            title: 'Акт создан!', 
+            description: `Акт №${defectReportData.report_number} сохранён`,
             action: {
               label: 'Открыть',
               onClick: () => navigate(`/document/${docResponse.data.id}`)

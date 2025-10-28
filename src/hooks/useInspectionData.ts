@@ -30,7 +30,7 @@ export function useInspectionData(inspectionId: string | undefined) {
         loadControlPointsForWork(found.work_id);
         
         if (found.status === 'completed' && parsedDefects.length > 0) {
-          loadDefectReport(found.id);
+          loadDefectReport(found);
         }
       }
     }
@@ -85,29 +85,22 @@ export function useInspectionData(inspectionId: string | undefined) {
     }
   };
 
-  const loadDefectReport = async (inspectionId: number) => {
-    if (!token) return;
+  const loadDefectReport = async (inspection: any) => {
+    if (!token || !inspection?.defect_report_document_id) return;
     
     try {
-      const response = await apiClient.get(ENDPOINTS.DOCUMENTS.BASE);
+      const response = await apiClient.get(`${ENDPOINTS.DOCUMENTS.BASE}?id=${inspection.defect_report_document_id}`);
       
       if (response.success && response.data) {
-        const documents = Array.isArray(response.data) ? response.data : [];
-        const defectDoc = documents.find((doc: any) => 
-          doc.document_type === 'defect_act' && 
-          doc.content?.inspectionNumber?.includes(inspectionId.toString())
-        );
-        
-        if (defectDoc) {
-          setDefectReport({
-            id: defectDoc.id,
-            report_number: defectDoc.content?.reportNumber || defectDoc.title,
-            total_defects: defectDoc.content?.totalDefects || 0,
-            critical_defects: defectDoc.content?.criticalDefects || 0,
-            created_at: defectDoc.created_at,
-            status: defectDoc.status
-          });
-        }
+        const doc = response.data;
+        setDefectReport({
+          id: doc.id,
+          report_number: doc.content?.reportNumber || doc.title,
+          total_defects: doc.content?.totalDefects || 0,
+          critical_defects: doc.content?.criticalDefects || 0,
+          created_at: doc.created_at,
+          status: doc.status
+        });
       }
     } catch (error) {
       console.error('Failed to load defect report:', error instanceof Error ? error.message : String(error));
