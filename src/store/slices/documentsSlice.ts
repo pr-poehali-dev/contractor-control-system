@@ -149,11 +149,14 @@ export const updateDocument = createAsyncThunk(
     htmlContent?: string;
   }, { rejectWithValue }) => {
     try {
+      console.log('🔵 updateDocument called with:', data);
       const response = await apiClient.put(`${ENDPOINTS.DOCUMENTS.UPDATE}/${data.id}`, data, {
         skipAuthRedirect: true
       });
+      console.log('🟢 updateDocument response:', response);
       return response.data;
     } catch (error: any) {
+      console.error('🔴 updateDocument error:', error);
       return rejectWithValue(error.message || 'Failed to update document');
     }
   }
