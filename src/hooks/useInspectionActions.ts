@@ -157,8 +157,22 @@ export function useInspectionActions(
       
       if (defectTemplate) {
         // 3. Получить данные работы и объекта
-        const work = userData?.works?.find((w: any) => w.id === inspection.work_id);
-        const object = userData?.objects?.find((o: any) => o.id === work?.object_id);
+        let work: any = null;
+        let object: any = null;
+        
+        // Ищем работу во всех объектах
+        for (const obj of userData?.objects || []) {
+          const foundWork = obj.works?.find((w: any) => w.id === inspection.work_id);
+          if (foundWork) {
+            work = foundWork;
+            object = obj;
+            break;
+          }
+        }
+        
+        if (!work || !object) {
+          throw new Error('Работа или объект не найдены');
+        }
         
         // 4. Подготовить данные для документа
         const documentData = {
