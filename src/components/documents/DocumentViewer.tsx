@@ -93,6 +93,49 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
     return [...new Set(matches.map(m => m.replace(/[{}]/g, '').trim()))];
   };
 
+  const handleDownloadPDF = () => {
+    let content = document?.htmlContent || '';
+    const data = document?.contentData || {};
+
+    Object.entries(data).forEach(([key, value]) => {
+      const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+      content = content.replace(regex, String(value || ''));
+    });
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <title>${document?.title || 'Документ'}</title>
+            <style>
+              body { 
+                font-family: 'Times New Roman', serif; 
+                padding: 40px; 
+                line-height: 1.6;
+                color: #000;
+              }
+              h1, h2, h3 { margin-top: 1em; margin-bottom: 0.5em; }
+              p { margin: 0.5em 0; }
+              @media print {
+                body { padding: 20px; }
+              }
+            </style>
+          </head>
+          <body>
+            ${content}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      setTimeout(() => {
+        printWindow.print();
+      }, 250);
+    }
+  };
+
   if (loading && !document) {
     return (
       <div className="space-y-4">
@@ -187,6 +230,7 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
           variables={extractVariables(document.htmlContent || '')}
           contentData={document.contentData || {}}
           onSave={handleSaveData}
+          onDownload={handleDownloadPDF}
         />
       ) : (
         <Card>

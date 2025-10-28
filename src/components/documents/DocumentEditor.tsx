@@ -5,13 +5,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface DocumentEditorProps {
   htmlContent: string;
   variables: string[];
   contentData: Record<string, any>;
   onSave: (data: Record<string, any>) => void;
+  onDownload?: () => void;
 }
 
 export default function DocumentEditor({
@@ -19,9 +20,9 @@ export default function DocumentEditor({
   variables,
   contentData,
   onSave,
+  onDownload,
 }: DocumentEditorProps) {
   const [formData, setFormData] = useState<Record<string, any>>(contentData || {});
-  const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
 
   useEffect(() => {
     setFormData(contentData || {});
@@ -81,99 +82,95 @@ export default function DocumentEditor({
   };
 
   return (
-    <div className="space-y-6">
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
-        <div className="flex items-center justify-between mb-4">
-          <TabsList>
-            <TabsTrigger value="edit" className="gap-2">
-              <Icon name="Edit" size={16} />
-              Заполнить поля
-            </TabsTrigger>
-            <TabsTrigger value="preview" className="gap-2">
-              <Icon name="Eye" size={16} />
-              Предпросмотр
-            </TabsTrigger>
-          </TabsList>
-          
-          <Button onClick={handleSave}>
-            <Icon name="Save" size={18} className="mr-2" />
-            Сохранить изменения
-          </Button>
-        </div>
-
-        <TabsContent value="edit" className="space-y-4 m-0">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Icon name="FileEdit" size={20} />
-                Заполнение данных документа
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+      <Card className="flex flex-col">
+        <CardHeader className="border-b bg-slate-50">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Icon name="FileEdit" size={20} />
+              Заполнение полей
+            </CardTitle>
+            <Button onClick={handleSave} size="sm">
+              <Icon name="Save" size={16} className="mr-2" />
+              Сохранить
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="flex-1 overflow-hidden p-0">
+          <ScrollArea className="h-full">
+            <div className="p-6 space-y-4">
               {variables.length === 0 ? (
                 <div className="text-center py-8 text-slate-500">
                   <Icon name="FileQuestion" size={48} className="mx-auto mb-4 text-slate-300" />
                   <p>В документе нет переменных для заполнения</p>
                 </div>
               ) : (
-                <div className="grid gap-4">
-                  {variables.map((variable) => {
-                    const fieldType = getFieldType(variable);
-                    const label = getFieldLabel(variable);
+                variables.map((variable) => {
+                  const fieldType = getFieldType(variable);
+                  const label = getFieldLabel(variable);
 
-                    return (
-                      <div key={variable}>
-                        <Label htmlFor={variable} className="text-sm font-medium mb-2 block">
-                          {label}
-                        </Label>
-                        {fieldType === 'textarea' ? (
-                          <Textarea
-                            id={variable}
-                            value={formData[variable] || ''}
-                            onChange={(e) => handleFieldChange(variable, e.target.value)}
-                            placeholder={`Введите ${label.toLowerCase()}`}
-                            rows={4}
-                          />
-                        ) : fieldType === 'date' ? (
-                          <Input
-                            id={variable}
-                            type="date"
-                            value={formData[variable] || ''}
-                            onChange={(e) => handleFieldChange(variable, e.target.value)}
-                          />
-                        ) : (
-                          <Input
-                            id={variable}
-                            type="text"
-                            value={formData[variable] || ''}
-                            onChange={(e) => handleFieldChange(variable, e.target.value)}
-                            placeholder={`Введите ${label.toLowerCase()}`}
-                          />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+                  return (
+                    <div key={variable}>
+                      <Label htmlFor={variable} className="text-sm font-medium mb-2 block">
+                        {label}
+                      </Label>
+                      {fieldType === 'textarea' ? (
+                        <Textarea
+                          id={variable}
+                          value={formData[variable] || ''}
+                          onChange={(e) => handleFieldChange(variable, e.target.value)}
+                          placeholder={`Введите ${label.toLowerCase()}`}
+                          rows={4}
+                        />
+                      ) : fieldType === 'date' ? (
+                        <Input
+                          id={variable}
+                          type="date"
+                          value={formData[variable] || ''}
+                          onChange={(e) => handleFieldChange(variable, e.target.value)}
+                        />
+                      ) : (
+                        <Input
+                          id={variable}
+                          type="text"
+                          value={formData[variable] || ''}
+                          onChange={(e) => handleFieldChange(variable, e.target.value)}
+                          placeholder={`Введите ${label.toLowerCase()}`}
+                        />
+                      )}
+                    </div>
+                  );
+                })
               )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
 
-        <TabsContent value="preview" className="m-0">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Icon name="FileText" size={20} />
-                Предпросмотр документа
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-white p-8 rounded-lg border prose max-w-none">
+      <Card className="flex flex-col">
+        <CardHeader className="border-b bg-slate-50">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Icon name="Eye" size={20} />
+              Предпросмотр документа
+            </CardTitle>
+            {onDownload && (
+              <Button onClick={onDownload} variant="outline" size="sm">
+                <Icon name="Download" size={16} className="mr-2" />
+                Скачать PDF
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="flex-1 overflow-hidden p-0">
+          <ScrollArea className="h-full">
+            <div className="p-8">
+              <div className="bg-white rounded-lg prose max-w-none">
                 <div dangerouslySetInnerHTML={{ __html: renderPreview() }} />
               </div>
               
               {variables.some(v => !formData[v]) && (
-                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-3">
+                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-3">
                   <Icon name="AlertTriangle" size={20} className="text-yellow-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium text-yellow-900">Не все поля заполнены</p>
@@ -183,10 +180,10 @@ export default function DocumentEditor({
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
     </div>
   );
 }
