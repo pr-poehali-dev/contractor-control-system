@@ -238,7 +238,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 if 'contentData' in body_data or 'htmlContent' in body_data:
                     if 'contentData' in body_data:
-                        current_content.update(body_data['contentData'])
+                        for key, value in body_data['contentData'].items():
+                            current_content[key] = value
                     if 'htmlContent' in body_data:
                         current_content['html'] = body_data['htmlContent']
                     
