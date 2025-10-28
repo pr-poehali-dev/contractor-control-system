@@ -13,15 +13,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
     method: str = event.get('httpMethod', 'GET')
     
+    cors_headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, X-User-Id, X-Auth-Token, X-Session-Id',
+        'Content-Type': 'application/json'
+    }
+    
     if method == 'OPTIONS':
         return {
             'statusCode': 200,
-            'headers': {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, X-User-Id, X-Auth-Token, X-Session-Id',
-                'Access-Control-Max-Age': '86400'
-            },
+            'headers': {**cors_headers, 'Access-Control-Max-Age': '86400'},
             'body': '',
             'isBase64Encoded': False
         }
@@ -30,7 +32,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     if not database_url:
         return {
             'statusCode': 500,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': cors_headers,
             'body': json.dumps({'error': 'DATABASE_URL not configured'}),
             'isBase64Encoded': False
         }
@@ -67,7 +69,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     if not doc:
                         return {
                             'statusCode': 404,
-                            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                            'headers': cors_headers,
                             'body': json.dumps({'error': 'Document not found'}),
                             'isBase64Encoded': False
                         }
@@ -81,7 +83,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     
                     return {
                         'statusCode': 200,
-                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'headers': cors_headers,
                         'isBase64Encoded': False,
                         'body': json.dumps({
                             'id': doc['id'],
@@ -121,7 +123,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     
                     return {
                         'statusCode': 200,
-                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'headers': cors_headers,
                         'isBase64Encoded': False,
                         'body': json.dumps({
                             'documents': [{
@@ -148,7 +150,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if not template_id:
                 return {
                     'statusCode': 400,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'headers': cors_headers,
                     'body': json.dumps({'error': 'templateId is required'}),
                     'isBase64Encoded': False
                 }
@@ -162,7 +164,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 if not user:
                     return {
                         'statusCode': 500,
-                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'headers': cors_headers,
                         'body': json.dumps({'error': 'No users found in database'}),
                         'isBase64Encoded': False
                     }
@@ -173,7 +175,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 if not work:
                     return {
                         'statusCode': 400,
-                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'headers': cors_headers,
                         'body': json.dumps({'error': 'No works found in database. Create a work first.'}),
                         'isBase64Encoded': False
                     }
@@ -200,7 +202,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 return {
                     'statusCode': 201,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'headers': cors_headers,
                     'isBase64Encoded': False,
                     'body': json.dumps({
                         'id': doc['id'],
@@ -220,7 +222,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if not doc_id:
                 return {
                     'statusCode': 400,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'headers': cors_headers,
                     'body': json.dumps({'error': 'Document ID is required'}),
                     'isBase64Encoded': False
                 }
@@ -234,7 +236,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 if not existing:
                     return {
                         'statusCode': 404,
-                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'headers': cors_headers,
                         'body': json.dumps({'error': 'Document not found'}),
                         'isBase64Encoded': False
                     }
@@ -265,7 +267,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 if len(update_fields) <= 1:
                     return {
                         'statusCode': 400,
-                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'headers': cors_headers,
                         'body': json.dumps({'error': 'No fields to update'}),
                         'isBase64Encoded': False
                     }
@@ -288,7 +290,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 return {
                     'statusCode': 200,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'headers': cors_headers,
                     'isBase64Encoded': False,
                     'body': json.dumps({
                         'id': doc['id'],
@@ -308,7 +310,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if not doc_id:
                 return {
                     'statusCode': 400,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'headers': cors_headers,
                     'body': json.dumps({'error': 'Document ID is required'}),
                     'isBase64Encoded': False
                 }
@@ -327,7 +329,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         return {
             'statusCode': 405,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': cors_headers,
             'body': json.dumps({'error': 'Method not allowed'}),
             'isBase64Encoded': False
         }
@@ -335,7 +337,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     except Exception as e:
         return {
             'statusCode': 500,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': cors_headers,
             'body': json.dumps({'error': str(e)}),
             'isBase64Encoded': False
         }
