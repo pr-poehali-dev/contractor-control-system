@@ -54,12 +54,21 @@ const MyTasks = () => {
       if (response.success && response.data) {
         const allTasks: Task[] = [];
         
-        console.log('[MyTasks] Current user:', { id: user.id, role: user.role });
+        const userContractorId = response.data.contractorId;
+        
+        console.log('[MyTasks] User contractor:', { user_id: user.id, contractor_id: userContractorId });
+        
+        if (!userContractorId) {
+          console.warn('[MyTasks] User has no contractor_id');
+          setTasks([]);
+          setLoading(false);
+          return;
+        }
         
         for (const obj of response.data.objects || []) {
           for (const work of obj.works || []) {
-            console.log('[MyTasks] Checking work:', { work_id: work.id, contractor_id: work.contractor_id, user_id: user.id });
-            if (work.contractor_id === user.id) {
+            console.log('[MyTasks] Checking work:', { work_id: work.id, contractor_id: work.contractor_id, user_contractor_id: userContractorId });
+            if (work.contractor_id === userContractorId) {
               for (const inspection of work.inspections || []) {
                 if (inspection.status === 'completed' && inspection.defects) {
                   try {

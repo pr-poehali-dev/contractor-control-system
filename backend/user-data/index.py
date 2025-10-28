@@ -441,6 +441,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur.close()
         conn.close()
         
+        # Получаем contractor_id для пользователя-подрядчика
+        user_contractor_id = None
+        if role == 'contractor':
+            cur = conn.cursor(cursor_factory=RealDictCursor)
+            cur.execute(f"""
+                SELECT id as contractor_id
+                FROM {SCHEMA}.contractors
+                WHERE user_id = {user_id}
+            """)
+            contractor_result = cur.fetchone()
+            if contractor_result:
+                user_contractor_id = contractor_result['contractor_id']
+            cur.close()
+        
         return {
             'statusCode': 200,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
@@ -450,6 +464,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'infoPosts': [dict(ip) for ip in info_posts],
                 'workTemplates': [dict(wt) for wt in work_templates],
                 'unreadCounts': unread_counts,
+                'contractorId': user_contractor_id,
                 'user': {
                     'id': user['id'],
                     'name': user['name'],
