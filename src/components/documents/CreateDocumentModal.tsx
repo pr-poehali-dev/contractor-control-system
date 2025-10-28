@@ -33,7 +33,12 @@ export default function CreateDocumentModal({
   onSelectTemplate
 }: CreateDocumentModalProps) {
   // Показываем только пользовательские шаблоны (НЕ системные)
-  const userTemplates = templates.filter(t => !t.is_system);
+  // Убираем дубликаты по имени - берем только первый шаблон с каждым уникальным именем
+  const userTemplates = templates
+    .filter(t => !t.is_system)
+    .filter((template, index, self) => 
+      index === self.findIndex(t => t.name === template.name)
+    );
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

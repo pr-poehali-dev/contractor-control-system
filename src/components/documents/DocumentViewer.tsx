@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   fetchDocumentDetail,
   createSignatureRequest,
   signDocument,
   updateDocument,
+  deleteDocument,
   selectCurrentDocument,
   selectDocumentsLoading,
 } from '@/store/slices/documentsSlice';
@@ -26,6 +28,7 @@ interface DocumentViewerProps {
 
 export default function DocumentViewer({ documentId }: DocumentViewerProps) {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const document = useAppSelector(selectCurrentDocument);
   const loading = useAppSelector(selectDocumentsLoading);
   const user = useAppSelector((state) => state.user.user);
@@ -57,6 +60,25 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
     }));
     
     dispatch(fetchDocumentDetail(documentId));
+  };
+
+  const handleDelete = async () => {
+    if (!confirm('Вы уверены, что хотите удалить этот документ?')) return;
+    
+    try {
+      await dispatch(deleteDocument(documentId)).unwrap();
+      toast({
+        title: 'Документ удалён',
+        description: 'Документ успешно удалён',
+      });
+      navigate('/documents');
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось удалить документ',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleSaveData = async (data: Record<string, any>) => {
@@ -299,6 +321,7 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
             <Button 
               variant="ghost" 
               className="w-full justify-start h-9 px-3 hover:bg-red-50 text-red-600 hover:text-red-700"
+              onClick={handleDelete}
             >
               <Icon name="Trash2" size={18} className="mr-3" />
               <span className="text-sm">Удалить</span>

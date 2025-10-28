@@ -72,6 +72,7 @@ export const ENDPOINTS = {
     LIST: '/b12e1795-0474-4db7-90d4-c95c29efd2d9',
     CREATE: '/b12e1795-0474-4db7-90d4-c95c29efd2d9',
     UPDATE: '/b12e1795-0474-4db7-90d4-c95c29efd2d9',
+    DELETE: '/b12e1795-0474-4db7-90d4-c95c29efd2d9',
     DETAIL: '/b12e1795-0474-4db7-90d4-c95c29efd2d9',
   },
 
