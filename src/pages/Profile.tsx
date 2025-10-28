@@ -129,7 +129,7 @@ const Profile = () => {
                   </div>
                 </div>
                 <Button 
-                  onClick={() => navigate(ROUTES.ORGANIZATION))
+                  onClick={() => navigate(ROUTES.ORGANIZATION)}
                   variant="outline"
                   className="w-full mt-6"
                 >
