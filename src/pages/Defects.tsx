@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
 import CreateInspectionWithWorkSelect from '@/components/dashboard/CreateInspectionWithWorkSelect';
+import { ROUTES } from '@/constants/routes';
 
 const Defects = () => {
   const navigate = useNavigate();
@@ -157,8 +158,8 @@ const Defects = () => {
               key={inspection.id} 
               className="hover:shadow-lg transition-shadow cursor-pointer"
               onClick={() => {
-                sessionStorage.setItem('inspectionFromPage', '/defects');
-                navigate(`/inspection/${inspection.id}`);
+                sessionStorage.setItem('inspectionFromPage', ROUTES.DEFECTS);
+                navigate(ROUTES.INSPECTION_DETAIL(inspection.id));
               }}
             >
               <CardContent className="p-5 md:p-6">

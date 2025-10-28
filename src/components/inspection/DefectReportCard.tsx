@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
+import { ROUTES } from '@/constants/routes';
 
 interface DefectReportCardProps {
   defectReport: any;
@@ -49,7 +50,7 @@ export default function DefectReportCard({
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => navigate(`/document/${defectReport.id}`)}
+                    onClick={() => navigate(ROUTES.DOCUMENT_VIEW(defectReport.id))}
                     className="flex-1 sm:flex-none"
                   >
                     <Icon name="Eye" size={16} className="mr-2" />
@@ -58,7 +59,7 @@ export default function DefectReportCard({
                   <Button 
                     variant="ghost" 
                     size="sm"
-                    onClick={() => navigate('/documents')}
+                    onClick={() => navigate(ROUTES.DOCUMENTS)}
                     className="flex-1 sm:flex-none"
                   >
                     <Icon name="FolderOpen" size={16} className="mr-2" />

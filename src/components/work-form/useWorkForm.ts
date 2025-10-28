@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { updateObject } from '@/store/slices/objectsSlice';
 import { createWork, updateWork as updateWorkAction } from '@/store/slices/worksSlice';
 import { WorkForm, emptyWork } from './types';
+import { ROUTES } from '@/constants/routes';
 
 interface ObjectData {
   id: number | null;
@@ -257,7 +258,7 @@ export const useWorkForm = (objectId: string | undefined) => {
       });
 
       setTimeout(() => {
-        navigate(`/objects/${objectId}`);
+        navigate(ROUTES.OBJECT_DETAIL(Number(objectId)));
       }, 500);
     } catch (error) {
       toast({

@@ -4,6 +4,7 @@ import { useAppSelector } from '@/store/hooks';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import WorkJournal from '@/components/WorkJournal';
+import { ROUTES } from '@/constants/routes';
 
 const WorkDetail = () => {
   const { objectId, workId } = useParams();
@@ -29,7 +30,7 @@ const WorkDetail = () => {
   if (!work) {
     return (
       <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-        <Button variant="ghost" onClick={() => navigate(`/objects/${objectId}`)}>
+        <Button variant="ghost" onClick={() => navigate(ROUTES.OBJECT_DETAIL(Number(objectId)))}>
           <Icon name="ChevronLeft" size={20} className="mr-2" />
           К объекту
         </Button>

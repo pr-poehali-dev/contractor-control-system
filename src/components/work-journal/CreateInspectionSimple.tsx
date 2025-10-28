@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useAppDispatch } from '@/store/hooks';
 import { createInspection } from '@/store/slices/inspectionsSlice';
+import { ROUTES } from '@/constants/routes';
 
 interface CreateInspectionSimpleProps {
   isOpen: boolean;
@@ -69,7 +70,7 @@ export default function CreateInspectionSimple({ isOpen, onClose, workId }: Crea
       
       // Navigate immediately before loading user data
       sessionStorage.setItem('inspectionFromPage', window.location.pathname);
-      navigate(`/inspection/${inspectionId}`);
+      navigate(ROUTES.INSPECTION_DETAIL(inspectionId));
       
       // Load data in background
       loadUserData();

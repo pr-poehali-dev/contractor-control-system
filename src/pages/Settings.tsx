@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import Icon from '@/components/ui/icon';
 import { Badge } from '@/components/ui/badge';
+import { ROUTES } from '@/constants/routes';
 
 const getRoleLabel = (role?: string): string => {
   if (role === 'admin') return 'Администратор';
@@ -49,7 +50,7 @@ const Settings = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate(ROUTES.LOGIN);
   };
   
   const handleSaveProfile = async () => {
@@ -113,7 +114,7 @@ const Settings = () => {
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Настройки</h1>
         </div>
-        <Button variant="ghost" size="icon" onClick={() => navigate('/profile')} className="h-10 w-10 rounded-full">
+        <Button variant="ghost" size="icon" onClick={() => navigate(ROUTES.PROFILE)} className="h-10 w-10 rounded-full">
           <Icon name="X" size={20} />
         </Button>
       </div>

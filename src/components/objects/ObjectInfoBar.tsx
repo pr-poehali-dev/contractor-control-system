@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import type { ObjectEntity } from '@/store/slices/objectsSlice';
+import { ROUTES } from '@/constants/routes';
 
 interface ObjectInfoBarProps {
   object: ObjectEntity;
@@ -15,7 +16,7 @@ const ObjectInfoBar = ({ object, className = '', compact = false, onBack, onSett
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/public/objects/${object.id}`);
+    navigate(ROUTES.PUBLIC_OBJECT(object.id));
   };
 
   const getStatusBadge = (status: string) => {

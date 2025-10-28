@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ROUTES } from '@/constants/routes';
 
 const getRoleLabel = (role?: string): string => {
   if (role === 'admin') return 'Администратор';
@@ -34,7 +35,7 @@ const Profile = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate(ROUTES.LOGIN);
   };
 
   const getInitials = (name: string) => {
@@ -68,7 +69,7 @@ const Profile = () => {
             <Button 
               variant="ghost" 
               size="icon"
-              onClick={() => navigate('/settings')}
+              onClick={() => navigate(ROUTES.SETTINGS)}
               className="absolute top-6 right-6 h-10 w-10 rounded-full"
             >
               <Icon name="Settings" size={20} />
@@ -89,14 +90,14 @@ const Profile = () => {
             {user?.role === 'admin' ? (
               <div className="grid grid-cols-2 gap-3 mt-6">
                 <Button 
-                  onClick={() => navigate('/admin')}
+                  onClick={() => navigate(ROUTES.ADMIN)}
                   className="h-16 flex flex-col items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700"
                 >
                   <Icon name="Shield" size={20} />
                   <span className="text-xs">Админ-панель</span>
                 </Button>
                 <Button 
-                  onClick={() => navigate('/work-types')}
+                  onClick={() => navigate(ROUTES.WORK_TYPES)}
                   className="h-16 flex flex-col items-center justify-center gap-1 bg-purple-600 hover:bg-purple-700"
                 >
                   <Icon name="BookOpen" size={20} />
@@ -128,7 +129,7 @@ const Profile = () => {
                   </div>
                 </div>
                 <Button 
-                  onClick={() => navigate('/organization')}
+                  onClick={() => navigate(ROUTES.ORGANIZATION))
                   variant="outline"
                   className="w-full mt-6"
                 >
@@ -175,7 +176,7 @@ const Profile = () => {
             <TabsContent value="objects" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {userObjects.map((obj) => (
-                <Card key={obj.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate(`/public/objects/${obj.id}`)}>
+                <Card key={obj.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate(ROUTES.PUBLIC_OBJECT(obj.id))}>
                   <CardContent className="p-4">
                     <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg mb-3 flex items-center justify-center">
                       <Icon name="Building2" size={48} className="text-slate-400" />

@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import CreateDocumentModal from '@/components/documents/CreateDocumentModal';
+import { ROUTES } from '@/constants/routes';
 
 const Documents = () => {
   const { isAuthenticated } = useAuthRedux();
@@ -61,7 +62,7 @@ const Documents = () => {
   };
 
   const handleSelectTemplate = (templateId: number, templateName: string) => {
-    navigate(`/document/new?templateId=${templateId}`);
+    navigate(`${ROUTES.DOCUMENT_NEW}?templateId=${templateId}`);
   };
 
   if (loading && documents.length === 0) {
@@ -207,7 +208,7 @@ const Documents = () => {
                 <Card
                   key={doc.id}
                   className="cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => navigate(`/document/${doc.id}`)}
+                  onClick={() => navigate(ROUTES.DOCUMENT_VIEW(doc.id))}
                 >
                   <CardContent className="p-4 md:p-6">
                     <div className="flex items-start gap-4">

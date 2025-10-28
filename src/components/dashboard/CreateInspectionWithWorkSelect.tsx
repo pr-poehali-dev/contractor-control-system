@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useAppDispatch } from '@/store/hooks';
 import { createInspection } from '@/store/slices/inspectionsSlice';
+import { ROUTES } from '@/constants/routes';
 
 interface CreateInspectionWithWorkSelectProps {
   isOpen: boolean;
@@ -72,8 +73,8 @@ export default function CreateInspectionWithWorkSelect({ isOpen, onClose }: Crea
       handleClose();
       
       if (result?.id) {
-        sessionStorage.setItem('inspectionFromPage', '/dashboard');
-        navigate(`/inspection/${result.id}`);
+        sessionStorage.setItem('inspectionFromPage', ROUTES.DASHBOARD);
+        navigate(ROUTES.INSPECTION_DETAIL(result.id));
       }
     } catch (error) {
       toast({ 

@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Defect } from '@/components/inspection/DefectsSection';
 import { apiClient } from '@/api/apiClient';
 import { ENDPOINTS } from '@/api/endpoints';
+import { ROUTES } from '@/constants/routes';
 import { useAppDispatch } from '@/store/hooks';
 import { updateInspection } from '@/store/slices/inspectionsSlice';
 
@@ -216,7 +217,7 @@ export function useInspectionActions(
       toast({ 
         title: 'Акт создан!', 
         description: `Акт №${reportNumber} сохранён`,
-        onClick: () => navigate(`/document/${documentId}`)
+        onClick: () => navigate(ROUTES.DOCUMENT_VIEW(documentId))
       });
       
     } catch (error: any) {

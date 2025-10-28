@@ -3,6 +3,7 @@ import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
+import { ROUTES } from '@/constants/routes';
 
 interface NavItem {
   id: string;
@@ -13,10 +14,10 @@ interface NavItem {
 }
 
 const mobileNavItems: NavItem[] = [
-  { id: 'dashboard', label: 'Главная', icon: 'Home', path: '/dashboard' },
-  { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects', roles: ['client', 'contractor', 'admin'] },
-  { id: 'my-tasks', label: 'Мои задачи', icon: 'ClipboardCheck', path: '/my-tasks', roles: ['contractor'] },
-  { id: 'defects', label: 'Проверки', icon: 'ClipboardCheck', path: '/defects', roles: ['client', 'admin'] },
+  { id: 'dashboard', label: 'Главная', icon: 'Home', path: ROUTES.DASHBOARD },
+  { id: 'objects', label: 'Объекты', icon: 'Building2', path: ROUTES.OBJECTS, roles: ['client', 'contractor', 'admin'] },
+  { id: 'my-tasks', label: 'Мои задачи', icon: 'ClipboardCheck', path: ROUTES.MY_TASKS, roles: ['contractor'] },
+  { id: 'defects', label: 'Проверки', icon: 'ClipboardCheck', path: ROUTES.DEFECTS, roles: ['client', 'admin'] },
 ];
 
 export default function BottomNavigation() {
@@ -33,7 +34,7 @@ export default function BottomNavigation() {
       <div className="grid h-16" style={{ gridTemplateColumns: `repeat(${visibleNavItems.length}, 1fr)` }}>
         {visibleNavItems.map((item) => {
           const isActive = location.pathname === item.path || 
-            (item.path === '/objects' && location.pathname.startsWith('/objects'));
+            (item.path === ROUTES.OBJECTS && location.pathname.startsWith(ROUTES.OBJECTS));
 
           return (
             <Button

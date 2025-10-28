@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ROUTES } from '@/constants/routes';
 
 interface NavItem {
   id: string;
@@ -25,16 +26,16 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { id: 'dashboard', label: 'Лента событий', icon: 'LayoutDashboard', path: '/dashboard', roles: ['client', 'contractor', 'admin'] },
-  { id: 'objects', label: 'Объекты', icon: 'Building2', path: '/objects', roles: ['client', 'contractor', 'admin'] },
-  { id: 'my-tasks', label: 'Мои задачи', icon: 'ClipboardCheck', path: '/my-tasks', roles: ['contractor'] },
-  { id: 'admin', label: 'Админ-панель', icon: 'Shield', path: '/admin', roles: ['admin'] },
-  { id: 'work-templates', label: 'Справочник', icon: 'BookOpen', path: '/work-templates', roles: ['admin'] },
-  { id: 'defects', label: 'Проверки', icon: 'ClipboardCheck', path: '/defects', roles: ['client', 'admin'] },
-  { id: 'documents', label: 'Документы', icon: 'FileText', path: '/documents', roles: ['client', 'contractor', 'admin'] },
-  { id: 'document-templates', label: 'Шаблоны', icon: 'FileType', path: '/document-templates', roles: ['client', 'contractor', 'admin'] },
-  { id: 'analytics', label: 'Аналитика', icon: 'BarChart3', path: '/analytics', roles: ['client', 'admin'] },
-  { id: 'contractors', label: 'Подрядчики', icon: 'Users', path: '/contractors', roles: ['client', 'admin'] },
+  { id: 'dashboard', label: 'Лента событий', icon: 'LayoutDashboard', path: ROUTES.DASHBOARD, roles: ['client', 'contractor', 'admin'] },
+  { id: 'objects', label: 'Объекты', icon: 'Building2', path: ROUTES.OBJECTS, roles: ['client', 'contractor', 'admin'] },
+  { id: 'my-tasks', label: 'Мои задачи', icon: 'ClipboardCheck', path: ROUTES.MY_TASKS, roles: ['contractor'] },
+  { id: 'admin', label: 'Админ-панель', icon: 'Shield', path: ROUTES.ADMIN, roles: ['admin'] },
+  { id: 'work-templates', label: 'Справочник', icon: 'BookOpen', path: ROUTES.WORK_TEMPLATES, roles: ['admin'] },
+  { id: 'defects', label: 'Проверки', icon: 'ClipboardCheck', path: ROUTES.DEFECTS, roles: ['client', 'admin'] },
+  { id: 'documents', label: 'Документы', icon: 'FileText', path: ROUTES.DOCUMENTS, roles: ['client', 'contractor', 'admin'] },
+  { id: 'document-templates', label: 'Шаблоны', icon: 'FileType', path: ROUTES.DOCUMENT_TEMPLATES, roles: ['client', 'contractor', 'admin'] },
+  { id: 'analytics', label: 'Аналитика', icon: 'BarChart3', path: ROUTES.ANALYTICS, roles: ['client', 'admin'] },
+  { id: 'contractors', label: 'Подрядчики', icon: 'Users', path: ROUTES.CONTRACTORS, roles: ['client', 'admin'] },
 ];
 
 export default function TopNavigation() {
@@ -63,7 +64,7 @@ export default function TopNavigation() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate(ROUTES.LOGIN);
   };
 
   const getInitials = (name: string) => {
@@ -162,17 +163,17 @@ export default function TopNavigation() {
                   </div>
                 </div>
               </div>
-              <DropdownMenuItem onClick={() => navigate('/profile')}>
+              <DropdownMenuItem onClick={() => navigate(ROUTES.PROFILE)}>
                 <Icon name="User" size={16} className="mr-2" />
                 Профиль
               </DropdownMenuItem>
               {user?.role === 'contractor' && (
-                <DropdownMenuItem onClick={() => navigate('/organization')}>
+                <DropdownMenuItem onClick={() => navigate(ROUTES.ORGANIZATION)}>
                   <Icon name="Building" size={16} className="mr-2" />
                   Организация
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem onClick={() => navigate('/settings')}>
+              <DropdownMenuItem onClick={() => navigate(ROUTES.SETTINGS)}>
                 <Icon name="Settings" size={16} className="mr-2" />
                 Настройки
               </DropdownMenuItem>
@@ -186,7 +187,7 @@ export default function TopNavigation() {
 
           <Button
             variant="ghost"
-            onClick={() => navigate('/profile')}
+            onClick={() => navigate(ROUTES.PROFILE)}
             className="relative h-10 w-10 rounded-full p-0 md:hidden"
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white">

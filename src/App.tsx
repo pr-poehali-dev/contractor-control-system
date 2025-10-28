@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuthRedux } from "./hooks/useAuthRedux";
+import { ROUTES, ROUTE_PATHS } from "./constants/routes";
 import Layout from "./components/Layout";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Login from "./pages/Login";
@@ -71,7 +72,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
   
-  return isAuthenticated ? <Layout>{children}</Layout> : <Navigate to="/login" />;
+  return isAuthenticated ? <Layout>{children}</Layout> : <Navigate to={ROUTES.LOGIN} />;
 };
 
 const App = () => (
@@ -82,43 +83,43 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/" element={<Navigate to="/dashboard" />} />
-              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/objects" element={<ProtectedRoute><Objects /></ProtectedRoute>} />
-              <Route path="/objects/create" element={<ProtectedRoute><CreateObject /></ProtectedRoute>} />
-              <Route path="/objects/:objectId/edit" element={<ProtectedRoute><EditObject /></ProtectedRoute>} />
-              <Route path="/objects/:objectId/public" element={<ProtectedRoute><ObjectPublicPage /></ProtectedRoute>} />
-              <Route path="/objects/:objectId" element={<ProtectedRoute><ObjectDetail /></ProtectedRoute>} />
-              <Route path="/objects/:objectId/works/create" element={<ProtectedRoute><CreateWork /></ProtectedRoute>} />
-              <Route path="/objects/:objectId/works/:workId" element={<ProtectedRoute><WorkDetail /></ProtectedRoute>} />
-              <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
-              <Route path="/my-works" element={<ProtectedRoute><MyWorks /></ProtectedRoute>} />
-              <Route path="/work-log" element={<ProtectedRoute><WorkLog /></ProtectedRoute>} />
-              <Route path="/inspection/:inspectionId" element={<ProtectedRoute><InspectionDetail /></ProtectedRoute>} />
-              <Route path="/inspections/:inspectionId" element={<ProtectedRoute><InspectionDetail /></ProtectedRoute>} />
-              <Route path="/journal-entry/:entryId" element={<ProtectedRoute><JournalEntryDetail /></ProtectedRoute>} />
-              <Route path="/defect-report/:reportId" element={<ProtectedRoute><DefectReportDetail /></ProtectedRoute>} />
-              <Route path="/defects" element={<ProtectedRoute><Defects /></ProtectedRoute>} />
-              <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
-              <Route path="/document/:id" element={<ProtectedRoute><DocumentView /></ProtectedRoute>} />
-              <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-              <Route path="/contractors" element={<ProtectedRoute><Contractors /></ProtectedRoute>} />
-              <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
-              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-              <Route path="/public/objects/:objectId" element={<ProtectedRoute><PublicObject /></ProtectedRoute>} />
-              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-              <Route path="/work-templates" element={<ProtectedRoute><WorkTemplates /></ProtectedRoute>} />
-              <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-              <Route path="/work-types" element={<ProtectedRoute><WorkTypes /></ProtectedRoute>} />
-              <Route path="/my-tasks" element={<ProtectedRoute><MyTasks /></ProtectedRoute>} />
-              <Route path="/pricing" element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
-              <Route path="/document-templates" element={<ProtectedRoute><DocumentTemplates /></ProtectedRoute>} />
-              <Route path="/document-templates/:templateId" element={<ProtectedRoute><DocumentTemplateEditor /></ProtectedRoute>} />
-              <Route path="/document/new" element={<ProtectedRoute><NewDocument /></ProtectedRoute>} />
-              <Route path="/organization" element={<ProtectedRoute><OrganizationPage /></ProtectedRoute>} />
-              <Route path="*" element={<NotFound />} />
+              <Route path={ROUTES.LOGIN} element={<Login />} />
+              <Route path={ROUTES.REGISTER} element={<Register />} />
+              <Route path={ROUTES.ROOT} element={<Navigate to={ROUTES.DASHBOARD} />} />
+              <Route path={ROUTES.DASHBOARD} element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path={ROUTES.OBJECTS} element={<ProtectedRoute><Objects /></ProtectedRoute>} />
+              <Route path={ROUTES.OBJECTS_CREATE} element={<ProtectedRoute><CreateObject /></ProtectedRoute>} />
+              <Route path={ROUTE_PATHS.OBJECT_EDIT} element={<ProtectedRoute><EditObject /></ProtectedRoute>} />
+              <Route path={ROUTE_PATHS.OBJECT_PUBLIC} element={<ProtectedRoute><ObjectPublicPage /></ProtectedRoute>} />
+              <Route path={ROUTE_PATHS.OBJECT_DETAIL} element={<ProtectedRoute><ObjectDetail /></ProtectedRoute>} />
+              <Route path={ROUTE_PATHS.WORK_CREATE} element={<ProtectedRoute><CreateWork /></ProtectedRoute>} />
+              <Route path={ROUTE_PATHS.WORK_DETAIL} element={<ProtectedRoute><WorkDetail /></ProtectedRoute>} />
+              <Route path={ROUTES.ACTIVITY} element={<ProtectedRoute><Activity /></ProtectedRoute>} />
+              <Route path={ROUTES.MY_WORKS} element={<ProtectedRoute><MyWorks /></ProtectedRoute>} />
+              <Route path={ROUTES.WORK_LOG} element={<ProtectedRoute><WorkLog /></ProtectedRoute>} />
+              <Route path={ROUTE_PATHS.INSPECTION_DETAIL} element={<ProtectedRoute><InspectionDetail /></ProtectedRoute>} />
+              <Route path={ROUTE_PATHS.INSPECTION_DETAIL_ALT} element={<ProtectedRoute><InspectionDetail /></ProtectedRoute>} />
+              <Route path={ROUTE_PATHS.JOURNAL_ENTRY} element={<ProtectedRoute><JournalEntryDetail /></ProtectedRoute>} />
+              <Route path={ROUTE_PATHS.DEFECT_REPORT} element={<ProtectedRoute><DefectReportDetail /></ProtectedRoute>} />
+              <Route path={ROUTES.DEFECTS} element={<ProtectedRoute><Defects /></ProtectedRoute>} />
+              <Route path={ROUTES.DOCUMENTS} element={<ProtectedRoute><Documents /></ProtectedRoute>} />
+              <Route path={ROUTE_PATHS.DOCUMENT_VIEW} element={<ProtectedRoute><DocumentView /></ProtectedRoute>} />
+              <Route path={ROUTES.ANALYTICS} element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+              <Route path={ROUTES.CONTRACTORS} element={<ProtectedRoute><Contractors /></ProtectedRoute>} />
+              <Route path={ROUTES.MESSAGES} element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+              <Route path={ROUTES.PROFILE} element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path={ROUTE_PATHS.PUBLIC_OBJECT} element={<ProtectedRoute><PublicObject /></ProtectedRoute>} />
+              <Route path={ROUTES.SETTINGS} element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+              <Route path={ROUTES.WORK_TEMPLATES} element={<ProtectedRoute><WorkTemplates /></ProtectedRoute>} />
+              <Route path={ROUTES.ADMIN} element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+              <Route path={ROUTES.WORK_TYPES} element={<ProtectedRoute><WorkTypes /></ProtectedRoute>} />
+              <Route path={ROUTES.MY_TASKS} element={<ProtectedRoute><MyTasks /></ProtectedRoute>} />
+              <Route path={ROUTES.PRICING} element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
+              <Route path={ROUTES.DOCUMENT_TEMPLATES} element={<ProtectedRoute><DocumentTemplates /></ProtectedRoute>} />
+              <Route path={ROUTE_PATHS.DOCUMENT_TEMPLATE_EDITOR} element={<ProtectedRoute><DocumentTemplateEditor /></ProtectedRoute>} />
+              <Route path={ROUTES.DOCUMENT_NEW} element={<ProtectedRoute><NewDocument /></ProtectedRoute>} />
+              <Route path={ROUTES.ORGANIZATION} element={<ProtectedRoute><OrganizationPage /></ProtectedRoute>} />
+              <Route path={ROUTES.NOT_FOUND} element={<NotFound />} />
             </Routes>
           </BrowserRouter>
       </TooltipProvider>

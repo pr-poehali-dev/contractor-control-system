@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import type { ObjectEntity } from '@/store/slices/objectsSlice';
+import { ROUTES } from '@/constants/routes';
 
 interface ObjectHeaderProps {
   object: ObjectEntity;
@@ -14,11 +15,11 @@ const ObjectHeader = ({ object, showBackButton = false, onEdit }: ObjectHeaderPr
   const navigate = useNavigate();
 
   const handleBack = () => {
-    navigate('/objects');
+    navigate(ROUTES.OBJECTS);
   };
 
   const handlePublicPage = () => {
-    navigate(`/objects/${object.id}/public`);
+    navigate(ROUTES.OBJECT_PUBLIC(object.id));
   };
 
   const getStatusBadge = (status: string) => {

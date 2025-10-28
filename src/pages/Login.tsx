@@ -7,6 +7,7 @@ import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { apiClient } from '@/api/apiClient';
 import { ENDPOINTS } from '@/api/endpoints';
+import { ROUTES } from '@/constants/routes';
 
 const Login = () => {
   const [phone, setPhone] = useState('');
@@ -32,7 +33,7 @@ const Login = () => {
       setIsLoading(true);
       try {
         await login('admin@example.com', 'admin123');
-        navigate('/dashboard');
+        navigate(ROUTES.DASHBOARD);
         toast({
           title: 'Добро пожаловать, Администратор!',
           description: 'Вы вошли как администратор',
@@ -87,7 +88,7 @@ const Login = () => {
     setIsLoading(true);
     try {
       await loginWithPhone(phone, code);
-      navigate('/dashboard');
+      navigate(ROUTES.DASHBOARD);
       toast({
         title: 'Добро пожаловать!',
         description: 'Вы успешно вошли в систему',

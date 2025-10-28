@@ -9,6 +9,7 @@ import { JournalEvent } from '@/types/journal';
 import { PhotoGallery, PhotoViewer, usePhotoGallery } from '@/components/ui/photo-gallery';
 import { useNavigate } from 'react-router-dom';
 import WorkLogModal from '@/components/work-journal/WorkLogModal';
+import { ROUTES } from '@/constants/routes';
 
 interface EventItemProps {
   event: JournalEvent;
@@ -36,7 +37,7 @@ export default function EventItem({
   const handleInspectionClick = () => {
     if (event.inspection_data?.inspection_id) {
       sessionStorage.setItem('inspectionFromPage', '/journal');
-      navigate(`/inspection/${event.inspection_data.inspection_id}`);
+      navigate(ROUTES.INSPECTION_DETAIL(event.inspection_data.inspection_id));
     }
   };
   

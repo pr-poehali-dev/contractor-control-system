@@ -10,6 +10,7 @@ import { useAuthRedux } from '@/hooks/useAuthRedux';
 import ObjectInfoBar from '@/components/objects/ObjectInfoBar';
 import type { Work } from '@/store/slices/userSlice';
 import type { ObjectEntity } from '@/store/slices/objectsSlice';
+import { ROUTES } from '@/constants/routes';
 
 interface WorksListProps {
   works: Work[];
@@ -42,8 +43,8 @@ export default function WorksList({
         {currentObject && (
           <ObjectInfoBar 
             object={currentObject} 
-            onBack={() => navigate('/objects')}
-            onSettings={() => navigate(`/objects/${objectId}/works/create`)}
+            onBack={() => navigate(ROUTES.OBJECTS)}
+            onSettings={() => navigate(ROUTES.WORK_CREATE(objectId))}
           />
         )}
       </div>
@@ -55,7 +56,7 @@ export default function WorksList({
             <p className="text-sm text-slate-600 mb-4">Нет работ на этом объекте</p>
             <Button
               size="sm"
-              onClick={() => navigate(`/objects/${objectId}/works/create`)}
+              onClick={() => navigate(ROUTES.WORK_CREATE(objectId))}
             >
               <Icon name="Plus" size={16} className="mr-2" />
               Добавить первую работу

@@ -20,6 +20,7 @@ import CreateInspectionWithWorkSelect from '@/components/dashboard/CreateInspect
 import InfoPostModal from '@/components/dashboard/InfoPostModal';
 import NotificationsSummary from '@/components/work-journal/NotificationsSummary';
 import WorkLogModal from '@/components/work-journal/WorkLogModal';
+import { ROUTES } from '@/constants/routes';
 
 
 interface FeedEvent {
@@ -143,7 +144,7 @@ const Dashboard = () => {
     if (event.type === 'info_post') return;
     
     if (event.objectId && event.workId) {
-      navigate(`/objects/${event.objectId}`, {
+      navigate(ROUTES.OBJECT_DETAIL(event.objectId), {
         state: { scrollToWork: event.workId }
       });
     }

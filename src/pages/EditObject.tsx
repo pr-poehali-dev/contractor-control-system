@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import { ROUTES } from '@/constants/routes';
 
 const EditObject = () => {
   const { objectId } = useParams();
@@ -71,7 +72,7 @@ const EditObject = () => {
       });
 
       setTimeout(() => {
-        navigate(`/objects/${objectId}`);
+        navigate(ROUTES.OBJECT_DETAIL(Number(objectId)));
       }, 300);
     } catch (error) {
       toast({
@@ -97,7 +98,7 @@ const EditObject = () => {
   if (!object) {
     return (
       <div className="min-h-screen bg-slate-50 p-4">
-        <Button variant="ghost" size="sm" onClick={() => navigate('/objects')}>
+        <Button variant="ghost" size="sm" onClick={() => navigate(ROUTES.OBJECTS)}>
           <Icon name="ChevronLeft" size={20} className="mr-2" />
           Назад
         </Button>
@@ -113,7 +114,7 @@ const EditObject = () => {
       <Button 
         variant="ghost" 
         className="mb-6"
-        onClick={() => navigate(`/objects/${objectId}`)}
+        onClick={() => navigate(ROUTES.OBJECT_DETAIL(Number(objectId)))}
       >
         <Icon name="ChevronLeft" size={20} className="mr-2" />
         Назад
@@ -179,7 +180,7 @@ const EditObject = () => {
                 type="button" 
                 variant="outline" 
                 size="lg"
-                onClick={() => navigate(`/objects/${objectId}`)}
+                onClick={() => navigate(ROUTES.OBJECT_DETAIL(Number(objectId)))}
                 disabled={isSubmitting}
               >
                 Отмена

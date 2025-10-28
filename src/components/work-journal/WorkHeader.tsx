@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
 import { NotificationGroup } from '@/components/ui/notification-badge';
 import type { Work } from '@/store/slices/userSlice';
+import { ROUTES } from '@/constants/routes';
 
 interface WorkHeaderProps {
   selectedWorkData: Work;
@@ -28,7 +29,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
       <div className="md:hidden bg-white border-b border-slate-200 px-4 py-3 overflow-x-hidden">
         <div className="flex items-start gap-3">
           <button 
-            onClick={() => navigate(`/objects/${objectId}`)}
+            onClick={() => navigate(ROUTES.OBJECT_DETAIL(Number(objectId)))}
             className="flex-shrink-0 h-8 w-8 flex items-center justify-center hover:bg-slate-100 rounded-lg transition-colors"
           >
             <Icon name="ChevronLeft" size={20} className="text-slate-600" />
@@ -39,7 +40,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
               <h1 className="text-sm font-bold text-slate-900 leading-tight flex-1 min-w-0">{selectedWorkData.title}</h1>
               {(userRole === 'client' || userRole === 'admin') && (
                 <button
-                  onClick={() => navigate(`/objects/${objectId}/works/create`)}
+                  onClick={() => navigate(ROUTES.WORK_CREATE(Number(objectId)))}
                   className="flex-shrink-0 h-6 w-6 flex items-center justify-center hover:bg-slate-100 rounded-lg transition-colors"
                 >
                   <Icon name="Settings" size={15} className="text-slate-400" />

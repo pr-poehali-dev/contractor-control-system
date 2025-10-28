@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import { ROUTES } from '@/constants/routes';
 
 const CreateObject = () => {
   const navigate = useNavigate();
@@ -58,7 +59,7 @@ const CreateObject = () => {
       });
 
       setTimeout(() => {
-        navigate('/objects');
+        navigate(ROUTES.OBJECTS);
       }, 300);
     } catch (error) {
       toast({
@@ -75,7 +76,7 @@ const CreateObject = () => {
       <Button 
         variant="ghost" 
         className="mb-6"
-        onClick={() => navigate('/objects')}
+        onClick={() => navigate(ROUTES.OBJECTS)}
       >
         <Icon name="ChevronLeft" size={20} className="mr-2" />
         Назад
@@ -213,7 +214,7 @@ const CreateObject = () => {
             type="button" 
             variant="outline" 
             size="lg"
-            onClick={() => navigate('/objects')}
+            onClick={() => navigate(ROUTES.OBJECTS)}
             disabled={isSubmitting}
           >
             Отмена

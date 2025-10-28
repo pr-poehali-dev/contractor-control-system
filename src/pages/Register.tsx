@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import { ROUTES } from '@/constants/routes';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -64,7 +65,7 @@ const Register = () => {
         role: 'client',
       });
       
-      navigate('/dashboard');
+      navigate(ROUTES.DASHBOARD);
       toast({
         title: 'Регистрация успешна!',
         description: 'Добро пожаловать в систему',
@@ -197,7 +198,7 @@ const Register = () => {
           <p className="text-sm text-slate-600">
             Уже есть аккаунт?{' '}
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => navigate(ROUTES.LOGIN)}
               className="text-blue-600 hover:underline font-medium"
             >
               Войти

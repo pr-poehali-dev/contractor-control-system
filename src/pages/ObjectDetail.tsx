@@ -18,6 +18,7 @@ import {
 import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
 import { NotificationGroup } from '@/components/ui/notification-badge';
 import ObjectInfoBar from '@/components/objects/ObjectInfoBar';
+import { ROUTES } from '@/constants/routes';
 
 const ObjectDetail = () => {
   const { objectId } = useParams();
@@ -68,7 +69,7 @@ const ObjectDetail = () => {
   useEffect(() => {
     if (!hasRedirected && objectWorks.length > 0 && window.innerWidth >= 768) {
       setHasRedirected(true);
-      navigate(`/objects/${objectId}/works/${objectWorks[0].id}`, { replace: true });
+      navigate(ROUTES.WORK_DETAIL(Number(objectId), objectWorks[0].id), { replace: true });
     }
   }, [objectWorks.length, objectId, navigate, hasRedirected]);
   
@@ -86,7 +87,7 @@ const ObjectDetail = () => {
   if (!object) {
     return (
       <div className="min-h-screen bg-slate-50 p-4">
-        <Button variant="ghost" size="sm" onClick={() => navigate('/objects')}>
+        <Button variant="ghost" size="sm" onClick={() => navigate(ROUTES.OBJECTS)}>
           <Icon name="ChevronLeft" size={20} className="mr-2" />
           Назад
         </Button>
@@ -98,7 +99,7 @@ const ObjectDetail = () => {
   }
 
   const handleEdit = () => {
-    navigate(`/objects/${objectId}/edit`);
+    navigate(ROUTES.OBJECT_EDIT(Number(objectId)));
   };
 
   const handleDelete = async () => {
@@ -109,7 +110,7 @@ const ObjectDetail = () => {
       await dispatch(deleteObject(object.id)).unwrap();
       await loadUserData();
       toast({ title: 'Объект удалён' });
-      navigate('/objects');
+      navigate(ROUTES.OBJECTS);
     } catch (error) {
       toast({ 
         title: 'Ошибка', 
@@ -127,8 +128,8 @@ const ObjectDetail = () => {
           <ObjectInfoBar 
             object={object} 
             compact 
-            onBack={() => navigate('/objects')}
-            onSettings={() => navigate(`/objects/${objectId}/works/create`)}
+            onBack={() => navigate(ROUTES.OBJECTS)}
+            onSettings={() => navigate(ROUTES.WORK_CREATE(Number(objectId)))}
           />
         </div>
 
@@ -171,7 +172,7 @@ const ObjectDetail = () => {
             <p className="text-sm text-slate-600 mb-6 text-center max-w-md">
               Создайте первую работу для этого объекта
             </p>
-            <Button onClick={() => navigate(`/objects/${objectId}/works/create`)}>
+            <Button onClick={() => navigate(ROUTES.WORK_CREATE(Number(objectId)))}>
               <Icon name="Plus" size={18} className="mr-2" />
               Создать работу
             </Button>
@@ -183,7 +184,7 @@ const ObjectDetail = () => {
                 <div
                   key={work.id}
                   className="bg-white p-4 active:bg-slate-50 transition-colors cursor-pointer"
-                  onClick={() => navigate(`/objects/${objectId}/works/${work.id}`)}
+                  onClick={() => navigate(ROUTES.WORK_DETAIL(Number(objectId), work.id))}
                 >
                   <div className="flex gap-3">
                     <div className="flex-shrink-0 w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">

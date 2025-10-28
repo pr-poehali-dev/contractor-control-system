@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
+import { ROUTES } from '@/constants/routes';
 
 type WorkStatus = 'inProgress' | 'review' | 'completed' | 'defects';
 
@@ -130,7 +131,7 @@ const MyWorks = () => {
               key={work.id}
               className="cursor-pointer hover-scale animate-fade-in"
               style={{ animationDelay: `${index * 0.1}s` }}
-              onClick={() => navigate(`/my-works/${work.id}`)}
+              onClick={() => {}}
             >
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between mb-4">
