@@ -116,11 +116,6 @@ export default function DocumentTemplates() {
       return false;
     }
     
-    const hiddenTypes = ['work_acceptance', 'defect_detection', 'defect_resolution'];
-    if (hiddenTypes.includes(template.template_type) && !isAdmin) {
-      return false;
-    }
-    
     return matchesSearch && matchesType;
   });
 
