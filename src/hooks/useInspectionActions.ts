@@ -148,14 +148,12 @@ export function useInspectionActions(
       const defectReportData = reportResponse.data;
       setDefectReport(defectReportData);
       
-      // 2. Получить шаблон "Акт об обнаружении дефектов"
+      // 2. Получить шаблон "Акт об обнаружении дефектов" по system_key
       const templatesResponse = await apiClient.get(ENDPOINTS.DOCUMENTS.TEMPLATES);
       const templates = templatesResponse.data?.templates || [];
-      const defectTemplate = templates.find((t: any) => 
-        t.template_type === 'inspection' || 
-        t.name?.includes('замечани') || 
-        t.name?.includes('дефект')
-      );
+      console.log('📋 Available templates:', templates.map((t: any) => ({ id: t.id, name: t.name, system_key: t.system_key })));
+      const defectTemplate = templates.find((t: any) => t.system_key === 'defect_detection_act');
+      console.log('✅ Found defect template:', defectTemplate);
       
       if (defectTemplate) {
         // 3. Получить данные работы и объекта
