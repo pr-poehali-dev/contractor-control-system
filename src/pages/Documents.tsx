@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import CreateDocumentModal from '@/components/documents/CreateDocumentModal';
 
 const Documents = () => {
   const { isAuthenticated } = useAuthRedux();
@@ -31,6 +32,7 @@ const Documents = () => {
   
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   
   useEffect(() => {
     if (isAuthenticated) {
@@ -55,10 +57,11 @@ const Documents = () => {
   });
 
   const handleCreateDocument = () => {
-    if (selectedTemplateId) {
-      navigate(`/document/new?templateId=${selectedTemplateId}`);
-      setSelectedTemplateId('');
-    }
+    setIsCreateModalOpen(true);
+  };
+
+  const handleSelectTemplate = (templateId: number, templateName: string) => {
+    navigate(`/document/new?templateId=${templateId}`);
   };
 
   if (loading && documents.length === 0) {
@@ -149,36 +152,13 @@ const Documents = () => {
           </Card>
         </div>
 
-        <Card className="mb-6">
-          <CardContent className="p-4">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <Label className="text-sm font-medium mb-2">Выберите шаблон для создания документа</Label>
-                <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Выберите шаблон документа" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {templatesLoading ? (
-                      <SelectItem value="loading" disabled>Загрузка...</SelectItem>
-                    ) : templates.filter(t => !t.is_system).length === 0 ? (
-                      <SelectItem value="empty" disabled>Нет доступных шаблонов</SelectItem>
-                    ) : (
-                      templates
-                        .filter(template => !template.is_system)
-                        .map((template) => (
-                          <SelectItem key={template.id} value={template.id.toString()}>
-                            {template.name}
-                          </SelectItem>
-                        ))
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-end">
-                <Button 
-                  onClick={handleCreateDocument}
-                  disabled={!selectedTemplateId}
+        <div className="mb-6 flex justify-between items-center">
+          <div>
+            <h2 className="text-lg font-semibold">Документы</h2>
+            <p className="text-sm text-slate-600">Список созданных документов</p>
+          </div>
+          <Button 
+            onClick={handleCreateDocument}
                   className="w-full md:w-auto"
                 >
                   <Icon name="FilePlus" size={18} className="mr-2" />
@@ -277,6 +257,14 @@ const Documents = () => {
             })}
           </div>
         )}
+
+        <CreateDocumentModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          templates={templates.filter(t => !t.is_system)}
+          loading={templatesLoading}
+          onSelectTemplate={handleSelectTemplate}
+        />
       </div>
     </div>
   );

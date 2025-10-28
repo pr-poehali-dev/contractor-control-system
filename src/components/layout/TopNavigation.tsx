@@ -138,23 +138,29 @@ export default function TopNavigation() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-72">
-              <DropdownMenuLabel>
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{user?.name || 'Пользователь'}</p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    {user?.role === 'client' && 'Заказчик'}
-                    {user?.role === 'contractor' && 'Подрядчик'}
-                    {user?.role === 'admin' && 'Администратор'}
-                  </p>
-                  {user?.role === 'contractor' && userData?.contractor?.organization_name && (
-                    <p className="text-xs leading-none text-muted-foreground mt-1 flex items-center">
-                      <Icon name="Building" size={12} className="mr-1" />
-                      {userData.contractor.organization_name}
-                    </p>
-                  )}
+              <div className="px-2 py-3 bg-gradient-to-br from-blue-50 to-indigo-50 border-b">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md">
+                    {getInitials(user?.name || 'U')}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-slate-900 truncate">{user?.name || 'Пользователь'}</p>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                        {user?.role === 'client' && 'Заказчик'}
+                        {user?.role === 'contractor' && 'Подрядчик'}
+                        {user?.role === 'admin' && 'Администратор'}
+                      </Badge>
+                    </div>
+                    {user?.role === 'contractor' && userData?.contractor?.organization_name && (
+                      <p className="text-xs text-slate-600 mt-1 flex items-center truncate">
+                        <Icon name="Building" size={12} className="mr-1 flex-shrink-0" />
+                        <span className="truncate">{userData.contractor.organization_name}</span>
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
+              </div>
               <DropdownMenuItem onClick={() => navigate('/profile')}>
                 <Icon name="User" size={16} className="mr-2" />
                 Профиль

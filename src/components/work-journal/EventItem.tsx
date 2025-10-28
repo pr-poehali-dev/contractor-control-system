@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { JournalEvent } from '@/types/journal';
 import { PhotoGallery, PhotoViewer, usePhotoGallery } from '@/components/ui/photo-gallery';
 import { useNavigate } from 'react-router-dom';
+import WorkLogModal from '@/components/work-journal/WorkLogModal';
 
 interface EventItemProps {
   event: JournalEvent;
@@ -29,6 +31,7 @@ export default function EventItem({
   const workPhotosGallery = usePhotoGallery();
   const inspectionPhotosGallery = usePhotoGallery();
   const defectPhotosGallery = usePhotoGallery();
+  const [isWorkLogModalOpen, setIsWorkLogModalOpen] = useState(false);
   
   const handleInspectionClick = () => {
     if (event.inspection_data?.inspection_id) {
@@ -43,11 +46,22 @@ export default function EventItem({
         return (
           <>
             {event.work_data && (
-              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-200">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Icon name="Wrench" size={16} className="text-green-600" />
+              <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-slate-200">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                    <Icon name="Wrench" size={16} className="text-green-600" />
+                  </div>
+                  <span className="text-sm sm:text-base font-semibold text-green-700">Отчёт о работе</span>
                 </div>
-                <span className="text-sm sm:text-base font-semibold text-green-700">Отчёт о работе</span>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setIsWorkLogModalOpen(true)}
+                  className="text-xs"
+                >
+                  <Icon name="Eye" size={14} className="mr-1" />
+                  Открыть
+                </Button>
               </div>
             )}
             <p className="text-[13px] sm:text-[15px] leading-relaxed text-slate-700 whitespace-pre-wrap break-words">{event.content}</p>
@@ -444,6 +458,22 @@ export default function EventItem({
           isOpen={defectPhotosGallery.isOpen}
           onClose={defectPhotosGallery.closeGallery}
           onNavigate={defectPhotosGallery.navigateToPhoto}
+        />
+      )}
+
+      {event.type === 'work_entry' && event.work_data && isWorkLogModalOpen && (
+        <WorkLogModal
+          isOpen={isWorkLogModalOpen}
+          onClose={() => setIsWorkLogModalOpen(false)}
+          workLog={{
+            id: event.id,
+            description: event.content,
+            timestamp: event.created_at,
+            author: event.author_name,
+            photoUrls: event.work_data.photos || [],
+            volume: event.work_data.volume,
+            materials: event.work_data.materials?.join(', ')
+          }}
         />
       )}
     </div>
