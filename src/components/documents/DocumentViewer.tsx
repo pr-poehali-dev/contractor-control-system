@@ -88,14 +88,17 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
     return [...new Set(matches.map(m => m.replace(/[\[\]]/g, '').trim()))];
   };
 
-  const handleDownloadPDF = () => {
-    let content = document?.htmlContent || '';
-    const data = document?.contentData || {};
-
+  const replaceVariables = (html: string, data: Record<string, any>): string => {
+    let result = html;
     Object.entries(data).forEach(([key, value]) => {
       const regex = new RegExp(`\\[${key}\\]`, 'g');
-      content = content.replace(regex, String(value || ''));
+      result = result.replace(regex, String(value || ''));
     });
+    return result;
+  };
+
+  const handleDownloadPDF = () => {
+    const content = replaceVariables(document?.htmlContent || '', document?.contentData || {});
 
     const printWindow = window.open('', '_blank');
     if (printWindow) {
@@ -157,264 +160,161 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
 
   const mySignature = document.signatures?.find(sig => sig.signer_id === user?.id);
 
+  if (isEditing) {
+    return (
+      <DocumentEditor
+        htmlContent={document.htmlContent || ''}
+        variables={extractVariables(document.htmlContent || '')}
+        contentData={document.contentData || {}}
+        onSave={(data) => {
+          handleSaveData(data);
+          setIsEditing(false);
+        }}
+        onDownload={handleDownloadPDF}
+      />
+    );
+  }
+
+  const documentHtml = replaceVariables(document.htmlContent || '', document.contentData || {});
+
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="text-2xl mb-2">{document.title}</CardTitle>
-              <p className="text-slate-500">{document.document_number}</p>
-            </div>
-            
-            <div className="flex items-center gap-2">
+    <div className="grid lg:grid-cols-[1fr,380px] gap-6">
+      <div className="bg-white rounded-lg border shadow-sm p-8 overflow-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: documentHtml || 'Нет содержимого' }} />
+      </div>
+
+      <div className="space-y-4">
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-start justify-between mb-2">
+              <CardTitle className="text-xl">{document.title}</CardTitle>
               {document.status === 'draft' && (
-                <Badge className="bg-slate-100 text-slate-700">Черновик</Badge>
+                <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-300">Черновик</Badge>
               )}
               {document.status === 'pending_signature' && (
-                <Badge className="bg-amber-100 text-amber-700">На подписи</Badge>
+                <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300">На подписи</Badge>
               )}
               {document.status === 'signed' && (
-                <Badge className="bg-green-100 text-green-700">Подписан</Badge>
-              )}
-              {document.status === 'rejected' && (
-                <Badge className="bg-red-100 text-red-700">Отклонён</Badge>
+                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">Подписан</Badge>
               )}
             </div>
-          </div>
-        </CardHeader>
-        
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="text-slate-500 mb-1">Работа</p>
-              <p className="font-medium">{document.work_title}</p>
-            </div>
+            {document.document_number && (
+              <p className="text-sm text-slate-500">{document.document_number}</p>
+            )}
+          </CardHeader>
+          
+          <CardContent className="space-y-3 text-sm">
+            {document.work_title && (
+              <div>
+                <p className="text-slate-500 mb-0.5">Работа</p>
+                <p className="font-medium text-slate-900">{document.work_title}</p>
+              </div>
+            )}
+            
+            {document.object_title && (
+              <div>
+                <p className="text-slate-500 mb-0.5">Объект</p>
+                <p className="font-medium text-slate-900">{document.object_title}</p>
+              </div>
+            )}
             
             <div>
-              <p className="text-slate-500 mb-1">Объект</p>
-              <p className="font-medium">{document.object_title}</p>
-            </div>
-            
-            <div>
-              <p className="text-slate-500 mb-1">Создан</p>
-              <p className="font-medium">
-                {document.createdAt ? format(new Date(document.createdAt), 'dd MMMM yyyy, HH:mm', { locale: ru }) : 'Не указано'}
+              <p className="text-slate-500 mb-0.5">Создан</p>
+              <p className="font-medium text-slate-900">
+                {document.createdAt ? format(new Date(document.createdAt), 'd MMMM yyyy, HH:mm', { locale: ru }) : 'Не указано'}
               </p>
             </div>
             
             <div>
-              <p className="text-slate-500 mb-1">Автор</p>
-              <p className="font-medium">{document.created_by_name || 'Не указан'}</p>
+              <p className="text-slate-500 mb-0.5">Автор</p>
+              <p className="font-medium text-slate-900">{document.created_by_name || 'Не указан'}</p>
             </div>
+          </CardContent>
+        </Card>
 
-            {document.contractor_organization && (
-              <div className="col-span-2">
-                <p className="text-slate-500 mb-1">Организация подрядчика</p>
-                <p className="font-medium">{document.contractor_organization}</p>
-              </div>
-            )}
-          </div>
+        <Card>
+          <CardContent className="p-3 space-y-1">
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start h-9 px-3 hover:bg-slate-50" 
+              onClick={handleDownloadPDF}
+            >
+              <Icon name="Printer" size={18} className="mr-3 text-slate-600" />
+              <span className="text-sm">Печать</span>
+            </Button>
+            
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start h-9 px-3 hover:bg-slate-50"
+              onClick={() => setIsEditing(true)}
+            >
+              <Icon name="Edit" size={18} className="mr-3 text-slate-600" />
+              <span className="text-sm">Редактировать</span>
+            </Button>
 
-        </CardContent>
-      </Card>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start h-9 px-3 hover:bg-slate-50"
+              onClick={handleDownloadPDF}
+            >
+              <Icon name="Download" size={18} className="mr-3 text-slate-600" />
+              <span className="text-sm">Скачать</span>
+            </Button>
 
-      {isEditing ? (
-        <DocumentEditor
-          htmlContent={document.htmlContent || ''}
-          variables={extractVariables(document.htmlContent || '')}
-          contentData={document.contentData || {}}
-          onSave={(data) => {
-            handleSaveData(data);
-            setIsEditing(false);
-          }}
-          onDownload={handleDownloadPDF}
-        />
-      ) : (
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Icon name="FileText" size={20} />
-                  Превью документа
-                </CardTitle>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={handleDownloadPDF}>
-                    <Icon name="Printer" size={16} className="mr-2" />
-                    Печать
-                  </Button>
-                  <Button size="sm" onClick={() => setIsEditing(true)}>
-                    <Icon name="Edit" size={16} className="mr-2" />
-                    Редактировать
-                  </Button>
-                </div>
-              </div>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start h-9 px-3 hover:bg-slate-50"
+            >
+              <Icon name="Mail" size={18} className="mr-3 text-slate-600" />
+              <span className="text-sm">Отправить клиенту</span>
+            </Button>
+
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start h-9 px-3 hover:bg-slate-50"
+            >
+              <Icon name="History" size={18} className="mr-3 text-slate-600" />
+              <span className="text-sm">История изменений</span>
+            </Button>
+
+            <Separator className="my-2" />
+
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start h-9 px-3 hover:bg-red-50 text-red-600 hover:text-red-700"
+            >
+              <Icon name="Trash2" size={18} className="mr-3" />
+              <span className="text-sm">Удалить</span>
+            </Button>
+          </CardContent>
+        </Card>
+
+        {canSign && mySignature && (
+          <Card className="border-amber-200 bg-amber-50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Icon name="FileSignature" size={18} />
+                Требуется подпись
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="bg-white p-8 rounded-lg border shadow-sm">
-                <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: document.htmlContent || 'Нет содержимого' }} />
+              <p className="text-sm text-slate-700 mb-3">
+                Необходимо подписать документ
+              </p>
+              <div className="flex gap-2">
+                <Button size="sm" className="flex-1" onClick={() => handleSign(mySignature.id)}>
+                  <Icon name="CheckCircle" size={16} className="mr-1" />
+                  Подписать
+                </Button>
+                <Button size="sm" variant="destructive" className="flex-1" onClick={() => handleReject(mySignature.id)}>
+                  <Icon name="XCircle" size={16} className="mr-1" />
+                  Отклонить
+                </Button>
               </div>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Действия с документом</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button variant="outline" className="w-full justify-start" onClick={handleDownloadPDF}>
-                <Icon name="Download" size={18} className="mr-3" />
-                Скачать
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Icon name="Mail" size={18} className="mr-3" />
-                Отправить клиенту
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Icon name="Clock" size={18} className="mr-3" />
-                Напомнить об оплате
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Icon name="Link" size={18} className="mr-3" />
-                Включить доступ по ссылке
-              </Button>
-              <Separator />
-              <Button variant="outline" className="w-full justify-start" onClick={() => setIsEditing(true)}>
-                <Icon name="Edit" size={18} className="mr-3" />
-                Редактировать
-              </Button>
-              <Button variant="outline" className="w-full justify-start text-red-600 hover:text-red-700">
-                <Icon name="Trash2" size={18} className="mr-3" />
-                Удалить
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {canSign && mySignature && (
-        <Card className="border-amber-200 bg-amber-50">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Icon name="FileSignature" size={20} />
-              Требуется ваша подпись
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-slate-700 mb-4">
-              Вам необходимо подписать этот документ. Пожалуйста, ознакомьтесь с содержанием и примите решение.
-            </p>
-            <div className="flex gap-3">
-              <Button onClick={() => handleSign(mySignature.id)}>
-                <Icon name="CheckCircle" size={18} className="mr-2" />
-                Подписать
-              </Button>
-              <Button variant="destructive" onClick={() => handleReject(mySignature.id)}>
-                <Icon name="XCircle" size={18} className="mr-2" />
-                Отклонить
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Icon name="FileSignature" size={20} />
-            Подписи ({document.signatures?.length || 0})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {document.signatures && document.signatures.length > 0 ? (
-            <div className="space-y-3">
-              {document.signatures.map((signature) => (
-                <div
-                  key={signature.id}
-                  className={cn(
-                    'p-4 rounded-lg border',
-                    signature.status === 'signed' && 'bg-green-50 border-green-200',
-                    signature.status === 'rejected' && 'bg-red-50 border-red-200',
-                    signature.status === 'pending' && 'bg-slate-50 border-slate-200'
-                  )}
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="font-medium">{signature.signer_name}</p>
-                      <p className="text-sm text-slate-600">{signature.signer_email}</p>
-                      {signature.organization_name && (
-                        <p className="text-sm text-slate-500">{signature.organization_name}</p>
-                      )}
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      {signature.status === 'pending' && (
-                        <Badge className="bg-amber-100 text-amber-700">Ожидает</Badge>
-                      )}
-                      {signature.status === 'signed' && (
-                        <Badge className="bg-green-100 text-green-700">Подписан</Badge>
-                      )}
-                      {signature.status === 'rejected' && (
-                        <Badge className="bg-red-100 text-red-700">Отклонён</Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  {signature.signed_at && (
-                    <p className="text-sm text-slate-600">
-                      Подписано {format(new Date(signature.signed_at), 'dd MMMM yyyy, HH:mm', { locale: ru })}
-                    </p>
-                  )}
-
-                  {signature.rejected_at && signature.rejection_reason && (
-                    <div className="mt-2 p-2 bg-red-100 rounded text-sm">
-                      <p className="font-medium text-red-700">Причина отклонения:</p>
-                      <p className="text-red-600">{signature.rejection_reason}</p>
-                      <p className="text-xs text-red-500 mt-1">
-                        {format(new Date(signature.rejected_at), 'dd MMMM yyyy, HH:mm', { locale: ru })}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-center text-slate-500 py-4">Подписи отсутствуют</p>
-          )}
-        </CardContent>
-      </Card>
-
-      {document.versions && document.versions.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Icon name="History" size={20} />
-              История версий ({document.versions.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {document.versions.map((version) => (
-                <div key={version.id} className="p-3 bg-slate-50 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Версия {version.version}</p>
-                      <p className="text-sm text-slate-600">{version.changed_by_name}</p>
-                    </div>
-                    <p className="text-sm text-slate-500">
-                      {format(new Date(version.created_at), 'dd MMM yyyy, HH:mm', { locale: ru })}
-                    </p>
-                  </div>
-                  {version.change_description && (
-                    <p className="text-sm text-slate-600 mt-2">{version.change_description}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+        )}
+      </div>
     </div>
   );
 }

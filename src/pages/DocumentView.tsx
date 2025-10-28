@@ -17,18 +17,16 @@ export default function DocumentView() {
 
   return (
     <div className="flex-1 overflow-y-auto bg-slate-50 w-full">
-      <div className="px-3 py-4 md:p-8 lg:p-12 max-w-7xl mx-auto">
-        <div className="mb-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/documents')}
-            className="mb-4"
-          >
-            <Icon name="ArrowLeft" size={16} className="mr-2" />
-            Назад к документам
-          </Button>
-        </div>
+      <div className="px-4 py-6 md:px-8 md:py-8 max-w-[1400px] mx-auto">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate('/documents')}
+          className="mb-6 -ml-2"
+        >
+          <Icon name="ArrowLeft" size={16} className="mr-2" />
+          Назад к документам
+        </Button>
 
         <DocumentViewer documentId={parseInt(id)} />
       </div>
