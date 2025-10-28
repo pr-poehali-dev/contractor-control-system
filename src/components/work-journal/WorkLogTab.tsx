@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Icon from '@/components/ui/icon';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import WorkLogModal from '@/components/work-journal/WorkLogModal';
 
 interface WorkLogTabProps {
   workId: number;
@@ -18,6 +19,8 @@ export default function WorkLogTab({ workId, objectId, onCreateInspection, onCre
   const { userData } = useAuthRedux();
   const navigate = useNavigate();
   const [inspectionEvents, setInspectionEvents] = useState<ApiInspectionEvent[]>([]);
+  const [selectedWorkLog, setSelectedWorkLog] = useState<any>(null);
+  const [isWorkLogModalOpen, setIsWorkLogModalOpen] = useState(false);
 
   const workLogs = (userData?.workLogs && Array.isArray(userData.workLogs)) ? userData.workLogs : [];
   const inspections = (userData?.inspections && Array.isArray(userData.inspections)) ? userData.inspections : [];
@@ -96,7 +99,14 @@ export default function WorkLogTab({ workId, objectId, onCreateInspection, onCre
         <div className="space-y-4">
         
         {allEvents.map((event) => event.type === 'report' ? (
-          <div key={event.data.id} className="bg-white rounded-lg shadow-sm border border-slate-200 p-3 md:p-4 relative">
+          <div 
+            key={event.data.id} 
+            className="bg-white rounded-lg shadow-sm border border-slate-200 p-3 md:p-4 relative cursor-pointer hover:shadow-md hover:border-slate-300 transition-all"
+            onClick={() => {
+              setSelectedWorkLog(event.data);
+              setIsWorkLogModalOpen(true);
+            }}
+          >
             <div className="flex items-start gap-2.5 pb-6">
               <div className="w-9 h-9 md:w-10 md:h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                 <Icon name="ClipboardCheck" size={18} className="text-green-600" />
@@ -202,6 +212,25 @@ export default function WorkLogTab({ workId, objectId, onCreateInspection, onCre
           </div>
         )}
         </div>
+
+        {selectedWorkLog && (
+          <WorkLogModal
+            isOpen={isWorkLogModalOpen}
+            onClose={() => {
+              setIsWorkLogModalOpen(false);
+              setSelectedWorkLog(null);
+            }}
+            workLog={{
+              id: selectedWorkLog.id,
+              description: selectedWorkLog.description,
+              timestamp: selectedWorkLog.created_at,
+              author: selectedWorkLog.author_name,
+              photoUrls: selectedWorkLog.photo_urls ? selectedWorkLog.photo_urls.split(',').filter((url: string) => url.trim()) : [],
+              volume: selectedWorkLog.volume,
+              materials: selectedWorkLog.materials
+            }}
+          />
+        )}
       </div>
     </div>
   );
