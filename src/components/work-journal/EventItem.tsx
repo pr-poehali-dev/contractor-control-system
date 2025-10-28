@@ -51,7 +51,12 @@ export default function EventItem({
                   <div className="w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-lg flex items-center justify-center">
                     <Icon name="Wrench" size={16} className="text-green-600" />
                   </div>
-                  <span className="text-sm sm:text-base font-semibold text-green-700">Отчёт о работе</span>
+                  <div className="flex flex-col">
+                    <span className="text-sm sm:text-base font-semibold text-green-700">Отчёт о работе</span>
+                    {event.work_data.workLogNumber && (
+                      <span className="text-xs text-slate-500">№{event.work_data.workLogNumber}</span>
+                    )}
+                  </div>
                 </div>
                 <Button 
                   variant="ghost" 
@@ -467,12 +472,13 @@ export default function EventItem({
           onClose={() => setIsWorkLogModalOpen(false)}
           workLog={{
             id: event.id,
-            description: event.content,
+            description: event.content || '',
             timestamp: event.created_at,
             author: event.author_name,
             photoUrls: event.work_data.photos || [],
             volume: event.work_data.volume,
-            materials: event.work_data.materials?.join(', ')
+            materials: event.work_data.materials?.join(', '),
+            workLogNumber: event.work_data.workLogNumber
           }}
         />
       )}

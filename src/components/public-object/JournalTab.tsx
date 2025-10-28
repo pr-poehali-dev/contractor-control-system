@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { safeDateCompare, isValidDate } from '@/utils/dateValidation';
+import WorkLogModal from '@/components/work-journal/WorkLogModal';
 
 interface JournalTabProps {
   objectId: number;
@@ -9,6 +12,8 @@ interface JournalTabProps {
 
 const JournalTab = ({ objectId }: JournalTabProps) => {
   const { userData } = useAuthRedux();
+  const [selectedWorkLog, setSelectedWorkLog] = useState<any>(null);
+  const [isWorkReportModalOpen, setIsWorkReportModalOpen] = useState(false);
 
   const works = (userData?.works && Array.isArray(userData.works)) 
     ? userData.works.filter(w => w.object_id === objectId) 
@@ -23,8 +28,10 @@ const JournalTab = ({ objectId }: JournalTabProps) => {
         const work = works.find(w => w.id === log.work_id);
         return work !== undefined;
       })
-      .map(log => {
+      .map((log, index, arr) => {
         const work = works.find(w => w.id === log.work_id);
+        const reportNumber = arr.length - index;
+        const workLogNumber = `${log.work_id}-${reportNumber}`;
         return {
           id: `log-${log.id}`,
           type: 'work' as const,
@@ -33,6 +40,8 @@ const JournalTab = ({ objectId }: JournalTabProps) => {
           timestamp: log.created_at,
           user: log.author_name,
           workTitle: work?.title,
+          workLog: log,
+          workLogNumber: workLogNumber,
         };
       }),
     ...inspections
@@ -99,7 +108,28 @@ const JournalTab = ({ objectId }: JournalTabProps) => {
                     <Icon name={getIcon(item.type) as any} size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-slate-900 mb-1">{item.title}</h3>
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-slate-900">{item.title}</h3>
+                        {item.type === 'work' && (item as any).workLogNumber && (
+                          <p className="text-xs text-slate-500">№{(item as any).workLogNumber}</p>
+                        )}
+                      </div>
+                      {item.type === 'work' && (item as any).workLog && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => {
+                            setSelectedWorkLog((item as any).workLog);
+                            setIsWorkReportModalOpen(true);
+                          }}
+                          className="text-xs"
+                        >
+                          <Icon name="Eye" size={14} className="mr-1" />
+                          Открыть
+                        </Button>
+                      )}
+                    </div>
                     <p className="text-sm text-slate-600 mb-2">{item.description}</p>
                     {item.workTitle && (
                       <div className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 rounded text-xs text-slate-700 mb-2">
@@ -123,6 +153,25 @@ const JournalTab = ({ objectId }: JournalTabProps) => {
             </Card>
           ))}
         </div>
+      )}
+
+      {selectedWorkLog && (
+        <WorkLogModal
+          isOpen={isWorkReportModalOpen}
+          onClose={() => {
+            setIsWorkReportModalOpen(false);
+            setSelectedWorkLog(null);
+          }}
+          workLog={{
+            id: selectedWorkLog.id,
+            description: selectedWorkLog.description,
+            timestamp: selectedWorkLog.created_at,
+            author: selectedWorkLog.author_name,
+            photoUrls: selectedWorkLog.photo_urls ? selectedWorkLog.photo_urls.split(',').filter((url: string) => url.trim()) : [],
+            volume: selectedWorkLog.volume,
+            materials: selectedWorkLog.materials
+          }}
+        />
       )}
     </div>
   );

@@ -4,12 +4,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { safeDateCompare, isValidDate } from '@/utils/dateValidation';
+import WorkLogModal from '@/components/work-journal/WorkLogModal';
 
 const Activity = () => {
   const { userData, user } = useAuthRedux();
   const [typeFilter, setTypeFilter] = useState<'all' | 'work' | 'check' | 'info'>('all');
   const [objectFilter, setObjectFilter] = useState<number | null>(null);
   const [workFilter, setWorkFilter] = useState<number | null>(null);
+  const [selectedWorkLog, setSelectedWorkLog] = useState<any>(null);
+  const [isWorkReportModalOpen, setIsWorkReportModalOpen] = useState(false);
 
   if (!userData) {
     return (
@@ -58,6 +61,7 @@ const Activity = () => {
         workId: log.work_id,
         contractorId: work?.contractor_id,
         objectId: work?.object_id,
+        workLog: log,
       };
     }),
     ...inspections.map(insp => {
@@ -292,6 +296,20 @@ const Activity = () => {
                             )}
                           </div>
                         </div>
+                        {item.type === 'work' && (item as any).workLog && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => {
+                              setSelectedWorkLog((item as any).workLog);
+                              setIsWorkReportModalOpen(true);
+                            }}
+                            className="text-xs"
+                          >
+                            <Icon name="Eye" size={14} className="mr-1" />
+                            Открыть
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -301,6 +319,25 @@ const Activity = () => {
           </div>
         )}
       </div>
+
+      {selectedWorkLog && (
+        <WorkLogModal
+          isOpen={isWorkReportModalOpen}
+          onClose={() => {
+            setIsWorkReportModalOpen(false);
+            setSelectedWorkLog(null);
+          }}
+          workLog={{
+            id: selectedWorkLog.id,
+            description: selectedWorkLog.description,
+            timestamp: selectedWorkLog.created_at,
+            author: selectedWorkLog.author_name,
+            photoUrls: selectedWorkLog.photo_urls ? selectedWorkLog.photo_urls.split(',').filter((url: string) => url.trim()) : [],
+            volume: selectedWorkLog.volume,
+            materials: selectedWorkLog.materials
+          }}
+        />
+      )}
     </div>
   );
 };

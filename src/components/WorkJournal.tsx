@@ -148,7 +148,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
       .toUpperCase();
   };
 
-  const workEntryEvents: JournalEvent[] = workEntries.map(log => {
+  const workEntryEvents: JournalEvent[] = workEntries.map((log, index) => {
     const isWorkStart = log.is_work_start === true;
     const isInspectionStart = log.is_inspection_start === true;
     const isInspectionCompleted = log.is_inspection_completed === true;
@@ -157,6 +157,9 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
     if (isWorkStart) eventType = 'work_start';
     else if (isInspectionStart) eventType = 'inspection_started';
     else if (isInspectionCompleted) eventType = 'inspection_completed';
+    
+    const reportNumber = workEntries.length - index;
+    const workLogNumber = `${log.work_id}-${reportNumber}`;
     
     return {
       id: log.id,
@@ -174,6 +177,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
         photos: log.photo_urls ? log.photo_urls.split(',').filter(url => url.trim()) : [],
         progress: log.progress,
         completion_percentage: log.completion_percentage,
+        workLogNumber: workLogNumber,
       },
       inspection_data: (isInspectionStart || isInspectionCompleted) ? {
         inspection_id: log.inspection_id,

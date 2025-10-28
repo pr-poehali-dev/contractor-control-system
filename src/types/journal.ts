@@ -30,6 +30,7 @@ export interface JournalEvent {
     photos?: string[];
     progress?: number;
     completion_percentage?: number;
+    workLogNumber?: string;
   };
   
   inspection_data?: {
