@@ -161,10 +161,12 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
   const mySignature = document.signatures?.find(sig => sig.signer_id === user?.id);
 
   if (isEditing) {
+    const variableKeys = document.contentData ? Object.keys(document.contentData) : extractVariables(document.htmlContent || '');
+    
     return (
       <DocumentEditor
         htmlContent={document.htmlContent || ''}
-        variables={extractVariables(document.htmlContent || '')}
+        variables={variableKeys}
         contentData={document.contentData || {}}
         onSave={(data) => {
           handleSaveData(data);

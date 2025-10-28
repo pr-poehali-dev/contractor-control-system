@@ -64,12 +64,13 @@ export default function DocumentEditor({
 
   const getFieldLabel = (fieldName: string): string => {
     const labels: Record<string, string> = {
-      date: 'Дата',
+      date: 'Дата составления',
       object_name: 'Название объекта',
       object_address: 'Адрес объекта',
       work_name: 'Название работ',
-      work_volume: 'Объем работ',
+      work_volume: 'Объём работ',
       work_cost: 'Стоимость работ',
+      work_description: 'Описание работ',
       client_representative: 'Представитель заказчика',
       contractor_representative: 'Представитель подрядчика',
       defects_description: 'Описание дефектов',
@@ -78,6 +79,8 @@ export default function DocumentEditor({
       start_date: 'Дата начала',
       end_date: 'Дата окончания',
       quality_assessment: 'Оценка качества',
+      materials_list: 'Список материалов',
+      completion_percentage: 'Процент выполнения',
     };
     return labels[fieldName] || fieldName.replace(/_/g, ' ');
   };
