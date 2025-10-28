@@ -66,6 +66,7 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
   };
 
   const handleSaveData = async (data: Record<string, any>) => {
+    console.log('📤 DocumentViewer handleSaveData called with data:', data);
     try {
       await dispatch(updateDocument({
         id: documentId,

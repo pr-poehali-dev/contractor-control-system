@@ -33,6 +33,7 @@ export default function DocumentEditor({
   };
 
   const handleSave = () => {
+    console.log('💾 DocumentEditor handleSave called with formData:', formData);
     onSave(formData);
   };
 
