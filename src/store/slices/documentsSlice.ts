@@ -213,6 +213,20 @@ export const fetchPendingSignatures = createAsyncThunk(
   }
 );
 
+export const deleteDocument = createAsyncThunk(
+  'documents/delete',
+  async (id: number, { rejectWithValue }) => {
+    try {
+      await apiClient.delete(`${ENDPOINTS.DOCUMENTS.DELETE}/${id}`, {
+        skipAuthRedirect: true
+      });
+      return id;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to delete document');
+    }
+  }
+);
+
 const documentsSlice = createSlice({
   name: 'documents',
   initialState,
@@ -273,6 +287,13 @@ const documentsSlice = createSlice({
         }
         if (state.currentDocument?.id === action.payload.id) {
           state.currentDocument = { ...state.currentDocument, ...action.payload };
+        }
+      })
+      
+      .addCase(deleteDocument.fulfilled, (state, action) => {
+        state.items = state.items.filter(doc => doc.id !== action.payload);
+        if (state.currentDocument?.id === action.payload) {
+          state.currentDocument = null;
         }
       })
       

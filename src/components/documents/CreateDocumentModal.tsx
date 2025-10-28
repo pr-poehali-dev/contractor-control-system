@@ -32,7 +32,7 @@ export default function CreateDocumentModal({
   loading = false,
   onSelectTemplate
 }: CreateDocumentModalProps) {
-  const systemTemplates = templates.filter(t => t.is_system);
+  // Показываем только пользовательские шаблоны (НЕ системные)
   const userTemplates = templates.filter(t => !t.is_system);
 
   return (
@@ -63,50 +63,7 @@ export default function CreateDocumentModal({
           ) : (
             <ScrollArea className="h-[50vh]">
               <div className="space-y-6 pr-4">
-                {systemTemplates.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-2 mb-3">
-                      <Icon name="Shield" size={18} className="text-purple-600" />
-                      <h3 className="font-semibold text-slate-900">Системные шаблоны</h3>
-                      <Badge variant="secondary" className="text-xs">{systemTemplates.length}</Badge>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {systemTemplates.map((template) => (
-                        <Card
-                          key={template.id}
-                          className="p-4 hover:shadow-lg transition-all cursor-pointer border-2 hover:border-blue-300 group"
-                          onClick={() => {
-                            onSelectTemplate(template.id, template.name);
-                            onClose();
-                          }}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
-                              <Icon name="FileText" size={20} className="text-blue-600" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">
-                                {template.name}
-                              </h3>
-                              {template.description && (
-                                <p className="text-xs text-slate-600 line-clamp-2">
-                                  {template.description}
-                                </p>
-                              )}
-                            </div>
-                            <Icon 
-                              name="ChevronRight" 
-                              size={20} 
-                              className="text-slate-400 group-hover:text-blue-600 transition-colors" 
-                            />
-                          </div>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {userTemplates.length > 0 && (
+                {userTemplates.length > 0 ? (
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <Icon name="User" size={18} className="text-slate-600" />
@@ -146,6 +103,12 @@ export default function CreateDocumentModal({
                         </Card>
                       ))}
                     </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <Icon name="FileX" size={48} className="mx-auto mb-4 text-slate-300" />
+                    <p className="text-slate-500">Нет пользовательских шаблонов</p>
+                    <p className="text-sm text-slate-400 mt-2">Создайте шаблон в разделе "Шаблоны"</p>
                   </div>
                 )}
               </div>
