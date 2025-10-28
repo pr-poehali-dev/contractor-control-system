@@ -55,11 +55,9 @@ export function TemplatesHeader({
             <SelectItem value="all">Все типы</SelectItem>
             <SelectItem value="act">Акт работ</SelectItem>
             <SelectItem value="inspection">Акт проверки</SelectItem>
-            <SelectItem value="defect_elimination">Акт о дефектах</SelectItem>
             <SelectItem value="defect_detection">Обнаружение дефектов</SelectItem>
             <SelectItem value="defect_resolution">Устранение дефектов</SelectItem>
             <SelectItem value="work_acceptance">Приёмка работ</SelectItem>
-            <SelectItem value="completion">Акт приёмки</SelectItem>
             <SelectItem value="protocol">Протокол</SelectItem>
             <SelectItem value="contract">Договор</SelectItem>
             <SelectItem value="custom">Прочее</SelectItem>
