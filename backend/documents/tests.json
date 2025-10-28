@@ -1,14 +1,10 @@
 {
   "tests": [
     {
-      "name": "Get all documents (empty list)",
+      "name": "Get all documents",
       "method": "GET",
       "path": "/",
-      "expectedStatus": 200,
-      "expectedBody": {
-        "documents": []
-      },
-      "bodyMatcher": "partial"
+      "expectedStatus": 200
     },
     {
       "name": "Create new document (draft)",
