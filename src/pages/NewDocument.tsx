@@ -46,15 +46,33 @@ export default function NewDocument() {
     }
   }, [template]);
 
-  const saveAsDraft = useCallback(async () => {
-    if (!template || isSaving) return;
+  const getFieldLabel = (fieldName: string): string => {
+    const labels: Record<string, string> = {
+      date: 'Дата составления',
+      object_name: 'Название объекта',
+      object_address: 'Адрес объекта',
+      client_representative: 'Представитель заказчика',
+      contractor_representative: 'Представитель подрядчика',
+      defects_description: 'Описание дефектов',
+      deadline_date: 'Срок устранения',
+      detection_date: 'Дата обнаружения',
+      work_description: 'Описание работ',
+      work_volume: 'Объём работ',
+      materials_list: 'Список материалов',
+      completion_percentage: 'Процент выполнения',
+    };
+    return labels[fieldName] || fieldName;
+  };
+
+  const saveDocument = useCallback(async () => {
+    if (!template || isSaving || !documentTitle.trim()) return;
     
     setIsSaving(true);
     try {
       let html = template.content?.html || '';
       Object.entries(documentData).forEach(([key, value]) => {
         const regex = new RegExp(`{{${key}}}`, 'g');
-        html = html.replace(regex, value || `[${key}]`);
+        html = html.replace(regex, value || `{{${key}}}`);
       });
 
       if (currentDocId) {
@@ -75,23 +93,18 @@ export default function NewDocument() {
           status: 'draft'
         })).unwrap();
         setCurrentDocId(result.id);
+        return result.id;
       }
+      return currentDocId;
     } catch (error) {
-      console.error('Ошибка автосохранения:', error);
+      console.error('Ошибка сохранения:', error);
+      throw error;
     } finally {
       setIsSaving(false);
     }
   }, [template, documentData, documentTitle, currentDocId, dispatch, isSaving]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (documentTitle.trim()) {
-        saveAsDraft();
-      }
-    }, 2000);
 
-    return () => clearTimeout(timer);
-  }, [documentData, documentTitle, saveAsDraft]);
 
   if (loading) {
     return (
@@ -132,22 +145,21 @@ export default function NewDocument() {
       return;
     }
 
-    const emptyFields = Object.entries(documentData).filter(([_, value]) => !value.trim());
-    if (emptyFields.length > 0) {
+    try {
+      const docId = await saveDocument();
+      
       toast({
-        title: 'Документ сохранён как черновик',
-        description: `Не все поля заполнены. Вы можете вернуться к редактированию позже.`,
+        title: 'Успешно!',
+        description: 'Документ сохранён',
       });
-    }
-
-    await saveAsDraft();
-    
-    if (currentDocId) {
-      navigate(`/document/${currentDocId}`);
-    } else {
+      
+      if (docId) {
+        navigate(`/document/${docId}`);
+      }
+    } catch (error) {
       toast({
         title: 'Ошибка',
-        description: 'Не удалось создать документ',
+        description: 'Не удалось сохранить документ',
         variant: 'destructive',
       });
     }
@@ -222,8 +234,8 @@ export default function NewDocument() {
                 <div className="space-y-4">
                   {template.content?.variables?.map((variable: string) => (
                     <div key={variable}>
-                      <Label htmlFor={`field-${variable}`} className="text-sm">
-                        {variable}
+                      <Label htmlFor={`field-${variable}`} className="text-sm font-medium">
+                        {getFieldLabel(variable)}
                       </Label>
                       <Input
                         id={`field-${variable}`}
@@ -232,7 +244,7 @@ export default function NewDocument() {
                           ...documentData,
                           [variable]: e.target.value
                         })}
-                        placeholder={`Введите ${variable}`}
+                        placeholder={`Введите ${getFieldLabel(variable).toLowerCase()}`}
                         className="mt-1.5"
                       />
                     </div>

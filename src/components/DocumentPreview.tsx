@@ -16,8 +16,13 @@ export default function DocumentPreview({ html, variables, templateName }: Docum
   const replaceVariables = (content: string): string => {
     let result = content;
     Object.entries(variables).forEach(([key, value]) => {
-      const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
-      result = result.replace(regex, `<span class="variable-filled">${value || `{{${key}}}`}</span>`);
+      // Заменяем переменные в формате {{key}}
+      const regex1 = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
+      result = result.replace(regex1, value ? `<span class="variable-filled">${value}</span>` : `<span class="variable-empty">{{${key}}}</span>`);
+      
+      // Заменяем переменные в формате {key} (без двойных скобок)
+      const regex2 = new RegExp(`{\\s*${key}\\s*}`, 'g');
+      result = result.replace(regex2, value ? `<span class="variable-filled">${value}</span>` : `<span class="variable-empty">{${key}}</span>`);
     });
     return result;
   };
@@ -98,6 +103,13 @@ export default function DocumentPreview({ html, variables, templateName }: Docum
           border-radius: 3px;
           font-weight: 500;
           color: #1e40af;
+        }
+        .variable-empty {
+          background-color: #fee2e2;
+          padding: 2px 6px;
+          border-radius: 3px;
+          font-weight: 500;
+          color: #991b1b;
         }
       `}</style>
     </div>
