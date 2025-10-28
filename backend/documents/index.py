@@ -68,6 +68,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         if template:
                             template_name = template['name']
                     
+                    # Разделяем content на contentData (без html) и htmlContent
+                    content = doc['content'] or {}
+                    html_content = content.get('html', '')
+                    content_data = {k: v for k, v in content.items() if k != 'html'}
+                    
                     return {
                         'statusCode': 200,
                         'headers': cors_headers,
@@ -78,8 +83,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             'templateId': doc['template_id'],
                             'templateName': template_name,
                             'status': doc['status'],
-                            'contentData': doc['content'] or {},
-                            'htmlContent': doc['content'].get('html', '') if doc['content'] else '',
+                            'contentData': content_data,
+                            'htmlContent': html_content,
                             'createdAt': doc['created_at'].isoformat() if doc['created_at'] else None,
                             'updatedAt': doc['updated_at'].isoformat() if doc['updated_at'] else None
                         }, ensure_ascii=False)
@@ -108,22 +113,28 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     
                     docs = cur.fetchall()
                     
+                    # Подготовка списка документов без html в contentData
+                    documents_list = []
+                    for doc in docs:
+                        content = doc['content'] or {}
+                        content_data = {k: v for k, v in content.items() if k != 'html'}
+                        
+                        documents_list.append({
+                            'id': doc['id'],
+                            'title': doc['title'],
+                            'templateId': doc['template_id'],
+                            'templateName': doc.get('template_name', ''),
+                            'status': doc['status'],
+                            'contentData': content_data,
+                            'createdAt': doc['created_at'].isoformat() if doc['created_at'] else None,
+                            'updatedAt': doc['updated_at'].isoformat() if doc['updated_at'] else None
+                        })
+                    
                     return {
                         'statusCode': 200,
                         'headers': cors_headers,
                         'isBase64Encoded': False,
-                        'body': json.dumps({
-                            'documents': [{
-                                'id': doc['id'],
-                                'title': doc['title'],
-                                'templateId': doc['template_id'],
-                                'templateName': doc.get('template_name', ''),
-                                'status': doc['status'],
-                                'contentData': doc['content'] or {},
-                                'createdAt': doc['created_at'].isoformat() if doc['created_at'] else None,
-                                'updatedAt': doc['updated_at'].isoformat() if doc['updated_at'] else None
-                            } for doc in docs]
-                        }, ensure_ascii=False)
+                        'body': json.dumps({'documents': documents_list}, ensure_ascii=False)
                     }
         
         elif method == 'POST':
@@ -187,6 +198,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 template = cur.fetchone()
                 template_name = template['name'] if template else ''
                 
+                # Разделяем content на contentData (без html) и htmlContent
+                content = doc['content'] or {}
+                html_content = content.get('html', '')
+                content_data = {k: v for k, v in content.items() if k != 'html'}
+                
                 return {
                     'statusCode': 201,
                     'headers': cors_headers,
@@ -197,8 +213,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'templateId': doc['template_id'],
                         'templateName': template_name,
                         'status': doc['status'],
-                        'contentData': doc['content'] or {},
-                        'htmlContent': doc['content'].get('html', '') if doc['content'] else '',
+                        'contentData': content_data,
+                        'htmlContent': html_content,
                         'createdAt': doc['created_at'].isoformat() if doc['created_at'] else None,
                         'updatedAt': doc['updated_at'].isoformat() if doc['updated_at'] else None
                     }, ensure_ascii=False)
@@ -280,6 +296,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     if template:
                         template_name = template['name']
                 
+                # Разделяем content на contentData (без html) и htmlContent
+                content = doc['content'] or {}
+                html_content = content.get('html', '')
+                content_data = {k: v for k, v in content.items() if k != 'html'}
+                
                 return {
                     'statusCode': 200,
                     'headers': cors_headers,
@@ -290,8 +311,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'templateId': doc['template_id'],
                         'templateName': template_name,
                         'status': doc['status'],
-                        'contentData': doc['content'] or {},
-                        'htmlContent': doc['content'].get('html', '') if doc['content'] else '',
+                        'contentData': content_data,
+                        'htmlContent': html_content,
                         'createdAt': doc['created_at'].isoformat() if doc['created_at'] else None,
                         'updatedAt': doc['updated_at'].isoformat() if doc['updated_at'] else None
                     }, ensure_ascii=False)
