@@ -44,10 +44,7 @@ export default function EventItem({
     switch (event.type) {
       case 'work_entry':
         return (
-          <div 
-            className="cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => setIsWorkLogModalOpen(true)}
-          >
+          <>
             {event.work_data && (
               <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-200">
                 <div className="w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-lg flex items-center justify-center">
@@ -109,7 +106,7 @@ export default function EventItem({
                 />
               </div>
             )}
-          </div>
+          </>
         );
         
       case 'inspection':
@@ -401,13 +398,22 @@ export default function EventItem({
           <span className="text-[13px] sm:text-base font-bold text-slate-900 truncate">{event.author_name}</span>
         </div>
 
-        <Card className={cn(
-          'border shadow-sm relative w-full transition-shadow hover:shadow-md',
-          isOwnEvent ? 'bg-gradient-to-br from-blue-50 to-white border-blue-100' : 'bg-white border-slate-200',
-          event.type === 'work_entry' && !isOwnEvent && 'border-l-4 border-l-green-500',
-          event.type === 'inspection' && !isOwnEvent && 'border-l-4 border-l-blue-500',
-          event.type === 'defect_added' && 'border-l-4 border-l-amber-500'
-        )}>
+        <Card 
+          className={cn(
+            'border shadow-sm relative w-full transition-shadow hover:shadow-md',
+            isOwnEvent ? 'bg-gradient-to-br from-blue-50 to-white border-blue-100' : 'bg-white border-slate-200',
+            event.type === 'work_entry' && !isOwnEvent && 'border-l-4 border-l-green-500',
+            event.type === 'inspection' && !isOwnEvent && 'border-l-4 border-l-blue-500',
+            event.type === 'defect_added' && 'border-l-4 border-l-amber-500',
+            event.type === 'work_entry' && 'cursor-pointer'
+          )}
+          onClick={(e) => {
+            if (event.type === 'work_entry') {
+              e.stopPropagation();
+              setIsWorkLogModalOpen(true);
+            }
+          }}
+        >
           <CardContent className="p-3 sm:p-4 w-full overflow-hidden">
             {(userRole === 'customer' || userRole === 'client') && event.type === 'work_entry' && !isOwnEvent && (
               <Button

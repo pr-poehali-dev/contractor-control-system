@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
@@ -12,6 +13,7 @@ interface JournalTabProps {
 
 const JournalTab = ({ objectId }: JournalTabProps) => {
   const { userData } = useAuthRedux();
+  const navigate = useNavigate();
   const [selectedWorkLog, setSelectedWorkLog] = useState<any>(null);
   const [isWorkReportModalOpen, setIsWorkReportModalOpen] = useState(false);
 
@@ -59,6 +61,7 @@ const JournalTab = ({ objectId }: JournalTabProps) => {
           timestamp: insp.created_at,
           user: insp.author_name || 'Инспектор',
           workTitle: work?.title,
+          inspection: insp,
         };
       }),
   ].sort((a, b) => safeDateCompare(a.timestamp, b.timestamp));
@@ -103,11 +106,13 @@ const JournalTab = ({ objectId }: JournalTabProps) => {
           {allActivity.map((item) => (
             <Card 
               key={item.id} 
-              className={`hover:shadow-md transition-shadow ${item.type === 'work' ? 'cursor-pointer' : ''}`}
+              className="hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => {
                 if (item.type === 'work' && (item as any).workLog) {
                   setSelectedWorkLog((item as any).workLog);
                   setIsWorkReportModalOpen(true);
+                } else if (item.type === 'check' && (item as any).inspection) {
+                  navigate(`/inspection/${(item as any).inspection.id}`);
                 }
               }}
             >
