@@ -4,6 +4,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
+import { useEffect } from 'react';
 
 interface TiptapEditorProps {
   content: string;
@@ -39,6 +40,12 @@ export default function TiptapEditor({
       },
     },
   });
+
+  useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content);
+    }
+  }, [content, editor]);
 
   const insertVariable = (variable: string) => {
     if (!editor) return;
