@@ -159,15 +159,12 @@ const Documents = () => {
           </div>
           <Button 
             onClick={handleCreateDocument}
-                  className="w-full md:w-auto"
-                >
-                  <Icon name="FilePlus" size={18} className="mr-2" />
-                  Создать документ
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            className="w-full md:w-auto"
+          >
+            <Icon name="FilePlus" size={18} className="mr-2" />
+            Создать документ
+          </Button>
+        </div>
 
         <Card className="mb-6">
           <CardContent className="p-4">
