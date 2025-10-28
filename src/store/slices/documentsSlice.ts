@@ -150,7 +150,7 @@ export const updateDocument = createAsyncThunk(
   }, { rejectWithValue }) => {
     try {
       console.log('🔵 updateDocument called with:', data);
-      const response = await apiClient.put(`${ENDPOINTS.DOCUMENTS.UPDATE}/${data.id}`, data, {
+      const response = await apiClient.put(`${ENDPOINTS.DOCUMENTS.UPDATE}?id=${data.id}`, data, {
         skipAuthRedirect: true
       });
       console.log('🟢 updateDocument response:', response);
