@@ -94,7 +94,8 @@ export function useInspectionData(inspectionId: string | undefined) {
       );
       
       if (response.success && response.data) {
-        setDefectReport(response.data);
+        const reports = Array.isArray(response.data) ? response.data : [response.data];
+        setDefectReport(reports.length > 0 ? reports[0] : null);
       }
     } catch (error) {
       console.error('Failed to load defect report:', error instanceof Error ? error.message : String(error));
