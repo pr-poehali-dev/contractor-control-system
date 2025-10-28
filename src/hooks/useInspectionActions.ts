@@ -134,24 +134,79 @@ export function useInspectionActions(
     
     setLoadingReport(true);
     try {
-      const response = await apiClient.post(ENDPOINTS.DEFECTS.REPORTS, {
+      // 1. Создать defect_report
+      const reportResponse = await apiClient.post(ENDPOINTS.DEFECTS.REPORTS, {
         inspection_id: parseInt(inspection.id.toString()),
         notes: ''
       });
       
-      if (!response.success) {
-        console.error('Failed to create report:', response.error);
-        throw new Error(response.error || 'Failed to create report');
+      if (!reportResponse.success) {
+        console.error('Failed to create report:', reportResponse.error);
+        throw new Error(reportResponse.error || 'Failed to create report');
       }
       
-      setDefectReport(response.data);
+      const defectReportData = reportResponse.data;
+      setDefectReport(defectReportData);
+      
+      // 2. Получить шаблон "Акт об обнаружении дефектов"
+      const templatesResponse = await apiClient.get(ENDPOINTS.DOCUMENTS.TEMPLATES);
+      const templates = templatesResponse.data?.templates || [];
+      const defectTemplate = templates.find((t: any) => 
+        t.template_type === 'inspection' || 
+        t.name?.includes('замечани') || 
+        t.name?.includes('дефект')
+      );
+      
+      if (defectTemplate) {
+        // 3. Получить данные работы и объекта
+        const work = userData?.works?.find((w: any) => w.id === inspection.work_id);
+        const object = userData?.objects?.find((o: any) => o.id === work?.object_id);
+        
+        // 4. Подготовить данные для документа
+        const documentData = {
+          work_id: inspection.work_id,
+          template_id: defectTemplate.id,
+          document_type: 'defect_act',
+          title: `Акт об обнаружении дефектов №${defectReportData.report_number}`,
+          status: 'draft',
+          content: {
+            title: `АКТ ОБ ОБНАРУЖЕНИИ ДЕФЕКТОВ №${defectReportData.report_number}`,
+            date: new Date().toLocaleDateString('ru-RU'),
+            objectName: `Объект: ${object?.title || 'Не указан'}`,
+            objectAddress: object?.address || '',
+            workName: `Работа: ${work?.title || 'Не указана'}`,
+            inspectionNumber: `Проверка №${inspection.inspection_number || ''}`,
+            defects: defects.map((d: any, idx: number) => 
+              `${idx + 1}. ${d.description}\n   Местоположение: ${d.location || 'не указано'}\n   Серьёзность: ${d.severity || 'не указана'}`
+            ).join('\n\n'),
+            totalDefects: defects.length,
+            criticalDefects: defects.filter((d: any) => d.severity === 'Критический').length,
+            reportNumber: defectReportData.report_number
+          }
+        };
+        
+        // 5. Создать документ
+        const docResponse = await apiClient.post(ENDPOINTS.DOCUMENTS.BASE, documentData);
+        
+        if (docResponse.success) {
+          toast({ 
+            title: 'Документ создан!', 
+            description: `Акт №${defectReportData.report_number} сохранён в разделе "Документы"`,
+            action: {
+              label: 'Открыть',
+              onClick: () => navigate(`/document/${docResponse.data.id}`)
+            }
+          });
+        }
+      } else {
+        toast({ 
+          title: 'Отчёт создан', 
+          description: `Акт №${defectReportData.report_number}. Шаблон документа не найден - создайте документ вручную.`
+        });
+      }
       
       await loadUserData();
       
-      toast({ 
-        title: 'Акт успешно сформирован!', 
-        description: `Акт №${response.data?.report_number} доступен в разделе "Документы"`
-      });
     } catch (error: any) {
       console.error('Error creating report:', error);
       toast({ 
