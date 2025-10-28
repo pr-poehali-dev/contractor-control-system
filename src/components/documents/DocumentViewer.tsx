@@ -100,8 +100,13 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
   const replaceVariables = (html: string, data: Record<string, any>): string => {
     let result = html;
     Object.entries(data).forEach(([key, value]) => {
-      const regex = new RegExp(`\\[${key}\\]`, 'g');
-      result = result.replace(regex, String(value || ''));
+      // Заменяем переменные в формате [key]
+      const regex1 = new RegExp(`\\[${key}\\]`, 'g');
+      result = result.replace(regex1, String(value || ''));
+      
+      // Заменяем переменные в формате {{key}}
+      const regex2 = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
+      result = result.replace(regex2, String(value || ''));
     });
     return result;
   };
