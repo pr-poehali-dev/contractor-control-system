@@ -80,9 +80,6 @@ export function CreateTemplateDialog({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="act">Акт работ</SelectItem>
-                <SelectItem value="inspection">Акт проверки</SelectItem>
-                <SelectItem value="defect_report">Акт о дефектах</SelectItem>
-                <SelectItem value="completion">Акт приёмки</SelectItem>
                 <SelectItem value="protocol">Протокол</SelectItem>
                 <SelectItem value="contract">Договор</SelectItem>
                 <SelectItem value="custom">Прочее</SelectItem>

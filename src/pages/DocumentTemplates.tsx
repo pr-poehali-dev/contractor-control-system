@@ -32,7 +32,7 @@ export default function DocumentTemplates() {
   const [newTemplate, setNewTemplate] = useState({
     name: '',
     description: '',
-    template_type: 'act',
+    template_type: 'custom',
   });
 
   useEffect(() => {
@@ -143,7 +143,7 @@ export default function DocumentTemplates() {
       ).unwrap();
 
       setIsCreateDialogOpen(false);
-      setNewTemplate({ name: '', description: '', template_type: 'act' });
+      setNewTemplate({ name: '', description: '', template_type: 'custom' });
 
       toast({
         title: 'Шаблон создан',
@@ -165,10 +165,7 @@ export default function DocumentTemplates() {
     const types: Record<string, string> = {
       act: 'Акт работ',
       inspection: 'Акт проверки',
-      defect_report: 'Акт о дефектах',
-      defect_detection: 'Обнаружение дефектов',
-      defect_resolution: 'Устранение дефектов',
-      work_acceptance: 'Приёмка работ',
+      defect_elimination: 'Акт о дефектах',
       completion: 'Акт приёмки',
       protocol: 'Протокол',
       contract: 'Договор',
