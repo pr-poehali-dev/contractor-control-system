@@ -134,100 +134,92 @@ export function useInspectionActions(
     
     setLoadingReport(true);
     try {
-      // 1. Создать defect_report
-      const reportResponse = await apiClient.post(ENDPOINTS.DEFECTS.REPORTS, {
-        inspection_id: parseInt(inspection.id.toString()),
-        notes: ''
-      });
-      
-      if (!reportResponse.success) {
-        console.error('Failed to create report:', reportResponse.error);
-        throw new Error(reportResponse.error || 'Failed to create report');
-      }
-      
-      const defectReportData = reportResponse.data;
-      setDefectReport(defectReportData);
-      
-      // 2. Получить шаблон "Акт об обнаружении дефектов" по system_key
+      // 1. Получить шаблон "Акт об обнаружении дефектов" по system_key
       const templatesResponse = await apiClient.get(ENDPOINTS.DOCUMENTS.TEMPLATES);
       const templates = templatesResponse.data?.templates || [];
       console.log('📋 Available templates:', templates.map((t: any) => ({ id: t.id, name: t.name, system_key: t.system_key })));
       const defectTemplate = templates.find((t: any) => t.system_key === 'defect_detection_act');
       console.log('✅ Found defect template:', defectTemplate);
       
-      if (defectTemplate) {
-        // 3. Получить данные работы и объекта
-        let work: any = null;
-        let object: any = null;
-        
-        // Ищем работу во всех объектах
-        for (const obj of userData?.objects || []) {
-          const foundWork = obj.works?.find((w: any) => w.id === inspection.work_id);
-          if (foundWork) {
-            work = foundWork;
-            object = obj;
-            break;
-          }
-        }
-        
-        if (!work || !object) {
-          throw new Error('Работа или объект не найдены');
-        }
-        
-        // 4. Подготовить данные для документа
-        const documentData = {
-          work_id: inspection.work_id,
-          template_id: defectTemplate.id,
-          document_type: 'defect_act',
-          title: `Акт об обнаружении дефектов №${defectReportData.report_number}`,
-          status: 'draft',
-          content: {
-            title: `АКТ ОБ ОБНАРУЖЕНИИ ДЕФЕКТОВ №${defectReportData.report_number}`,
-            date: new Date().toLocaleDateString('ru-RU'),
-            objectName: `Объект: ${object?.title || 'Не указан'}`,
-            objectAddress: object?.address || '',
-            workName: `Работа: ${work?.title || 'Не указана'}`,
-            inspectionNumber: `Проверка №${inspection.inspection_number || ''}`,
-            defects: defects.map((d: any, idx: number) => 
-              `${idx + 1}. ${d.description}\n   Местоположение: ${d.location || 'не указано'}\n   Серьёзность: ${d.severity || 'не указана'}`
-            ).join('\n\n'),
-            totalDefects: defects.length,
-            criticalDefects: defects.filter((d: any) => d.severity === 'Критический').length,
-            reportNumber: defectReportData.report_number
-          }
-        };
-        
-        // 5. Создать документ
-        const docResponse = await apiClient.post(ENDPOINTS.DOCUMENTS.BASE, documentData);
-        
-        if (docResponse.success) {
-          // 6. Сохранить ссылку на документ в проверке
-          await dispatch(updateInspection({
-            id: inspection.id,
-            data: {
-              defect_report_document_id: docResponse.data.id
-            }
-          })).unwrap();
-          
-          await loadUserData();
-          
-          toast({ 
-            title: 'Акт создан!', 
-            description: `Акт №${defectReportData.report_number} сохранён`,
-            action: {
-              label: 'Открыть',
-              onClick: () => navigate(`/document/${docResponse.data.id}`)
-            }
-          });
-        }
-      } else {
-        toast({ 
-          title: 'Отчёт создан', 
-          description: `Акт №${defectReportData.report_number}. Шаблон документа не найден - создайте документ вручную.`
-        });
+      if (!defectTemplate) {
+        throw new Error('Шаблон "Акт об обнаружении дефектов" не найден');
       }
       
+      // 2. Получить данные работы и объекта
+      let work: any = null;
+      let object: any = null;
+      
+      // Ищем работу во всех объектах
+      for (const obj of userData?.objects || []) {
+        const foundWork = obj.works?.find((w: any) => w.id === inspection.work_id);
+        if (foundWork) {
+          work = foundWork;
+          object = obj;
+          break;
+        }
+      }
+      
+      if (!work || !object) {
+        throw new Error('Работа или объект не найдены');
+      }
+      
+      // Генерируем номер акта
+      const reportNumber = `АКТ-${work.id}-${inspection.id}-${Date.now()}`;
+      
+      // 3. Подготовить данные для документа
+      const documentData = {
+        work_id: inspection.work_id,
+        templateId: defectTemplate.id,
+        title: `Акт об обнаружении дефектов №${reportNumber}`,
+        status: 'draft',
+        contentData: {
+          title: `АКТ ОБ ОБНАРУЖЕНИИ ДЕФЕКТОВ №${reportNumber}`,
+          date: new Date().toLocaleDateString('ru-RU'),
+          objectName: object?.title || 'Не указан',
+          objectAddress: object?.address || '',
+          workName: work?.title || 'Не указана',
+          inspectionNumber: inspection.inspection_number || '',
+          defects: defects,
+          totalDefects: defects.length,
+          criticalDefects: defects.filter((d: any) => d.severity === 'critical').length,
+          reportNumber: reportNumber
+        },
+        htmlContent: ''
+      };
+      
+      // 4. Создать документ
+      const docResponse = await apiClient.post(ENDPOINTS.DOCUMENTS.CREATE, documentData);
+      
+      if (!docResponse.success) {
+        throw new Error(docResponse.error || 'Не удалось создать документ');
+      }
+      
+      // 5. Сохранить ссылку на документ в проверке
+      await dispatch(updateInspection({
+        id: inspection.id,
+        data: {
+          defect_report_document_id: docResponse.data.id
+        }
+      })).unwrap();
+      
+      setDefectReport({
+        id: docResponse.data.id,
+        report_number: reportNumber,
+        total_defects: defects.length,
+        critical_defects: defects.filter((d: any) => d.severity === 'critical').length,
+        created_at: new Date().toISOString()
+      });
+      
       await loadUserData();
+      
+      toast({ 
+        title: 'Акт создан!', 
+        description: `Акт №${reportNumber} сохранён`,
+        action: {
+          label: 'Открыть',
+          onClick: () => navigate(`/document/${docResponse.data.id}`)
+        }
+      });
       
     } catch (error: any) {
       console.error('Error creating report:', error);
