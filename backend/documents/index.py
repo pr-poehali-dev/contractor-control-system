@@ -213,6 +213,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             body_data = json.loads(event.get('body', '{}'))
+            print(f"🔍 PUT body_data: {body_data}")
             
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
                 cur.execute(f"SELECT content FROM {schema}.documents WHERE id = {int(doc_id)}")
