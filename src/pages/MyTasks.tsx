@@ -279,7 +279,7 @@ const MyTasks = () => {
 
                       <div className="flex md:flex-col gap-2">
                         <Button
-                          onClick={() => navigate(`/inspection/${task.inspection_id}`)}
+                          onClick={() => navigate(ROUTES.INSPECTION_DETAIL(task.inspection_id))}
                           className="flex-1 md:flex-none"
                         >
                           <Icon name="ExternalLink" size={16} className="mr-2" />

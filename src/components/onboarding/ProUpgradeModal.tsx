@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { ROUTES } from '@/constants/routes';
 
 interface TimeLeft {
   hours: number;
@@ -50,7 +51,7 @@ const ProUpgradeModal = ({ open, onOpenChange, registrationDate }: ProUpgradeMod
 
   const handleUpgrade = () => {
     onOpenChange(false);
-    navigate('/pricing');
+    navigate(ROUTES.PRICING);
   };
 
   return (

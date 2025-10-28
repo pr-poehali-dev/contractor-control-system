@@ -15,6 +15,7 @@ import { TemplatesHeader } from '@/components/document-templates/TemplatesHeader
 import { EmptyTemplatesState } from '@/components/document-templates/EmptyTemplatesState';
 import { TemplatesList } from '@/components/document-templates/TemplatesList';
 import { CreateTemplateDialog } from '@/components/document-templates/CreateTemplateDialog';
+import { ROUTES } from '@/constants/routes';
 
 export default function DocumentTemplates() {
   const navigate = useNavigate();
@@ -157,7 +158,7 @@ export default function DocumentTemplates() {
         description: 'Теперь вы можете настроить его содержимое',
       });
 
-      navigate(`/document-templates/${result.id}`);
+      navigate(ROUTES.DOCUMENT_TEMPLATE_EDITOR(result.id));
     } catch (error) {
       console.error('Template creation error:', error);
       toast({
@@ -213,7 +214,7 @@ export default function DocumentTemplates() {
             userTemplates={userTemplates}
             extractVariables={extractVariablesFromContent}
             getTemplateTypeLabel={getTemplateTypeLabel}
-            onTemplateClick={(id) => navigate(`/document-templates/${id}`)}
+            onTemplateClick={(id) => navigate(ROUTES.DOCUMENT_TEMPLATE_EDITOR(id))}
           />
         )}
 

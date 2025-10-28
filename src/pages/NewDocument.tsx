@@ -12,6 +12,7 @@ import { createDocument, updateDocument } from '@/store/slices/documentsSlice';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import DocumentPreview from '@/components/DocumentPreview';
+import { ROUTES } from '@/constants/routes';
 
 export default function NewDocument() {
   const [searchParams] = useSearchParams();
@@ -131,7 +132,7 @@ export default function NewDocument() {
         <div className="text-center">
           <Icon name="AlertCircle" size={48} className="text-slate-400 mx-auto mb-4" />
           <p className="text-slate-600 mb-4">Шаблон не найден</p>
-          <Button onClick={() => navigate('/documents')}>
+          <Button onClick={() => navigate(ROUTES.DOCUMENTS)}>
             <Icon name="ArrowLeft" size={18} className="mr-2" />
             Назад к документам
           </Button>
@@ -159,7 +160,7 @@ export default function NewDocument() {
       });
       
       if (docId) {
-        navigate(`/document/${docId}`);
+        navigate(ROUTES.DOCUMENT_VIEW(docId));
       }
     } catch (error) {
       toast({
@@ -175,7 +176,7 @@ export default function NewDocument() {
       <div className="px-3 py-4 md:p-8 lg:p-12 max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/documents')}>
+            <Button variant="ghost" size="sm" onClick={() => navigate(ROUTES.DOCUMENTS)}>
               <Icon name="ArrowLeft" size={18} className="mr-2" />
               Назад
             </Button>
@@ -195,7 +196,7 @@ export default function NewDocument() {
                 Черновик сохранён
               </span>
             )}
-            <Button variant="outline" onClick={() => navigate('/documents')}>
+            <Button variant="outline" onClick={() => navigate(ROUTES.DOCUMENTS)}>
               Отмена
             </Button>
             <Button onClick={handleSaveDocument} disabled={isSaving}>

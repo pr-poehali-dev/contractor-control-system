@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { ROUTES } from '@/constants/routes';
 
 export function NoWorksEmptyState({ objectId }: { objectId: number }) {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ export function NoWorksEmptyState({ objectId }: { objectId: number }) {
         <Icon name="Briefcase" size={48} className="mx-auto text-slate-300 mb-4" />
         <h3 className="text-lg font-semibold text-slate-900 mb-2">Пока нет работ</h3>
         <p className="text-slate-600 mb-6">Создайте первую работу для этого объекта</p>
-        <Button onClick={() => navigate(`/objects/${objectId}/works/create`)}>
+        <Button onClick={() => navigate(ROUTES.WORK_CREATE(objectId))}>
           <Icon name="Plus" size={18} className="mr-2" />
           Создать работу
         </Button>

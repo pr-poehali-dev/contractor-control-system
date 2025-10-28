@@ -14,6 +14,7 @@ import Icon from '@/components/ui/icon';
 import { useNavigate } from 'react-router-dom';
 import { apiClient } from '@/api/apiClient';
 import { ENDPOINTS } from '@/api/endpoints';
+import { ROUTES } from '@/constants/routes';
 
 interface Assignment {
   object_id: number;
@@ -73,12 +74,12 @@ const ContractorDetailsModal = ({
   };
 
   const handleNavigateToObject = (objectId: number) => {
-    navigate(`/objects/${objectId}`);
+    navigate(ROUTES.OBJECT_DETAIL(objectId));
     onOpenChange(false);
   };
 
   const handleNavigateToWork = (objectId: number, workId: number) => {
-    navigate(`/objects/${objectId}/works/${workId}`);
+    navigate(ROUTES.WORK_DETAIL(objectId, workId));
     onOpenChange(false);
   };
 

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import Icon from '@/components/ui/icon';
+import { ROUTES } from '@/constants/routes';
 
 const ObjectPublicPage = () => {
   const { objectId } = useParams();
@@ -22,7 +23,7 @@ const ObjectPublicPage = () => {
         <div className="text-center">
           <Icon name="Building2" size={48} className="mx-auto text-slate-300 mb-4" />
           <h2 className="text-xl font-semibold text-slate-900 mb-2">Объект не найден</h2>
-          <Button onClick={() => navigate('/objects')} variant="outline">
+          <Button onClick={() => navigate(ROUTES.OBJECTS)} variant="outline">
             <Icon name="ChevronLeft" size={16} className="mr-2" />
             К списку объектов
           </Button>
@@ -59,7 +60,7 @@ const ObjectPublicPage = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate(`/objects/${objectId}`)}
+              onClick={() => navigate(ROUTES.OBJECT_DETAIL(objectId!))}
             >
               <Icon name="ChevronLeft" size={20} />
             </Button>
@@ -81,7 +82,7 @@ const ObjectPublicPage = () => {
 
             <div className="flex gap-2">
               <Button
-                onClick={() => navigate(`/objects/${objectId}/works/create`)}
+                onClick={() => navigate(ROUTES.WORK_CREATE(objectId!))}
                 variant="ghost"
                 size="icon"
                 title="Настройки объекта"
@@ -90,7 +91,7 @@ const ObjectPublicPage = () => {
               </Button>
               
               <Button
-                onClick={() => navigate(`/objects/${objectId}`)}
+                onClick={() => navigate(ROUTES.OBJECT_DETAIL(objectId!))}
                 variant="outline"
               >
                 К работам

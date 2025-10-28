@@ -155,7 +155,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
           </div>
           <div className="flex items-center gap-2">
             {(userRole === 'client' || userRole === 'admin') && (
-              <Button variant="outline" size="default" onClick={() => navigate(`/objects/${objectId}/works/create`)} className="shadow-sm md:hidden">
+              <Button variant="outline" size="default" onClick={() => navigate(ROUTES.WORK_CREATE(objectId))} className="shadow-sm md:hidden">
                 <Icon name="Edit" size={16} className="mr-2" />
                 Управление
               </Button>

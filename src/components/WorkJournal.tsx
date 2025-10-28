@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { api, InspectionEvent as ApiInspectionEvent } from '@/lib/api';
 import { apiClient } from '@/api/apiClient';
 import { ENDPOINTS } from '@/api/endpoints';
+import { ROUTES } from '@/constants/routes';
 
 import WorksList from '@/components/work-journal/WorksList';
 import WorkHeader from '@/components/work-journal/WorkHeader';
@@ -101,7 +102,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
   }, []);
 
   const handleWorkSelect = (workId: number) => {
-    navigate(`/objects/${objectId}/works/${workId}`);
+    navigate(ROUTES.WORK_DETAIL(objectId, workId));
   };
 
   const handleCreateEstimate = () => {

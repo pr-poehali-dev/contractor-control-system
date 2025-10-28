@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { BuildingObject } from './types';
+import { ROUTES } from '@/constants/routes';
 
 interface ObjectHeaderProps {
   object: BuildingObject;
@@ -29,7 +30,7 @@ const ObjectHeader = ({ object, onBack }: ObjectHeaderProps) => {
         <Button 
           variant="ghost" 
           size="icon"
-          onClick={() => navigate(`/objects/${object.id}/works/create`)}
+          onClick={() => navigate(ROUTES.WORK_CREATE(object.id))}
           className="flex-shrink-0"
           title="Настройки объекта"
         >

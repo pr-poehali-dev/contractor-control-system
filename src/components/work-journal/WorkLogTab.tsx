@@ -6,6 +6,7 @@ import Icon from '@/components/ui/icon';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import WorkLogModal from '@/components/work-journal/WorkLogModal';
+import { ROUTES } from '@/constants/routes';
 
 interface WorkLogTabProps {
   workId: number;
@@ -163,7 +164,7 @@ export default function WorkLogTab({ workId, objectId, onCreateInspection, onCre
               <div 
                 key={inspection.id} 
                 className="bg-white rounded-lg shadow-sm border border-slate-200 p-3 md:p-4 cursor-pointer hover:shadow-md transition-shadow relative"
-                onClick={() => navigate(`/inspection/${inspection.id}`)}
+                onClick={() => navigate(ROUTES.INSPECTION_DETAIL(inspection.id))}
               >
                 <div className="flex items-start gap-2.5 pb-6">
                   <div className="w-9 h-9 md:w-10 md:h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">

@@ -180,7 +180,7 @@ const MyWorks = () => {
 
         <TabsContent value="inProgress" className="mt-6 space-y-4">
           {mockWorks.filter(w => w.status === 'inProgress').map((work) => (
-            <Card key={work.id} className="cursor-pointer hover-scale" onClick={() => navigate(`/my-works/${work.id}`)}>
+            <Card key={work.id} className="cursor-pointer hover-scale" onClick={() => {}}>
               <CardContent className="pt-6">
                 <h3 className="font-bold text-lg text-slate-900 mb-2">{work.name}</h3>
                 <p className="text-sm text-slate-600 mb-3">{work.object}</p>
@@ -192,7 +192,7 @@ const MyWorks = () => {
 
         <TabsContent value="review" className="mt-6 space-y-4">
           {mockWorks.filter(w => w.status === 'review').map((work) => (
-            <Card key={work.id} className="cursor-pointer hover-scale" onClick={() => navigate(`/my-works/${work.id}`)}>
+            <Card key={work.id} className="cursor-pointer hover-scale" onClick={() => {}}>
               <CardContent className="pt-6">
                 <h3 className="font-bold text-lg text-slate-900 mb-2">{work.name}</h3>
                 <p className="text-sm text-slate-600 mb-3">{work.object}</p>
@@ -204,7 +204,7 @@ const MyWorks = () => {
 
         <TabsContent value="defects" className="mt-6 space-y-4">
           {mockWorks.filter(w => w.defectsCount > 0).map((work) => (
-            <Card key={work.id} className="border-red-200 cursor-pointer hover-scale" onClick={() => navigate(`/my-works/${work.id}`)}>
+            <Card key={work.id} className="border-red-200 cursor-pointer hover-scale" onClick={() => {}}>
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between">
                   <div>

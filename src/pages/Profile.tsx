@@ -205,8 +205,8 @@ const Profile = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {userInspections.map((inspection) => (
                   <Card key={inspection.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => {
-                    sessionStorage.setItem('inspectionFromPage', '/profile');
-                    navigate(`/inspection/${inspection.id}`);
+                    sessionStorage.setItem('inspectionFromPage', ROUTES.PROFILE);
+                    navigate(ROUTES.INSPECTION_DETAIL(inspection.id));
                   }}>
                     <CardContent className="p-4">
                       <div className="aspect-video bg-gradient-to-br from-green-100 to-green-200 rounded-lg mb-3 flex items-center justify-center">

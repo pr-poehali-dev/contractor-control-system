@@ -6,6 +6,7 @@ import Icon from '@/components/ui/icon';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { safeDateCompare, isValidDate } from '@/utils/dateValidation';
 import WorkLogModal from '@/components/work-journal/WorkLogModal';
+import { ROUTES } from '@/constants/routes';
 
 interface JournalTabProps {
   objectId: number;
@@ -112,7 +113,7 @@ const JournalTab = ({ objectId }: JournalTabProps) => {
                   setSelectedWorkLog((item as any).workLog);
                   setIsWorkReportModalOpen(true);
                 } else if (item.type === 'check' && (item as any).inspection) {
-                  navigate(`/inspection/${(item as any).inspection.id}`);
+                  navigate(ROUTES.INSPECTION_DETAIL((item as any).inspection.id));
                 }
               }}
             >
