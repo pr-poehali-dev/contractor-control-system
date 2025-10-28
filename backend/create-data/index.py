@@ -231,6 +231,40 @@ def handler(event, context):
                 result = cur.fetchone()
                 conn.commit()
                 
+            elif item_type == 'inspection':
+                work_id = int(data.get('work_id', 0))
+                inspection_type = data.get('type', 'unscheduled')
+                status = data.get('status', 'draft')
+                scheduled_date = data.get('scheduled_date')
+                
+                # Генерируем inspection_number на основе work_id
+                cur.execute(f"""
+                    SELECT COALESCE(MAX(CAST(SUBSTRING(inspection_number FROM 'INS-{work_id}-(\\d+)') AS INTEGER)), 0) + 1
+                    FROM {SCHEMA}.inspections
+                    WHERE work_id = {work_id}
+                """)
+                next_number_row = cur.fetchone()
+                next_number = next_number_row[0] if next_number_row and next_number_row[0] else 1
+                inspection_number = f"INS-{work_id}-{next_number}"
+                
+                fields = ['work_id', 'inspection_number', 'type', 'status', 'created_by', 'created_at']
+                values = [str(work_id), f"'{inspection_number}'", f"'{inspection_type}'", f"'{status}'", str(user_id_int), 'NOW()']
+                
+                if scheduled_date:
+                    fields.append('scheduled_date')
+                    values.append(f"'{scheduled_date}'")
+                
+                fields_str = ', '.join(fields)
+                values_str = ', '.join(values)
+                
+                cur.execute(f"""
+                    INSERT INTO {SCHEMA}.inspections ({fields_str})
+                    VALUES ({values_str})
+                    RETURNING id, work_id, inspection_number, type, status, scheduled_date, created_by, created_at
+                """)
+                result = cur.fetchone()
+                conn.commit()
+                
             elif item_type == 'chat_message':
                 work_id = int(data.get('work_id', 0))
                 message = data.get('message', '').replace("'", "''")
