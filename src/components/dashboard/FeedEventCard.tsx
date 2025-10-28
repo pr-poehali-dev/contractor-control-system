@@ -343,24 +343,7 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
           </div>
         )}
 
-        {event.type === 'work_log' && (
-          <div className="mt-2">
-            <Button 
-              onClick={(e) => {
-                e.stopPropagation();
-                if (onWorkLogClick) {
-                  onWorkLogClick(event);
-                }
-              }}
-              className="w-full bg-blue-600 hover:bg-blue-700"
-              size="sm"
-              variant="outline"
-            >
-              <Icon name="Eye" size={16} className="mr-2" />
-              Открыть отчёт
-            </Button>
-          </div>
-        )}
+
         
         <div className="flex items-center justify-between gap-2 mt-4 pt-3 border-t border-slate-100">
           <Badge variant="outline" className={`text-xs font-medium px-2.5 py-1 ${getEventBadgeColor(event.type)}`}>
