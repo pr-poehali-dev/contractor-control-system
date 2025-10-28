@@ -122,7 +122,7 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
             <div>
               <p className="text-slate-500 mb-1">Создан</p>
               <p className="font-medium">
-                {format(new Date(document.created_at), 'dd MMMM yyyy, HH:mm', { locale: ru })}
+                {document.createdAt ? format(new Date(document.createdAt), 'dd MMMM yyyy, HH:mm', { locale: ru }) : 'Не указано'}
               </p>
             </div>
             
@@ -143,10 +143,8 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
 
           <div>
             <h3 className="font-semibold mb-3">Содержание документа</h3>
-            <div className="bg-slate-50 p-4 rounded-lg">
-              <pre className="whitespace-pre-wrap font-mono text-sm">
-                {JSON.stringify(document.content, null, 2)}
-              </pre>
+            <div className="bg-white p-6 rounded-lg border prose max-w-none">
+              <div dangerouslySetInnerHTML={{ __html: document.htmlContent || 'Нет содержимого' }} />
             </div>
           </div>
         </CardContent>
