@@ -40,7 +40,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     try:
         if method == 'GET':
-            doc_id = event.get('pathParams', {}).get('id')
+            query_params = event.get('queryStringParameters', {}) or {}
+            doc_id = query_params.get('id')
             
             if doc_id:
                 with conn.cursor(cursor_factory=RealDictCursor) as cur:

@@ -101,12 +101,18 @@ export const fetchDocumentDetail = createAsyncThunk(
   'documents/fetchDetail',
   async (id: number, { rejectWithValue }) => {
     try {
-      const response = await apiClient.get(ENDPOINTS.DOCUMENTS.DETAIL, {
-        params: { id },
+      const response = await apiClient.get(`${ENDPOINTS.DOCUMENTS.DETAIL}?id=${id}`, {
         skipAuthRedirect: true
       });
-      return response.data.document;
+      console.log('📥 fetchDocumentDetail response:', response);
+      
+      if (response.data) {
+        return response.data;
+      }
+      
+      return null;
     } catch (error: any) {
+      console.error('❌ fetchDocumentDetail error:', error);
       return rejectWithValue(error.message || 'Failed to fetch document detail');
     }
   }
