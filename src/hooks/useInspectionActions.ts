@@ -202,20 +202,20 @@ export function useInspectionActions(
         }
       })).unwrap();
       
+      await loadUserData();
+      
       setDefectReport({
         id: docResponse.data.id,
         report_number: reportNumber,
         total_defects: defects.length,
         critical_defects: defects.filter((d: any) => d.severity === 'critical').length,
-        created_at: new Date().toISOString()
+        created_at: docResponse.data.createdAt || new Date().toISOString()
       });
-      
-      await loadUserData();
       
       const documentId = docResponse.data.id;
       toast({ 
         title: 'Акт создан!', 
-        description: `Акт №${reportNumber} сохранён. Нажмите для просмотра.`,
+        description: `Акт №${reportNumber} сохранён`,
         onClick: () => navigate(`/document/${documentId}`)
       });
       
