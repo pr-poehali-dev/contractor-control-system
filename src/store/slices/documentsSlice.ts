@@ -217,7 +217,7 @@ export const deleteDocument = createAsyncThunk(
   'documents/delete',
   async (id: number, { rejectWithValue }) => {
     try {
-      await apiClient.delete(`${ENDPOINTS.DOCUMENTS.DELETE}/${id}`, {
+      await apiClient.delete(`${ENDPOINTS.DOCUMENTS.DELETE}?id=${id}`, {
         skipAuthRedirect: true
       });
       return id;

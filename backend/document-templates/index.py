@@ -68,6 +68,7 @@ def create_template(cursor, conn, user_id: str, event: dict) -> dict:
     description = body.get('description', '').strip()
     template_type = body.get('template_type', '').strip()
     content = body.get('content', {})
+    is_system = body.get('is_system', False)  # Копируем флаг is_system если передан
     
     if not name or not template_type:
         return {
@@ -83,9 +84,9 @@ def create_template(cursor, conn, user_id: str, event: dict) -> dict:
     
     cursor.execute(f"""
         INSERT INTO {SCHEMA}.document_templates
-        (client_id, name, description, template_type, content)
-        VALUES ({user_id}, '{name_safe}', '{description_safe}', '{template_type}', '{content_json}'::jsonb)
-        RETURNING id, name, description, template_type, content, version, is_active, created_at
+        (client_id, name, description, template_type, content, is_system)
+        VALUES ({user_id}, '{name_safe}', '{description_safe}', '{template_type}', '{content_json}'::jsonb, {str(is_system).lower()})
+        RETURNING id, name, description, template_type, content, version, is_active, is_system, created_at
     """)
     
     template = cursor.fetchone()

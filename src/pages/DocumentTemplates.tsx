@@ -110,17 +110,12 @@ export default function DocumentTemplates() {
     
     const matchesType = typeFilter === 'all' || template.template_type === typeFilter;
     
-    const isAdmin = userData?.id === 6;
-    
-    if (template.is_system && !isAdmin) {
-      return false;
-    }
-    
     return matchesSearch && matchesType;
   });
 
-  const systemTemplates = filteredTemplates.filter(t => t.is_system || t.source_template_id);
-  const userTemplates = filteredTemplates.filter(t => !t.is_system && !t.source_template_id);
+  // Системные шаблоны видны всем, редактировать могут только админы
+  const systemTemplates = filteredTemplates.filter(t => t.is_system);
+  const userTemplates = filteredTemplates.filter(t => !t.is_system);
 
   const handleCreateTemplate = async () => {
     if (!newTemplate.name.trim()) {

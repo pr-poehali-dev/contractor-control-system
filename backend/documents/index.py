@@ -298,7 +298,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
         
         elif method == 'DELETE':
+            # Попытка получить id из pathParams или queryStringParameters
             doc_id = event.get('pathParams', {}).get('id')
+            if not doc_id:
+                query_params = event.get('queryStringParameters', {}) or {}
+                doc_id = query_params.get('id')
+            
             if not doc_id:
                 return {
                     'statusCode': 400,
