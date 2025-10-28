@@ -240,9 +240,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     update_fields.append(f"status = '{body_data['status']}'")
                 
                 if 'contentData' in body_data or 'htmlContent' in body_data:
+                    # Обновляем только переданные поля contentData
                     if 'contentData' in body_data:
+                        # Мерджим с текущими данными (не перезаписываем весь объект)
                         for key, value in body_data['contentData'].items():
-                            current_content[key] = value
+                            if key != 'html':  # html обновляется отдельно через htmlContent
+                                current_content[key] = value
+                    
+                    # Обновляем html только если он явно передан
                     if 'htmlContent' in body_data:
                         current_content['html'] = body_data['htmlContent']
                     

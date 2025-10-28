@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchTemplateDetail, selectCurrentTemplate, selectTemplatesLoading } from '@/store/slices/documentTemplatesSlice';
@@ -61,7 +62,14 @@ export default function NewDocument() {
       materials_list: 'Список материалов',
       completion_percentage: 'Процент выполнения',
     };
-    return labels[fieldName] || fieldName;
+    return labels[fieldName] || fieldName.replace(/_/g, ' ');
+  };
+
+  const getFieldType = (fieldName: string): 'text' | 'textarea' | 'date' => {
+    const lowerName = fieldName.toLowerCase();
+    if (lowerName.includes('date') || lowerName.includes('дата')) return 'date';
+    if (lowerName.includes('description') || lowerName.includes('defects') || lowerName.includes('дефект')) return 'textarea';
+    return 'text';
   };
 
   const saveDocument = useCallback(async () => {
@@ -229,23 +237,55 @@ export default function NewDocument() {
                 </h3>
                 
                 <div className="space-y-4">
-                  {template.content?.variables?.map((variable: string) => (
-                    <div key={variable}>
-                      <Label htmlFor={`field-${variable}`} className="text-sm font-medium">
-                        {getFieldLabel(variable)}
-                      </Label>
-                      <Input
-                        id={`field-${variable}`}
-                        value={documentData[variable] || ''}
-                        onChange={(e) => setDocumentData({
-                          ...documentData,
-                          [variable]: e.target.value
-                        })}
-                        placeholder={`Введите ${getFieldLabel(variable).toLowerCase()}`}
-                        className="mt-1.5"
-                      />
-                    </div>
-                  ))}
+                  {template.content?.variables?.map((variable: string) => {
+                    const fieldType = getFieldType(variable);
+                    const label = getFieldLabel(variable);
+
+                    return (
+                      <div key={variable}>
+                        <Label htmlFor={`field-${variable}`} className="text-sm font-medium">
+                          {label}
+                        </Label>
+                        
+                        {fieldType === 'date' ? (
+                          <Input
+                            id={`field-${variable}`}
+                            type="date"
+                            value={documentData[variable] || ''}
+                            onChange={(e) => setDocumentData({
+                              ...documentData,
+                              [variable]: e.target.value
+                            })}
+                            className="mt-1.5"
+                          />
+                        ) : fieldType === 'textarea' ? (
+                          <Textarea
+                            id={`field-${variable}`}
+                            value={documentData[variable] || ''}
+                            onChange={(e) => setDocumentData({
+                              ...documentData,
+                              [variable]: e.target.value
+                            })}
+                            placeholder={`Введите ${label.toLowerCase()}`}
+                            className="mt-1.5 min-h-[100px]"
+                            rows={4}
+                          />
+                        ) : (
+                          <Input
+                            id={`field-${variable}`}
+                            type="text"
+                            value={documentData[variable] || ''}
+                            onChange={(e) => setDocumentData({
+                              ...documentData,
+                              [variable]: e.target.value
+                            })}
+                            placeholder={`Введите ${label.toLowerCase()}`}
+                            className="mt-1.5"
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
                   
                   {(!template.content?.variables || template.content.variables.length === 0) && (
                     <p className="text-sm text-slate-500 text-center py-4">

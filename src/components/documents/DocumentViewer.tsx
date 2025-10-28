@@ -83,9 +83,18 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
   };
 
   const extractVariables = (html: string): string[] => {
-    const matches = html.match(/\[([^\]]+)\]/g);
-    if (!matches) return [];
-    return [...new Set(matches.map(m => m.replace(/[\[\]]/g, '').trim()))];
+    // Извлекаем переменные в формате {{key}} и [key]
+    const matches1 = html.match(/{{([^}]+)}}/g) || [];
+    const matches2 = html.match(/\[([^\]]+)\]/g) || [];
+    const allMatches = [...matches1, ...matches2];
+    
+    if (allMatches.length === 0) return [];
+    
+    const variables = allMatches.map(m => 
+      m.replace(/[{}\[\]]/g, '').trim()
+    );
+    
+    return [...new Set(variables)];
   };
 
   const replaceVariables = (html: string, data: Record<string, any>): string => {
@@ -161,7 +170,8 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
   const mySignature = document.signatures?.find(sig => sig.signer_id === user?.id);
 
   if (isEditing) {
-    const variableKeys = document.contentData ? Object.keys(document.contentData) : extractVariables(document.htmlContent || '');
+    // Извлекаем переменные из HTML шаблона, а не из contentData
+    const variableKeys = extractVariables(document.htmlContent || '');
     
     return (
       <DocumentEditor
