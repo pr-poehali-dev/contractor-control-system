@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
+import { useAppSelector } from '@/store/hooks';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
@@ -9,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -38,6 +40,7 @@ export default function TopNavigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthRedux();
+  const userData = useAppSelector((state) => state.user.userData);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
@@ -134,7 +137,24 @@ export default function TopNavigation() {
                 </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align="end" className="w-72">
+              <DropdownMenuLabel>
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{user?.name || 'Пользователь'}</p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {user?.role === 'client' && 'Заказчик'}
+                    {user?.role === 'contractor' && 'Подрядчик'}
+                    {user?.role === 'admin' && 'Администратор'}
+                  </p>
+                  {user?.role === 'contractor' && userData?.contractor?.organization_name && (
+                    <p className="text-xs leading-none text-muted-foreground mt-1 flex items-center">
+                      <Icon name="Building" size={12} className="mr-1" />
+                      {userData.contractor.organization_name}
+                    </p>
+                  )}
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => navigate('/profile')}>
                 <Icon name="User" size={16} className="mr-2" />
                 Профиль

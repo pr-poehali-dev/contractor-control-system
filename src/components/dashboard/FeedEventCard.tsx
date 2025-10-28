@@ -16,6 +16,7 @@ interface FeedEvent {
   inspectionType?: 'scheduled' | 'unscheduled';
   inspectionNumber?: string;
   inspectionId?: number;
+  workLogNumber?: string;
   title: string;
   description: string;
   timestamp: string;
@@ -42,6 +43,7 @@ interface FeedEventCardProps {
   onStartInspection?: (event: FeedEvent) => void;
   onTagClick?: (tagId: string, tagType: 'object' | 'work' | 'contractor') => void;
   onInspectionClick?: (event: FeedEvent) => void;
+  onWorkLogClick?: (event: FeedEvent) => void;
   userRole?: 'client' | 'contractor' | 'admin';
 }
 
@@ -133,7 +135,7 @@ const getEventBgColor = (type: string) => {
   }
 };
 
-const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspectionClick, userRole }: FeedEventCardProps) => {
+const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspectionClick, onWorkLogClick, userRole }: FeedEventCardProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
   const photos = event.photoUrls || [];
@@ -228,6 +230,14 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
           <div className="mb-2 pl-0.5">
             <p className="text-sm text-slate-600">
               Проверка <span className="font-mono font-medium text-purple-600">№{event.inspectionNumber}</span>
+            </p>
+          </div>
+        )}
+
+        {event.type === 'work_log' && event.workLogNumber && (
+          <div className="mb-2 pl-0.5">
+            <p className="text-sm text-slate-600">
+              Отчёт <span className="font-mono font-medium text-blue-600">№{event.workLogNumber}</span>
             </p>
           </div>
         )}
@@ -330,6 +340,25 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
                 Перейти к результатам
               </Button>
             )}
+          </div>
+        )}
+
+        {event.type === 'work_log' && (
+          <div className="mt-2">
+            <Button 
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onWorkLogClick) {
+                  onWorkLogClick(event);
+                }
+              }}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+              size="sm"
+              variant="outline"
+            >
+              <Icon name="Eye" size={16} className="mr-2" />
+              Открыть отчёт
+            </Button>
           </div>
         )}
         

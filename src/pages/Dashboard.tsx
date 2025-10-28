@@ -19,6 +19,7 @@ import JournalEntryModal from '@/components/dashboard/JournalEntryModal';
 import CreateInspectionWithWorkSelect from '@/components/dashboard/CreateInspectionWithWorkSelect';
 import InfoPostModal from '@/components/dashboard/InfoPostModal';
 import NotificationsSummary from '@/components/work-journal/NotificationsSummary';
+import WorkLogModal from '@/components/work-journal/WorkLogModal';
 
 
 interface FeedEvent {
@@ -26,6 +27,7 @@ interface FeedEvent {
   type: 'work_log' | 'inspection' | 'info_post';
   inspectionType?: 'scheduled' | 'unscheduled';
   inspectionNumber?: string;
+  workLogNumber?: string;
   title: string;
   description: string;
   timestamp: string;
@@ -58,6 +60,7 @@ const Dashboard = () => {
   const [showJournalModal, setShowJournalModal] = useState(false);
   const [showInspectionModal, setShowInspectionModal] = useState(false);
   const [showInfoPostModal, setShowInfoPostModal] = useState(false);
+  const [selectedWorkLog, setSelectedWorkLog] = useState<FeedEvent | null>(null);
 
   const [journalForm, setJournalForm] = useState({
     objectId: '',
@@ -417,6 +420,9 @@ const Dashboard = () => {
                         });
                       }
                     }}
+                    onWorkLogClick={(event) => {
+                      setSelectedWorkLog(event);
+                    }}
                   />
                 ))
               )}
@@ -447,6 +453,25 @@ const Dashboard = () => {
         onSubmit={handleCreateInfoPost}
       />
 
+      {selectedWorkLog && (
+        <WorkLogModal
+          isOpen={!!selectedWorkLog}
+          onClose={() => setSelectedWorkLog(null)}
+          workLog={{
+            id: parseInt(selectedWorkLog.id.replace('work_log_', '')),
+            workLogNumber: selectedWorkLog.workLogNumber,
+            title: selectedWorkLog.title,
+            description: selectedWorkLog.description,
+            workTitle: selectedWorkLog.workTitle,
+            objectTitle: selectedWorkLog.objectTitle,
+            author: selectedWorkLog.author,
+            timestamp: selectedWorkLog.timestamp,
+            photoUrls: selectedWorkLog.photoUrls,
+            volume: selectedWorkLog.volume,
+            materials: selectedWorkLog.materials
+          }}
+        />
+      )}
 
       </div>
     </>

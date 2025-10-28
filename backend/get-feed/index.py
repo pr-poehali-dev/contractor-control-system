@@ -188,6 +188,24 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     cur.execute(work_logs_query)
     work_logs = cur.fetchall()
     
+    # Calculate work log numbers by querying count for each work_id
+    work_log_numbers = {}
+    for log in work_logs:
+        work_id = log['work_id']
+        log_id = log['id']
+        
+        # Get sequential number for this log within its work
+        count_query = f'''
+            SELECT COUNT(*) as log_number
+            FROM {SCHEMA}.work_logs
+            WHERE work_id = {work_id} AND id <= {log_id}
+            AND (is_inspection_start IS NULL OR is_inspection_start = FALSE)
+            AND (is_inspection_completed IS NULL OR is_inspection_completed = FALSE)
+        '''
+        cur.execute(count_query)
+        result = cur.fetchone()
+        work_log_numbers[log_id] = result['log_number'] if result else 1
+    
     for log in work_logs:
         photo_urls = []
         if log['photo_urls']:
@@ -203,9 +221,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             elif isinstance(photo_url_str, list):
                 photo_urls = photo_url_str
         
+        work_id = log['work_id']
+        log_number = work_log_numbers.get(log['id'], 1)
+        
         events.append({
             'id': f"work_log_{log['id']}",
             'type': 'work_log',
+            'workLogNumber': f"{work_id}-{log_number}",
             'title': log['work_title'],
             'description': log['description'],
             'timestamp': log['created_at'].isoformat() if hasattr(log['created_at'], 'isoformat') else str(log['created_at']),
