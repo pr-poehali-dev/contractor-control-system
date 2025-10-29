@@ -6,6 +6,7 @@ import {
   updateDocument,
   deleteDocument,
   fetchDocumentDetail,
+  fetchDocuments,
 } from '@/store/slices/documentsSlice';
 import { useNavigate } from 'react-router-dom';
 
@@ -123,7 +124,7 @@ export const useDocumentHandlers = (documentId: number, user: any, document: any
     try {
       await dispatch(updateDocument({
         id: documentId,
-        status: 'pending_signature',
+        status: 'pending',
       })).unwrap();
 
       toast({
@@ -131,7 +132,8 @@ export const useDocumentHandlers = (documentId: number, user: any, document: any
         description: 'Документ отправлен на подписание',
       });
 
-      dispatch(fetchDocumentDetail(documentId));
+      await dispatch(fetchDocumentDetail(documentId));
+      await dispatch(fetchDocuments());
     } catch (error) {
       toast({
         title: 'Ошибка',
