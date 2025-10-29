@@ -181,4 +181,9 @@ const worksSlice = createSlice({
 });
 
 export const { setWorks, clearWorksError } = worksSlice.actions;
+
+export const selectWorks = (state: { works: WorksState }) => state.works.items;
+export const selectWorksLoading = (state: { works: WorksState }) => state.works.loading;
+export const selectWorksError = (state: { works: WorksState }) => state.works.error;
+
 export default worksSlice.reducer;

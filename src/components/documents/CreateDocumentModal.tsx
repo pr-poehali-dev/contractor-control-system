@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/select';
 import { useAppSelector } from '@/store/hooks';
 import { selectInspections } from '@/store/slices/inspectionsSlice';
+import { selectObjects } from '@/store/slices/objectsSlice';
+import { selectWorks } from '@/store/slices/worksSlice';
 
 interface Template {
   id: number;
@@ -40,8 +42,12 @@ export default function CreateDocumentModal({
   onSelectTemplate
 }: CreateDocumentModalProps) {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('');
+  const [selectedObjectId, setSelectedObjectId] = useState<string>('');
+  const [selectedWorkId, setSelectedWorkId] = useState<string>('');
   const [selectedInspectionId, setSelectedInspectionId] = useState<string>('');
   
+  const objects = useAppSelector(selectObjects);
+  const works = useAppSelector(selectWorks);
   const inspections = useAppSelector(selectInspections);
   
   const systemTemplates = templates
@@ -62,12 +68,33 @@ export default function CreateDocumentModal({
   
   const needsInspection = selectedTemplate?.name?.toLowerCase().includes('дефект');
 
+  const filteredWorks = useMemo(() => {
+    if (!selectedObjectId) return [];
+    return works.filter(w => w.object_id.toString() === selectedObjectId);
+  }, [works, selectedObjectId]);
+
+  const filteredInspections = useMemo(() => {
+    if (!selectedWorkId) return [];
+    return inspections.filter(i => i.work_id.toString() === selectedWorkId);
+  }, [inspections, selectedWorkId]);
+
   useEffect(() => {
     if (!isOpen) {
       setSelectedTemplateId('');
+      setSelectedObjectId('');
+      setSelectedWorkId('');
       setSelectedInspectionId('');
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    setSelectedWorkId('');
+    setSelectedInspectionId('');
+  }, [selectedObjectId]);
+
+  useEffect(() => {
+    setSelectedInspectionId('');
+  }, [selectedWorkId]);
 
   const handleCreate = () => {
     if (!selectedTemplateId) return;
@@ -76,9 +103,16 @@ export default function CreateDocumentModal({
     const templateName = selectedTemplate?.name || '';
     
     let relatedData = undefined;
-    if (needsInspection && selectedInspectionId) {
+    if (needsInspection && selectedInspectionId && selectedWorkId && selectedObjectId) {
       const inspection = inspections.find(i => i.id.toString() === selectedInspectionId);
-      relatedData = { inspection };
+      const work = works.find(w => w.id.toString() === selectedWorkId);
+      const object = objects.find(o => o.id.toString() === selectedObjectId);
+      
+      relatedData = { 
+        inspection,
+        work,
+        object
+      };
     }
     
     onSelectTemplate(templateId, templateName, relatedData);
@@ -151,38 +185,104 @@ export default function CreateDocumentModal({
           </div>
 
           {needsInspection && (
-            <div className="space-y-2">
-              <Label htmlFor="inspection">Проверка *</Label>
-              <Select 
-                value={selectedInspectionId} 
-                onValueChange={setSelectedInspectionId}
-              >
-                <SelectTrigger id="inspection">
-                  <SelectValue placeholder="Выберите проверку" />
-                </SelectTrigger>
-                <SelectContent>
-                  {inspections.length === 0 ? (
-                    <div className="px-2 py-6 text-center text-sm text-slate-500">
-                      Нет доступных проверок
-                    </div>
-                  ) : (
-                    inspections.map((inspection) => (
-                      <SelectItem key={inspection.id} value={inspection.id.toString()}>
-                        <div className="flex flex-col items-start">
-                          <span className="font-medium">{inspection.title}</span>
-                          <span className="text-xs text-slate-500">
-                            #{inspection.inspection_number}
-                          </span>
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="object">Объект *</Label>
+                <Select 
+                  value={selectedObjectId} 
+                  onValueChange={setSelectedObjectId}
+                >
+                  <SelectTrigger id="object">
+                    <SelectValue placeholder="Выберите объект" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {objects.length === 0 ? (
+                      <div className="px-2 py-6 text-center text-sm text-slate-500">
+                        Нет доступных объектов
+                      </div>
+                    ) : (
+                      objects.map((object) => (
+                        <SelectItem key={object.id} value={object.id.toString()}>
+                          <div className="flex flex-col items-start">
+                            <span className="font-medium">{object.title}</span>
+                            {object.address && (
+                              <span className="text-xs text-slate-500">{object.address}</span>
+                            )}
+                          </div>
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {selectedObjectId && (
+                <div className="space-y-2">
+                  <Label htmlFor="work">Работа *</Label>
+                  <Select 
+                    value={selectedWorkId} 
+                    onValueChange={setSelectedWorkId}
+                  >
+                    <SelectTrigger id="work">
+                      <SelectValue placeholder="Выберите работу" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filteredWorks.length === 0 ? (
+                        <div className="px-2 py-6 text-center text-sm text-slate-500">
+                          Нет работ на этом объекте
                         </div>
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-slate-500 mt-1">
-                Данные проверки будут использованы для заполнения документа
-              </p>
-            </div>
+                      ) : (
+                        filteredWorks.map((work) => (
+                          <SelectItem key={work.id} value={work.id.toString()}>
+                            <div className="flex flex-col items-start">
+                              <span className="font-medium">{work.title}</span>
+                              {work.contractor_name && (
+                                <span className="text-xs text-slate-500">{work.contractor_name}</span>
+                              )}
+                            </div>
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {selectedWorkId && (
+                <div className="space-y-2">
+                  <Label htmlFor="inspection">Проверка *</Label>
+                  <Select 
+                    value={selectedInspectionId} 
+                    onValueChange={setSelectedInspectionId}
+                  >
+                    <SelectTrigger id="inspection">
+                      <SelectValue placeholder="Выберите проверку" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filteredInspections.length === 0 ? (
+                        <div className="px-2 py-6 text-center text-sm text-slate-500">
+                          Нет проверок для этой работы
+                        </div>
+                      ) : (
+                        filteredInspections.map((inspection) => (
+                          <SelectItem key={inspection.id} value={inspection.id.toString()}>
+                            <div className="flex flex-col items-start">
+                              <span className="font-medium">{inspection.title}</span>
+                              <span className="text-xs text-slate-500">
+                                #{inspection.inspection_number}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Данные проверки будут использованы для заполнения документа
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -192,7 +292,7 @@ export default function CreateDocumentModal({
           </Button>
           <Button 
             onClick={handleCreate}
-            disabled={!selectedTemplateId || (needsInspection && !selectedInspectionId)}
+            disabled={!selectedTemplateId || (needsInspection && (!selectedObjectId || !selectedWorkId || !selectedInspectionId))}
           >
             <Icon name="FilePlus" size={16} className="mr-2" />
             Создать

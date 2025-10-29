@@ -184,4 +184,9 @@ const objectsSlice = createSlice({
 });
 
 export const { setObjects, clearObjectsError } = objectsSlice.actions;
+
+export const selectObjects = (state: { objects: ObjectsState }) => state.objects.items;
+export const selectObjectsLoading = (state: { objects: ObjectsState }) => state.objects.loading;
+export const selectObjectsError = (state: { objects: ObjectsState }) => state.objects.error;
+
 export default objectsSlice.reducer;
