@@ -106,6 +106,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             'title': doc['title'],
                             'work_id': doc['work_id'],
                             'work_title': doc['work_title'],
+                            'object_id': doc['object_id'],
                             'object_title': doc['object_title'],
                             'created_by_name': doc['created_by_name'],
                             'inspection_id': inspection_id,

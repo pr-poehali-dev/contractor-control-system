@@ -54,17 +54,33 @@ export default function DocumentInfo({ document }: DocumentInfoProps) {
           </div>
         )}
         
-        {document.work_title && (
+        {document.work_title && document.work_id && document.object_id && (
           <div>
-            <p className="text-slate-500 mb-0.5">Работа</p>
-            <p className="font-medium text-slate-900">{document.work_title}</p>
+            <p className="text-slate-500 mb-1">Работа</p>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(ROUTES.WORK_DETAIL(document.object_id!, document.work_id!))}
+              className="-ml-3 h-auto p-2 hover:bg-slate-100"
+            >
+              <Icon name="Briefcase" size={16} className="mr-2 text-blue-600" />
+              <span className="font-medium text-slate-900">{document.work_title}</span>
+            </Button>
           </div>
         )}
         
-        {document.object_title && (
+        {document.object_title && document.object_id && (
           <div>
-            <p className="text-slate-500 mb-0.5">Объект</p>
-            <p className="font-medium text-slate-900">{document.object_title}</p>
+            <p className="text-slate-500 mb-1">Объект</p>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(ROUTES.OBJECT_DETAIL(document.object_id!))}
+              className="-ml-3 h-auto p-2 hover:bg-slate-100"
+            >
+              <Icon name="Building2" size={16} className="mr-2 text-blue-600" />
+              <span className="font-medium text-slate-900">{document.object_title}</span>
+            </Button>
           </div>
         )}
         

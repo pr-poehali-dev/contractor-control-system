@@ -6,6 +6,7 @@ import { RootState } from '../store';
 export interface Document {
   id: number;
   work_id?: number;
+  object_id?: number;
   templateId?: number;
   templateName?: string;
   document_number?: string;
