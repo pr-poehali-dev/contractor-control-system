@@ -96,6 +96,10 @@ export default function CreateDocumentModal({
     setSelectedInspectionId('');
   }, [selectedWorkId]);
 
+  const selectedObject = objects.find(o => o.id.toString() === selectedObjectId);
+  const selectedWork = works.find(w => w.id.toString() === selectedWorkId);
+  const selectedInspection = inspections.find(i => i.id.toString() === selectedInspectionId);
+
   const handleCreate = () => {
     if (!selectedTemplateId) return;
     
@@ -103,15 +107,11 @@ export default function CreateDocumentModal({
     const templateName = selectedTemplate?.name || '';
     
     let relatedData = undefined;
-    if (needsInspection && selectedInspectionId && selectedWorkId && selectedObjectId) {
-      const inspection = inspections.find(i => i.id.toString() === selectedInspectionId);
-      const work = works.find(w => w.id.toString() === selectedWorkId);
-      const object = objects.find(o => o.id.toString() === selectedObjectId);
-      
+    if (needsInspection && selectedInspection && selectedWork && selectedObject) {
       relatedData = { 
-        inspection,
-        work,
-        object
+        inspection: selectedInspection,
+        work: selectedWork,
+        object: selectedObject
       };
     }
     
@@ -193,7 +193,9 @@ export default function CreateDocumentModal({
                   onValueChange={setSelectedObjectId}
                 >
                   <SelectTrigger id="object">
-                    <SelectValue placeholder="Выберите объект" />
+                    <SelectValue placeholder="Выберите объект">
+                      {selectedObject?.title}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {objects.length === 0 ? (
@@ -203,12 +205,7 @@ export default function CreateDocumentModal({
                     ) : (
                       objects.map((object) => (
                         <SelectItem key={object.id} value={object.id.toString()}>
-                          <div className="flex flex-col items-start">
-                            <span className="font-medium">{object.title}</span>
-                            {object.address && (
-                              <span className="text-xs text-slate-500">{object.address}</span>
-                            )}
-                          </div>
+                          {object.title}
                         </SelectItem>
                       ))
                     )}
@@ -224,7 +221,9 @@ export default function CreateDocumentModal({
                     onValueChange={setSelectedWorkId}
                   >
                     <SelectTrigger id="work">
-                      <SelectValue placeholder="Выберите работу" />
+                      <SelectValue placeholder="Выберите работу">
+                        {selectedWork?.title}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {filteredWorks.length === 0 ? (
@@ -234,12 +233,7 @@ export default function CreateDocumentModal({
                       ) : (
                         filteredWorks.map((work) => (
                           <SelectItem key={work.id} value={work.id.toString()}>
-                            <div className="flex flex-col items-start">
-                              <span className="font-medium">{work.title}</span>
-                              {work.contractor_name && (
-                                <span className="text-xs text-slate-500">{work.contractor_name}</span>
-                              )}
-                            </div>
+                            {work.title}
                           </SelectItem>
                         ))
                       )}
@@ -256,7 +250,9 @@ export default function CreateDocumentModal({
                     onValueChange={setSelectedInspectionId}
                   >
                     <SelectTrigger id="inspection">
-                      <SelectValue placeholder="Выберите проверку" />
+                      <SelectValue placeholder="Выберите проверку">
+                        {selectedInspection?.title}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {filteredInspections.length === 0 ? (
@@ -266,12 +262,7 @@ export default function CreateDocumentModal({
                       ) : (
                         filteredInspections.map((inspection) => (
                           <SelectItem key={inspection.id} value={inspection.id.toString()}>
-                            <div className="flex flex-col items-start">
-                              <span className="font-medium">{inspection.title}</span>
-                              <span className="text-xs text-slate-500">
-                                #{inspection.inspection_number}
-                              </span>
-                            </div>
+                            {inspection.title}
                           </SelectItem>
                         ))
                       )}
