@@ -9,6 +9,9 @@ import Icon from '@/components/ui/icon';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchTemplateDetail, selectCurrentTemplate, selectTemplatesLoading } from '@/store/slices/documentTemplatesSlice';
 import { createDocument, updateDocument } from '@/store/slices/documentsSlice';
+import { selectInspections } from '@/store/slices/inspectionsSlice';
+import { selectObjects } from '@/store/slices/objectsSlice';
+import { selectWorks } from '@/store/slices/worksSlice';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import DocumentPreview from '@/components/DocumentPreview';
@@ -22,8 +25,17 @@ export default function NewDocument() {
   
   const templateId = searchParams.get('templateId');
   const docId = searchParams.get('docId');
+  const inspectionId = searchParams.get('inspectionId');
   const template = useAppSelector(selectCurrentTemplate);
   const loading = useAppSelector(selectTemplatesLoading);
+  
+  const inspections = useAppSelector(selectInspections);
+  const objects = useAppSelector(selectObjects);
+  const works = useAppSelector(selectWorks);
+  
+  const inspection = inspectionId ? inspections.find(i => i.id === parseInt(inspectionId)) : null;
+  const work = inspection ? works.find(w => w.id === inspection.work_id) : null;
+  const object = work ? objects.find(o => o.id === work.object_id) : null;
 
   const [documentData, setDocumentData] = useState<Record<string, string>>({});
   const [documentTitle, setDocumentTitle] = useState('');
@@ -36,17 +48,55 @@ export default function NewDocument() {
     }
   }, [templateId, dispatch]);
 
+  const generateDefectsTable = (defects: any[]): string => {
+    if (!defects || defects.length === 0) return '';
+    
+    let html = '<table border="1" cellpadding="5" cellspacing="0" style="width: 100%; border-collapse: collapse;">';
+    html += '<thead><tr><th>№</th><th>Описание дефекта</th><th>Место</th><th>Срок устранения</th></tr></thead><tbody>';
+    
+    defects.forEach((defect, index) => {
+      html += '<tr>';
+      html += `<td>${index + 1}</td>`;
+      html += `<td>${defect.description || ''}</td>`;
+      html += `<td>${defect.location || ''}</td>`;
+      html += `<td>${defect.deadline || ''}</td>`;
+      html += '</tr>';
+    });
+    
+    html += '</tbody></table>';
+    return html;
+  };
+
   useEffect(() => {
     if (template) {
       const variables = template.content?.variables || [];
       const initialData: Record<string, string> = {};
+      
       variables.forEach((v: string) => {
         initialData[v] = '';
       });
+      
+      if (inspection && object && work) {
+        initialData['date'] = new Date().toISOString().split('T')[0];
+        initialData['object_name'] = object.title || '';
+        initialData['object_address'] = object.address || '';
+        initialData['client_representative'] = inspection.author_name || '';
+        initialData['contractor_representative'] = work.contractor_name || '';
+        initialData['deadline_date'] = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        
+        try {
+          const defects = JSON.parse(inspection.defects || '[]');
+          initialData['defects'] = generateDefectsTable(defects);
+        } catch (e) {
+          console.error('Error parsing defects:', e);
+          initialData['defects'] = '';
+        }
+      }
+      
       setDocumentData(initialData);
       setDocumentTitle(`${template.name} - ${new Date().toLocaleDateString('ru-RU')}`);
     }
-  }, [template]);
+  }, [template, inspection, object, work]);
 
   const getFieldLabel = (fieldName: string): string => {
     const labels: Record<string, string> = {
