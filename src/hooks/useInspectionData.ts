@@ -28,13 +28,18 @@ export function useInspectionData(inspectionId: string | undefined) {
         }
         
         loadControlPointsForWork(found.work_id);
-        
-        if (found.status === 'completed' && parsedDefects.length > 0) {
-          loadDefectReport(found);
-        }
       }
     }
   }, [userData, inspectionId]);
+
+  // Отдельный эффект для загрузки документа акта
+  useEffect(() => {
+    if (inspection?.defect_report_document_id) {
+      loadDefectReport(inspection);
+    } else {
+      setDefectReport(null);
+    }
+  }, [inspection?.defect_report_document_id, token]);
 
   const loadControlPointsForWork = async (workId: number) => {
     try {

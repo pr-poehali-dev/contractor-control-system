@@ -133,6 +133,16 @@ export function useInspectionActions(
       return;
     }
     
+    // Проверка: акт уже создан
+    if (inspection.defect_report_document_id) {
+      toast({ 
+        title: 'Акт уже создан', 
+        description: 'Для этой проверки уже сформирован акт об обнаружении дефектов',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
     setLoadingReport(true);
     try {
       // 1. Получить шаблон "Акт об обнаружении дефектов" по system_key

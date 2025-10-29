@@ -221,11 +221,12 @@ const InspectionDetail = () => {
 
 
 
-        {inspection.status === 'completed' && defects.length > 0 && isClient && (
+        {inspection.status === 'completed' && defects.length > 0 && (
           <DefectReportCard
             defectReport={defectReport}
             loadingReport={loadingReport}
             onCreateReport={handleCreateDefectReport}
+            isClient={isClient}
           />
         )}
 

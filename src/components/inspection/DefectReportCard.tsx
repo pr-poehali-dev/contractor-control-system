@@ -8,12 +8,14 @@ interface DefectReportCardProps {
   defectReport: any;
   loadingReport: boolean;
   onCreateReport: () => void;
+  isClient?: boolean;
 }
 
 export default function DefectReportCard({
   defectReport,
   loadingReport,
-  onCreateReport
+  onCreateReport,
+  isClient = false
 }: DefectReportCardProps) {
   const navigate = useNavigate();
 
@@ -71,25 +73,27 @@ export default function DefectReportCard({
               <div className="space-y-3">
                 <p className="text-xs md:text-sm text-slate-600">
                   Проверка завершена с замечаниями. 
-                  Необходимо сформировать акт об обнаружении дефектов.
+                  {isClient ? ' Необходимо сформировать акт об обнаружении дефектов.' : ' Акт будет сформирован заказчиком.'}
                 </p>
-                <Button 
-                  onClick={onCreateReport}
-                  disabled={loadingReport}
-                  className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
-                >
-                  {loadingReport ? (
-                    <>
-                      <Icon name="Loader2" size={16} className="mr-2 animate-spin" />
-                      Формирование...
-                    </>
-                  ) : (
-                    <>
-                      <Icon name="FilePlus" size={16} className="mr-2" />
-                      Сформировать акт
-                    </>
-                  )}
-                </Button>
+                {isClient && (
+                  <Button 
+                    onClick={onCreateReport}
+                    disabled={loadingReport}
+                    className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+                  >
+                    {loadingReport ? (
+                      <>
+                        <Icon name="Loader2" size={16} className="mr-2 animate-spin" />
+                        Формирование...
+                      </>
+                    ) : (
+                      <>
+                        <Icon name="FilePlus" size={16} className="mr-2" />
+                        Сформировать акт
+                      </>
+                    )}
+                  </Button>
+                )}
               </div>
             )}
           </div>
