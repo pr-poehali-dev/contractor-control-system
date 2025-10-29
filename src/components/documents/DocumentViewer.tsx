@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   fetchDocumentDetail,
@@ -29,6 +29,7 @@ interface DocumentViewerProps {
 export default function DocumentViewer({ documentId }: DocumentViewerProps) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const document = useAppSelector(selectCurrentDocument);
   const loading = useAppSelector(selectDocumentsLoading);
   const user = useAppSelector((state) => state.user.user);
@@ -39,12 +40,16 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
     dispatch(fetchDocumentDetail(documentId));
   }, [dispatch, documentId]);
 
-  // Автоматически включаем редактирование для черновиков
+  // Открываем редактор только если в URL есть параметр edit=true
   useEffect(() => {
-    if (document?.status === 'draft') {
+    const shouldEdit = searchParams.get('edit') === 'true';
+    if (shouldEdit) {
       setIsEditing(true);
+      // Убираем параметр из URL после открытия редактора
+      searchParams.delete('edit');
+      setSearchParams(searchParams, { replace: true });
     }
-  }, [document?.status]);
+  }, [searchParams, setSearchParams]);
 
   const handleSign = async (signatureId: number) => {
     await dispatch(signDocument({

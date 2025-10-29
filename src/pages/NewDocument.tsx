@@ -160,7 +160,7 @@ export default function NewDocument() {
       });
       
       if (docId) {
-        navigate(ROUTES.DOCUMENT_VIEW(docId));
+        navigate(`${ROUTES.DOCUMENT_VIEW(docId)}?edit=true`);
       }
     } catch (error) {
       toast({
