@@ -13,7 +13,8 @@ export function useInspectionActions(
   inspection: any,
   defects: Defect[],
   setDefects: (defects: Defect[]) => void,
-  setDefectReport: (report: any) => void
+  setDefectReport: (report: any) => void,
+  defectReport?: any
 ) {
   const navigate = useNavigate();
   const { userData, user, loadUserData } = useAuthRedux();
@@ -133,8 +134,8 @@ export function useInspectionActions(
       return;
     }
     
-    // Проверка: акт уже создан
-    if (inspection.defect_report_document_id) {
+    // Проверка: акт уже создан (и существует)
+    if (inspection.defect_report_document_id && defectReport) {
       toast({ 
         title: 'Акт уже создан', 
         description: 'Для этой проверки уже сформирован акт об обнаружении дефектов',

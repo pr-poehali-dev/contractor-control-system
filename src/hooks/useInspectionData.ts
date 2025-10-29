@@ -107,8 +107,17 @@ export function useInspectionData(inspectionId: string | undefined) {
           status: doc.status
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load defect report:', error instanceof Error ? error.message : String(error));
+      
+      // Если документ не найден (404), сбрасываем ссылку на него
+      if (error?.status === 404 || error?.response?.status === 404) {
+        console.log('Document not found (404), clearing defect_report_document_id');
+        // Обновляем inspection в Redux без document_id
+        const updatedInspection = { ...inspection, defect_report_document_id: null };
+        setInspection(updatedInspection);
+      }
+      
       setDefectReport(null);
     }
   };

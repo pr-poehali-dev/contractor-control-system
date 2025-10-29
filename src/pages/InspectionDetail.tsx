@@ -32,7 +32,7 @@ const InspectionDetail = () => {
     handleAddDefect,
     handleRemoveDefect,
     handleCreateDefectReport
-  } = useInspectionActions(inspection, defects, setDefects, setDefectReport);
+  } = useInspectionActions(inspection, defects, setDefects, setDefectReport, defectReport);
 
   const {
     newDefectPhotos,
