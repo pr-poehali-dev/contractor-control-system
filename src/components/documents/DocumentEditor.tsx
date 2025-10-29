@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import DefectsEditor from './DefectsEditor';
 
 interface DocumentEditorProps {
   htmlContent: string;
@@ -39,6 +40,37 @@ export default function DocumentEditor({
     onSave(formData);
   };
 
+  const renderDefectsTable = (defects: any[]) => {
+    if (!Array.isArray(defects) || defects.length === 0) return '<p>Дефекты не указаны</p>';
+    
+    return `
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <thead>
+          <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+            <th style="padding: 12px; text-align: left; font-weight: 600; border: 1px solid #e2e8f0;">№</th>
+            <th style="padding: 12px; text-align: left; font-weight: 600; border: 1px solid #e2e8f0;">Описание</th>
+            <th style="padding: 12px; text-align: left; font-weight: 600; border: 1px solid #e2e8f0;">Местоположение</th>
+            <th style="padding: 12px; text-align: left; font-weight: 600; border: 1px solid #e2e8f0;">Серьезность</th>
+            <th style="padding: 12px; text-align: left; font-weight: 600; border: 1px solid #e2e8f0;">Ответственный</th>
+            <th style="padding: 12px; text-align: left; font-weight: 600; border: 1px solid #e2e8f0;">Срок</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${defects.map(d => `
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+              <td style="padding: 12px; border: 1px solid #e2e8f0;">${d.number}</td>
+              <td style="padding: 12px; border: 1px solid #e2e8f0;">${d.description || '-'}</td>
+              <td style="padding: 12px; border: 1px solid #e2e8f0;">${d.location || '-'}</td>
+              <td style="padding: 12px; border: 1px solid #e2e8f0;">${d.severityLabel || '-'}</td>
+              <td style="padding: 12px; border: 1px solid #e2e8f0;">${d.responsible || '-'}</td>
+              <td style="padding: 12px; border: 1px solid #e2e8f0;">${d.deadline || '-'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  };
+
   const renderPreview = () => {
     let preview = htmlContent || '';
     
@@ -47,7 +79,12 @@ export default function DocumentEditor({
       const regex1 = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
       const regex2 = new RegExp(`\\[${key}\\]`, 'g');
       
-      if (value) {
+      // Специальная обработка для дефектов - рендерим таблицу
+      if (key === 'defects' && Array.isArray(value)) {
+        const defectsTable = renderDefectsTable(value);
+        preview = preview.replace(regex1, defectsTable);
+        preview = preview.replace(regex2, defectsTable);
+      } else if (value) {
         preview = preview.replace(regex1, `<span class="bg-blue-100 px-2 py-0.5 rounded text-blue-900 font-medium">${value}</span>`);
         preview = preview.replace(regex2, `<span class="bg-blue-100 px-2 py-0.5 rounded text-blue-900 font-medium">${value}</span>`);
       } else {
@@ -78,6 +115,7 @@ export default function DocumentEditor({
       work_description: 'Описание работ',
       client_representative: 'Представитель заказчика',
       contractor_representative: 'Представитель подрядчика',
+      defects: 'Выявленные дефекты',
       defects_description: 'Описание дефектов',
       detection_date: 'Дата обнаружения',
       deadline_date: 'Срок устранения',
@@ -129,6 +167,21 @@ export default function DocumentEditor({
                 variables.map((variable) => {
                   const fieldType = getFieldType(variable);
                   const label = getFieldLabel(variable);
+
+                  // Специальная обработка для дефектов - показываем редактор карточек
+                  if (variable === 'defects') {
+                    return (
+                      <div key={variable}>
+                        <Label className="text-sm font-medium mb-2 block">
+                          {label}
+                        </Label>
+                        <DefectsEditor
+                          defects={formData[variable] || []}
+                          onChange={(defects) => handleFieldChange(variable, defects)}
+                        />
+                      </div>
+                    );
+                  }
 
                   return (
                     <div key={variable}>

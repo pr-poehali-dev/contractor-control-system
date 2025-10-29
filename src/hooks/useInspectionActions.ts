@@ -178,14 +178,16 @@ export function useInspectionActions(
       // Генерируем номер акта
       const reportNumber = `АКТ-${work.id}-${inspection.id}-${Date.now()}`;
       
-      // Формируем описание дефектов для шаблона
-      const defectsDescription = defects.map((d: any, index: number) => 
-        `<p><strong>Дефект ${index + 1}:</strong> ${d.description || 'Не указано'}<br/>
-        <strong>Местоположение:</strong> ${d.location || 'Не указано'}<br/>
-        <strong>Серьезность:</strong> ${d.severity === 'critical' ? 'Критическая' : d.severity === 'high' ? 'Высокая' : 'Средняя'}<br/>
-        <strong>Ответственный:</strong> ${d.responsible || 'Не указано'}<br/>
-        <strong>Срок устранения:</strong> ${d.deadline || 'Не указано'}</p>`
-      ).join('');
+      // Сохраняем дефекты как массив объектов (не HTML!)
+      const defectsData = defects.map((d: any, index: number) => ({
+        number: index + 1,
+        description: d.description || '',
+        location: d.location || '',
+        severity: d.severity || 'medium',
+        severityLabel: d.severity === 'critical' ? 'Критическая' : d.severity === 'high' ? 'Высокая' : 'Средняя',
+        responsible: d.responsible || '',
+        deadline: d.deadline || ''
+      }));
       
       // 3. Подготовить данные для документа
       const contentData = {
@@ -194,7 +196,7 @@ export function useInspectionActions(
         object_address: object?.address || '',
         client_representative: user?.name || 'Не указан',
         contractor_representative: work?.contractor_name || 'Не указан',
-        defects_description: defectsDescription,
+        defects: defectsData,  // Массив дефектов вместо HTML
         deadline_date: defects[0]?.deadline ? new Date(defects[0].deadline).toLocaleDateString('ru-RU') : 'Не указан',
         reportNumber: reportNumber,
         totalDefects: defects.length,
