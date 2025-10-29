@@ -203,6 +203,7 @@ const Defects = () => {
                     <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-red-50 rounded-lg border border-red-200 self-start">
                       <Icon name="AlertCircle" size={16} className="text-red-600" />
                       <span className="font-bold text-red-600 text-base">{inspection.defectsCount}</span>
+                      <span className="text-red-600 text-sm">Выявлены замечания</span>
                     </div>
                   )}
                 </div>
