@@ -11,13 +11,15 @@ interface DocumentSignaturesProps {
   userId?: number;
   onRequestSignature: () => void;
   onReject: (signatureId: number) => void;
+  onSendToSignature?: () => void;
 }
 
 export default function DocumentSignatures({ 
   document, 
   userId,
   onRequestSignature, 
-  onReject 
+  onReject,
+  onSendToSignature
 }: DocumentSignaturesProps) {
   const canSign = document.signatures?.some(
     sig => sig.signer_id === userId && sig.status === 'pending'
@@ -39,7 +41,7 @@ export default function DocumentSignatures({
             <p className="text-sm text-slate-700 mb-3">
               Документ готов к подписанию. Отправьте его на согласование.
             </p>
-            <Button size="sm" className="w-full" onClick={() => {}}>
+            <Button size="sm" className="w-full" onClick={onSendToSignature}>
               <Icon name="Send" size={16} className="mr-2" />
               Отправить на подписание
             </Button>

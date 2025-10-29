@@ -43,6 +43,7 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
     handleReject,
     handleDelete,
     handleSaveData,
+    handleSendToSignature,
   } = useDocumentHandlers(documentId, user, document);
 
   useEffect(() => {
@@ -135,6 +136,7 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
           userId={user?.id}
           onRequestSignature={onRequestSignature}
           onReject={handleReject}
+          onSendToSignature={handleSendToSignature}
         />
       </div>
 

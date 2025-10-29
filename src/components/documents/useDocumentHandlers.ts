@@ -119,6 +119,28 @@ export const useDocumentHandlers = (documentId: number, user: any, document: any
     }
   };
 
+  const handleSendToSignature = async () => {
+    try {
+      await dispatch(updateDocument({
+        id: documentId,
+        status: 'pending_signature',
+      })).unwrap();
+
+      toast({
+        title: 'Документ отправлен',
+        description: 'Документ отправлен на подписание',
+      });
+
+      dispatch(fetchDocumentDetail(documentId));
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось отправить документ',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return {
     handleSelectMethod,
     handleSmsSign,
@@ -126,5 +148,6 @@ export const useDocumentHandlers = (documentId: number, user: any, document: any
     handleReject,
     handleDelete,
     handleSaveData,
+    handleSendToSignature,
   };
 };
