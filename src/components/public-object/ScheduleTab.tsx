@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { Work } from './types';
 import GanttChart from './GanttChart';
+import { ROUTES } from '@/constants/routes';
 
 interface ScheduleTabProps {
   works: Work[];
@@ -73,7 +74,7 @@ const ScheduleTab = ({ works, onRefresh, isRefreshing }: ScheduleTabProps) => {
                 <Card 
                   key={work.id}
                   className="cursor-pointer hover:shadow-lg transition-all hover:border-blue-300"
-                  onClick={() => window.location.href = `/objects/${work.object_id}/works/${work.id}`}
+                  onClick={() => window.location.href = ROUTES.WORK_DETAIL(work.object_id, work.id)}
                 >
                   <CardContent className="p-3 md:p-4">
                     <div className="space-y-2.5">

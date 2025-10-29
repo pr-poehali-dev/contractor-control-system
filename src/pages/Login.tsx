@@ -205,7 +205,7 @@ const Login = () => {
               try {
                 setIsLoading(true);
                 await login('admin@example.com', 'admin123');
-                navigate('/dashboard');
+                navigate(ROUTES.DASHBOARD);
               } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : String(error);
                 console.error('Quick admin login failed:', errorMessage);

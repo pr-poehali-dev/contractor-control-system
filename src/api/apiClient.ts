@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import { ROUTES } from '@/constants/routes';
 
 const API_BASE_URL = 'https://functions.poehali.dev';
 
@@ -79,8 +80,8 @@ class ApiClient {
           localStorage.removeItem('auth_token');
           localStorage.removeItem('user');
           
-          if (!window.location.pathname.includes('/login')) {
-            window.location.href = '/login';
+          if (!window.location.pathname.includes(ROUTES.LOGIN)) {
+            window.location.href = ROUTES.LOGIN;
           }
         }
 
