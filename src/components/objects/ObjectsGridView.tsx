@@ -35,6 +35,7 @@ interface SiteData {
   unreadMessages?: number;
   unreadLogs?: number;
   unreadInspections?: number;
+  hasDelays?: boolean;
 }
 
 interface ObjectsGridViewProps {
@@ -65,9 +66,17 @@ export default function ObjectsGridView({
           onClick={() => onSiteClick(site.id)}
         >
           <CardContent className="p-6">
-            <h3 className="font-bold text-lg text-slate-900 group-hover:text-blue-600 transition-colors mb-4">
-              {site.title}
-            </h3>
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <h3 className="font-bold text-lg text-slate-900 group-hover:text-blue-600 transition-colors flex-1">
+                {site.title}
+              </h3>
+              {site.hasDelays && (
+                <Badge variant="destructive" className="flex-shrink-0">
+                  <Icon name="AlertTriangle" size={14} className="mr-1" />
+                  Отставание
+                </Badge>
+              )}
+            </div>
 
             <div className="flex items-center gap-2 text-sm text-slate-600 mb-4">
               <Icon name="MapPin" size={16} />

@@ -10,7 +10,7 @@ import ObjectsMobileList from '@/components/objects/ObjectsMobileList';
 import ObjectsGridView from '@/components/objects/ObjectsGridView';
 import ObjectsTableView from '@/components/objects/ObjectsTableView';
 import ObjectsEmptyState from '@/components/objects/ObjectsEmptyState';
-import { getObjectStatusInfo } from '@/utils/workStatus';
+import { getObjectStatusInfo, getWorkStatusInfo } from '@/utils/workStatus';
 import { safeDateCompare } from '@/utils/dateValidation';
 import { ROUTES } from '@/constants/routes';
 
@@ -63,6 +63,11 @@ export default function Objects() {
     const totalLogs = objectWorks.reduce((sum, w) => sum + (unreadCounts[w.id]?.logs || 0), 0);
     const totalInspections = objectWorks.reduce((sum, w) => sum + (unreadCounts[w.id]?.inspections || 0), 0);
     
+    const hasDelays = objectWorks.some(work => {
+      const workStatus = getWorkStatusInfo(work);
+      return workStatus.daysDelayed > 0;
+    });
+    
     return {
       ...obj,
       worksCount: objectWorks.length,
@@ -76,6 +81,7 @@ export default function Objects() {
       unreadMessages: totalMessages,
       unreadLogs: totalLogs,
       unreadInspections: totalInspections,
+      hasDelays,
     };
   });
 

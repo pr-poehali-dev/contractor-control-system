@@ -26,6 +26,7 @@ interface SiteData {
   statusMessage?: string;
   statusColor?: string;
   statusIcon?: string;
+  hasDelays?: boolean;
 }
 
 interface ObjectsTableViewProps {
@@ -66,7 +67,15 @@ export default function ObjectsTableView({
                   onClick={() => onSiteClick(site.id)}
                 >
                   <td className="p-4">
-                    <p className="font-semibold text-slate-900">{site.title}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold text-slate-900">{site.title}</p>
+                      {site.hasDelays && (
+                        <Badge variant="destructive" className="flex-shrink-0">
+                          <Icon name="AlertTriangle" size={12} className="mr-1" />
+                          Отставание
+                        </Badge>
+                      )}
+                    </div>
                   </td>
                   <td className="p-4 text-sm text-slate-600">{site.address}</td>
                   <td className="p-4">

@@ -15,6 +15,7 @@ interface SiteData {
   unreadMessages?: number;
   unreadLogs?: number;
   unreadInspections?: number;
+  hasDelays?: boolean;
 }
 
 interface ObjectsMobileListProps {
@@ -53,8 +54,13 @@ export default function ObjectsMobileList({
             
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-3 mb-2">
-                <h3 className="font-semibold text-lg text-slate-900 leading-snug">{site.title}</h3>
-                <span className="flex-shrink-0 text-xs text-slate-400 whitespace-nowrap mt-1">2 ч назад</span>
+                <h3 className="font-semibold text-lg text-slate-900 leading-snug flex-1">{site.title}</h3>
+                {site.hasDelays && (
+                  <Badge variant="destructive" className="flex-shrink-0 text-xs">
+                    <Icon name="AlertTriangle" size={12} className="mr-1" />
+                    Отставание
+                  </Badge>
+                )}
               </div>
               
               {site.address && (
