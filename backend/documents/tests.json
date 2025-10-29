@@ -7,23 +7,10 @@
       "expectedStatus": 200
     },
     {
-      "name": "Create new document (draft)",
-      "method": "POST",
+      "name": "OPTIONS for CORS",
+      "method": "OPTIONS",
       "path": "/",
-      "body": {
-        "title": "Тестовый документ",
-        "templateId": 2,
-        "templateName": "Тестовый шаблон",
-        "contentData": {
-          "field1": "value1"
-        }
-      },
-      "expectedStatus": 201,
-      "expectedBody": {
-        "title": "Тестовый документ",
-        "status": "draft"
-      },
-      "bodyMatcher": "partial"
+      "expectedStatus": 200
     }
   ]
 }

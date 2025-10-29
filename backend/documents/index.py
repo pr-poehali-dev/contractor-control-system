@@ -141,6 +141,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             body_data = json.loads(event.get('body', '{}'))
             title = body_data.get('title', 'Новый документ')
             template_id = body_data.get('templateId')
+            work_id = body_data.get('work_id')
             content_data = body_data.get('contentData', {})
             html_content = body_data.get('htmlContent', '')
             status = body_data.get('status', 'draft')
@@ -153,31 +154,41 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
+            if not work_id:
+                return {
+                    'statusCode': 400,
+                    'headers': cors_headers,
+                    'body': json.dumps({'error': 'work_id is required'}),
+                    'isBase64Encoded': False
+                }
+            
             content_obj = content_data.copy()
             content_obj['html'] = html_content
             
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute(f"SELECT id FROM {schema}.users ORDER BY id LIMIT 1")
-                user = cur.fetchone()
-                if not user:
-                    return {
-                        'statusCode': 500,
-                        'headers': cors_headers,
-                        'body': json.dumps({'error': 'No users found in database'}),
-                        'isBase64Encoded': False
-                    }
-                user_id = user['id']
+                # Получаем created_by из заголовков или используем владельца работы
+                headers = event.get('headers', {})
+                user_id = headers.get('X-User-Id') or headers.get('x-user-id')
                 
-                cur.execute(f"SELECT id FROM {schema}.works ORDER BY id LIMIT 1")
-                work = cur.fetchone()
-                if not work:
-                    return {
-                        'statusCode': 400,
-                        'headers': cors_headers,
-                        'body': json.dumps({'error': 'No works found in database. Create a work first.'}),
-                        'isBase64Encoded': False
-                    }
-                work_id = work['id']
+                if not user_id:
+                    # Fallback: получаем владельца работы
+                    cur.execute(f"""
+                        SELECT o.client_id FROM {schema}.works w
+                        JOIN {schema}.objects o ON w.object_id = o.id
+                        WHERE w.id = {int(work_id)}
+                    """)
+                    work_owner = cur.fetchone()
+                    if work_owner:
+                        user_id = work_owner['client_id']
+                    else:
+                        return {
+                            'statusCode': 400,
+                            'headers': cors_headers,
+                            'body': json.dumps({'error': 'Work not found'}),
+                            'isBase64Encoded': False
+                        }
+                
+                user_id = int(user_id)
                 
                 content_json = json.dumps(content_obj, ensure_ascii=False).replace("'", "''")
                 title_escaped = title.replace("'", "''")

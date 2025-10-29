@@ -177,25 +177,45 @@ export function useInspectionActions(
       // Генерируем номер акта
       const reportNumber = `АКТ-${work.id}-${inspection.id}-${Date.now()}`;
       
+      // Формируем описание дефектов для шаблона
+      const defectsDescription = defects.map((d: any, index: number) => 
+        `<p><strong>Дефект ${index + 1}:</strong> ${d.description || 'Не указано'}<br/>
+        <strong>Местоположение:</strong> ${d.location || 'Не указано'}<br/>
+        <strong>Серьезность:</strong> ${d.severity === 'critical' ? 'Критическая' : d.severity === 'high' ? 'Высокая' : 'Средняя'}<br/>
+        <strong>Ответственный:</strong> ${d.responsible || 'Не указано'}<br/>
+        <strong>Срок устранения:</strong> ${d.deadline || 'Не указано'}</p>`
+      ).join('');
+      
       // 3. Подготовить данные для документа
+      const contentData = {
+        date: new Date().toLocaleDateString('ru-RU'),
+        object_name: object?.title || 'Не указан',
+        object_address: object?.address || '',
+        client_representative: user?.name || 'Не указан',
+        contractor_representative: work?.contractor_name || 'Не указан',
+        defects_description: defectsDescription,
+        deadline_date: defects[0]?.deadline ? new Date(defects[0].deadline).toLocaleDateString('ru-RU') : 'Не указан',
+        reportNumber: reportNumber,
+        totalDefects: defects.length,
+        criticalDefects: defects.filter((d: any) => d.severity === 'critical').length,
+        inspectionNumber: inspection.inspection_number || '',
+        workName: work?.title || 'Не указана'
+      };
+      
+      // Получаем HTML шаблон и заполняем его
+      let htmlContent = defectTemplate.content?.html || '';
+      Object.entries(contentData).forEach(([key, value]) => {
+        const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
+        htmlContent = htmlContent.replace(regex, String(value || ''));
+      });
+      
       const documentData = {
         work_id: inspection.work_id,
         templateId: defectTemplate.id,
         title: `Акт об обнаружении дефектов №${reportNumber}`,
         status: 'draft',
-        contentData: {
-          title: `АКТ ОБ ОБНАРУЖЕНИИ ДЕФЕКТОВ №${reportNumber}`,
-          date: new Date().toLocaleDateString('ru-RU'),
-          objectName: object?.title || 'Не указан',
-          objectAddress: object?.address || '',
-          workName: work?.title || 'Не указана',
-          inspectionNumber: inspection.inspection_number || '',
-          defects: defects,
-          totalDefects: defects.length,
-          criticalDefects: defects.filter((d: any) => d.severity === 'critical').length,
-          reportNumber: reportNumber
-        },
-        htmlContent: ''
+        contentData: contentData,
+        htmlContent: htmlContent
       };
       
       // 4. Создать документ
