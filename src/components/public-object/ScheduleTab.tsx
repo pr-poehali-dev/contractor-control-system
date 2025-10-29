@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { Work } from './types';
@@ -12,6 +13,7 @@ interface ScheduleTabProps {
 }
 
 const ScheduleTab = ({ works, onRefresh, isRefreshing }: ScheduleTabProps) => {
+  const navigate = useNavigate();
   const [scheduleView, setScheduleView] = useState<'list' | 'gantt'>('list');
   const worksWithDates = works.filter(w => 
     (w.start_date && w.end_date) || (w.planned_start_date && w.planned_end_date)
@@ -74,7 +76,7 @@ const ScheduleTab = ({ works, onRefresh, isRefreshing }: ScheduleTabProps) => {
                 <Card 
                   key={work.id}
                   className="cursor-pointer hover:shadow-lg transition-all hover:border-blue-300"
-                  onClick={() => window.location.href = ROUTES.WORK_DETAIL(work.object_id, work.id)}
+                  onClick={() => navigate(ROUTES.WORK_DETAIL(work.object_id, work.id))}
                 >
                   <CardContent className="p-3 md:p-4">
                     <div className="space-y-2.5">

@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
@@ -9,6 +10,7 @@ interface InspectionsTabProps {
 }
 
 const InspectionsTab = ({ objectId }: InspectionsTabProps) => {
+  const navigate = useNavigate();
   const { userData } = useAuthRedux();
 
   const works = (userData?.works && Array.isArray(userData.works)) 
@@ -74,7 +76,7 @@ const InspectionsTab = ({ objectId }: InspectionsTabProps) => {
             <Card 
               key={inspection.id} 
               className="hover:shadow-lg transition-all cursor-pointer hover:border-blue-300"
-              onClick={() => window.location.href = ROUTES.INSPECTION_DETAIL(inspection.id)}
+              onClick={() => navigate(ROUTES.INSPECTION_DETAIL(inspection.id))}
             >
               <CardContent className="p-5">
                 <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
