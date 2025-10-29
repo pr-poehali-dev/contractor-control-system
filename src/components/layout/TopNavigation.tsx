@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useAppSelector } from '@/store/hooks';
+import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
@@ -43,6 +44,7 @@ export default function TopNavigation() {
   const location = useLocation();
   const { user, logout } = useAuthRedux();
   const userData = useAppSelector((state) => state.user.userData);
+  const { displayCount, hasUnread } = useUnreadNotifications();
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
@@ -115,6 +117,11 @@ export default function TopNavigation() {
               >
                 <Icon name={item.icon as any} size={20} />
                 <span className="hidden md:inline font-medium">{item.label}</span>
+                {item.id === 'objects' && hasUnread && (
+                  <span className="absolute top-1 right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full">
+                    {displayCount}
+                  </span>
+                )}
                 {isActive && (
                   <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
                 )}

@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
+import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
@@ -24,6 +25,7 @@ export default function BottomNavigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuthRedux();
+  const { displayCount, hasUnread } = useUnreadNotifications();
 
   const visibleNavItems = mobileNavItems
     .filter((item) => !item.roles || item.roles.includes(user?.role as any || 'contractor'))
@@ -42,12 +44,17 @@ export default function BottomNavigation() {
               variant="ghost"
               onClick={() => navigate(item.path)}
               className={cn(
-                'flex flex-col items-center justify-center gap-1 h-full rounded-none',
+                'flex flex-col items-center justify-center gap-1 h-full rounded-none relative',
                 isActive ? 'text-[#F59E0B]' : 'text-slate-600'
               )}
             >
               <Icon name={item.icon as any} size={24} />
               <span className="text-[11px] font-medium">{item.label}</span>
+              {item.id === 'objects' && hasUnread && (
+                <span className="absolute top-2 right-1/2 translate-x-3 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full">
+                  {displayCount}
+                </span>
+              )}
             </Button>
           );
         })}
