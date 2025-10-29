@@ -70,7 +70,11 @@ const ScheduleTab = ({ works, onRefresh, isRefreshing }: ScheduleTabProps) => {
           {scheduleView === 'list' ? (
             <div className="space-y-3">
               {worksWithDates.map((work) => (
-                <Card key={work.id}>
+                <Card 
+                  key={work.id}
+                  className="cursor-pointer hover:shadow-lg transition-all hover:border-blue-300"
+                  onClick={() => window.location.href = `/work/${work.id}`}
+                >
                   <CardContent className="p-3 md:p-4">
                     <div className="space-y-2.5">
                       <div>
