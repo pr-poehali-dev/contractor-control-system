@@ -13,6 +13,7 @@ interface DocumentEditorProps {
   contentData: Record<string, any>;
   onSave: (data: Record<string, any>) => void;
   onDownload?: () => void;
+  onClose?: () => void;
 }
 
 export default function DocumentEditor({
@@ -21,6 +22,7 @@ export default function DocumentEditor({
   contentData,
   onSave,
   onDownload,
+  onClose,
 }: DocumentEditorProps) {
   const [formData, setFormData] = useState<Record<string, any>>(contentData || {});
 
@@ -96,10 +98,18 @@ export default function DocumentEditor({
               <Icon name="FileEdit" size={20} />
               Заполнение полей
             </CardTitle>
-            <Button onClick={handleSave} size="sm">
-              <Icon name="Save" size={16} className="mr-2" />
-              Сохранить
-            </Button>
+            <div className="flex gap-2">
+              {onClose && (
+                <Button onClick={onClose} variant="ghost" size="sm">
+                  <Icon name="X" size={16} className="mr-2" />
+                  Закрыть
+                </Button>
+              )}
+              <Button onClick={handleSave} size="sm">
+                <Icon name="Save" size={16} className="mr-2" />
+                Сохранить
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="flex-1 overflow-hidden p-0">

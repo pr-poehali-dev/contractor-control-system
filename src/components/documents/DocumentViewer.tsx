@@ -39,6 +39,13 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
     dispatch(fetchDocumentDetail(documentId));
   }, [dispatch, documentId]);
 
+  // Автоматически включаем редактирование для черновиков
+  useEffect(() => {
+    if (document?.status === 'draft') {
+      setIsEditing(true);
+    }
+  }, [document?.status]);
+
   const handleSign = async (signatureId: number) => {
     await dispatch(signDocument({
       signature_id: signatureId,
@@ -207,9 +214,9 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
         contentData={document.contentData || {}}
         onSave={(data) => {
           handleSaveData(data);
-          setIsEditing(false);
         }}
         onDownload={handleDownloadPDF}
+        onClose={() => setIsEditing(false)}
       />
     );
   }
