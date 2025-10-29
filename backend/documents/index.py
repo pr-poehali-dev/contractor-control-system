@@ -47,9 +47,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             if doc_id:
                 with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                    query = f"""SELECT id, work_id, template_id, document_number, document_type, 
-                               title, content, status, created_by, created_at, updated_at 
-                               FROM {schema}.documents WHERE id = {int(doc_id)}"""
+                    query = f"""
+                        SELECT d.id, d.work_id, d.template_id, d.document_number, d.document_type, 
+                               d.title, d.content, d.status, d.created_by, d.created_at, d.updated_at,
+                               w.title as work_title, w.object_id,
+                               o.title as object_title,
+                               u.name as created_by_name
+                        FROM {schema}.documents d
+                        LEFT JOIN {schema}.works w ON d.work_id = w.id
+                        LEFT JOIN {schema}.objects o ON w.object_id = o.id
+                        LEFT JOIN {schema}.users u ON d.created_by = u.id
+                        WHERE d.id = {int(doc_id)}
+                    """
                     cur.execute(query)
                     doc = cur.fetchone()
                     
@@ -68,6 +77,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         if template:
                             template_name = template['name']
                     
+                    # Найти inspection_id если это акт о дефектах
+                    inspection_id = None
+                    inspection_number = None
+                    if template_name and 'дефект' in template_name.lower():
+                        cur.execute(f"""
+                            SELECT id, inspection_number 
+                            FROM {schema}.inspections 
+                            WHERE defect_report_document_id = {int(doc_id)}
+                            LIMIT 1
+                        """)
+                        inspection = cur.fetchone()
+                        if inspection:
+                            inspection_id = inspection['id']
+                            inspection_number = inspection['inspection_number']
+                    
                     # Разделяем content на contentData (без html) и htmlContent
                     content = doc['content'] or {}
                     html_content = content.get('html', '')
@@ -80,6 +104,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'body': json.dumps({
                             'id': doc['id'],
                             'title': doc['title'],
+                            'work_id': doc['work_id'],
+                            'work_title': doc['work_title'],
+                            'object_title': doc['object_title'],
+                            'created_by_name': doc['created_by_name'],
+                            'inspection_id': inspection_id,
+                            'inspection_number': inspection_number,
                             'templateId': doc['template_id'],
                             'templateName': template_name,
                             'status': doc['status'],

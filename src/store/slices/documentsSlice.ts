@@ -21,6 +21,8 @@ export interface Document {
   object_title?: string;
   created_by_name?: string;
   contractor_organization?: string;
+  inspection_id?: number;
+  inspection_number?: string;
   signatures?: DocumentSignature[];
   versions?: DocumentVersion[];
   pending_signatures?: number;

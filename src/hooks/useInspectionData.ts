@@ -100,10 +100,10 @@ export function useInspectionData(inspectionId: string | undefined) {
         const doc = response.data;
         setDefectReport({
           id: doc.id,
-          report_number: doc.content?.reportNumber || doc.title,
-          total_defects: doc.content?.totalDefects || 0,
-          critical_defects: doc.content?.criticalDefects || 0,
-          created_at: doc.created_at,
+          report_number: doc.contentData?.reportNumber || doc.title,
+          total_defects: doc.contentData?.totalDefects || 0,
+          critical_defects: doc.contentData?.criticalDefects || 0,
+          created_at: doc.createdAt,
           status: doc.status
         });
       }
