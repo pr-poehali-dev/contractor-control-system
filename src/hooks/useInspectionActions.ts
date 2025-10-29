@@ -203,12 +203,8 @@ export function useInspectionActions(
         workName: work?.title || 'Не указана'
       };
       
-      // Получаем HTML шаблон и заполняем его
-      let htmlContent = defectTemplate.content?.html || '';
-      Object.entries(contentData).forEach(([key, value]) => {
-        const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
-        htmlContent = htmlContent.replace(regex, String(value || ''));
-      });
+      // Сохраняем оригинальный шаблон (БЕЗ заполнения переменных)
+      const templateHtml = defectTemplate.content?.html || '';
       
       const documentData = {
         work_id: inspection.work_id,
@@ -216,7 +212,7 @@ export function useInspectionActions(
         title: `Акт об обнаружении дефектов №${reportNumber}`,
         status: 'draft',
         contentData: contentData,
-        htmlContent: htmlContent
+        htmlContent: templateHtml  // Сохраняем оригинальный шаблон с {{переменными}}
       };
       
       // 4. Создать документ

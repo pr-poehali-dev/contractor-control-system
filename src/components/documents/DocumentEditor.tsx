@@ -72,6 +72,7 @@ export default function DocumentEditor({
       object_name: 'Название объекта',
       object_address: 'Адрес объекта',
       work_name: 'Название работ',
+      workName: 'Название работ',
       work_volume: 'Объём работ',
       work_cost: 'Стоимость работ',
       work_description: 'Описание работ',
@@ -85,6 +86,10 @@ export default function DocumentEditor({
       quality_assessment: 'Оценка качества',
       materials_list: 'Список материалов',
       completion_percentage: 'Процент выполнения',
+      reportNumber: 'Номер акта',
+      totalDefects: 'Всего дефектов',
+      criticalDefects: 'Критических дефектов',
+      inspectionNumber: 'Номер проверки',
     };
     return labels[fieldName] || fieldName.replace(/_/g, ' ');
   };
