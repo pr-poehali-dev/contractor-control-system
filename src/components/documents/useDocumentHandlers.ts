@@ -120,8 +120,14 @@ export const useDocumentHandlers = (documentId: number, user: any, document: any
     }
   };
 
-  const handleSendToSignature = async () => {
+  const handleSendToSignature = async (signatureType: 'sms' | 'ecp') => {
     try {
+      await dispatch(createSignatureRequest({
+        document_id: documentId,
+        signer_id: user.id,
+        signature_type: signatureType,
+      })).unwrap();
+
       await dispatch(updateDocument({
         id: documentId,
         status: 'pending',
@@ -129,7 +135,7 @@ export const useDocumentHandlers = (documentId: number, user: any, document: any
 
       toast({
         title: 'Документ отправлен',
-        description: 'Документ отправлен на подписание',
+        description: `Документ отправлен на подписание через ${signatureType === 'sms' ? 'СМС' : 'ЭЦП'}`,
       });
 
       await dispatch(fetchDocumentDetail(documentId));

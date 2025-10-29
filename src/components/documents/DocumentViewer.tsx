@@ -13,6 +13,7 @@ import DocumentEditor from './DocumentEditor';
 import SignatureMethodDialog from './SignatureMethodDialog';
 import SmsSignatureDialog from './SmsSignatureDialog';
 import EcpSignatureDialog from './EcpSignatureDialog';
+import SignatureTypeDialog from './SignatureTypeDialog';
 import DocumentContent from './DocumentContent';
 import DocumentInfo from './DocumentInfo';
 import DocumentActions from './DocumentActions';
@@ -33,6 +34,7 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
   
   const [isEditing, setIsEditing] = useState(false);
   const [showSignatureMethod, setShowSignatureMethod] = useState(false);
+  const [showSignatureTypeDialog, setShowSignatureTypeDialog] = useState(false);
   const [showSmsDialog, setShowSmsDialog] = useState(false);
   const [showEcpDialog, setShowEcpDialog] = useState(false);
 
@@ -136,7 +138,7 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
           userId={user?.id}
           onRequestSignature={onRequestSignature}
           onReject={handleReject}
-          onSendToSignature={handleSendToSignature}
+          onSendToSignature={() => setShowSignatureTypeDialog(true)}
         />
       </div>
 
@@ -158,6 +160,15 @@ export default function DocumentViewer({ documentId }: DocumentViewerProps) {
         open={showEcpDialog}
         onClose={() => setShowEcpDialog(false)}
         onSign={handleEcpSign}
+      />
+
+      <SignatureTypeDialog
+        open={showSignatureTypeDialog}
+        onClose={() => setShowSignatureTypeDialog(false)}
+        onSelectType={(type) => {
+          handleSendToSignature(type);
+        }}
+        documentTitle={document?.title}
       />
     </div>
   );
