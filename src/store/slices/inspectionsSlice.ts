@@ -141,4 +141,9 @@ const inspectionsSlice = createSlice({
 });
 
 export const { setInspections, clearInspectionsError } = inspectionsSlice.actions;
+
+export const selectInspections = (state: { inspections: InspectionsState }) => state.inspections.items;
+export const selectInspectionsLoading = (state: { inspections: InspectionsState }) => state.inspections.loading;
+export const selectInspectionsError = (state: { inspections: InspectionsState }) => state.inspections.error;
+
 export default inspectionsSlice.reducer;
