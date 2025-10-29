@@ -70,7 +70,11 @@ const InspectionsTab = ({ objectId }: InspectionsTabProps) => {
       ) : (
         <div className="space-y-4">
           {objectInspections.map((inspection) => (
-            <Card key={inspection.id} className="hover:shadow-lg transition-shadow">
+            <Card 
+              key={inspection.id} 
+              className="hover:shadow-lg transition-all cursor-pointer hover:border-blue-300"
+              onClick={() => window.location.href = `/inspection/${inspection.id}`}
+            >
               <CardContent className="p-5">
                 <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                   <div className="flex-1 w-full">
