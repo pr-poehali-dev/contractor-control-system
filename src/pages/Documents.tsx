@@ -61,8 +61,14 @@ const Documents = () => {
     setIsCreateModalOpen(true);
   };
 
-  const handleSelectTemplate = (templateId: number, templateName: string) => {
-    navigate(`${ROUTES.DOCUMENT_NEW}?templateId=${templateId}`);
+  const handleSelectTemplate = (templateId: number, templateName: string, relatedData?: any) => {
+    let url = `${ROUTES.DOCUMENT_NEW}?templateId=${templateId}`;
+    
+    if (relatedData?.inspection) {
+      url += `&inspectionId=${relatedData.inspection.id}`;
+    }
+    
+    navigate(url);
   };
 
   if (loading && documents.length === 0) {
