@@ -131,7 +131,16 @@ export default function CreateOrganizationDialog({
 
   return (
     <>
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog 
+      open={open} 
+      onOpenChange={(newOpen) => {
+        // Не закрываем основной диалог, если показан конфликтный
+        if (!newOpen && showConflictDialog) {
+          return;
+        }
+        onOpenChange(newOpen);
+      }}
+    >
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
