@@ -380,7 +380,7 @@ const ClientOnboarding = () => {
             ) : (
               <Button
                 onClick={handleSubmit}
-                disabled={isSubmitting || !isStep1Valid || !isStep2Valid}
+                disabled={isSubmitting || !isStep1Valid}
               >
                 {isSubmitting ? 'Сохранение...' : (isEditMode ? 'Сохранить' : 'Завершить')}
                 <Icon name="Check" size={16} className="ml-1" />
