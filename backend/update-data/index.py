@@ -122,7 +122,7 @@ def handler(event, context):
             return {
                 'statusCode': 200,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                'body': json.dumps({'success': True, 'data': {'user': dict(updated_user)}})
+                'body': json.dumps({'success': True, 'data': {'user': dict(updated_user)}}, default=str)
             }
         
         if method == 'DELETE':

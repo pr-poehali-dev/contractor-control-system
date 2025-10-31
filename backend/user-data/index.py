@@ -447,14 +447,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         # Получаем организацию пользователя ПЕРЕД закрытием соединения
         organization = None
         if user.get('organization_id'):
-            cur.execute(f"""
-                SELECT id, name, inn, kpp, legal_address, actual_address, director, phone, email, type, created_at
-                FROM {SCHEMA}.organizations
-                WHERE id = {user['organization_id']}
-            """)
-            org_row = cur.fetchone()
-            if org_row:
-                organization = dict(org_row)
+            try:
+                cur.execute(f"""
+                    SELECT id, name, inn, kpp, legal_address, actual_address, director, phone, email, type, created_at
+                    FROM {SCHEMA}.organizations
+                    WHERE id = {user['organization_id']}
+                """)
+                org_row = cur.fetchone()
+                if org_row:
+                    organization = dict(org_row)
+            except Exception as org_error:
+                print(f"WARNING: Failed to fetch organization: {org_error}")
+                organization = None
         
         # Строим иерархию данных
         objects_with_works = build_hierarchy(
