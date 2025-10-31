@@ -253,11 +253,12 @@ export const loadUserData = createAsyncThunk(
  * @param {string} [data.email] - Новый email
  * @param {string} [data.phone] - Новый телефон
  * @param {string} [data.avatar_url] - URL аватарки
+ * @param {boolean} [data.onboarding_completed] - Статус прохождения онбординга
  * @returns {Promise<User>} Обновленные данные пользователя
  */
 export const updateProfile = createAsyncThunk(
   'user/updateProfile',
-  async (data: { name?: string; email?: string; phone?: string; avatar_url?: string }, { rejectWithValue }) => {
+  async (data: { name?: string; email?: string; phone?: string; avatar_url?: string; onboarding_completed?: boolean }, { rejectWithValue }) => {
     try {
       const response = await apiClient.put(ENDPOINTS.ENTITIES.UPDATE, {
         type: 'user',

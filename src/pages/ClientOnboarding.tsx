@@ -119,7 +119,7 @@ const ClientOnboarding = () => {
 
     setIsSubmitting(true);
     try {
-      await dispatch(updateProfile(userData)).unwrap();
+      await dispatch(updateProfile({ ...userData, onboarding_completed: true })).unwrap();
 
       if (isEditMode && user?.organization_id) {
         await dispatch(updateOrganization({ id: user.organization_id, ...formData })).unwrap();

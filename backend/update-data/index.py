@@ -85,11 +85,22 @@ def handler(event, context):
             update_fields = []
             
             if 'name' in data:
-                update_fields.append(f"name = '{data['name']}'")
+                escaped_name = data['name'].replace("'", "''")
+                update_fields.append(f"name = '{escaped_name}'")
             if 'phone' in data:
-                update_fields.append(f"phone = '{data['phone']}'")
+                if data['phone']:
+                    escaped_phone = data['phone'].replace("'", "''")
+                    update_fields.append(f"phone = '{escaped_phone}'")
+                else:
+                    update_fields.append("phone = NULL")
             if 'email' in data:
-                update_fields.append(f"email = '{data['email']}'")
+                if data['email']:
+                    escaped_email = data['email'].replace("'", "''")
+                    update_fields.append(f"email = '{escaped_email}'")
+                else:
+                    update_fields.append("email = NULL")
+            if 'onboarding_completed' in data:
+                update_fields.append(f"onboarding_completed = {str(data['onboarding_completed']).lower()}")
             
             if not update_fields:
                 cur.close()
@@ -100,7 +111,7 @@ def handler(event, context):
                     'body': json.dumps({'success': False, 'error': 'No fields to update'})
                 }
             
-            update_query = f"UPDATE {SCHEMA}.users SET {', '.join(update_fields)} WHERE id = {user_id_int} RETURNING id, name, email, phone, role"
+            update_query = f"UPDATE {SCHEMA}.users SET {', '.join(update_fields)} WHERE id = {user_id_int} RETURNING id, name, email, phone, role, onboarding_completed, organization_id, created_at"
             cur.execute(update_query)
             updated_user = cur.fetchone()
             conn.commit()
