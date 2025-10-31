@@ -121,13 +121,16 @@ const ClientOnboarding = () => {
     try {
       await dispatch(updateProfile({ ...userData, onboarding_completed: true })).unwrap();
 
-      if (isEditMode && user?.organization_id) {
+      if (user?.organization_id) {
         await dispatch(updateOrganization({ id: user.organization_id, ...formData })).unwrap();
-        alert('Данные успешно обновлены');
-        navigate(ROUTES.PROFILE);
+        if (isEditMode) {
+          alert('Данные успешно обновлены');
+          navigate(ROUTES.PROFILE);
+        } else {
+          navigate(ROUTES.OBJECTS);
+        }
       } else {
-        await dispatch(createOrganization({ ...formData, type: 'client' })).unwrap();
-        navigate(ROUTES.OBJECTS);
+        alert('Организация не найдена. Обратитесь к администратору.');
       }
     } catch (error) {
       console.error('Failed to save data:', error);

@@ -81,9 +81,32 @@ def handler(event, context):
         
         new_user = cur.fetchone()
         user_id = new_user['id']
+        organization_id = None
         
-        # Копируем системные шаблоны новому клиенту
+        # Создаём пустую организацию для нового клиента
         if role == 'client':
+            cur.execute(f"""
+                INSERT INTO {SCHEMA}.organizations (name, inn, type, created_at)
+                VALUES ('Новая организация', '0000000000', 'client', NOW())
+                RETURNING id
+            """)
+            org = cur.fetchone()
+            organization_id = org['id']
+            
+            # Привязываем пользователя к организации как администратора
+            cur.execute(f"""
+                INSERT INTO {SCHEMA}.user_organizations (user_id, organization_id, role)
+                VALUES ({user_id}, {organization_id}, 'admin')
+            """)
+            
+            # Обновляем organization_id у пользователя
+            cur.execute(f"""
+                UPDATE {SCHEMA}.users 
+                SET organization_id = {organization_id}
+                WHERE id = {user_id}
+            """)
+            
+            # Копируем системные шаблоны новому клиенту
             cur.execute(f"""
                 INSERT INTO {SCHEMA}.document_templates 
                   (client_id, name, description, template_type, content, version, is_active, is_system, source_template_id)
