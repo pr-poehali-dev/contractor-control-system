@@ -43,11 +43,12 @@ import DocumentTemplateEditor from "./pages/DocumentTemplateEditor";
 import DocumentView from "./pages/DocumentView";
 import OrganizationPage from "./pages/OrganizationPage";
 import NewDocument from "./pages/NewDocument";
+import ClientOnboarding from "./pages/ClientOnboarding";
 
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, isLoading, token, verifyToken, loadUserData, userData } = useAuthRedux();
+  const { isAuthenticated, isLoading, token, verifyToken, loadUserData, user } = useAuthRedux();
   const initRef = useRef(false);
   
   useEffect(() => {
@@ -72,7 +73,15 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
   
-  return isAuthenticated ? <Layout>{children}</Layout> : <Navigate to={ROUTES.LOGIN} />;
+  if (!isAuthenticated) {
+    return <Navigate to={ROUTES.LOGIN} />;
+  }
+  
+  if (user?.role === 'client' && !user?.onboarding_completed && window.location.pathname !== ROUTES.ONBOARDING) {
+    return <Navigate to={ROUTES.ONBOARDING} />;
+  }
+  
+  return <Layout>{children}</Layout>;
 };
 
 const App = () => (
@@ -85,6 +94,7 @@ const App = () => (
             <Routes>
               <Route path={ROUTES.LOGIN} element={<Login />} />
               <Route path={ROUTES.REGISTER} element={<Register />} />
+              <Route path={ROUTES.ONBOARDING} element={<ProtectedRoute><ClientOnboarding /></ProtectedRoute>} />
               <Route path={ROUTES.ROOT} element={<Navigate to={ROUTES.DASHBOARD} />} />
               <Route path={ROUTES.DASHBOARD} element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path={ROUTES.OBJECTS} element={<ProtectedRoute><Objects /></ProtectedRoute>} />
