@@ -118,11 +118,12 @@ export const createOrganization = createAsyncThunk(
       const response = await apiClient.post(ENDPOINTS.ORGANIZATIONS.CREATE, data);
       return response.data.organization;
     } catch (error: any) {
+      console.log('🔍 Create org error:', error);
       // Если это 409 (организация существует), передаём данные существующей организации
-      if (error.response?.data?.existing_organization) {
+      if (error.status === 409 && error.data?.existing_organization) {
         return rejectWithValue({
-          error: error.response.data.error,
-          existing_organization: error.response.data.existing_organization
+          error: error.data.error,
+          existing_organization: error.data.existing_organization
         });
       }
       return rejectWithValue({ error: error.message || 'Failed to create organization' });

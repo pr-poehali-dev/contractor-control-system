@@ -217,7 +217,13 @@ class ApiClient {
         const errorData = axiosError.response.data;
         const message = errorData.error || errorData.message || 'Произошла ошибка';
         console.error('API error:', { status: axiosError.response.status, message, data: errorData });
-        return new Error(message);
+        
+        // Создаём Error с дополнительными данными для обработки в Redux
+        const err = new Error(message) as any;
+        err.response = axiosError.response;
+        err.status = axiosError.response.status;
+        err.data = errorData;
+        return err;
       }
       
       // Если запрос был отправлен, но нет ответа
