@@ -171,7 +171,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             cur.execute(
                 f"""
-                SELECT id, email, phone, name, role, organization, password_hash, is_active, created_at
+                SELECT id, email, phone, name, role, organization, password_hash, is_active, created_at,
+                       onboarding_completed, organization_id
                 FROM {SCHEMA}.users
                 WHERE ({email_cond} OR {phone_cond}) 
                   AND password_hash IS NOT NULL
@@ -188,7 +189,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'error': 'Invalid credentials'})
                 }
             
-            user_id, user_email, user_phone, user_name, user_role, user_org, password_hash, is_active, user_created_at = user
+            user_id, user_email, user_phone, user_name, user_role, user_org, password_hash, is_active, user_created_at, onboarding_completed, organization_id = user
             
             print(f"DEBUG: user_id={user_id}, is_active={is_active}, has_hash={bool(password_hash)}")
             
@@ -221,7 +222,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'name': user_name,
                 'role': user_role,
                 'organization': user_org,
-                'created_at': user_created_at.isoformat() if user_created_at else None
+                'created_at': user_created_at.isoformat() if user_created_at else None,
+                'onboarding_completed': onboarding_completed if onboarding_completed is not None else False,
+                'organization_id': organization_id
             }
             
             token = create_jwt_token(user_id, user_role)
@@ -257,7 +260,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 cur.execute(
                     f"""
-                    SELECT id, email, phone, name, role, organization, is_active, created_at
+                    SELECT id, email, phone, name, role, organization, is_active, created_at, 
+                           onboarding_completed, organization_id
                     FROM {SCHEMA}.users
                     WHERE id = {user_id}
                     """
@@ -278,7 +282,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'name': user[3],
                     'role': user[4],
                     'organization': user[5],
-                    'created_at': user[7].isoformat() if user[7] else None
+                    'created_at': user[7].isoformat() if user[7] else None,
+                    'onboarding_completed': user[8] if user[8] is not None else False,
+                    'organization_id': user[9]
                 }
                 
                 cur.close()

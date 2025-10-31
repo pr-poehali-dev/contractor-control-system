@@ -42,6 +42,11 @@ const ClientOnboarding = () => {
   };
 
   useEffect(() => {
+    if (user?.onboarding_completed && user?.role === 'client' && !user?.organization_id) {
+      navigate(ROUTES.OBJECTS);
+      return;
+    }
+
     if (user?.organization_id) {
       setIsEditMode(true);
       setIsLoading(true);
@@ -72,7 +77,7 @@ const ClientOnboarding = () => {
           setIsLoading(false);
         });
     }
-  }, [user?.organization_id, dispatch]);
+  }, [user?.organization_id, user?.onboarding_completed, user?.role, dispatch, navigate]);
 
   const handleSkip = async () => {
     try {
