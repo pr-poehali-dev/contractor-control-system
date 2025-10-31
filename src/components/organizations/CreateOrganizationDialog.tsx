@@ -72,10 +72,6 @@ export default function CreateOrganizationDialog({
       } else if (createOrganization.rejected.match(result)) {
         const error = result.payload as any;
         
-        console.log('🐛 DEBUG result.payload:', error);
-        console.log('🐛 DEBUG error?.existing_organization:', error?.existing_organization);
-        console.log('🐛 DEBUG error?.already_linked:', error?.already_linked);
-        
         // Если организация уже существует (409)
         if (error?.existing_organization) {
           console.log('⚠️ Organization already exists:', error.existing_organization);

@@ -118,25 +118,14 @@ export const createOrganization = createAsyncThunk(
       const response = await apiClient.post(ENDPOINTS.ORGANIZATIONS.CREATE, data);
       return response.data.organization;
     } catch (error: any) {
-      console.log('🔍 Create org error:', error);
-      console.log('🔍 error.status:', error.status);
-      console.log('🔍 error.data:', error.data);
-      console.log('🔍 error.response:', error.response);
-      
       // Если это 409 (организация существует), передаём данные существующей организации
       if (error.status === 409 && error.data?.existing_organization) {
-        console.log('✅ Returning 409 conflict data:', {
-          error: error.data.error,
-          existing_organization: error.data.existing_organization,
-          already_linked: error.data.already_linked
-        });
         return rejectWithValue({
           error: error.data.error,
           existing_organization: error.data.existing_organization,
           already_linked: error.data.already_linked || false
         });
       }
-      console.log('❌ Returning generic error');
       return rejectWithValue({ error: error.message || 'Failed to create organization' });
     }
   }
