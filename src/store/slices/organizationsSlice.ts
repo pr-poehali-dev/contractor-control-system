@@ -23,12 +23,19 @@ export interface Organization {
   name: string;
   inn: string;
   kpp?: string;
+  ogrn?: string;
   legal_address?: string;
   actual_address?: string;
   phone?: string;
   email?: string;
   status: string;
   type?: 'client' | 'contractor';
+  director_name?: string;
+  director_position?: string;
+  bik?: string;
+  bank_name?: string;
+  payment_account?: string;
+  correspondent_account?: string;
   created_by: number;
   created_at: string;
   updated_at: string;
@@ -117,10 +124,19 @@ export const updateOrganization = createAsyncThunk(
   async (data: {
     id: number;
     name?: string;
+    inn?: string;
+    kpp?: string;
+    ogrn?: string;
     legal_address?: string;
     actual_address?: string;
     phone?: string;
     email?: string;
+    director_name?: string;
+    director_position?: string;
+    bik?: string;
+    bank_name?: string;
+    payment_account?: string;
+    correspondent_account?: string;
   }) => {
     const response = await apiClient.put(ENDPOINTS.ORGANIZATIONS.UPDATE, data);
     return response.data.organization;

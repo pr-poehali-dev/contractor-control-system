@@ -25,6 +25,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import EditOrganizationDialog from '@/components/organizations/EditOrganizationDialog';
 
 export default function OrganizationPage() {
   const { isAuthenticated } = useAuthRedux();
@@ -36,6 +37,7 @@ export default function OrganizationPage() {
   
   const [invitePhone, setInvitePhone] = useState('');
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && user?.organization_id) {
@@ -91,11 +93,17 @@ export default function OrganizationPage() {
     <div className="flex-1 overflow-y-auto bg-slate-50 w-full pb-20 md:pb-0">
       <div className="px-3 py-4 md:p-8 lg:p-12 max-w-7xl mx-auto">
         <div className="mb-4 md:mb-8">
-          <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start justify-between mb-4 gap-2">
             <div className="flex-1 min-w-0">
               <h1 className="text-2xl md:text-3xl font-bold truncate">Моя организация</h1>
               <p className="text-slate-500 mt-1 text-sm md:text-base truncate">{currentOrg.name}</p>
             </div>
+            {isAdmin && (
+              <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
+                <Icon name="Pencil" size={18} className="mr-2" />
+                <span className="hidden md:inline">Редактировать</span>
+              </Button>
+            )}
           </div>
           
           {isAdmin && (
@@ -172,45 +180,72 @@ export default function OrganizationPage() {
               <CardTitle className="text-lg md:text-xl">Информация об организации</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 md:space-y-4">
-              <div>
-                <Label className="text-xs md:text-sm text-slate-500">ИНН</Label>
-                <p className="font-medium text-sm md:text-base break-all">{currentOrg.inn}</p>
-              </div>
-              
-              {currentOrg.kpp && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                <div>
+                  <Label className="text-xs md:text-sm text-slate-500">ИНН</Label>
+                  <p className="font-medium text-sm md:text-base break-all">{currentOrg.inn || '—'}</p>
+                </div>
+                
                 <div>
                   <Label className="text-xs md:text-sm text-slate-500">КПП</Label>
-                  <p className="font-medium text-sm md:text-base break-all">{currentOrg.kpp}</p>
+                  <p className="font-medium text-sm md:text-base break-all">{currentOrg.kpp || '—'}</p>
                 </div>
-              )}
-              
-              {currentOrg.legal_address && (
+                
                 <div>
-                  <Label className="text-xs md:text-sm text-slate-500">Юридический адрес</Label>
-                  <p className="font-medium text-sm md:text-base break-words">{currentOrg.legal_address}</p>
+                  <Label className="text-xs md:text-sm text-slate-500">ОГРН</Label>
+                  <p className="font-medium text-sm md:text-base break-all">{(currentOrg as any).ogrn || '—'}</p>
                 </div>
-              )}
-              
-              {currentOrg.actual_address && (
-                <div>
-                  <Label className="text-xs md:text-sm text-slate-500">Фактический адрес</Label>
-                  <p className="font-medium text-sm md:text-base break-words">{currentOrg.actual_address}</p>
-                </div>
-              )}
-              
-              {currentOrg.phone && (
+                
                 <div>
                   <Label className="text-xs md:text-sm text-slate-500">Телефон</Label>
-                  <p className="font-medium text-sm md:text-base">{currentOrg.phone}</p>
+                  <p className="font-medium text-sm md:text-base">{currentOrg.phone || '—'}</p>
                 </div>
-              )}
-              
-              {currentOrg.email && (
-                <div>
+                
+                <div className="md:col-span-2">
                   <Label className="text-xs md:text-sm text-slate-500">Email</Label>
-                  <p className="font-medium text-sm md:text-base break-all">{currentOrg.email}</p>
+                  <p className="font-medium text-sm md:text-base break-all">{currentOrg.email || '—'}</p>
                 </div>
-              )}
+                
+                <div className="md:col-span-2">
+                  <Label className="text-xs md:text-sm text-slate-500">Юридический адрес</Label>
+                  <p className="font-medium text-sm md:text-base break-words">{currentOrg.legal_address || '—'}</p>
+                </div>
+                
+                <div className="md:col-span-2">
+                  <Label className="text-xs md:text-sm text-slate-500">Фактический адрес</Label>
+                  <p className="font-medium text-sm md:text-base break-words">{currentOrg.actual_address || '—'}</p>
+                </div>
+                
+                <div>
+                  <Label className="text-xs md:text-sm text-slate-500">Директор (ФИО)</Label>
+                  <p className="font-medium text-sm md:text-base">{(currentOrg as any).director_name || '—'}</p>
+                </div>
+                
+                <div>
+                  <Label className="text-xs md:text-sm text-slate-500">Должность директора</Label>
+                  <p className="font-medium text-sm md:text-base">{(currentOrg as any).director_position || '—'}</p>
+                </div>
+                
+                <div>
+                  <Label className="text-xs md:text-sm text-slate-500">БИК</Label>
+                  <p className="font-medium text-sm md:text-base">{(currentOrg as any).bik || '—'}</p>
+                </div>
+                
+                <div>
+                  <Label className="text-xs md:text-sm text-slate-500">Название банка</Label>
+                  <p className="font-medium text-sm md:text-base">{(currentOrg as any).bank_name || '—'}</p>
+                </div>
+                
+                <div>
+                  <Label className="text-xs md:text-sm text-slate-500">Расчётный счёт</Label>
+                  <p className="font-medium text-sm md:text-base break-all">{(currentOrg as any).payment_account || '—'}</p>
+                </div>
+                
+                <div>
+                  <Label className="text-xs md:text-sm text-slate-500">Корреспондентский счёт</Label>
+                  <p className="font-medium text-sm md:text-base break-all">{(currentOrg as any).correspondent_account || '—'}</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -276,6 +311,19 @@ export default function OrganizationPage() {
           </Card>
         )}
       </div>
+      
+      {currentOrg && (
+        <EditOrganizationDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          organization={currentOrg}
+          onSuccess={() => {
+            if (currentOrg.id) {
+              dispatch(fetchOrganizationDetail(currentOrg.id));
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

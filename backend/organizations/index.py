@@ -282,12 +282,12 @@ def update_organization(cursor, conn, user_id: str, event: dict) -> dict:
         }
     
     cursor.execute(f"""
-        SELECT organization_role FROM {SCHEMA}.users 
-        WHERE id = {user_id} AND organization_id = {org_id}
+        SELECT role FROM {SCHEMA}.user_organizations 
+        WHERE user_id = {user_id} AND organization_id = {org_id}
     """)
-    user_role = cursor.fetchone()
+    user_org_role = cursor.fetchone()
     
-    if not user_role or user_role['organization_role'] != 'admin':
+    if not user_org_role or user_org_role['role'] != 'admin':
         return {
             'statusCode': 403,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
@@ -298,6 +298,12 @@ def update_organization(cursor, conn, user_id: str, event: dict) -> dict:
     updates = []
     if 'name' in body and body['name'].strip():
         updates.append(f"name = '{body['name'].strip()}'")
+    if 'inn' in body and body['inn'].strip():
+        updates.append(f"inn = '{body['inn'].strip()}'")
+    if 'kpp' in body:
+        updates.append(f"kpp = '{body['kpp'].strip()}'")
+    if 'ogrn' in body:
+        updates.append(f"ogrn = '{body['ogrn'].strip()}'")
     if 'legal_address' in body:
         updates.append(f"legal_address = '{body['legal_address'].strip()}'")
     if 'actual_address' in body:
@@ -306,6 +312,18 @@ def update_organization(cursor, conn, user_id: str, event: dict) -> dict:
         updates.append(f"phone = '{body['phone'].strip()}'")
     if 'email' in body:
         updates.append(f"email = '{body['email'].strip()}'")
+    if 'director_name' in body:
+        updates.append(f"director_name = '{body['director_name'].strip()}'")
+    if 'director_position' in body:
+        updates.append(f"director_position = '{body['director_position'].strip()}'")
+    if 'bik' in body:
+        updates.append(f"bik = '{body['bik'].strip()}'")
+    if 'bank_name' in body:
+        updates.append(f"bank_name = '{body['bank_name'].strip()}'")
+    if 'payment_account' in body:
+        updates.append(f"payment_account = '{body['payment_account'].strip()}'")
+    if 'correspondent_account' in body:
+        updates.append(f"correspondent_account = '{body['correspondent_account'].strip()}'")
     
     if not updates:
         return {
