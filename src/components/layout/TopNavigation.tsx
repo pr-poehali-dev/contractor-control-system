@@ -174,7 +174,7 @@ export default function TopNavigation() {
                 <Icon name="User" size={16} className="mr-2" />
                 Профиль
               </DropdownMenuItem>
-              {user?.role === 'contractor' && (
+              {(user?.role === 'contractor' || user?.role === 'client') && (
                 <DropdownMenuItem onClick={() => navigate(ROUTES.ORGANIZATION)}>
                   <Icon name="Building" size={16} className="mr-2" />
                   Организация
