@@ -23,6 +23,13 @@ export interface Organization {
   name: string;
   inn: string;
   kpp?: string;
+  ogrn?: string;
+  bik?: string;
+  bank_name?: string;
+  payment_account?: string;
+  correspondent_account?: string;
+  director_name?: string;
+  director_position?: string;
   legal_address?: string;
   actual_address?: string;
   phone?: string;
@@ -100,6 +107,13 @@ export const createOrganization = createAsyncThunk(
     name: string;
     inn: string;
     kpp?: string;
+    ogrn?: string;
+    bik?: string;
+    bank_name?: string;
+    payment_account?: string;
+    correspondent_account?: string;
+    director_name?: string;
+    director_position?: string;
     legal_address?: string;
     actual_address?: string;
     phone?: string;
@@ -116,6 +130,15 @@ export const updateOrganization = createAsyncThunk(
   async (data: {
     id: number;
     name?: string;
+    inn?: string;
+    kpp?: string;
+    ogrn?: string;
+    bik?: string;
+    bank_name?: string;
+    payment_account?: string;
+    correspondent_account?: string;
+    director_name?: string;
+    director_position?: string;
     legal_address?: string;
     actual_address?: string;
     phone?: string;

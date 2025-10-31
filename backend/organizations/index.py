@@ -69,6 +69,13 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
     name = body.get('name', '').strip()
     inn = body.get('inn', '').strip()
     kpp = body.get('kpp', '').strip()
+    ogrn = body.get('ogrn', '').strip()
+    bik = body.get('bik', '').strip()
+    bank_name = body.get('bank_name', '').strip()
+    payment_account = body.get('payment_account', '').strip()
+    correspondent_account = body.get('correspondent_account', '').strip()
+    director_name = body.get('director_name', '').strip()
+    director_position = body.get('director_position', '').strip()
     legal_address = body.get('legal_address', '').strip()
     actual_address = body.get('actual_address', '').strip()
     phone = body.get('phone', '').strip()
@@ -96,14 +103,38 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
             'body': json.dumps({'error': 'Organization with this INN already exists'})
         }
     
+    ogrn_val = f"'{ogrn}'" if ogrn else 'NULL'
+    kpp_val = f"'{kpp}'" if kpp else 'NULL'
+    bik_val = f"'{bik}'" if bik else 'NULL'
+    bank_name_val = f"'{bank_name}'" if bank_name else 'NULL'
+    payment_account_val = f"'{payment_account}'" if payment_account else 'NULL'
+    correspondent_account_val = f"'{correspondent_account}'" if correspondent_account else 'NULL'
+    director_name_val = f"'{director_name}'" if director_name else 'NULL'
+    director_position_val = f"'{director_position}'" if director_position else 'NULL'
+    legal_address_val = f"'{legal_address}'" if legal_address else 'NULL'
+    actual_address_val = f"'{actual_address}'" if actual_address else 'NULL'
+    phone_val = f"'{phone}'" if phone else 'NULL'
+    email_val = f"'{email}'" if email else 'NULL'
+    
     cursor.execute(f"""
         INSERT INTO {SCHEMA}.organizations 
-        (name, inn, kpp, legal_address, actual_address, phone, email, created_by)
-        VALUES ('{name}', '{inn}', '{kpp}', '{legal_address}', '{actual_address}', '{phone}', '{email}', {user_id})
-        RETURNING id, name, inn, kpp, legal_address, actual_address, phone, email, status, created_at
+        (name, inn, kpp, ogrn, bik, bank_name, payment_account, correspondent_account, 
+         director_name, director_position, legal_address, actual_address, phone, email, created_by)
+        VALUES ('{name}', '{inn}', {kpp_val}, {ogrn_val}, {bik_val}, {bank_name_val}, {payment_account_val}, 
+                {correspondent_account_val}, {director_name_val}, {director_position_val}, 
+                {legal_address_val}, {actual_address_val}, {phone_val}, {email_val}, {user_id})
+        RETURNING id, name, inn, kpp, ogrn, bik, bank_name, payment_account, correspondent_account,
+                  director_name, director_position, legal_address, actual_address, phone, email, status, created_at
     """)
     
     organization = cursor.fetchone()
+    conn.commit()
+    
+    cursor.execute(f"""
+        UPDATE {SCHEMA}.users 
+        SET organization_id = {organization['id']}, onboarding_completed = TRUE
+        WHERE id = {user_id}
+    """)
     conn.commit()
     
     if first_user_phone:
@@ -296,6 +327,24 @@ def update_organization(cursor, conn, user_id: str, event: dict) -> dict:
     updates = []
     if 'name' in body and body['name'].strip():
         updates.append(f"name = '{body['name'].strip()}'")
+    if 'inn' in body and body['inn'].strip():
+        updates.append(f"inn = '{body['inn'].strip()}'")
+    if 'kpp' in body:
+        updates.append(f"kpp = '{body.get('kpp', '').strip()}'")
+    if 'ogrn' in body:
+        updates.append(f"ogrn = '{body.get('ogrn', '').strip()}'")
+    if 'bik' in body:
+        updates.append(f"bik = '{body.get('bik', '').strip()}'")
+    if 'bank_name' in body:
+        updates.append(f"bank_name = '{body.get('bank_name', '').strip()}'")
+    if 'payment_account' in body:
+        updates.append(f"payment_account = '{body.get('payment_account', '').strip()}'")
+    if 'correspondent_account' in body:
+        updates.append(f"correspondent_account = '{body.get('correspondent_account', '').strip()}'")
+    if 'director_name' in body:
+        updates.append(f"director_name = '{body.get('director_name', '').strip()}'")
+    if 'director_position' in body:
+        updates.append(f"director_position = '{body.get('director_position', '').strip()}'")
     if 'legal_address' in body:
         updates.append(f"legal_address = '{body['legal_address'].strip()}'")
     if 'actual_address' in body:

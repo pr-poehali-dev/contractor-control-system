@@ -35,6 +35,7 @@ export const ROUTES = {
   DOCUMENT_TEMPLATES: '/document-templates',
   DOCUMENT_TEMPLATE_EDITOR: (templateId: string | number) => `/document-templates/${templateId}`,
   ORGANIZATION: '/organization',
+  CLIENT_ONBOARDING: '/onboarding',
   NOT_FOUND: '*'
 } as const;
 

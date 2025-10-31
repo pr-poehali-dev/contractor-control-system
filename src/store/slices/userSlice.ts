@@ -9,6 +9,8 @@ export interface User {
   email?: string;
   phone?: string;
   organization?: string;
+  organization_id?: number;
+  onboarding_completed?: boolean;
   avatar_url?: string;
   created_at?: string;
 }

@@ -138,28 +138,38 @@ const Profile = () => {
                 </Button>
               </>
             ) : (
-              <div className="grid grid-cols-3 gap-4 md:gap-8">
-                <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
-                    {getRatingData(user?.role, reliabilityRating, qualityRating).primary.value}%
+              <>
+                <div className="grid grid-cols-3 gap-4 md:gap-8">
+                  <div className="text-center">
+                    <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
+                      {getRatingData(user?.role, reliabilityRating, qualityRating).primary.value}%
+                    </div>
+                    <p className="text-xs md:text-sm text-slate-600">
+                      {getRatingData(user?.role, reliabilityRating, qualityRating).primary.label}
+                    </p>
                   </div>
-                  <p className="text-xs md:text-sm text-slate-600">
-                    {getRatingData(user?.role, reliabilityRating, qualityRating).primary.label}
-                  </p>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
-                    {getRatingData(user?.role, reliabilityRating, qualityRating).secondary.value}%
+                  <div className="text-center">
+                    <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
+                      {getRatingData(user?.role, reliabilityRating, qualityRating).secondary.value}%
+                    </div>
+                    <p className="text-xs md:text-sm text-slate-600">
+                      {getRatingData(user?.role, reliabilityRating, qualityRating).secondary.label}
+                    </p>
                   </div>
-                  <p className="text-xs md:text-sm text-slate-600">
-                    {getRatingData(user?.role, reliabilityRating, qualityRating).secondary.label}
-                  </p>
+                  <div className="text-center">
+                    <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">{daysInSystem}</div>
+                    <p className="text-xs md:text-sm text-slate-600">дней в системе</p>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">{daysInSystem}</div>
-                  <p className="text-xs md:text-sm text-slate-600">дней в системе</p>
-                </div>
-              </div>
+                <Button 
+                  onClick={() => navigate(ROUTES.CLIENT_ONBOARDING)}
+                  variant="outline"
+                  className="w-full mt-6"
+                >
+                  <Icon name="Building2" size={18} className="mr-2" />
+                  Реквизиты организации
+                </Button>
+              </>
             )}
           </CardContent>
         </Card>
