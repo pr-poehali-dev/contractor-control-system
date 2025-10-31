@@ -18,8 +18,13 @@ const ClientOnboarding = () => {
   const { user } = useAuthRedux();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [userData, setUserData] = useState({
+    name: '',
+    email: '',
+    phone: ''
+  });
   const [formData, setFormData] = useState({
     name: '',
     inn: '',
@@ -41,10 +46,22 @@ const ClientOnboarding = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleUserChange = (field: string, value: string) => {
+    setUserData(prev => ({ ...prev, [field]: value }));
+  };
+
   useEffect(() => {
     if (user?.onboarding_completed && user?.role === 'client' && !user?.organization_id) {
       navigate(ROUTES.OBJECTS);
       return;
+    }
+
+    if (user) {
+      setUserData({
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || ''
+      });
     }
 
     if (user?.organization_id) {
@@ -90,6 +107,11 @@ const ClientOnboarding = () => {
   };
 
   const handleSubmit = async () => {
+    if (!userData.name) {
+      alert('Пожалуйста, заполните ваше имя');
+      return;
+    }
+
     if (!formData.name || !formData.inn) {
       alert('Пожалуйста, заполните обязательные поля: Название организации и ИНН');
       return;
@@ -97,22 +119,25 @@ const ClientOnboarding = () => {
 
     setIsSubmitting(true);
     try {
+      await dispatch(updateProfile(userData)).unwrap();
+
       if (isEditMode && user?.organization_id) {
         await dispatch(updateOrganization({ id: user.organization_id, ...formData })).unwrap();
-        alert('Данные организации успешно обновлены');
+        alert('Данные успешно обновлены');
         navigate(ROUTES.PROFILE);
       } else {
         await dispatch(createOrganization({ ...formData, type: 'client' })).unwrap();
         navigate(ROUTES.OBJECTS);
       }
     } catch (error) {
-      console.error('Failed to save organization:', error);
-      alert('Ошибка при сохранении данных организации');
+      console.error('Failed to save data:', error);
+      alert('Ошибка при сохранении данных');
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const isStep0Valid = userData.name;
   const isStep1Valid = formData.name && formData.inn;
   const isStep2Valid = formData.legal_address;
 
@@ -144,6 +169,7 @@ const ClientOnboarding = () => {
           </p>
           
           <div className="flex items-center justify-center gap-2 mt-6">
+            <div className={`h-2 w-20 rounded-full ${currentStep >= 0 ? 'bg-blue-500' : 'bg-slate-200'}`} />
             <div className={`h-2 w-20 rounded-full ${currentStep >= 1 ? 'bg-blue-500' : 'bg-slate-200'}`} />
             <div className={`h-2 w-20 rounded-full ${currentStep >= 2 ? 'bg-blue-500' : 'bg-slate-200'}`} />
             <div className={`h-2 w-20 rounded-full ${currentStep >= 3 ? 'bg-blue-500' : 'bg-slate-200'}`} />
@@ -151,6 +177,48 @@ const ClientOnboarding = () => {
         </CardHeader>
 
         <CardContent className="space-y-6">
+          {currentStep === 0 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                Информация о вас
+              </h3>
+              
+              <div>
+                <Label htmlFor="user_name">Ваше имя *</Label>
+                <Input
+                  id="user_name"
+                  value={userData.name}
+                  onChange={(e) => handleUserChange('name', e.target.value)}
+                  placeholder="Иван Иванов"
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="user_email">Email</Label>
+                <Input
+                  id="user_email"
+                  type="email"
+                  value={userData.email}
+                  onChange={(e) => handleUserChange('email', e.target.value)}
+                  placeholder="ivan@example.com"
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="user_phone">Телефон</Label>
+                <Input
+                  id="user_phone"
+                  value={userData.phone}
+                  onChange={(e) => handleUserChange('phone', e.target.value)}
+                  placeholder="+7 (999) 123-45-67"
+                  className="mt-1"
+                />
+              </div>
+            </div>
+          )}
+
           {currentStep === 1 && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-slate-900 mb-4">
@@ -341,7 +409,7 @@ const ClientOnboarding = () => {
           )}
 
           <div className="flex justify-between pt-4 border-t">
-            {currentStep === 1 ? (
+            {currentStep === 0 ? (
               isEditMode ? (
                 <Button
                   variant="ghost"
@@ -372,7 +440,10 @@ const ClientOnboarding = () => {
             {currentStep < 3 ? (
               <Button
                 onClick={() => setCurrentStep(currentStep + 1)}
-                disabled={currentStep === 1 && !isStep1Valid}
+                disabled={
+                  (currentStep === 0 && !isStep0Valid) ||
+                  (currentStep === 1 && !isStep1Valid)
+                }
               >
                 Далее
                 <Icon name="ChevronRight" size={16} className="ml-1" />
@@ -380,7 +451,7 @@ const ClientOnboarding = () => {
             ) : (
               <Button
                 onClick={handleSubmit}
-                disabled={isSubmitting || !isStep1Valid}
+                disabled={isSubmitting || !isStep0Valid || !isStep1Valid}
               >
                 {isSubmitting ? 'Сохранение...' : (isEditMode ? 'Сохранить' : 'Завершить')}
                 <Icon name="Check" size={16} className="ml-1" />
@@ -388,7 +459,7 @@ const ClientOnboarding = () => {
             )}
           </div>
 
-          {currentStep === 1 && (
+          {(currentStep === 0 || currentStep === 1) && (
             <p className="text-xs text-slate-500 text-center">
               * Обязательные поля
             </p>
