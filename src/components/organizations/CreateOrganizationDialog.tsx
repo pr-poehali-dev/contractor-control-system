@@ -81,10 +81,14 @@ export default function CreateOrganizationDialog({
             ...error.existing_organization,
             already_linked: error.already_linked
           });
-          console.log('🔔 Setting showConflictDialog to true...');
-          // Показываем AlertDialog БЕЗ закрытия основного диалога
-          setShowConflictDialog(true);
-          console.log('✅ showConflictDialog set to true');
+          console.log('🔔 Closing main dialog and showing conflict dialog...');
+          // Сначала закрываем основной диалог
+          onOpenChange(false);
+          // Затем показываем AlertDialog
+          setTimeout(() => {
+            setShowConflictDialog(true);
+            console.log('✅ Conflict dialog shown');
+          }, 100);
         } else {
           console.error('❌ Organization creation failed:', result.error);
           alert(`Ошибка: ${error?.error || 'Не удалось создать организацию'}`);
