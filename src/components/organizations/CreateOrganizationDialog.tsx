@@ -55,7 +55,9 @@ export default function CreateOrganizationDialog({
   const [showConflictDialog, setShowConflictDialog] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('🚀 handleSubmit called, preventing default...');
     e.preventDefault();
+    e.stopPropagation();
     
     console.log('📤 Submitting organization:', formData);
     
