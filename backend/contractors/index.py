@@ -311,12 +311,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             cur.execute(
                 """
-                SELECT c.id, c.name, c.inn, c.contact_info, cc.added_at,
-                       u.email, u.phone, u.name as user_name
-                FROM t_p8942561_contractor_control_s.contractors c
-                INNER JOIN t_p8942561_contractor_control_s.client_contractors cc ON c.id = cc.contractor_id
-                LEFT JOIN t_p8942561_contractor_control_s.users u ON c.user_id = u.id
-                WHERE cc.client_id = %s
+                SELECT 
+                    o.id, 
+                    o.name, 
+                    o.inn, 
+                    o.phone as contact_info, 
+                    cc.added_at,
+                    o.email,
+                    o.phone,
+                    (SELECT COUNT(*) FROM t_p8942561_contractor_control_s.works WHERE contractor_id = o.id) as works_count,
+                    o.status,
+                    o.created_at
+                FROM t_p8942561_contractor_control_s.organizations o
+                INNER JOIN t_p8942561_contractor_control_s.client_contractors cc ON o.id = cc.contractor_id
+                WHERE cc.client_id = %s AND o.type = 'contractor'
                 ORDER BY cc.added_at DESC
                 """,
                 (client_id,)
@@ -331,10 +339,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'inn': contractor[2],
                     'contact_info': contractor[3],
                     'added_at': contractor[4].isoformat() if contractor[4] else None,
+                    'email': contractor[5],
+                    'phone': contractor[6],
+                    'works_count': contractor[7],
+                    'status': contractor[8],
+                    'created_at': contractor[9].isoformat() if contractor[9] else None,
                     'user': {
                         'email': contractor[5],
                         'phone': contractor[6],
-                        'name': contractor[7]
+                        'name': contractor[1]
                     } if contractor[5] or contractor[6] else None
                 })
             

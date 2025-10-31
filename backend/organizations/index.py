@@ -192,6 +192,14 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
         
         organization['invite'] = dict(invite)
         organization['invited_user_id'] = invited_user_id
+        
+        # Добавляем подрядчика в список заказчика
+        cursor.execute(f"""
+            INSERT INTO {SCHEMA}.client_contractors (client_id, contractor_id, added_at)
+            VALUES ({user_id}, {organization['id']}, NOW())
+            ON CONFLICT (client_id, contractor_id) DO NOTHING
+        """)
+        conn.commit()
     
     # Получаем полную информацию об организации с подсчётами
     cursor.execute(f"""
