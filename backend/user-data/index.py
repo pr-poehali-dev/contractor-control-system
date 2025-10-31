@@ -444,6 +444,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if contractor_result:
                 user_contractor_id = contractor_result['contractor_id']
         
+        # Получаем организацию пользователя ПЕРЕД закрытием соединения
+        organization = None
+        if user.get('organization_id'):
+            cur.execute(f"""
+                SELECT id, name, inn, kpp, legal_address, actual_address, director, phone, email, type, created_at
+                FROM {SCHEMA}.organizations
+                WHERE id = {user['organization_id']}
+            """)
+            org_row = cur.fetchone()
+            if org_row:
+                organization = dict(org_row)
+        
         # Строим иерархию данных
         objects_with_works = build_hierarchy(
             objects, works, inspections, remarks, work_logs, 
@@ -463,6 +475,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'workTemplates': [dict(wt) for wt in work_templates],
                 'unreadCounts': unread_counts,
                 'contractorId': user_contractor_id,
+                'organization': organization,
                 'user': {
                     'id': user['id'],
                     'name': user['name'],
