@@ -477,9 +477,9 @@ def link_organization(cursor, conn, user_id: str, event: dict) -> dict:
             'body': json.dumps({'error': 'Organization not found'})
         }
     
-    # Добавляем связь между клиентом и подрядчиком в contractor_links
+    # Добавляем связь между клиентом и подрядчиком
     cursor.execute(f"""
-        INSERT INTO {SCHEMA}.contractor_links (client_id, contractor_id, created_at)
+        INSERT INTO {SCHEMA}.client_contractors (client_id, contractor_id, added_at)
         VALUES ({user_id}, {org_id}, NOW())
         ON CONFLICT (client_id, contractor_id) DO NOTHING
     """)
