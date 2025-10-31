@@ -313,8 +313,15 @@ export const verifyToken = createAsyncThunk(
         throw new Error(response.error || 'Token invalid');
       }
 
+      // Обновляем данные пользователя из ответа
+      const userData = response.data?.user;
+      if (userData) {
+        localStorage.setItem('user', JSON.stringify(userData));
+        console.log('✅ verifyToken: User data updated:', userData);
+      }
+
       console.log('✅ verifyToken: Token valid');
-      return true;
+      return userData || true;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Token verification failed';
       const status = (error as any)?.response?.status;
@@ -463,10 +470,14 @@ const userSlice = createSlice({
       .addCase(verifyToken.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(verifyToken.fulfilled, (state) => {
+      .addCase(verifyToken.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = true;
         state.error = null;
+        // Обновляем данные пользователя если они пришли
+        if (action.payload && typeof action.payload === 'object') {
+          state.user = action.payload as User;
+        }
       })
       .addCase(verifyToken.rejected, (state) => {
         state.isLoading = false;
