@@ -87,9 +87,9 @@ export default function CreateOrganizationDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
+        <form onSubmit={handleSubmit} className="space-y-5 py-4">
+          <div className="space-y-4">
+            <div>
               <Label htmlFor="name">
                 Название организации <span className="text-red-500">*</span>
               </Label>
@@ -117,69 +117,8 @@ export default function CreateOrganizationDialog({
             </div>
 
             <div>
-              <Label htmlFor="kpp">КПП</Label>
-              <Input
-                id="kpp"
-                value={formData.kpp}
-                onChange={(e) => setFormData({ ...formData, kpp: e.target.value })}
-                placeholder="770701001"
-                maxLength={9}
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <Label htmlFor="legal_address">Юридический адрес</Label>
-              <Textarea
-                id="legal_address"
-                value={formData.legal_address}
-                onChange={(e) => setFormData({ ...formData, legal_address: e.target.value })}
-                placeholder="г. Москва, ул. Ленина, д. 1"
-                rows={2}
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <Label htmlFor="actual_address">Фактический адрес</Label>
-              <Textarea
-                id="actual_address"
-                value={formData.actual_address}
-                onChange={(e) => setFormData({ ...formData, actual_address: e.target.value })}
-                placeholder="г. Москва, ул. Ленина, д. 1"
-                rows={2}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="phone">Телефон</Label>
-              <Input
-                id="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="+7 (495) 123-45-67"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="info@stroitech.ru"
-              />
-            </div>
-          </div>
-
-          <div className="border-t pt-4 mt-6">
-            <h4 className="font-semibold mb-3 flex items-center gap-2">
-              <Icon name="UserPlus" size={18} />
-              Пригласить первого сотрудника
-            </h4>
-            <div>
               <Label htmlFor="first_user_phone">
-                Мобильный телефон первого сотрудника (станет администратором)
+                Телефон первого сотрудника <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="first_user_phone"
@@ -187,9 +126,10 @@ export default function CreateOrganizationDialog({
                 value={formData.first_user_phone}
                 onChange={(e) => setFormData({ ...formData, first_user_phone: e.target.value })}
                 placeholder="+7 (999) 123-45-67"
+                required
               />
-              <p className="text-sm text-slate-500 mt-1">
-                На этот номер будет отправлено SMS с кодом приглашения. После регистрации этот пользователь получит роль администратора.
+              <p className="text-sm text-slate-500 mt-1.5">
+                На этот номер будет отправлено SMS с кодом приглашения
               </p>
             </div>
           </div>
