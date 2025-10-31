@@ -75,7 +75,10 @@ export default function CreateOrganizationDialog({
         // Если организация уже существует (409)
         if (error?.existing_organization) {
           console.log('⚠️ Organization already exists:', error.existing_organization);
-          setExistingOrg(error.existing_organization);
+          setExistingOrg({
+            ...error.existing_organization,
+            already_linked: error.already_linked
+          });
           setShowConflictDialog(true);
         } else {
           console.error('❌ Organization creation failed:', result.error);
@@ -203,27 +206,56 @@ export default function CreateOrganizationDialog({
     <AlertDialog open={showConflictDialog} onOpenChange={setShowConflictDialog}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Организация уже существует</AlertDialogTitle>
+          <AlertDialogTitle>
+            {existingOrg?.already_linked ? 'Организация уже добавлена' : 'Организация уже существует'}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            Организация с ИНН <strong>{existingOrg?.inn}</strong> уже зарегистрирована в системе:
-            <div className="mt-3 p-3 bg-slate-50 rounded-lg">
-              <p className="font-semibold text-slate-900">{existingOrg?.name}</p>
-              <p className="text-sm text-slate-600 mt-1">ИНН: {existingOrg?.inn}</p>
-              {existingOrg?.legal_address && (
-                <p className="text-sm text-slate-600">Адрес: {existingOrg.legal_address}</p>
-              )}
-            </div>
-            <p className="mt-3">Хотите добавить эту организацию в ваш список подрядчиков?</p>
+            {existingOrg?.already_linked ? (
+              <>
+                <p>Организация <strong>{existingOrg?.name}</strong> (ИНН: {existingOrg?.inn}) уже добавлена в ваш список подрядчиков.</p>
+                <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <p className="font-semibold text-slate-900">{existingOrg?.name}</p>
+                  <p className="text-sm text-slate-600 mt-1">ИНН: {existingOrg?.inn}</p>
+                  {existingOrg?.legal_address && (
+                    <p className="text-sm text-slate-600">Адрес: {existingOrg.legal_address}</p>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                Организация с ИНН <strong>{existingOrg?.inn}</strong> уже зарегистрирована в системе:
+                <div className="mt-3 p-3 bg-slate-50 rounded-lg">
+                  <p className="font-semibold text-slate-900">{existingOrg?.name}</p>
+                  <p className="text-sm text-slate-600 mt-1">ИНН: {existingOrg?.inn}</p>
+                  {existingOrg?.legal_address && (
+                    <p className="text-sm text-slate-600">Адрес: {existingOrg.legal_address}</p>
+                  )}
+                </div>
+                <p className="mt-3">Хотите добавить эту организацию в ваш список подрядчиков?</p>
+              </>
+            )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => {
-            setShowConflictDialog(false);
-            setExistingOrg(null);
-          }}>Отмена</AlertDialogCancel>
-          <AlertDialogAction onClick={handleLinkExisting}>
-            Добавить подрядчика
-          </AlertDialogAction>
+          {existingOrg?.already_linked ? (
+            <AlertDialogAction onClick={() => {
+              setShowConflictDialog(false);
+              setExistingOrg(null);
+              onOpenChange(false);
+            }}>
+              Понятно
+            </AlertDialogAction>
+          ) : (
+            <>
+              <AlertDialogCancel onClick={() => {
+                setShowConflictDialog(false);
+                setExistingOrg(null);
+              }}>Отмена</AlertDialogCancel>
+              <AlertDialogAction onClick={handleLinkExisting}>
+                Добавить подрядчика
+              </AlertDialogAction>
+            </>
+          )}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

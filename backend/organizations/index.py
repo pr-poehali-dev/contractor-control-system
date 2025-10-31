@@ -96,7 +96,7 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
     existing = cursor.fetchone()
     
     if existing:
-        # Организация с таким ИНН уже существует - возвращаем 409 Conflict
+        # Организация с таким ИНН уже существует
         org_id = existing['id']
         cursor.execute(f"""
             SELECT id, name, inn, kpp, legal_address, actual_address, phone, email, type, status, created_at
@@ -104,15 +104,37 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
         """)
         organization = cursor.fetchone()
         
-        return {
-            'statusCode': 409,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'isBase64Encoded': False,
-            'body': json.dumps({
-                'error': 'Organization with this INN already exists',
-                'existing_organization': dict(organization)
-            }, default=str)
-        }
+        # Проверяем, добавлена ли эта организация уже в подрядчики текущего пользователя
+        cursor.execute(f"""
+            SELECT id FROM {SCHEMA}.contractor_links 
+            WHERE client_id = {user_id} AND contractor_id = {org_id}
+        """)
+        already_linked = cursor.fetchone()
+        
+        if already_linked:
+            # Организация уже добавлена в подрядчики
+            return {
+                'statusCode': 409,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'isBase64Encoded': False,
+                'body': json.dumps({
+                    'error': 'Organization already in your contractors list',
+                    'existing_organization': dict(organization),
+                    'already_linked': True
+                }, default=str)
+            }
+        else:
+            # Организация существует, но не добавлена - предлагаем добавить
+            return {
+                'statusCode': 409,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'isBase64Encoded': False,
+                'body': json.dumps({
+                    'error': 'Organization with this INN already exists',
+                    'existing_organization': dict(organization),
+                    'already_linked': False
+                }, default=str)
+            }
     
     # Создаём новую организацию с типом 'contractor'
     kpp_val = f"'{kpp}'" if kpp else 'NULL'
