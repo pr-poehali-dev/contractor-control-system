@@ -28,6 +28,7 @@ export interface Organization {
   phone?: string;
   email?: string;
   status: string;
+  type?: 'client' | 'contractor';
   created_by: number;
   created_at: string;
   updated_at: string;

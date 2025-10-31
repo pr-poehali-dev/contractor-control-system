@@ -19,10 +19,13 @@ import { Badge } from '@/components/ui/badge';
 const Contractors = () => {
   const { isAuthenticated, user } = useAuthRedux();
   const dispatch = useAppDispatch();
-  const organizations = useAppSelector(selectOrganizations);
+  const allOrganizations = useAppSelector(selectOrganizations);
   const loading = useAppSelector(selectOrganizationsLoading);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
+  
+  // Фильтруем только подрядные организации (type = 'contractor')
+  const organizations = allOrganizations.filter(org => org.type === 'contractor');
 
   useEffect(() => {
     if (isAuthenticated) {
