@@ -85,9 +85,11 @@ def handler(event, context):
         
         # Создаём пустую организацию для нового клиента
         if role == 'client':
+            # Генерируем временный уникальный ИНН на основе ID пользователя
+            temp_inn = f'{user_id:010d}'  # Форматируем user_id как 10-значное число
             cur.execute(f"""
                 INSERT INTO {SCHEMA}.organizations (name, inn, type, created_at)
-                VALUES ('Новая организация', '0000000000', 'client', NOW())
+                VALUES ('Новая организация', '{temp_inn}', 'client', NOW())
                 RETURNING id
             """)
             org = cur.fetchone()
