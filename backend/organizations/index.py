@@ -123,10 +123,16 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
         }
     
     # Создаём новую организацию с типом 'contractor'
+    kpp_val = f"'{kpp}'" if kpp else 'NULL'
+    legal_addr_val = f"'{legal_address}'" if legal_address else 'NULL'
+    actual_addr_val = f"'{actual_address}'" if actual_address else 'NULL'
+    phone_val = f"'{phone}'" if phone else 'NULL'
+    email_val = f"'{email}'" if email else 'NULL'
+    
     cursor.execute(f"""
         INSERT INTO {SCHEMA}.organizations 
         (name, inn, kpp, legal_address, actual_address, phone, email, type, created_at)
-        VALUES ('{name}', '{inn}', '{kpp}', '{legal_address}', '{actual_address}', '{phone}', '{email}', 'contractor', NOW())
+        VALUES ('{name}', '{inn}', {kpp_val}, {legal_addr_val}, {actual_addr_val}, {phone_val}, {email_val}, 'contractor', NOW())
         RETURNING id, name, inn, kpp, legal_address, actual_address, phone, email, type, status, created_at
     """)
     
