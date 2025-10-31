@@ -440,7 +440,12 @@ const userSlice = createSlice({
       })
       .addCase(loadUserData.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.userData = action.payload;
+        // Маппинг camelCase -> snake_case для совместимости
+        const payload = action.payload as any;
+        if (payload.workTemplates && !payload.work_templates) {
+          payload.work_templates = payload.workTemplates;
+        }
+        state.userData = payload;
         if (action.payload?.user) {
           state.user = action.payload.user;
           localStorage.setItem('user', JSON.stringify(action.payload.user));
