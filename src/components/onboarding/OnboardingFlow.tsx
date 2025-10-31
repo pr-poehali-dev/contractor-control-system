@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import OnboardingTour from './OnboardingTour';
 import ProUpgradeModal from './ProUpgradeModal';
+import { ROUTES } from '@/constants/routes';
 
 interface OnboardingFlowProps {
   userId: number;
@@ -12,6 +14,7 @@ interface OnboardingFlowProps {
 }
 
 const OnboardingFlow = ({ userId, userRole, registrationDate }: OnboardingFlowProps) => {
+  const navigate = useNavigate();
   const [showWelcome, setShowWelcome] = useState(false);
   const [showTour, setShowTour] = useState(false);
   const [showProUpgrade, setShowProUpgrade] = useState(false);
@@ -23,7 +26,11 @@ const OnboardingFlow = ({ userId, userRole, registrationDate }: OnboardingFlowPr
     const hasSeenProOffer = localStorage.getItem(`pro_offer_shown_${userId}`);
     
     if (!hasSeenOnboarding) {
-      setTimeout(() => setShowWelcome(true), 500);
+      if (userRole === 'contractor') {
+        navigate(ROUTES.ONBOARDING);
+      } else {
+        setTimeout(() => setShowWelcome(true), 500);
+      }
     } else if (!hasSeenProOffer && registrationDate && userRole === 'client') {
       const regDate = new Date(registrationDate);
       const now = new Date();
@@ -33,7 +40,7 @@ const OnboardingFlow = ({ userId, userRole, registrationDate }: OnboardingFlowPr
         setTimeout(() => setShowProUpgrade(true), 1000);
       }
     }
-  }, [userId, userRole, registrationDate]);
+  }, [userId, userRole, registrationDate, navigate]);
 
   const handleStartTour = () => {
     setShowWelcome(false);

@@ -51,8 +51,8 @@ const ClientOnboarding = () => {
   };
 
   useEffect(() => {
-    if (user?.onboarding_completed && user?.role === 'client' && !user?.organization_id) {
-      navigate(ROUTES.OBJECTS);
+    if (user?.onboarding_completed && (user?.role === 'client' || user?.role === 'contractor') && !user?.organization_id) {
+      navigate(user.role === 'client' ? ROUTES.OBJECTS : ROUTES.MY_WORKS);
       return;
     }
 
@@ -99,10 +99,13 @@ const ClientOnboarding = () => {
   const handleSkip = async () => {
     try {
       await dispatch(updateProfile({ onboarding_completed: true })).unwrap();
-      navigate(ROUTES.OBJECTS);
+      if (user?.id) {
+        localStorage.setItem(`onboarding_v2_${user.id}`, 'skipped');
+      }
+      navigate(user?.role === 'client' ? ROUTES.OBJECTS : ROUTES.MY_WORKS);
     } catch (error) {
       console.error('Failed to skip onboarding:', error);
-      navigate(ROUTES.OBJECTS);
+      navigate(user?.role === 'client' ? ROUTES.OBJECTS : ROUTES.MY_WORKS);
     }
   };
 
@@ -123,11 +126,14 @@ const ClientOnboarding = () => {
 
       if (user?.organization_id) {
         await dispatch(updateOrganization({ id: user.organization_id, ...formData })).unwrap();
+        if (user?.id) {
+          localStorage.setItem(`onboarding_v2_${user.id}`, 'completed');
+        }
         if (isEditMode) {
           alert('Данные успешно обновлены');
           navigate(ROUTES.PROFILE);
         } else {
-          navigate(ROUTES.OBJECTS);
+          navigate(user?.role === 'client' ? ROUTES.OBJECTS : ROUTES.MY_WORKS);
         }
       } else {
         alert('Организация не найдена. Обратитесь к администратору.');
