@@ -140,13 +140,14 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
     conn.commit()
     
     if first_user_phone:
-        token = secrets.token_urlsafe(32)
+        token = secrets.token_urlsafe(16)
         expires_at = datetime.now() + timedelta(days=7)
+        placeholder_email = f"invite_{organization['id']}@temp.local"
         
         cursor.execute(f"""
             INSERT INTO {SCHEMA}.organization_invites 
-            (organization_id, phone, invited_by, token, expires_at)
-            VALUES ({organization['id']}, '{first_user_phone}', {user_id}, '{token}', '{expires_at.isoformat()}')
+            (organization_id, email, phone, invited_by, token, expires_at)
+            VALUES ({organization['id']}, '{placeholder_email}', '{first_user_phone}', {user_id}, '{token}', '{expires_at.isoformat()}')
             RETURNING id, phone, token, expires_at
         """)
         
