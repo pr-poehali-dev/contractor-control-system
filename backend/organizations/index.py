@@ -272,11 +272,11 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
             SELECT w.id, w.title as name, w.status, w.start_date, w.end_date,
                    w.completion_percentage as progress, w.created_at,
                    o.id as object_id, o.title as object_name, o.address as object_address,
-                   c.name as contractor_name, c.id as contractor_id
+                   org.name as contractor_name, org.id as contractor_id
             FROM {SCHEMA}.works w
-            JOIN {SCHEMA}.contractors c ON w.contractor_id = c.id
+            JOIN {SCHEMA}.organizations org ON w.contractor_id = org.id
             JOIN {SCHEMA}.objects o ON w.object_id = o.id
-            WHERE c.organization_id = {org_id}
+            WHERE w.contractor_id = {org_id}
             ORDER BY w.created_at DESC
         """)
         works = cursor.fetchall()

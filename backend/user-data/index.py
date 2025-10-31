@@ -172,11 +172,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             cur.execute(f"""
                 SELECT w.id, w.title, w.description, w.object_id, w.contractor_id,
-                       c.name as contractor_name, w.status, w.start_date, w.end_date,
+                       o.name as contractor_name, w.status, w.start_date, w.end_date,
                        w.planned_start_date, w.planned_end_date, w.completion_percentage,
                        w.created_at, w.updated_at
                 FROM {SCHEMA}.works w
-                LEFT JOIN {SCHEMA}.contractors c ON w.contractor_id = c.id
+                LEFT JOIN {SCHEMA}.organizations o ON w.contractor_id = o.id
                 ORDER BY w.created_at DESC
             """)
             works = cur.fetchall()
@@ -204,11 +204,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 cur.execute(f"""
                     SELECT w.id, w.title, w.description, w.object_id, w.contractor_id,
-                           c.name as contractor_name, w.status, w.start_date, w.end_date,
+                           o.name as contractor_name, w.status, w.start_date, w.end_date,
                            w.planned_start_date, w.planned_end_date, w.completion_percentage,
                            w.created_at, w.updated_at
                     FROM {SCHEMA}.works w
-                    LEFT JOIN {SCHEMA}.contractors c ON w.contractor_id = c.id
+                    LEFT JOIN {SCHEMA}.organizations o ON w.contractor_id = o.id
                     WHERE w.contractor_id = {contractor_id}
                     ORDER BY w.created_at DESC
                 """)
@@ -231,11 +231,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 object_ids_str = ','.join(str(oid) for oid in object_ids)
                 cur.execute(f"""
                     SELECT w.id, w.title, w.description, w.object_id, w.contractor_id,
-                           c.name as contractor_name, w.status, w.start_date, w.end_date,
+                           o.name as contractor_name, w.status, w.start_date, w.end_date,
                            w.planned_start_date, w.planned_end_date, w.completion_percentage,
                            w.created_at, w.updated_at
                     FROM {SCHEMA}.works w
-                    LEFT JOIN {SCHEMA}.contractors c ON w.contractor_id = c.id
+                    LEFT JOIN {SCHEMA}.organizations o ON w.contractor_id = o.id
                     WHERE w.object_id IN ({object_ids_str})
                     ORDER BY w.created_at DESC
                 """)
@@ -329,9 +329,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     SELECT rem.id, rem.defect_report_id, rem.defect_id, rem.contractor_id,
                            rem.remediation_description, rem.remediation_photos, rem.status,
                            rem.created_at, rem.completed_at, rem.verified_at, rem.verified_by,
-                           c.name as contractor_name
+                           o.name as contractor_name
                     FROM {SCHEMA}.defect_remediations rem
-                    LEFT JOIN {SCHEMA}.contractors c ON rem.contractor_id = c.id
+                    LEFT JOIN {SCHEMA}.organizations o ON rem.contractor_id = o.id
                     WHERE rem.defect_report_id IN ({report_ids_str})
                     ORDER BY rem.created_at DESC
                 """)
@@ -340,18 +340,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         # Загружаем contractors для пользователя
         if role == 'admin':
             cur.execute(f"""
-                SELECT id, name, inn, contact_info, phone, email, user_id, created_at
-                FROM {SCHEMA}.contractors
+                SELECT id, name, inn, phone as contact_info, phone, email, created_at
+                FROM {SCHEMA}.organizations
+                WHERE type = 'contractor'
                 ORDER BY name
             """)
             contractors = cur.fetchall()
         else:
             cur.execute(f"""
-                SELECT DISTINCT c.id, c.name, c.inn, c.contact_info, c.phone, c.email, c.user_id, c.created_at
-                FROM {SCHEMA}.contractors c
-                LEFT JOIN {SCHEMA}.client_contractors cc ON c.id = cc.contractor_id
-                WHERE cc.client_id = {user_id} OR c.user_id = {user_id}
-                ORDER BY c.name
+                SELECT DISTINCT o.id, o.name, o.inn, o.phone as contact_info, o.phone, o.email, o.created_at
+                FROM {SCHEMA}.organizations o
+                LEFT JOIN {SCHEMA}.client_contractors cc ON o.id = cc.contractor_id
+                WHERE (cc.client_id = {user_id} OR o.id IN (
+                    SELECT organization_id FROM {SCHEMA}.user_organizations WHERE user_id = {user_id}
+                )) AND o.type = 'contractor'
+                ORDER BY o.name
             """)
             contractors = cur.fetchall()
         
