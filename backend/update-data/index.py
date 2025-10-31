@@ -431,9 +431,15 @@ def handler(event, context):
         import traceback
         error_trace = traceback.format_exc()
         print(f"ERROR: {error_trace}")
-        conn.rollback()
-        cur.close()
-        conn.close()
+        try:
+            if conn and not conn.closed:
+                conn.rollback()
+            if cur and not cur.closed:
+                cur.close()
+            if conn and not conn.closed:
+                conn.close()
+        except:
+            pass
         return {
             'statusCode': 500,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
