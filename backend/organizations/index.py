@@ -140,6 +140,42 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
     conn.commit()
     
     if first_user_phone:
+        # Проверяем, существует ли пользователь с таким телефоном
+        cursor.execute(f"""
+            SELECT id FROM {SCHEMA}.users WHERE phone = '{first_user_phone}'
+        """)
+        existing_user = cursor.fetchone()
+        
+        if existing_user:
+            invited_user_id = existing_user['id']
+        else:
+            # Создаём нового пользователя-подрядчика
+            cursor.execute(f"""
+                INSERT INTO {SCHEMA}.users 
+                (phone, name, role, organization_id, organization_role, onboarding_completed, created_at)
+                VALUES ('{first_user_phone}', 'Новый пользователь', 'contractor', {organization['id']}, 'admin', false, NOW())
+                RETURNING id
+            """)
+            new_user = cursor.fetchone()
+            invited_user_id = new_user['id']
+            conn.commit()
+        
+        # Привязываем пользователя к организации в user_organizations
+        cursor.execute(f"""
+            SELECT id FROM {SCHEMA}.user_organizations 
+            WHERE user_id = {invited_user_id} AND organization_id = {organization['id']}
+        """)
+        link_exists = cursor.fetchone()
+        
+        if not link_exists:
+            cursor.execute(f"""
+                INSERT INTO {SCHEMA}.user_organizations 
+                (user_id, organization_id, role, created_at)
+                VALUES ({invited_user_id}, {organization['id']}, 'admin', NOW())
+            """)
+            conn.commit()
+        
+        # Создаём приглашение с токеном для первого входа
         token = secrets.token_urlsafe(16)
         expires_at = datetime.now() + timedelta(days=7)
         placeholder_email = f"invite_{organization['id']}@temp.local"
@@ -155,6 +191,7 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
         conn.commit()
         
         organization['invite'] = dict(invite)
+        organization['invited_user_id'] = invited_user_id
     
     return {
         'statusCode': 200,
