@@ -1,11 +1,11 @@
 {
   "tests": [
     {
-      "name": "Create organization",
+      "name": "Create or link organization",
       "method": "POST",
       "path": "/",
       "headers": {
-        "X-User-Id": "1"
+        "X-User-Id": "32"
       },
       "body": {
         "name": "ООО Стройтех",
@@ -15,7 +15,7 @@
         "phone": "+7 (495) 123-45-67",
         "email": "info@stroitech.ru"
       },
-      "expectedStatus": 200,
+      "expectedStatus": [200],
       "expectedBody": {
         "organization": {
           "id": "number",
@@ -30,7 +30,7 @@
       "method": "GET",
       "path": "/",
       "headers": {
-        "X-User-Id": "1"
+        "X-User-Id": "32"
       },
       "expectedStatus": 200,
       "expectedBody": {

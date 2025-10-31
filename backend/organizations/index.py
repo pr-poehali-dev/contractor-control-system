@@ -83,24 +83,51 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
             'body': json.dumps({'error': 'Name and INN are required'})
         }
     
+    # Проверяем, существует ли организация с таким ИНН
     cursor.execute(f"""
-        SELECT id FROM {SCHEMA}.organizations WHERE inn = '{inn}'
+        SELECT id, type FROM {SCHEMA}.organizations WHERE inn = '{inn}'
     """)
     existing = cursor.fetchone()
     
     if existing:
+        # Если организация уже существует, связываем текущего пользователя с ней
+        org_id = existing['id']
+        org_type = existing['type']
+        
+        # Добавляем пользователя в user_organizations если его там еще нет
+        cursor.execute(f"""
+            SELECT id FROM {SCHEMA}.user_organizations 
+            WHERE user_id = {user_id} AND organization_id = {org_id}
+        """)
+        user_org_exists = cursor.fetchone()
+        
+        if not user_org_exists:
+            cursor.execute(f"""
+                INSERT INTO {SCHEMA}.user_organizations (user_id, organization_id, role, created_at)
+                VALUES ({user_id}, {org_id}, 'employee', NOW())
+            """)
+            conn.commit()
+        
+        # Возвращаем существующую организацию
+        cursor.execute(f"""
+            SELECT id, name, inn, kpp, legal_address, actual_address, phone, email, type, status, created_at
+            FROM {SCHEMA}.organizations WHERE id = {org_id}
+        """)
+        organization = cursor.fetchone()
+        
         return {
-            'statusCode': 400,
+            'statusCode': 200,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
-            'body': json.dumps({'error': 'Organization with this INN already exists'})
+            'body': json.dumps({'organization': dict(organization), 'message': 'Linked to existing organization'}, default=str)
         }
     
+    # Создаём новую организацию с типом 'contractor'
     cursor.execute(f"""
         INSERT INTO {SCHEMA}.organizations 
-        (name, inn, kpp, legal_address, actual_address, phone, email, created_by)
-        VALUES ('{name}', '{inn}', '{kpp}', '{legal_address}', '{actual_address}', '{phone}', '{email}', {user_id})
-        RETURNING id, name, inn, kpp, legal_address, actual_address, phone, email, status, created_at
+        (name, inn, kpp, legal_address, actual_address, phone, email, type, created_at)
+        VALUES ('{name}', '{inn}', '{kpp}', '{legal_address}', '{actual_address}', '{phone}', '{email}', 'contractor', NOW())
+        RETURNING id, name, inn, kpp, legal_address, actual_address, phone, email, type, status, created_at
     """)
     
     organization = cursor.fetchone()

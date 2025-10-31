@@ -44,21 +44,34 @@ export default function CreateOrganizationDialog({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const result = await dispatch(createOrganization(formData));
+    console.log('📤 Submitting organization:', formData);
     
-    if (createOrganization.fulfilled.match(result)) {
-      setFormData({
-        name: '',
-        inn: '',
-        kpp: '',
-        legal_address: '',
-        actual_address: '',
-        phone: '',
-        email: '',
-        first_user_phone: '',
-      });
-      onOpenChange(false);
-      onSuccess?.();
+    try {
+      const result = await dispatch(createOrganization(formData));
+      
+      console.log('📥 Organization creation result:', result);
+      
+      if (createOrganization.fulfilled.match(result)) {
+        console.log('✅ Organization created successfully');
+        setFormData({
+          name: '',
+          inn: '',
+          kpp: '',
+          legal_address: '',
+          actual_address: '',
+          phone: '',
+          email: '',
+          first_user_phone: '',
+        });
+        onOpenChange(false);
+        onSuccess?.();
+      } else if (createOrganization.rejected.match(result)) {
+        console.error('❌ Organization creation failed:', result.error);
+        alert(`Ошибка: ${result.error.message || 'Не удалось создать организацию'}`);
+      }
+    } catch (error) {
+      console.error('❌ Exception during organization creation:', error);
+      alert('Произошла ошибка при создании организации');
     }
   };
 
