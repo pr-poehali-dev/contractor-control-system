@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { createOrganization, selectOrganizationsLoading } from '@/store/slices/organizationsSlice';
+import { createOrganization, selectOrganizationsLoading, linkOrganization } from '@/store/slices/organizationsSlice';
 import {
   Dialog,
   DialogContent,
@@ -67,16 +67,40 @@ export default function CreateOrganizationDialog({
         // Если организация уже существует (409)
         if (error?.existing_organization) {
           const org = error.existing_organization;
-          const msg = error.already_linked 
-            ? `Организация "${org.name}" (ИНН: ${org.inn}) уже добавлена в ваш список`
-            : `Организация "${org.name}" (ИНН: ${org.inn}) уже существует в системе`;
           
-          toast.warning(msg, {
-            duration: 5000,
-          });
-          
-          resetForm();
-          onOpenChange(false);
+          if (error.already_linked) {
+            // Организация уже добавлена - просто показываем уведомление
+            toast.info(`Организация "${org.name}" уже в вашем списке подрядчиков`, {
+              duration: 4000,
+            });
+            resetForm();
+            onOpenChange(false);
+          } else {
+            // Организация существует, но не добавлена - предлагаем добавить
+            toast.warning(`Организация "${org.name}" (ИНН: ${org.inn}) уже существует`, {
+              duration: 8000,
+              action: {
+                label: 'Добавить в подрядчики',
+                onClick: async () => {
+                  try {
+                    const linkResult = await dispatch(linkOrganization(org.id));
+                    if (linkOrganization.fulfilled.match(linkResult)) {
+                      toast.success('Подрядчик добавлен');
+                      resetForm();
+                      onOpenChange(false);
+                      onSuccess?.();
+                    } else {
+                      toast.error('Не удалось добавить подрядчика');
+                    }
+                  } catch (err) {
+                    toast.error('Ошибка при добавлении подрядчика');
+                  }
+                },
+              },
+            });
+            resetForm();
+            onOpenChange(false);
+          }
         } else {
           console.error('❌ Organization creation failed:', result.error);
           toast.error(error?.error || 'Не удалось создать организацию');
