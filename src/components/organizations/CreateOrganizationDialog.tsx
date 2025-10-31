@@ -44,7 +44,7 @@ export default function CreateOrganizationDialog({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const result = await dispatch(createOrganization({ ...formData, type: 'contractor' }));
+    const result = await dispatch(createOrganization(formData));
     
     if (createOrganization.fulfilled.match(result)) {
       setFormData({
