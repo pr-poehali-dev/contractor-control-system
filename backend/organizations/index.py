@@ -298,9 +298,7 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
             cursor.execute(f"""
                 SELECT o.*,
                        (SELECT COUNT(*) FROM {SCHEMA}.user_organizations WHERE organization_id = o.id) as employees_count,
-                       (SELECT COUNT(*) FROM {SCHEMA}.works WHERE contractor_id IN (
-                           SELECT id FROM {SCHEMA}.contractors WHERE organization_id = o.id
-                       )) as works_count
+                       (SELECT COUNT(*) FROM {SCHEMA}.works WHERE contractor_id = o.id) as works_count
                 FROM {SCHEMA}.organizations o
                 ORDER BY o.created_at DESC
             """)
@@ -309,17 +307,12 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
             cursor.execute(f"""
                 SELECT DISTINCT o.*,
                        (SELECT COUNT(*) FROM {SCHEMA}.user_organizations WHERE organization_id = o.id) as employees_count,
-                       (SELECT COUNT(*) FROM {SCHEMA}.works WHERE contractor_id IN (
-                           SELECT id FROM {SCHEMA}.contractors WHERE organization_id = o.id
-                       )) as works_count
+                       (SELECT COUNT(*) FROM {SCHEMA}.works WHERE contractor_id = o.id) as works_count
                 FROM {SCHEMA}.organizations o
                 WHERE o.id IN (
                     SELECT organization_id FROM {SCHEMA}.user_organizations WHERE user_id = {user_id}
                     UNION
-                    SELECT DISTINCT c.organization_id 
-                    FROM {SCHEMA}.client_contractors cc
-                    JOIN {SCHEMA}.contractors c ON cc.contractor_id = c.id
-                    WHERE cc.client_id = {user_id} AND c.organization_id IS NOT NULL
+                    SELECT contractor_id FROM {SCHEMA}.client_contractors WHERE client_id = {user_id}
                 )
                 ORDER BY o.created_at DESC
             """)
@@ -328,9 +321,7 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
             cursor.execute(f"""
                 SELECT o.*,
                        (SELECT COUNT(*) FROM {SCHEMA}.user_organizations WHERE organization_id = o.id) as employees_count,
-                       (SELECT COUNT(*) FROM {SCHEMA}.works WHERE contractor_id IN (
-                           SELECT id FROM {SCHEMA}.contractors WHERE organization_id = o.id
-                       )) as works_count
+                       (SELECT COUNT(*) FROM {SCHEMA}.works WHERE contractor_id = o.id) as works_count
                 FROM {SCHEMA}.organizations o
                 WHERE o.id IN (
                     SELECT organization_id FROM {SCHEMA}.user_organizations WHERE user_id = {user_id}
