@@ -134,8 +134,10 @@ export default function CreateOrganizationDialog({
     <Dialog 
       open={open} 
       onOpenChange={(newOpen) => {
+        console.log('📌 Dialog onOpenChange called:', { newOpen, showConflictDialog });
         // Не закрываем основной диалог, если показан конфликтный
         if (!newOpen && showConflictDialog) {
+          console.log('🛑 Blocking dialog close - conflict dialog is shown');
           return;
         }
         onOpenChange(newOpen);
