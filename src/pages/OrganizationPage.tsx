@@ -38,16 +38,10 @@ export default function OrganizationPage() {
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      dispatch(fetchOrganizations());
+    if (isAuthenticated && user?.organization_id) {
+      dispatch(fetchOrganizationDetail(user.organization_id));
     }
-  }, [dispatch, isAuthenticated]);
-
-  useEffect(() => {
-    if (organizations.length > 0 && !currentOrg) {
-      dispatch(fetchOrganizationDetail(organizations[0].id));
-    }
-  }, [organizations, currentOrg, dispatch]);
+  }, [dispatch, isAuthenticated, user?.organization_id]);
 
   const handleSendInvite = async () => {
     if (!currentOrg || !invitePhone) return;

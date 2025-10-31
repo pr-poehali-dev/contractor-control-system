@@ -213,7 +213,7 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
                 FROM {SCHEMA}.organizations o
                 ORDER BY o.created_at DESC
             """)
-        # Заказчик видит только организации своих подрядчиков
+        # Заказчик видит свою организацию и организации своих подрядчиков
         elif user_role == 'client':
             cursor.execute(f"""
                 SELECT DISTINCT o.*,
@@ -223,6 +223,8 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
                        )) as works_count
                 FROM {SCHEMA}.organizations o
                 WHERE o.id IN (
+                    SELECT organization_id FROM {SCHEMA}.user_organizations WHERE user_id = {user_id}
+                    UNION
                     SELECT DISTINCT c.organization_id 
                     FROM {SCHEMA}.client_contractors cc
                     JOIN {SCHEMA}.contractors c ON cc.contractor_id = c.id
