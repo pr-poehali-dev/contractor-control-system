@@ -47,7 +47,13 @@ def handler(event: dict, context: any) -> dict:
     
     try:
         if method == 'POST':
-            return create_organization(cursor, conn, user_id, event)
+            query_params = event.get('queryStringParameters') or {}
+            action = query_params.get('action')
+            
+            if action == 'link':
+                return link_organization(cursor, conn, user_id, event)
+            else:
+                return create_organization(cursor, conn, user_id, event)
         elif method == 'GET':
             return get_organizations(cursor, user_id, event)
         elif method == 'PUT':
@@ -90,25 +96,8 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
     existing = cursor.fetchone()
     
     if existing:
-        # Если организация уже существует, связываем текущего пользователя с ней
+        # Организация с таким ИНН уже существует - возвращаем 409 Conflict
         org_id = existing['id']
-        org_type = existing['type']
-        
-        # Добавляем пользователя в user_organizations если его там еще нет
-        cursor.execute(f"""
-            SELECT id FROM {SCHEMA}.user_organizations 
-            WHERE user_id = {user_id} AND organization_id = {org_id}
-        """)
-        user_org_exists = cursor.fetchone()
-        
-        if not user_org_exists:
-            cursor.execute(f"""
-                INSERT INTO {SCHEMA}.user_organizations (user_id, organization_id, role, created_at)
-                VALUES ({user_id}, {org_id}, 'employee', NOW())
-            """)
-            conn.commit()
-        
-        # Возвращаем существующую организацию
         cursor.execute(f"""
             SELECT id, name, inn, kpp, legal_address, actual_address, phone, email, type, status, created_at
             FROM {SCHEMA}.organizations WHERE id = {org_id}
@@ -116,10 +105,13 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
         organization = cursor.fetchone()
         
         return {
-            'statusCode': 200,
+            'statusCode': 409,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
-            'body': json.dumps({'organization': dict(organization), 'message': 'Linked to existing organization'}, default=str)
+            'body': json.dumps({
+                'error': 'Organization with this INN already exists',
+                'existing_organization': dict(organization)
+            }, default=str)
         }
     
     # Создаём новую организацию с типом 'contractor'
@@ -432,4 +424,48 @@ def update_organization(cursor, conn, user_id: str, event: dict) -> dict:
         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
         'isBase64Encoded': False,
         'body': json.dumps({'organization': dict(updated_org)}, default=str)
+    }
+
+def link_organization(cursor, conn, user_id: str, event: dict) -> dict:
+    '''
+    Добавляет существующую организацию в список подрядчиков клиента
+    '''
+    body = json.loads(event.get('body', '{}'))
+    org_id = body.get('organization_id')
+    
+    if not org_id:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'isBase64Encoded': False,
+            'body': json.dumps({'error': 'organization_id is required'})
+        }
+    
+    # Проверяем, существует ли организация
+    cursor.execute(f"""
+        SELECT id, name, inn FROM {SCHEMA}.organizations WHERE id = {org_id}
+    """)
+    organization = cursor.fetchone()
+    
+    if not organization:
+        return {
+            'statusCode': 404,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'isBase64Encoded': False,
+            'body': json.dumps({'error': 'Organization not found'})
+        }
+    
+    # Добавляем связь между клиентом и подрядчиком в contractor_links
+    cursor.execute(f"""
+        INSERT INTO {SCHEMA}.contractor_links (client_id, contractor_id, created_at)
+        VALUES ({user_id}, {org_id}, NOW())
+        ON CONFLICT (client_id, contractor_id) DO NOTHING
+    """)
+    conn.commit()
+    
+    return {
+        'statusCode': 200,
+        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+        'isBase64Encoded': False,
+        'body': json.dumps({'message': 'Organization linked successfully', 'organization': dict(organization)}, default=str)
     }

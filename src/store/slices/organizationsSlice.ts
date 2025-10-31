@@ -113,9 +113,32 @@ export const createOrganization = createAsyncThunk(
     phone?: string;
     email?: string;
     first_user_phone?: string;
-  }) => {
-    const response = await apiClient.post(ENDPOINTS.ORGANIZATIONS.CREATE, data);
-    return response.data.organization;
+  }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.post(ENDPOINTS.ORGANIZATIONS.CREATE, data);
+      return response.data.organization;
+    } catch (error: any) {
+      // Если это 409 (организация существует), передаём данные существующей организации
+      if (error.response?.data?.existing_organization) {
+        return rejectWithValue({
+          error: error.response.data.error,
+          existing_organization: error.response.data.existing_organization
+        });
+      }
+      return rejectWithValue({ error: error.message || 'Failed to create organization' });
+    }
+  }
+);
+
+export const linkOrganization = createAsyncThunk(
+  'organizations/link',
+  async (organizationId: number, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.post(ENDPOINTS.ORGANIZATIONS.LINK, { organization_id: organizationId });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to link organization');
+    }
   }
 );
 
@@ -239,6 +262,19 @@ const organizationsSlice = createSlice({
       .addCase(updateOrganization.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to update organization';
+      })
+      
+      .addCase(linkOrganization.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(linkOrganization.fulfilled, (state, action) => {
+        state.loading = false;
+        // Организация уже добавлена на бэкенде, просто обновляем список
+      })
+      .addCase(linkOrganization.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to link organization';
       });
   },
 });

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuthRedux } from '@/hooks/useAuthRedux';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { createOrganization, selectOrganizationsLoading } from '@/store/slices/organizationsSlice';
+import { createOrganization, selectOrganizationsLoading, linkOrganization } from '@/store/slices/organizationsSlice';
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -41,6 +51,9 @@ export default function CreateOrganizationDialog({
     first_user_phone: '',
   });
 
+  const [existingOrg, setExistingOrg] = useState<any>(null);
+  const [showConflictDialog, setShowConflictDialog] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -53,21 +66,21 @@ export default function CreateOrganizationDialog({
       
       if (createOrganization.fulfilled.match(result)) {
         console.log('✅ Organization created successfully');
-        setFormData({
-          name: '',
-          inn: '',
-          kpp: '',
-          legal_address: '',
-          actual_address: '',
-          phone: '',
-          email: '',
-          first_user_phone: '',
-        });
+        resetForm();
         onOpenChange(false);
         onSuccess?.();
       } else if (createOrganization.rejected.match(result)) {
-        console.error('❌ Organization creation failed:', result.error);
-        alert(`Ошибка: ${result.error.message || 'Не удалось создать организацию'}`);
+        const error = result.payload as any;
+        
+        // Если организация уже существует (409)
+        if (error?.existing_organization) {
+          console.log('⚠️ Organization already exists:', error.existing_organization);
+          setExistingOrg(error.existing_organization);
+          setShowConflictDialog(true);
+        } else {
+          console.error('❌ Organization creation failed:', result.error);
+          alert(`Ошибка: ${error?.error || 'Не удалось создать организацию'}`);
+        }
       }
     } catch (error) {
       console.error('❌ Exception during organization creation:', error);
@@ -75,7 +88,43 @@ export default function CreateOrganizationDialog({
     }
   };
 
+  const handleLinkExisting = async () => {
+    if (!existingOrg) return;
+    
+    try {
+      const result = await dispatch(linkOrganization(existingOrg.id));
+      
+      if (linkOrganization.fulfilled.match(result)) {
+        console.log('✅ Linked to existing organization');
+        resetForm();
+        setShowConflictDialog(false);
+        onOpenChange(false);
+        onSuccess?.();
+      } else {
+        alert('Не удалось добавить организацию в подрядчики');
+      }
+    } catch (error) {
+      console.error('❌ Failed to link organization:', error);
+      alert('Произошла ошибка при добавлении организации');
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      inn: '',
+      kpp: '',
+      legal_address: '',
+      actual_address: '',
+      phone: '',
+      email: '',
+      first_user_phone: '',
+    });
+    setExistingOrg(null);
+  };
+
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -150,5 +199,34 @@ export default function CreateOrganizationDialog({
         </form>
       </DialogContent>
     </Dialog>
+
+    <AlertDialog open={showConflictDialog} onOpenChange={setShowConflictDialog}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Организация уже существует</AlertDialogTitle>
+          <AlertDialogDescription>
+            Организация с ИНН <strong>{existingOrg?.inn}</strong> уже зарегистрирована в системе:
+            <div className="mt-3 p-3 bg-slate-50 rounded-lg">
+              <p className="font-semibold text-slate-900">{existingOrg?.name}</p>
+              <p className="text-sm text-slate-600 mt-1">ИНН: {existingOrg?.inn}</p>
+              {existingOrg?.legal_address && (
+                <p className="text-sm text-slate-600">Адрес: {existingOrg.legal_address}</p>
+              )}
+            </div>
+            <p className="mt-3">Хотите добавить эту организацию в ваш список подрядчиков?</p>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={() => {
+            setShowConflictDialog(false);
+            setExistingOrg(null);
+          }}>Отмена</AlertDialogCancel>
+          <AlertDialogAction onClick={handleLinkExisting}>
+            Добавить подрядчика
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }

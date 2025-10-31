@@ -60,6 +60,7 @@ export const ENDPOINTS = {
     CREATE: '/b2540d24-831a-4ac0-b3e8-b128f51c0033',
     UPDATE: '/b2540d24-831a-4ac0-b3e8-b128f51c0033',
     DETAIL: '/b2540d24-831a-4ac0-b3e8-b128f51c0033',
+    LINK: '/b2540d24-831a-4ac0-b3e8-b128f51c0033?action=link',
   },
 
   ORGANIZATION_INVITES: {
