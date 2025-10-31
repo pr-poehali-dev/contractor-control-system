@@ -125,10 +125,40 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             (phone, user_name, user_role, datetime.utcnow(), datetime.utcnow(), True)
         )
         user = cursor.fetchone()
+        user_id, user_phone, user_name, user_role = user
+        
+        # Создаём организацию для клиента
+        if user_role == 'client':
+            temp_inn = f'{user_id:010d}'
+            cursor.execute(
+                """INSERT INTO t_p8942561_contractor_control_s.organizations 
+                (name, inn, type, created_at) 
+                VALUES (%s, %s, %s, %s) RETURNING id""",
+                ('Новая организация', temp_inn, 'client', datetime.utcnow())
+            )
+            org_result = cursor.fetchone()
+            organization_id = org_result[0]
+            
+            # Обновляем пользователя с organization_id
+            cursor.execute(
+                "UPDATE t_p8942561_contractor_control_s.users SET organization_id = %s WHERE id = %s",
+                (organization_id, user_id)
+            )
+            
+            # Добавляем связь в user_organizations с ролью admin
+            cursor.execute(
+                """INSERT INTO t_p8942561_contractor_control_s.user_organizations 
+                (user_id, organization_id, role, created_at) 
+                VALUES (%s, %s, %s, %s)""",
+                (user_id, organization_id, 'admin', datetime.utcnow())
+            )
     
     conn.commit()
     
-    user_id, user_phone, user_name, user_role = user
+    if user and len(user) >= 4:
+        user_id, user_phone, user_name, user_role = user
+    else:
+        user_id, user_phone, user_name, user_role = user
     
     token_payload = {
         'user_id': user_id,
