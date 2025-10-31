@@ -193,11 +193,23 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
         organization['invite'] = dict(invite)
         organization['invited_user_id'] = invited_user_id
     
+    # Получаем полную информацию об организации с подсчётами
+    cursor.execute(f"""
+        SELECT 
+            o.*,
+            COALESCE((SELECT COUNT(*) FROM {SCHEMA}.user_organizations WHERE organization_id = o.id), 0) as employees_count,
+            COALESCE((SELECT COUNT(*) FROM {SCHEMA}.works WHERE contractor_id = o.id), 0) as works_count
+        FROM {SCHEMA}.organizations o
+        WHERE o.id = {organization['id']}
+    """)
+    
+    full_org = cursor.fetchone()
+    
     return {
         'statusCode': 200,
         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
         'isBase64Encoded': False,
-        'body': json.dumps({'organization': dict(organization)}, default=str)
+        'body': json.dumps({'organization': dict(full_org)}, default=str)
     }
 
 def get_organizations(cursor, user_id: str, event: dict) -> dict:

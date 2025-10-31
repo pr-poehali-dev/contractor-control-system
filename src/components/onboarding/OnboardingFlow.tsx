@@ -17,14 +17,14 @@ const OnboardingFlow = ({ userId, userRole, registrationDate }: OnboardingFlowPr
   const [showProUpgrade, setShowProUpgrade] = useState(false);
 
   useEffect(() => {
-    if (userRole !== 'client') return;
+    if (userRole !== 'client' && userRole !== 'contractor') return;
 
     const hasSeenOnboarding = localStorage.getItem(`onboarding_v2_${userId}`);
     const hasSeenProOffer = localStorage.getItem(`pro_offer_shown_${userId}`);
     
     if (!hasSeenOnboarding) {
       setTimeout(() => setShowWelcome(true), 500);
-    } else if (!hasSeenProOffer && registrationDate) {
+    } else if (!hasSeenProOffer && registrationDate && userRole === 'client') {
       const regDate = new Date(registrationDate);
       const now = new Date();
       const totalSecondsLeft = 48 * 60 * 60 - Math.floor((now.getTime() - regDate.getTime()) / 1000);
@@ -43,19 +43,25 @@ const OnboardingFlow = ({ userId, userRole, registrationDate }: OnboardingFlowPr
   const handleSkipTour = () => {
     setShowWelcome(false);
     localStorage.setItem(`onboarding_v2_${userId}`, 'skipped');
-    setShowProUpgrade(true);
+    if (userRole === 'client') {
+      setShowProUpgrade(true);
+    }
   };
 
   const handleTourComplete = () => {
     setShowTour(false);
     localStorage.setItem(`onboarding_v2_${userId}`, 'completed');
-    setTimeout(() => setShowProUpgrade(true), 500);
+    if (userRole === 'client') {
+      setTimeout(() => setShowProUpgrade(true), 500);
+    }
   };
 
   const handleTourSkip = () => {
     setShowTour(false);
     localStorage.setItem(`onboarding_v2_${userId}`, 'skipped');
-    setShowProUpgrade(true);
+    if (userRole === 'client') {
+      setShowProUpgrade(true);
+    }
   };
 
   const handleProUpgradeClose = () => {
@@ -63,12 +69,14 @@ const OnboardingFlow = ({ userId, userRole, registrationDate }: OnboardingFlowPr
     localStorage.setItem(`pro_offer_shown_${userId}`, 'true');
   };
 
-  if (userRole !== 'client') return null;
+  if (userRole !== 'client' && userRole !== 'contractor') return null;
 
   const handleWelcomeClose = (open: boolean) => {
     if (!open) {
       localStorage.setItem(`onboarding_v2_${userId}`, 'skipped');
-      setShowProUpgrade(true);
+      if (userRole === 'client') {
+        setShowProUpgrade(true);
+      }
     }
     setShowWelcome(open);
   };
@@ -87,8 +95,9 @@ const OnboardingFlow = ({ userId, userRole, registrationDate }: OnboardingFlowPr
             </h2>
             
             <p className="text-sm md:text-base text-slate-600 mb-6 md:mb-8 leading-relaxed px-2">
-              Мы покажем, как создать объект, добавить работы и начать контролировать строительство. 
-              Это займёт всего минуту!
+              {userRole === 'client' 
+                ? 'Мы покажем, как создать объект, добавить работы и начать контролировать строительство. Это займёт всего минуту!' 
+                : 'Мы покажем, как работать с системой, выполнять работы и взаимодействовать с заказчиками. Это займёт всего минуту!'}
             </p>
 
             <div className="flex flex-col gap-3 justify-center px-2">
@@ -123,13 +132,15 @@ const OnboardingFlow = ({ userId, userRole, registrationDate }: OnboardingFlowPr
         />
       )}
 
-      <ProUpgradeModal
-        open={showProUpgrade}
-        onOpenChange={(open) => {
-          if (!open) handleProUpgradeClose();
-        }}
-        registrationDate={registrationDate}
-      />
+      {userRole === 'client' && (
+        <ProUpgradeModal
+          open={showProUpgrade}
+          onOpenChange={(open) => {
+            if (!open) handleProUpgradeClose();
+          }}
+          registrationDate={registrationDate}
+        />
+      )}
     </>
   );
 };
