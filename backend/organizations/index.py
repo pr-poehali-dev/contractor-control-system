@@ -81,6 +81,7 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
     phone = body.get('phone', '').strip()
     email = body.get('email', '').strip()
     first_user_phone = body.get('first_user_phone', '').strip()
+    org_type = body.get('type', 'contractor').strip()
     
     if not name or not inn:
         return {
@@ -119,23 +120,24 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
     cursor.execute(f"""
         INSERT INTO {SCHEMA}.organizations 
         (name, inn, kpp, ogrn, bik, bank_name, payment_account, correspondent_account, 
-         director_name, director_position, legal_address, actual_address, phone, email, created_by)
+         director_name, director_position, legal_address, actual_address, phone, email, type, created_by)
         VALUES ('{name}', '{inn}', {kpp_val}, {ogrn_val}, {bik_val}, {bank_name_val}, {payment_account_val}, 
                 {correspondent_account_val}, {director_name_val}, {director_position_val}, 
-                {legal_address_val}, {actual_address_val}, {phone_val}, {email_val}, {user_id})
+                {legal_address_val}, {actual_address_val}, {phone_val}, {email_val}, '{org_type}', {user_id})
         RETURNING id, name, inn, kpp, ogrn, bik, bank_name, payment_account, correspondent_account,
-                  director_name, director_position, legal_address, actual_address, phone, email, status, created_at
+                  director_name, director_position, legal_address, actual_address, phone, email, type, status, created_at
     """)
     
     organization = cursor.fetchone()
     conn.commit()
     
-    cursor.execute(f"""
-        UPDATE {SCHEMA}.users 
-        SET organization_id = {organization['id']}, onboarding_completed = TRUE
-        WHERE id = {user_id}
-    """)
-    conn.commit()
+    if org_type == 'client':
+        cursor.execute(f"""
+            UPDATE {SCHEMA}.users 
+            SET organization_id = {organization['id']}, onboarding_completed = TRUE
+            WHERE id = {user_id}
+        """)
+        conn.commit()
     
     if first_user_phone:
         token = secrets.token_urlsafe(32)
@@ -242,6 +244,7 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
                            SELECT id FROM {SCHEMA}.contractors WHERE organization_id = o.id
                        )) as works_count
                 FROM {SCHEMA}.organizations o
+                WHERE o.type = 'contractor'
                 ORDER BY o.created_at DESC
             """)
         # Заказчик видит только организации своих подрядчиков
@@ -253,7 +256,7 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
                            SELECT id FROM {SCHEMA}.contractors WHERE organization_id = o.id
                        )) as works_count
                 FROM {SCHEMA}.organizations o
-                WHERE o.id IN (
+                WHERE o.type = 'contractor' AND o.id IN (
                     SELECT DISTINCT c.organization_id 
                     FROM {SCHEMA}.client_contractors cc
                     JOIN {SCHEMA}.contractors c ON cc.contractor_id = c.id
@@ -270,7 +273,7 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
                            SELECT id FROM {SCHEMA}.contractors WHERE organization_id = o.id
                        )) as works_count
                 FROM {SCHEMA}.organizations o
-                WHERE o.id IN (
+                WHERE o.type = 'contractor' AND o.id IN (
                     SELECT organization_id FROM {SCHEMA}.user_organizations WHERE user_id = {user_id}
                 )
                 ORDER BY o.created_at DESC
@@ -311,17 +314,25 @@ def update_organization(cursor, conn, user_id: str, event: dict) -> dict:
         }
     
     cursor.execute(f"""
-        SELECT organization_role FROM {SCHEMA}.users 
-        WHERE id = {user_id} AND organization_id = {org_id}
+        SELECT role, organization_id FROM {SCHEMA}.users 
+        WHERE id = {user_id}
     """)
-    user_role = cursor.fetchone()
+    user_data = cursor.fetchone()
     
-    if not user_role or user_role['organization_role'] != 'admin':
+    if not user_data:
         return {
             'statusCode': 403,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
-            'body': json.dumps({'error': 'Only organization admin can update'})
+            'body': json.dumps({'error': 'User not found'})
+        }
+    
+    if user_data['role'] == 'client' and user_data['organization_id'] != int(org_id):
+        return {
+            'statusCode': 403,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'isBase64Encoded': False,
+            'body': json.dumps({'error': 'Cannot update other organization'})
         }
     
     updates = []

@@ -97,7 +97,7 @@ const ClientOnboarding = () => {
         alert('Данные организации успешно обновлены');
         navigate(ROUTES.PROFILE);
       } else {
-        await dispatch(createOrganization(formData)).unwrap();
+        await dispatch(createOrganization({ ...formData, type: 'client' })).unwrap();
         navigate(ROUTES.OBJECTS);
       }
     } catch (error) {
@@ -367,7 +367,7 @@ const ClientOnboarding = () => {
             {currentStep < 3 ? (
               <Button
                 onClick={() => setCurrentStep(currentStep + 1)}
-                disabled={currentStep === 1 ? !isStep1Valid : currentStep === 2 ? !isStep2Valid : false}
+                disabled={currentStep === 1 && !isStep1Valid}
               >
                 Далее
                 <Icon name="ChevronRight" size={16} className="ml-1" />

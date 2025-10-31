@@ -34,6 +34,7 @@ export interface Organization {
   actual_address?: string;
   phone?: string;
   email?: string;
+  type: 'client' | 'contractor';
   status: string;
   created_by: number;
   created_at: string;
@@ -118,6 +119,7 @@ export const createOrganization = createAsyncThunk(
     actual_address?: string;
     phone?: string;
     email?: string;
+    type?: 'client' | 'contractor';
     first_user_phone?: string;
   }) => {
     const response = await apiClient.post(ENDPOINTS.ORGANIZATIONS.CREATE, data);
@@ -141,6 +143,7 @@ export const updateOrganization = createAsyncThunk(
     director_position?: string;
     legal_address?: string;
     actual_address?: string;
+    type?: 'client' | 'contractor';
     phone?: string;
     email?: string;
   }) => {
