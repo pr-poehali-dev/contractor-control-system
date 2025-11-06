@@ -125,14 +125,14 @@ export default function Objects() {
           selectedStatus={selectedStatus}
           setSelectedStatus={setSelectedStatus}
           statusOptions={statusOptions}
-          onCreateClick={() => navigate(ROUTES.OBJECT_CREATE)}
+          onCreateClick={() => navigate(ROUTES.OBJECTS_CREATE)}
           isContractor={isContractor}
         />
         
         {filteredObjects.length === 0 ? (
           <ObjectsEmptyState 
             searchQuery={searchQuery}
-            onCreateClick={() => navigate(ROUTES.OBJECT_CREATE)}
+            onCreateClick={() => navigate(ROUTES.OBJECTS_CREATE)}
             isContractor={isContractor}
           />
         ) : (
@@ -156,14 +156,14 @@ export default function Objects() {
           setViewMode={setViewMode}
           sortBy={sortBy}
           setSortBy={setSortBy}
-          onCreateClick={() => navigate(ROUTES.OBJECT_CREATE)}
+          onCreateClick={() => navigate(ROUTES.OBJECTS_CREATE)}
           isContractor={isContractor}
         />
 
         {filteredObjects.length === 0 ? (
           <ObjectsEmptyState 
             searchQuery={searchQuery}
-            onCreateClick={() => navigate(ROUTES.OBJECT_CREATE)}
+            onCreateClick={() => navigate(ROUTES.OBJECTS_CREATE)}
             isContractor={isContractor}
           />
         ) : viewMode === 'grid' ? (
