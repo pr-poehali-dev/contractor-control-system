@@ -37,12 +37,6 @@ export const InviteContractorDialog = ({
 }: InviteContractorDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button>
-          <Icon name="UserPlus" size={18} className="mr-2" />
-          Пригласить подрядчика
-        </Button>
-      </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Пригласить подрядчика</DialogTitle>
