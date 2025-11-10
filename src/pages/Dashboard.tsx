@@ -21,6 +21,7 @@ import InfoPostModal from '@/components/dashboard/InfoPostModal';
 import NotificationsSummary from '@/components/work-journal/NotificationsSummary';
 import WorkLogModal from '@/components/work-journal/WorkLogModal';
 import { ROUTES } from '@/constants/routes';
+import styles from './Dashboard.module.css';
 
 
 interface FeedEvent {
@@ -341,11 +342,11 @@ const Dashboard = () => {
         />
       )}
       
-      <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-10 bg-slate-50 min-h-screen">
-        <div className="max-w-[680px] lg:max-w-[900px] mx-auto">
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+      <div className={styles.container}>
+        <div className={styles.wrapper}>
+          <div className={styles.header}>
+            <div className={styles.headerTop}>
+              <h1 className={styles.title}>
                 Лента событий
               </h1>
 
@@ -358,7 +359,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-        <div className="space-y-4">
+        <div className={styles.content}>
             <FeedFilters 
               filter={filter} 
               onFilterChange={setFilter}
@@ -371,32 +372,28 @@ const Dashboard = () => {
               onSearchChange={setSearchQuery}
             />
 
-            <div className="space-y-4">
+            <div className={styles.feedList}>
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <Card key={i}>
-                    <CardContent className="p-6">
-                      <div className="flex gap-4">
-                        <Skeleton className="w-12 h-12 rounded-full flex-shrink-0" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-4 w-3/4" />
-                          <Skeleton className="h-3 w-1/2" />
-                          <Skeleton className="h-3 w-full" />
-                        </div>
+                  <div key={i} className={styles.skeletonCard}>
+                    <div className={styles.skeletonContent}>
+                      <div className={styles.skeletonAvatar} />
+                      <div className={styles.skeletonText}>
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-3 w-1/2" />
+                        <Skeleton className="h-3 w-full" />
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 ))
               ) : filteredFeed.length === 0 ? (
-                <Card>
-                  <CardContent className="p-12 text-center">
-                    <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Icon name="Inbox" size={32} className="text-slate-400" />
-                    </div>
-                    <p className="text-slate-600 mb-2">Пока нет событий</p>
-                    <p className="text-sm text-slate-500">События появятся, когда начнется работа над объектами</p>
-                  </CardContent>
-                </Card>
+                <div className={styles.emptyState}>
+                  <div className={styles.emptyIcon}>
+                    <Icon name="Inbox" size={32} className="text-slate-400" />
+                  </div>
+                  <p className={styles.emptyTitle}>Пока нет событий</p>
+                  <p className={styles.emptyDescription}>События появятся, когда начнется работа над объектами</p>
+                </div>
               ) : (
                 filteredFeed.map((event, index) => (
                   <FeedEventCard
