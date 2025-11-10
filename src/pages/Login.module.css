@@ -1,0 +1,124 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom right, #eff6ff, #f8fafc);
+  padding: 1rem;
+}
+
+.wrapper {
+  width: 100%;
+  max-width: 28rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.logoWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 9999px;
+  background-color: #2563eb;
+  margin-bottom: 1.5rem;
+}
+
+.logoIcon {
+  color: white;
+}
+
+.title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #475569;
+  font-size: 1.125rem;
+}
+
+.card {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.cardTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 1.5rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #334155;
+  margin-bottom: 0.5rem;
+}
+
+.input {
+  height: 3rem;
+}
+
+.devCode {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+.button {
+  width: 100%;
+  height: 3rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.buttonOutline {
+  width: 100%;
+  height: 3rem;
+  font-size: 1rem;
+}
+
+.footer {
+  margin-top: 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.terms {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.termsLink {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.termsLink:hover {
+  text-decoration: underline;
+}
