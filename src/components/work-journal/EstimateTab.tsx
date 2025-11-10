@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import styles from './EstimateTab.module.css';
 
 interface EstimateTabProps {
   handleCreateEstimate: () => void;
@@ -147,21 +148,21 @@ export default function EstimateTab({ handleCreateEstimate }: EstimateTabProps) 
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-slate-50 w-full overflow-x-hidden">
-      <div className="px-3 py-4 md:p-8 lg:p-12 max-w-7xl mx-auto w-full">
-        <div className="flex items-center justify-between mb-4 md:mb-6 gap-2">
-          <h4 className="text-lg md:text-xl font-semibold">История версий</h4>
-          <Button onClick={() => setIsUploadDialogOpen(true)} size="sm" className="md:h-10 flex-shrink-0">
+    <div className={styles.container}>
+      <div className={styles.wrapper}>
+        <div className={styles.header}>
+          <h4 className={styles.headerTitle}>История версий</h4>
+          <Button onClick={() => setIsUploadDialogOpen(true)} size="sm" className={styles.uploadButton}>
             <Icon name="Upload" size={16} className="md:mr-2 md:w-[18px] md:h-[18px]" />
             <span className="hidden md:inline">Загрузить</span>
           </Button>
         </div>
 
-        <div className="space-y-3 md:space-y-4">
+        <div className={styles.versionsSpace}>
           {versions.map((version) => (
             <Card
               key={version.id}
-              className={version.isActive ? 'border-green-500 bg-green-50' : ''}
+              className={version.isActive ? styles.cardActive : ''}
             >
               <CardContent className="p-3 md:p-5">
                 <div className="flex items-start justify-between gap-2">

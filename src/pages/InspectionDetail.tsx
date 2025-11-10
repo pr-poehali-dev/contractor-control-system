@@ -14,6 +14,7 @@ import InspectionHintsCard from '@/components/inspection/InspectionHintsCard';
 import { useInspectionData } from '@/hooks/useInspectionData';
 import { useInspectionActions } from '@/hooks/useInspectionActions';
 import { useDefectPhotos } from '@/hooks/useDefectPhotos';
+import styles from './InspectionDetail.module.css';
 
 const InspectionDetail = () => {
   const { inspectionId } = useParams<{ inspectionId: string }>();
@@ -133,13 +134,15 @@ const InspectionDetail = () => {
 
   if (!inspection) {
     return (
-      <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-        <div className="max-w-4xl mx-auto">
+      <div className={styles.errorContainer}>
+        <div className={styles.errorWrapper}>
           <Button variant="ghost" onClick={handleBack} className="mb-4">
             <Icon name="ChevronLeft" size={20} className="mr-2" />
             Назад
           </Button>
-          <p className="text-slate-500 text-center mt-8">Проверка не найдена</p>
+          <div className={styles.errorContent}>
+            <p className={styles.errorText}>Проверка не найдена</p>
+          </div>
         </div>
       </div>
     );
@@ -173,17 +176,17 @@ const InspectionDetail = () => {
   const inspectionIndex = workInspections.findIndex((i: any) => i.id === inspection.id) + 1;
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-24">
-      <div className="max-w-5xl mx-auto px-4 py-4 md:py-8">
-        <div className="mb-6">
-          <div className="flex items-center gap-2 md:gap-3">
+    <div className={styles.container}>
+      <div className={styles.wrapper}>
+        <div className={styles.headerSection}>
+          <div className={styles.headerContent}>
             <button 
               onClick={handleBack}
-              className="flex-shrink-0 h-8 w-8 md:h-9 md:w-9 flex items-center justify-center hover:bg-slate-100 rounded-lg transition-colors"
+              className={styles.backButton}
             >
-              <Icon name="ArrowLeft" size={20} className="text-slate-600" />
+              <Icon name="ArrowLeft" size={20} className={styles.backIcon} />
             </button>
-            <h1 className="text-xl md:text-3xl font-bold flex-1 min-w-0 truncate">
+            <h1 className={styles.title}>
               Проверка №{inspection.inspection_number || inspectionIndex}
             </h1>
           </div>

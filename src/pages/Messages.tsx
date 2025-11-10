@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Icon from '@/components/ui/icon';
+import styles from './Messages.module.css';
 
 interface Message {
   id: string;
@@ -104,52 +105,50 @@ const Messages = () => {
   };
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Сообщения</h1>
-        <p className="text-slate-600">Общение с заказчиками и подрядчиками</p>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Сообщения</h1>
+        <p className={styles.subtitle}>Общение с заказчиками и подрядчиками</p>
       </div>
 
-      <div className="grid grid-cols-12 gap-6 h-[calc(100vh-240px)]">
-        <Card className="col-span-4">
+      <div className={styles.gridContainer}>
+        <Card className={styles.chatList}>
           <ScrollArea className="h-full">
-            <div className="p-4 border-b">
-              <div className="relative">
-                <Icon name="Search" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <Input placeholder="Поиск..." className="pl-10" />
+            <div className={styles.searchSection}>
+              <div className={styles.searchWrapper}>
+                <Icon name="Search" className={styles.searchIcon} size={18} />
+                <Input placeholder="Поиск..." className={styles.searchInput} />
               </div>
             </div>
-            <div className="divide-y">
+            <div className={styles.chatListItems}>
               {mockChats.map((chat) => (
                 <div
                   key={chat.id}
-                  className={`p-4 cursor-pointer hover:bg-slate-50 transition-colors ${
-                    selectedChat.id === chat.id ? 'bg-blue-50' : ''
-                  }`}
+                  className={`${styles.chatItem} ${selectedChat.id === chat.id ? styles.chatItemActive : ''}`}
                   onClick={() => setSelectedChat(chat)}
                 >
-                  <div className="flex items-start gap-3">
+                  <div className={styles.chatItemContent}>
                     <Avatar>
-                      <AvatarFallback className="bg-[#2563EB] text-white">
+                      <AvatarFallback className={styles.chatAvatar}>
                         {chat.avatar}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="font-semibold text-sm text-slate-900 truncate">
+                    <div className={styles.chatInfo}>
+                      <div className={styles.chatTopRow}>
+                        <p className={styles.chatName}>
                           {chat.name}
                         </p>
-                        <span className="text-xs text-slate-500">{chat.timestamp}</span>
+                        <span className={styles.chatTimestamp}>{chat.timestamp}</span>
                       </div>
-                      <p className="text-sm text-slate-600 truncate mb-1">
+                      <p className={styles.chatLastMessage}>
                         {chat.lastMessage}
                       </p>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className={styles.chatWork}>
                         {chat.work}
                       </Badge>
                     </div>
                     {chat.unread > 0 && (
-                      <Badge className="bg-[#2563EB]">
+                      <Badge className={styles.chatUnread}>
                         {chat.unread}
                       </Badge>
                     )}
@@ -160,21 +159,21 @@ const Messages = () => {
           </ScrollArea>
         </Card>
 
-        <Card className="col-span-8 flex flex-col">
-          <div className="p-4 border-b">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+        <Card className={styles.chatWindow}>
+          <div className={styles.chatHeader}>
+            <div className={styles.chatHeaderContent}>
+              <div className={styles.chatHeaderLeft}>
                 <Avatar>
-                  <AvatarFallback className="bg-[#2563EB] text-white">
+                  <AvatarFallback className={styles.chatAvatar}>
                     {selectedChat.avatar}
                   </AvatarFallback>
                 </Avatar>
-                <div>
-                  <p className="font-semibold text-slate-900">{selectedChat.name}</p>
-                  <p className="text-sm text-slate-600">{selectedChat.work}</p>
+                <div className={styles.chatHeaderInfo}>
+                  <p className={styles.chatHeaderName}>{selectedChat.name}</p>
+                  <p className={styles.chatHeaderWork}>{selectedChat.work}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className={styles.chatHeaderActions}>
                 <Button variant="ghost" size="sm">
                   <Icon name="Phone" size={20} />
                 </Button>
@@ -185,25 +184,19 @@ const Messages = () => {
             </div>
           </div>
 
-          <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4">
+          <ScrollArea className={styles.chatMessages}>
+            <div className={styles.messagesSpace}>
               {mockMessages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'} animate-fade-in`}
+                  className={`${styles.messageRow} ${message.sender === 'me' ? styles.messageRowMe : styles.messageRowOther}`}
                 >
                   <div
-                    className={`max-w-[70%] rounded-lg px-4 py-3 ${
-                      message.sender === 'me'
-                        ? 'bg-[#2563EB] text-white'
-                        : 'bg-slate-100 text-slate-900'
-                    }`}
+                    className={`${styles.messageBubble} ${message.sender === 'me' ? styles.messageBubbleMe : styles.messageBubbleOther}`}
                   >
-                    <p className="text-sm">{message.text}</p>
+                    <p className={styles.messageText}>{message.text}</p>
                     <p
-                      className={`text-xs mt-1 ${
-                        message.sender === 'me' ? 'text-blue-100' : 'text-slate-500'
-                      }`}
+                      className={`${styles.messageTime} ${message.sender === 'me' ? styles.messageTimeMe : styles.messageTimeOther}`}
                     >
                       {message.timestamp}
                     </p>
@@ -213,8 +206,8 @@ const Messages = () => {
             </div>
           </ScrollArea>
 
-          <div className="p-4 border-t">
-            <div className="flex items-center gap-3">
+          <div className={styles.chatFooter}>
+            <div className={styles.footerContent}>
               <Button variant="ghost" size="sm">
                 <Icon name="Paperclip" size={20} />
               </Button>
@@ -226,7 +219,7 @@ const Messages = () => {
                 value={messageText}
                 onChange={(e) => setMessageText(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                className="flex-1"
+                className={styles.footerInput}
               />
               <Button onClick={handleSend}>
                 <Icon name="Send" size={20} />
