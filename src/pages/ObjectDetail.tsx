@@ -19,7 +19,6 @@ import { getWorkStatusInfo, formatDateRange } from '@/utils/workStatus';
 import { NotificationGroup } from '@/components/ui/notification-badge';
 import ObjectInfoBar from '@/components/objects/ObjectInfoBar';
 import { ROUTES } from '@/constants/routes';
-import styles from './ObjectDetail.module.css';
 
 const ObjectDetail = () => {
   const { objectId } = useParams();
@@ -122,10 +121,10 @@ const ObjectDetail = () => {
   };
 
   return (
-    <div className={styles.container}>
+    <div className="min-h-screen bg-slate-50">
       {/* Mobile: хедер */}
-      <div className={styles.mobileHeader}>
-        <div className={styles.mobileHeaderInfo}>
+      <div className="md:hidden sticky top-0 z-10 bg-white border-b border-slate-200 p-4">
+        <div className="mb-3">
           <ObjectInfoBar 
             object={object} 
             compact 
@@ -134,7 +133,7 @@ const ObjectDetail = () => {
           />
         </div>
 
-        <div className={styles.mobileFilters}>
+        <div className="space-y-2">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full h-10">
               <SelectValue placeholder="Все работы" />
@@ -163,14 +162,14 @@ const ObjectDetail = () => {
 
 
 
-      <div className={styles.mobileContent}>
+      <div className="md:hidden pb-24">
         {objectWorks.length === 0 ? (
-          <div className={styles.mobileEmpty}>
-            <Icon name="Briefcase" size={48} className={styles.emptyIcon} />
-            <h3 className={styles.emptyTitle}>
+          <div className="flex flex-col items-center justify-center h-96 px-4">
+            <Icon name="Briefcase" size={48} className="text-slate-300 mb-4" />
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">
               Пока нет работ
             </h3>
-            <p className={styles.emptyDescription}>
+            <p className="text-sm text-slate-600 mb-6 text-center max-w-md">
               Создайте первую работу для этого объекта
             </p>
             <Button onClick={() => navigate(ROUTES.WORK_CREATE(Number(objectId)))}>
@@ -180,22 +179,22 @@ const ObjectDetail = () => {
           </div>
         ) : (
           <>
-            <div className={styles.mobileWorksList}>
+            <div className="divide-y divide-slate-100">
               {objectWorks.map((work) => (
                 <div
                   key={work.id}
-                  className={styles.mobileWorkItem}
+                  className="bg-white p-4 active:bg-slate-50 transition-colors cursor-pointer"
                   onClick={() => navigate(ROUTES.WORK_DETAIL(Number(objectId), work.id))}
                 >
-                  <div className={styles.mobileWorkContent}>
-                    <div className={styles.mobileWorkIcon}>
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
                       <Icon name="Wrench" size={18} className="text-blue-600" />
                     </div>
                     
-                    <div className={styles.mobileWorkInfo}>
-                      <h3 className={styles.mobileWorkTitle}>{work.title}</h3>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-base text-slate-900 mb-1 line-clamp-2">{work.title}</h3>
                       
-                      <div className={styles.mobileWorkMeta}>
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <Badge 
                           variant="outline"
                           className={`text-xs ${getWorkStatusInfo(work).color}`}

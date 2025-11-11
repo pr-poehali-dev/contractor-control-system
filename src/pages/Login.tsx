@@ -8,7 +8,6 @@ import { useToast } from '@/hooks/use-toast';
 import { apiClient } from '@/api/apiClient';
 import { ENDPOINTS } from '@/api/endpoints';
 import { ROUTES } from '@/constants/routes';
-import styles from './Login.module.css';
 
 const Login = () => {
   const [phone, setPhone] = useState('');
@@ -106,22 +105,22 @@ const Login = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.wrapper}>
-        <div className={styles.header}>
-          <div className={styles.logoWrapper}>
-            <Icon name="Building2" size={40} className={styles.logoIcon} />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-slate-50 p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-blue-600 mb-6">
+            <Icon name="Building2" size={40} className="text-white" />
           </div>
-          <h1 className={styles.title}>Подряд-ПРО</h1>
-          <p className={styles.subtitle}>Контроль подрядчиков</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Подряд-ПРО</h1>
+          <p className="text-slate-600 text-lg">Контроль подрядчиков</p>
         </div>
 
-        <div className={styles.card}>
-          <h2 className={styles.cardTitle}>Вход в систему</h2>
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-slate-900 mb-6">Вход в систему</h2>
           
-          <div className={styles.form}>
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 Номер телефона
               </label>
               <Input
@@ -129,7 +128,7 @@ const Login = () => {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+7 (999) 123-45-67 или admin"
-                className={styles.input}
+                className="h-12"
                 autoFocus
                 disabled={isCodeSent}
                 onKeyDown={(e) => e.key === 'Enter' && !isCodeSent && handleSendCode()}
@@ -137,8 +136,8 @@ const Login = () => {
             </div>
 
             {isCodeSent && (
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Код подтверждения
                 </label>
                 <Input
@@ -146,13 +145,13 @@ const Login = () => {
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                   placeholder="123456"
-                  className={styles.input}
+                  className="h-12"
                   maxLength={6}
                   autoFocus
                   onKeyDown={(e) => e.key === 'Enter' && handleVerifyCode()}
                 />
                 {devCode && (
-                  <p className={styles.devCode}>
+                  <p className="text-xs text-slate-500 mt-1">
                     Код для разработки: {devCode}
                   </p>
                 )}
@@ -163,7 +162,7 @@ const Login = () => {
               <Button
                 onClick={handleSendCode}
                 disabled={isLoading}
-                className={styles.button}
+                className="w-full h-12 text-base font-semibold"
               >
                 {isLoading ? (
                   <Icon name="Loader2" size={20} className="animate-spin" />
@@ -176,7 +175,7 @@ const Login = () => {
                 <Button
                   onClick={handleVerifyCode}
                   disabled={isLoading}
-                  className={styles.button}
+                  className="w-full h-12 text-base font-semibold"
                 >
                   {isLoading ? (
                     <Icon name="Loader2" size={20} className="animate-spin" />
@@ -191,7 +190,7 @@ const Login = () => {
                     setDevCode('');
                   }}
                   variant="outline"
-                  className={styles.buttonOutline}
+                  className="w-full h-12 text-base"
                 >
                   Изменить номер
                 </Button>
@@ -200,7 +199,7 @@ const Login = () => {
           </div>
         </div>
 
-        <div className={styles.footer}>
+        <div className="mt-4 text-center space-y-2">
           <Button
             onClick={async () => {
               try {
@@ -220,16 +219,16 @@ const Login = () => {
               }
             }}
             variant="outline"
-            className={styles.buttonOutline}
+            className="w-full"
             disabled={isLoading}
           >
             Быстрый вход (admin)
           </Button>
           
-          <div className={styles.terms}>
+          <div className="text-center text-xs text-slate-500">
             <p>
               Входя в систему, вы соглашаетесь с{' '}
-              <a href="#" className={styles.termsLink}>
+              <a href="#" className="text-blue-600 hover:underline">
                 условиями использования
               </a>
             </p>

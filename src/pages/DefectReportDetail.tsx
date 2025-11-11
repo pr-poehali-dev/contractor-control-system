@@ -9,7 +9,6 @@ import DefectReportInfo from '@/components/defect-report/DefectReportInfo';
 import DefectItem from '@/components/defect-report/DefectItem';
 import { apiClient } from '@/api/apiClient';
 import { ENDPOINTS } from '@/api/endpoints';
-import styles from './DefectReportDetail.module.css';
 
 interface Defect {
   id: string;
@@ -156,10 +155,10 @@ const DefectReportDetail = () => {
 
   if (loading) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.loadingContent}>
-          <div className={styles.spinner}></div>
-          <p className={styles.loadingText}>Загрузка акта...</p>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-slate-600">Загрузка акта...</p>
         </div>
       </div>
     );
@@ -167,8 +166,8 @@ const DefectReportDetail = () => {
 
   if (!report) {
     return (
-      <div className={styles.errorContainer}>
-        <p className={styles.errorText}>Акт не найден</p>
+      <div className="min-h-screen bg-slate-50 p-4">
+        <p className="text-slate-500 text-center mt-8">Акт не найден</p>
       </div>
     );
   }
@@ -179,11 +178,10 @@ const DefectReportDetail = () => {
   const progress = calculateProgress();
 
   return (
-    <div className={styles.container}>
+    <div className="min-h-screen bg-slate-50">
       <DefectReportHeader reportNumber={report.report_number} />
 
-      <div className={styles.wrapper}>
-        <div className={styles.contentSpace}>
+      <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
         <DefectReportInfo report={report} progress={progress} />
 
         <Card>
@@ -213,7 +211,6 @@ const DefectReportDetail = () => {
             })}
           </CardContent>
         </Card>
-        </div>
       </div>
     </div>
   );

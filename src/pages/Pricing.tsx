@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils';
 import DiscountTimer from '@/components/pricing/DiscountTimer';
 import { useDiscountOffer } from '@/hooks/useDiscountOffer';
 import TestProModal from '@/components/dev/TestProModal';
-import styles from './Pricing.module.css';
 
 const userTiers = [
   { users: 5, label: '5 пользователей', price: 0 },
@@ -126,23 +125,23 @@ const Pricing = () => {
   const finalPrice = totalPrice - totalDiscount;
 
   return (
-    <div className={styles.container}>
-      <div className={styles.wrapper}>
-        <div className={styles.header}>
-          <div className={styles.headerContent}>
-            <div className={styles.iconWrapper}>
-              <Icon name="Gem" size={18} className={styles.iconSmall} />
-              <Icon name="Gem" size={24} className={styles.iconLarge} />
+    <div className="min-h-screen bg-slate-50">
+      <div className="w-full max-w-5xl mx-auto px-3 py-3 md:px-8 md:py-8 pb-24 md:pb-10">
+        <div className="mb-4 md:mb-8">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center justify-center w-9 h-9 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex-shrink-0">
+              <Icon name="Gem" size={18} className="text-white md:hidden" />
+              <Icon name="Gem" size={24} className="text-white hidden md:block" />
             </div>
-            <div className={styles.titleSection}>
-              <h1 className={styles.title}>Тарифы</h1>
-              <p className={styles.subtitle}>Настройте план</p>
+            <div>
+              <h1 className="text-lg md:text-3xl font-bold text-slate-900">Тарифы</h1>
+              <p className="text-[10px] md:text-base text-slate-600">Настройте план</p>
             </div>
           </div>
         </div>
 
-        <div className={styles.grid}>
-          <div className={styles.leftColumn}>
+        <div className="grid lg:grid-cols-3 gap-3 md:gap-6">
+          <div className="lg:col-span-2 space-y-3 md:space-y-6">
           <Card>
             <CardHeader className="pb-3 md:pb-6">
               <CardTitle className="flex items-center gap-2 text-sm md:text-lg">

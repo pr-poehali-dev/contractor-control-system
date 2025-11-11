@@ -7,7 +7,6 @@ import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { ROUTES } from '@/constants/routes';
-import styles from './Register.module.css';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -83,21 +82,21 @@ const Register = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.wrapper}>
-        <div className={styles.header}>
-          <div className={styles.logoWrapper}>
-            <Icon name="Building2" size={40} className={styles.logoIcon} />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-slate-50 p-4">
+      <div className="w-full max-w-lg">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-blue-600 mb-6">
+            <Icon name="Building2" size={40} className="text-white" />
           </div>
-          <h1 className={styles.title}>Подряд-ПРО</h1>
-          <p className={styles.subtitle}>Создание аккаунта заказчика</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Подряд-ПРО</h1>
+          <p className="text-slate-600 text-lg">Создание аккаунта заказчика</p>
         </div>
 
-        <div className={styles.card}>
-          <h2 className={styles.cardTitle}>Регистрация</h2>
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-slate-900 mb-6">Регистрация</h2>
           
-          <div className={styles.form}>
-            <div className={styles.inputGroup}>
+          <div className="space-y-4">
+            <div>
               <Label htmlFor="name">Ваше имя *</Label>
               <Input
                 id="name"
@@ -105,12 +104,12 @@ const Register = () => {
                 value={formData.name}
                 onChange={(e) => handleChange('name', e.target.value)}
                 placeholder="Иван Иванов"
-                className={styles.input}
+                className="h-12 mt-1"
                 autoFocus
               />
             </div>
 
-            <div className={styles.inputGroup}>
+            <div>
               <Label htmlFor="organization">Организация</Label>
               <Input
                 id="organization"
@@ -118,11 +117,11 @@ const Register = () => {
                 value={formData.organization}
                 onChange={(e) => handleChange('organization', e.target.value)}
                 placeholder="ООО &quot;Строй-Инвест&quot;"
-                className={styles.input}
+                className="h-12 mt-1"
               />
             </div>
 
-            <div className={styles.inputGroup}>
+            <div>
               <Label htmlFor="email">Email *</Label>
               <Input
                 id="email"
@@ -130,11 +129,11 @@ const Register = () => {
                 value={formData.email}
                 onChange={(e) => handleChange('email', e.target.value)}
                 placeholder="user@example.com"
-                className={styles.input}
+                className="h-12 mt-1"
               />
             </div>
 
-            <div className={styles.inputGroup}>
+            <div>
               <Label htmlFor="phone">Телефон</Label>
               <Input
                 id="phone"
@@ -142,11 +141,11 @@ const Register = () => {
                 value={formData.phone}
                 onChange={(e) => handleChange('phone', e.target.value)}
                 placeholder="+7 999 123-45-67"
-                className={styles.input}
+                className="h-12 mt-1"
               />
             </div>
 
-            <div className={styles.inputGroup}>
+            <div>
               <Label htmlFor="password">Пароль *</Label>
               <Input
                 id="password"
@@ -154,11 +153,11 @@ const Register = () => {
                 value={formData.password}
                 onChange={(e) => handleChange('password', e.target.value)}
                 placeholder="Минимум 6 символов"
-                className={styles.input}
+                className="h-12 mt-1"
               />
             </div>
 
-            <div className={styles.inputGroup}>
+            <div>
               <Label htmlFor="confirmPassword">Подтвердите пароль *</Label>
               <Input
                 id="confirmPassword"
@@ -166,7 +165,7 @@ const Register = () => {
                 value={formData.confirmPassword}
                 onChange={(e) => handleChange('confirmPassword', e.target.value)}
                 placeholder="Повторите пароль"
-                className={styles.input}
+                className="h-12 mt-1"
                 onKeyDown={(e) => e.key === 'Enter' && handleRegister()}
               />
             </div>
@@ -174,7 +173,7 @@ const Register = () => {
             <Button
               onClick={handleRegister}
               disabled={isLoading}
-              className={styles.button}
+              className="w-full h-12 text-base font-semibold mt-6"
             >
               {isLoading ? (
                 <Icon name="Loader2" size={20} className="animate-spin" />
@@ -187,20 +186,20 @@ const Register = () => {
             </Button>
           </div>
 
-          <div className={styles.infoBox}>
-            <p className={styles.infoText}>
-              <Icon name="Info" size={16} className={styles.infoIcon} />
+          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+            <p className="text-sm text-blue-900">
+              <Icon name="Info" size={16} className="inline mr-1" />
               После регистрации вы сможете создавать проекты и приглашать подрядчиков
             </p>
           </div>
         </div>
 
-        <div className={styles.footer}>
-          <p className={styles.footerText}>
+        <div className="mt-6 text-center">
+          <p className="text-sm text-slate-600">
             Уже есть аккаунт?{' '}
             <button
               onClick={() => navigate(ROUTES.LOGIN)}
-              className={styles.footerLink}
+              className="text-blue-600 hover:underline font-medium"
             >
               Войти
             </button>

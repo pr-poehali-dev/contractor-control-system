@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ROUTES } from '@/constants/routes';
-import styles from './Profile.module.css';
 
 const getRoleLabel = (role?: string): string => {
   if (role === 'admin') return 'Администратор';
@@ -63,43 +62,43 @@ const Profile = () => {
   const qualityRating = Math.floor((userInspections.filter(i => i.status === 'completed').length / Math.max(userInspections.length, 1)) * 100);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.wrapper}>
-        <Card className={styles.profileCard}>
-          <CardContent className={styles.profileContent}>
+    <div className="min-h-screen bg-slate-50">
+      <div className="container max-w-6xl mx-auto p-4 md:p-8 pb-24 md:pb-10">
+        <Card className="mb-8">
+          <CardContent className="pt-6 relative">
             <Button 
               variant="ghost" 
               size="icon"
               onClick={() => navigate(ROUTES.SETTINGS)}
-              className={styles.settingsButton}
+              className="absolute top-6 right-6 h-10 w-10 rounded-full"
             >
               <Icon name="Settings" size={20} />
             </Button>
-            <div className={styles.profileHeader}>
-              <div className={styles.avatar}>
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold text-3xl mb-4">
                 {user ? getInitials(user.name) : 'U'}
               </div>
-              <h1 className={styles.name}>{user?.name}</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">{user?.name}</h1>
               {user?.role === 'contractor' && user?.organization && (
-                <p className={styles.role}>{user.organization}</p>
+                <p className="text-slate-600 mb-3">{user.organization}</p>
               )}
-              <Badge variant="outline" className={styles.badge}>
+              <Badge variant="outline" className="mb-4">
                 {getRoleLabel(user?.role)}
               </Badge>
             </div>
 
             {user?.role === 'admin' ? (
-              <div className={styles.adminActions}>
+              <div className="grid grid-cols-2 gap-3 mt-6">
                 <Button 
                   onClick={() => navigate(ROUTES.ADMIN)}
-                  className={`${styles.adminButton} bg-blue-600 hover:bg-blue-700`}
+                  className="h-16 flex flex-col items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700"
                 >
                   <Icon name="Shield" size={20} />
                   <span className="text-xs">Админ-панель</span>
                 </Button>
                 <Button 
                   onClick={() => navigate(ROUTES.WORK_TYPES)}
-                  className={`${styles.adminButton} bg-purple-600 hover:bg-purple-700`}
+                  className="h-16 flex flex-col items-center justify-center gap-1 bg-purple-600 hover:bg-purple-700"
                 >
                   <Icon name="BookOpen" size={20} />
                   <span className="text-xs">Справочники</span>
@@ -176,16 +175,16 @@ const Profile = () => {
         </Card>
 
         {user?.role !== 'admin' && (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className={styles.tabs}>
-            <TabsList className={`${styles.tabsList} ${user?.role === 'client' ? styles.twoColumns : styles.oneColumn}`}>
-              <TabsTrigger value="objects" className={styles.tabTrigger}>Мои объекты</TabsTrigger>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList className={`grid w-full ${user?.role === 'client' ? 'grid-cols-2' : 'grid-cols-1'}`}>
+              <TabsTrigger value="objects" className="text-xs md:text-sm">Мои объекты</TabsTrigger>
               {user?.role === 'client' && (
-                <TabsTrigger value="inspections" className={styles.tabTrigger}>Мои проверки</TabsTrigger>
+                <TabsTrigger value="inspections" className="text-xs md:text-sm">Мои проверки</TabsTrigger>
               )}
             </TabsList>
 
-            <TabsContent value="objects" className={styles.tabContent}>
-            <div className={styles.cardsGrid}>
+            <TabsContent value="objects" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {userObjects.map((obj) => (
                 <Card key={obj.id} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate(ROUTES.PUBLIC_OBJECT(obj.id))}>
                   <CardContent className="p-4">

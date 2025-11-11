@@ -7,7 +7,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import styles from './WorkLog.module.css';
 
 const WorkLog = () => {
   const { user, userData } = useAuthRedux();
@@ -61,8 +60,8 @@ const WorkLog = () => {
   };
 
   const MessageCard = ({ entry, isOwn }: { entry: typeof logEntries[0]; isOwn: boolean }) => (
-    <div className={cn(styles.messageWrapper, isOwn && styles.messageWrapperOwn)}>
-      <Avatar className={styles.avatar}>
+    <div className={cn('flex gap-3 mb-4', isOwn && 'flex-row-reverse')}>
+      <Avatar className="w-9 h-9 md:w-10 md:h-10 flex-shrink-0">
         <AvatarFallback className={cn(
           'text-xs font-semibold',
           isOwn ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-700'
@@ -71,26 +70,26 @@ const WorkLog = () => {
         </AvatarFallback>
       </Avatar>
 
-      <div className={cn(styles.messageContent, isOwn && styles.messageContentOwn)}>
-        <div className={cn(styles.messageHeader, isOwn && styles.messageHeaderOwn)}>
-          <span className={styles.authorName}>{entry.authorName}</span>
-          <span className={styles.timestamp}>{formatTime(entry.timestamp)}</span>
+      <div className={cn('flex-1 max-w-[85%] md:max-w-[70%]', isOwn && 'flex flex-col items-end')}>
+        <div className={cn('mb-1 flex items-baseline gap-2', isOwn && 'flex-row-reverse')}>
+          <span className="text-sm font-semibold text-slate-900">{entry.authorName}</span>
+          <span className="text-xs text-slate-400">{formatTime(entry.timestamp)}</span>
         </div>
 
         <Card className={cn(
-          styles.messageCard,
-          isOwn && styles.messageCardOwn,
-          entry.type === 'work' && styles.messageCardWork
+          'border-none shadow-sm',
+          isOwn ? 'bg-blue-50' : 'bg-white',
+          entry.type === 'work' && 'border-l-4 border-l-blue-500'
         )}>
-          <CardContent className={styles.messageBody}>
+          <CardContent className="p-3 md:p-4">
             {entry.type === 'work' && (
-              <div className={styles.workBadge}>
+              <div className="flex items-center gap-2 mb-2 pb-2 border-b border-slate-200">
                 <Icon name="Wrench" size={16} className="text-blue-600" />
-                <span className={styles.workBadgeText}>Запись о работе</span>
+                <span className="text-xs font-semibold text-blue-600">Запись о работе</span>
               </div>
             )}
 
-            <p className={styles.messageText}>
+            <p className="text-sm md:text-base text-slate-900 whitespace-pre-wrap break-words leading-relaxed">
               {entry.content}
             </p>
 
@@ -137,23 +136,23 @@ const WorkLog = () => {
   );
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Журнал работ</h1>
-        <p className={styles.subtitle}>Все записи и события по проектам</p>
+    <div className="flex flex-col h-screen bg-slate-50">
+      <div className="bg-white border-b border-slate-200 p-4 md:p-6 flex-shrink-0">
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">Журнал работ</h1>
+        <p className="text-sm text-slate-500">Все записи и события по проектам</p>
       </div>
 
-      <div className={styles.content}>
+      <div className="flex-1 overflow-y-auto p-4 md:p-6">
         {logEntries.length === 0 ? (
-          <div className={styles.empty}>
-            <div className={styles.emptyIcon}>
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4">
               <Icon name="FileText" size={32} className="text-slate-300" />
             </div>
-            <p className={styles.emptyTitle}>Записей пока нет</p>
-            <p className={styles.emptyDescription}>Добавьте первую запись в журнал</p>
+            <p className="text-slate-500 text-lg mb-2">Записей пока нет</p>
+            <p className="text-slate-400 text-sm">Добавьте первую запись в журнал</p>
           </div>
         ) : (
-          <div className={styles.messages}>
+          <div className="max-w-4xl mx-auto">
             {logEntries.map((entry) => {
               const isOwnMessage = entry.authorId === user?.id;
               return (
@@ -168,14 +167,14 @@ const WorkLog = () => {
         )}
       </div>
 
-      <div className={styles.footer}>
-        <div className={styles.footerContent}>
-          <div className={styles.inputWrapper}>
+      <div className="bg-white border-t border-slate-200 p-4 md:p-6 flex-shrink-0">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex gap-3">
             <Textarea
               placeholder="Добавить запись в журнал..."
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              className={styles.textarea}
+              className="min-h-[60px] md:min-h-[80px] resize-none text-sm md:text-base"
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
@@ -186,13 +185,13 @@ const WorkLog = () => {
             <Button 
               onClick={handleSendMessage}
               disabled={!newMessage.trim()}
-              className={styles.sendButton}
+              className="self-end"
               size="icon"
             >
               <Icon name="Send" size={20} />
             </Button>
           </div>
-          <p className={styles.hint}>
+          <p className="text-xs text-slate-400 mt-2">
             Enter — отправить, Shift+Enter — новая строка
           </p>
         </div>

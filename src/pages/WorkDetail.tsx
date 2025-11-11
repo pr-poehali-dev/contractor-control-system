@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import WorkJournal from '@/components/WorkJournal';
 import { ROUTES } from '@/constants/routes';
-import styles from './WorkDetail.module.css';
 
 const WorkDetail = () => {
   const { objectId, workId } = useParams();
@@ -19,10 +18,10 @@ const WorkDetail = () => {
 
   if (isLoading) {
     return (
-      <div className={styles.container}>
-        <div className={styles.loadingContainer}>
-          <div className={styles.spinner}></div>
-          <p className={styles.loadingText}>Загрузка...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-slate-600">Загрузка...</p>
         </div>
       </div>
     );
@@ -30,13 +29,13 @@ const WorkDetail = () => {
 
   if (!work) {
     return (
-      <div className={styles.errorContainer}>
+      <div className="min-h-screen bg-slate-50 p-4 md:p-8">
         <Button variant="ghost" onClick={() => navigate(ROUTES.OBJECT_DETAIL(Number(objectId)))}>
           <Icon name="ChevronLeft" size={20} className="mr-2" />
           К объекту
         </Button>
-        <div className={styles.errorContent}>
-          <p className={styles.errorText}>Работа не найдена</p>
+        <div className="mt-8 text-center">
+          <p className="text-slate-500">Работа не найдена</p>
         </div>
       </div>
     );
