@@ -69,33 +69,28 @@ export default function EventItem({
               </div>
             )}
             
-            {event.work_data?.completion_percentage !== undefined && (
-              <div className="mt-3 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
-                <div className="flex items-center justify-between">
-                  <p className="text-[13px] sm:text-sm text-slate-700">
-                    Процент выполнения:
-                  </p>
-                  <span className="font-bold text-green-700 text-base">{event.work_data.completion_percentage}%</span>
-                </div>
-                <div className="mt-2 w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-                  <div 
-                    className="bg-gradient-to-r from-green-500 to-emerald-600 h-full rounded-full transition-all duration-300"
-                    style={{ width: `${event.work_data.completion_percentage}%` }}
-                  />
-                </div>
-              </div>
-            )}
-            
-            {event.work_data?.materials && event.work_data.materials.length > 0 && (
-              <div className="mt-3">
-                <p className="text-[12px] sm:text-sm text-slate-600 mb-2 font-medium">Материалы:</p>
-                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                  {event.work_data.materials.map((material, idx) => (
-                    <Badge key={idx} variant="outline" className="text-[11px] sm:text-xs py-1 px-2.5 bg-white">
-                      {material}
-                    </Badge>
-                  ))}
-                </div>
+            {event.work_data?.positions && event.work_data.positions.length > 0 && (
+              <div className="mt-3 space-y-2">
+                <p className="text-[12px] sm:text-sm text-slate-600 font-medium">Позиции выполненных работ:</p>
+                {event.work_data.positions.map((position, idx) => (
+                  <div key={idx} className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <p className="text-[13px] sm:text-sm font-semibold text-slate-800 mb-1">
+                          {position.name}
+                          {position.is_manual && (
+                            <Badge variant="outline" className="ml-2 text-[10px] bg-blue-100 text-blue-700 border-blue-200">
+                              Ручной ввод
+                            </Badge>
+                          )}
+                        </p>
+                        <p className="text-[12px] sm:text-sm text-slate-600">
+                          Выполнено: <span className="font-bold text-blue-700">{position.quantity} {position.unit}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
             

@@ -16,7 +16,9 @@ import WorkHeader from '@/components/work-journal/WorkHeader';
 import WorkLogTab from '@/components/work-journal/WorkLogTab';
 import DescriptionTab from '@/components/work-journal/DescriptionTab';
 import EstimateTab from '@/components/work-journal/EstimateTab';
+import EstimateComparisonTab from '@/components/work-journal/EstimateComparisonTab';
 import AnalyticsTab from '@/components/work-journal/AnalyticsTab';
+import { mockEstimatePositions, mockWorkReports } from '@/data/mockEstimateData';
 import CreateInspectionSimple from '@/components/work-journal/CreateInspectionSimple';
 import WorkReportModal from '@/components/work-journal/WorkReportModal';
 import WorkEditDialog from '@/components/work-detail/WorkEditDialog';
@@ -84,6 +86,8 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
   const [showWorksList, setShowWorksList] = useState(false);
   const [activeTab, setActiveTab] = useState('journal');
   const [workTemplates, setWorkTemplates] = useState<any[]>([]);
+  const [estimatePositions] = useState(mockEstimatePositions);
+  const [workReports] = useState(mockWorkReports);
 
   useEffect(() => {
     const loadWorkTemplates = async () => {
@@ -330,6 +334,13 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                   <EstimateTab handleCreateEstimate={handleCreateEstimate} />
                 )}
 
+                {activeTab === 'comparison' && (
+                  <EstimateComparisonTab 
+                    estimatePositions={estimatePositions}
+                    workReports={workReports}
+                  />
+                )}
+
                 {activeTab === 'analytics' && (
                   <AnalyticsTab workId={selectedWork || 0} />
                 )}
@@ -357,7 +368,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
         onClose={() => handlers.setIsWorkReportModalOpen(false)}
         onSubmit={handlers.handleWorkReportSubmit}
         isSubmitting={handlers.isSubmitting}
-        currentCompletion={selectedWorkData?.completion_percentage || 0}
+        estimatePositions={estimatePositions}
       />
 
       <WorkEditDialog

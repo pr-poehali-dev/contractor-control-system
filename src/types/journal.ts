@@ -31,6 +31,12 @@ export interface JournalEvent {
     progress?: number;
     completion_percentage?: number;
     workLogNumber?: string;
+    positions?: Array<{
+      name: string;
+      unit: string;
+      quantity: number;
+      is_manual: boolean;
+    }>;
   };
   
   inspection_data?: {

@@ -137,23 +137,29 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
   };
 
   const handleWorkReportSubmit = async (data: {
-    text_content: string;
-    work_volume: string;
-    materials: Array<{ name: string; quantity: number; unit: string }>;
+    description: string;
     photo_urls: string[];
-    completion_percentage: number;
+    positions: Array<{
+      estimate_position_id?: number;
+      name: string;
+      unit: string;
+      actual_quantity: number;
+      is_manual: boolean;
+    }>;
   }) => {
     if (!user || !selectedWork) return;
     
     setIsSubmitting(true);
 
     try {
+      const positionsJson = JSON.stringify(data.positions);
+      
       await dispatch(createWorkLog({
         work_id: selectedWork,
-        description: data.text_content,
-        progress: data.completion_percentage,
-        volume: data.work_volume || null,
-        materials: data.materials.map(m => `${m.name} ${m.quantity} ${m.unit}`).join(', ') || null,
+        description: data.description,
+        progress: 0,
+        volume: null,
+        materials: positionsJson,
         photo_urls: data.photo_urls.join(',') || null,
       })).unwrap();
 
