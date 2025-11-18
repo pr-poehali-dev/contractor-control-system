@@ -313,10 +313,30 @@ const FeedEventCard = ({ event, index, onStartInspection, onTagClick, onInspecti
               </div>
             )}
             {event.materials && (
-              <div className="flex items-center gap-2 text-xs text-slate-700">
-                <Icon name="Boxes" size={14} className="text-slate-500" />
-                <span className="font-medium">Материалы:</span>
-                <span>{event.materials}</span>
+              <div className="flex items-start gap-2 text-xs text-slate-700 flex-1">
+                <Icon name="Boxes" size={14} className="text-slate-500 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <span className="font-medium">Материалы:</span>
+                  {(() => {
+                    try {
+                      const positions = JSON.parse(event.materials);
+                      if (Array.isArray(positions) && positions.length > 0) {
+                        return (
+                          <ul className="mt-1 space-y-0.5">
+                            {positions.map((pos: any, idx: number) => (
+                              <li key={idx} className="text-slate-600">
+                                • {pos.name}: {pos.actual_quantity} {pos.unit}
+                              </li>
+                            ))}
+                          </ul>
+                        );
+                      }
+                      return <span className="ml-1">{event.materials}</span>;
+                    } catch {
+                      return <span className="ml-1">{event.materials}</span>;
+                    }
+                  })()}
+                </div>
               </div>
             )}
           </div>
