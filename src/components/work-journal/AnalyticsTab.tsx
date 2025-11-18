@@ -11,9 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import type { EstimatePosition, WorkReport } from '@/types/estimate';
 
 interface AnalyticsTabProps {
   workId: number;
+  estimatePositions?: EstimatePosition[];
+  workReports?: WorkReport[];
 }
 
 interface MaterialItem {
@@ -42,14 +45,48 @@ const mockMaterials: MaterialItem[] = [
   { id: 11, name: 'Электроэнергия', planned: 32450, actual: 3000, deviation: 29450, deviationPercent: 90.76 },
 ];
 
-export default function AnalyticsTab({ workId }: AnalyticsTabProps) {
+export default function AnalyticsTab({ workId, estimatePositions = [], workReports = [] }: AnalyticsTabProps) {
+  const materials = useMemo(() => {
+    if (estimatePositions.length === 0) return mockMaterials;
+
+    const positionMap = new Map<number, { name: string; planned: number; actual: number; unit: string }>();
+
+    estimatePositions.forEach(ep => {
+      positionMap.set(ep.id, {
+        name: ep.name,
+        planned: ep.planned_quantity,
+        actual: 0,
+        unit: ep.unit,
+      });
+    });
+
+    workReports.forEach(report => {
+      report.positions.forEach(rp => {
+        if (rp.estimate_position_id) {
+          const existing = positionMap.get(rp.estimate_position_id);
+          if (existing) {
+            existing.actual += rp.actual_quantity;
+          }
+        }
+      });
+    });
+
+    return Array.from(positionMap.entries()).map(([id, data]) => ({
+      id,
+      name: data.name,
+      planned: data.planned,
+      actual: data.actual,
+      deviation: data.planned - data.actual,
+      deviationPercent: data.planned > 0 ? ((data.planned - data.actual) / data.planned) * 100 : 0,
+    }));
+  }, [estimatePositions, workReports]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [deviationFilter, setDeviationFilter] = useState<'all' | 'positive' | 'negative' | 'zero'>('all');
 
   const filteredAndSortedMaterials = useMemo(() => {
-    let filtered = mockMaterials;
+    let filtered = materials;
 
     if (searchQuery) {
       filtered = filtered.filter(item =>

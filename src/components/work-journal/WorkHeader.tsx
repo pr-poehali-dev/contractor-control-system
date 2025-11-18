@@ -74,7 +74,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
 
         {/* Mobile tabs */}
         <div className="border-t border-slate-200 -mx-4 px-4 pt-1 pb-0">
-        <div className="grid grid-cols-6 gap-1">
+        <div className="grid grid-cols-5 gap-1">
           <button
             onClick={() => setActiveTab('journal')}
             className={`py-2 transition-all relative flex items-center justify-center rounded-lg ${
@@ -83,7 +83,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
                 : 'text-slate-600 font-medium'
             }`}
           >
-            <span className="text-[11px]">Чат</span>
+            <span className="text-[12px]">Чат</span>
           </button>
           <button
             onClick={() => setActiveTab('info')}
@@ -93,7 +93,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
                 : 'text-slate-600 font-medium'
             }`}
           >
-            <span className="text-[11px]">Журнал</span>
+            <span className="text-[12px]">Журнал</span>
           </button>
           <button
             onClick={() => setActiveTab('description')}
@@ -103,7 +103,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
                 : 'text-slate-600 font-medium'
             }`}
           >
-            <span className="text-[11px]">Докум.</span>
+            <span className="text-[12px]">Докум.</span>
           </button>
           <button
             onClick={() => setActiveTab('estimate')}
@@ -113,17 +113,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
                 : 'text-slate-600 font-medium'
             }`}
           >
-            <span className="text-[11px]">Смета</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('comparison')}
-            className={`py-2 transition-all relative flex items-center justify-center rounded-lg ${
-              activeTab === 'comparison'
-                ? 'text-blue-600 bg-blue-50 font-semibold'
-                : 'text-slate-600 font-medium'
-            }`}
-          >
-            <span className="text-[11px]">Сравн.</span>
+            <span className="text-[12px]">Смета</span>
           </button>
           <button
             onClick={() => setActiveTab('analytics')}
@@ -133,7 +123,7 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
                 : 'text-slate-600 font-medium'
             }`}
           >
-            <span className="text-[11px]">Данные</span>
+            <span className="text-[12px]">Данные</span>
           </button>
         </div>
         </div>
@@ -214,19 +204,6 @@ export default function WorkHeader({ selectedWorkData, activeTab, setActiveTab, 
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
               }`}
             >Локальная смета</button>
-            <button
-              onClick={() => setActiveTab('comparison')}
-              className={`pb-3 px-4 text-[15px] font-semibold transition-all relative whitespace-nowrap rounded-t-xl ${
-                activeTab === 'comparison'
-                  ? 'text-blue-600 bg-gradient-to-b from-blue-50/50 to-transparent'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/50'
-              }`}
-            >
-              Сравнение
-              {activeTab === 'comparison' && (
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-lg" />
-              )}
-            </button>
             <button
               onClick={() => setActiveTab('analytics')}
               className={`pb-3 px-4 text-[15px] font-semibold transition-all relative whitespace-nowrap rounded-t-xl ${

@@ -16,7 +16,7 @@ import WorkHeader from '@/components/work-journal/WorkHeader';
 import WorkLogTab from '@/components/work-journal/WorkLogTab';
 import DescriptionTab from '@/components/work-journal/DescriptionTab';
 import EstimateTab from '@/components/work-journal/EstimateTab';
-import EstimateComparisonTab from '@/components/work-journal/EstimateComparisonTab';
+
 import AnalyticsTab from '@/components/work-journal/AnalyticsTab';
 import { mockEstimatePositions, mockWorkReports } from '@/data/mockEstimateData';
 import CreateInspectionSimple from '@/components/work-journal/CreateInspectionSimple';
@@ -334,15 +334,12 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                   <EstimateTab handleCreateEstimate={handleCreateEstimate} />
                 )}
 
-                {activeTab === 'comparison' && (
-                  <EstimateComparisonTab 
+                {activeTab === 'analytics' && (
+                  <AnalyticsTab 
+                    workId={selectedWork || 0}
                     estimatePositions={estimatePositions}
                     workReports={workReports}
                   />
-                )}
-
-                {activeTab === 'analytics' && (
-                  <AnalyticsTab workId={selectedWork || 0} />
                 )}
               </div>
 
