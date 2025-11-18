@@ -122,6 +122,32 @@ export default function WorkLogTab({ workId, objectId, onCreateInspection, onCre
                   <p className="text-xs md:text-sm text-slate-700 mb-2 line-clamp-2">{event.data.description}</p>
                 )}
 
+                {event.data.materials && (() => {
+                  try {
+                    const positions = JSON.parse(event.data.materials);
+                    if (Array.isArray(positions) && positions.length > 0) {
+                      return (
+                        <div className="mb-2 p-2 bg-slate-50 rounded border border-slate-200">
+                          <div className="flex items-center gap-1.5 text-xs font-medium text-slate-700 mb-1">
+                            <Icon name="Boxes" size={14} />
+                            <span>Материалы:</span>
+                          </div>
+                          <ul className="text-xs text-slate-600 space-y-0.5 ml-5">
+                            {positions.map((pos: any, idx: number) => (
+                              <li key={idx}>
+                                • {pos.name}: {pos.actual_quantity} {pos.unit}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      );
+                    }
+                  } catch {
+                    return null;
+                  }
+                  return null;
+                })()}
+
                 <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs md:text-sm">
                   {event.data.completion_percentage !== undefined && event.data.completion_percentage !== null && (
                     <div className="flex items-center gap-1.5 text-green-600 font-medium">
