@@ -90,10 +90,30 @@ export default function WorkLogModal({ isOpen, onClose, workLog }: WorkLogModalP
                 </div>
               )}
               {workLog.materials && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Icon name="Boxes" size={16} className="text-slate-500" />
-                  <span className="font-medium">Материалы:</span>
-                  <span className="text-slate-700">{workLog.materials}</span>
+                <div className="flex items-start gap-2 text-sm flex-1">
+                  <Icon name="Boxes" size={16} className="text-slate-500 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <span className="font-medium">Материалы:</span>
+                    {(() => {
+                      try {
+                        const positions = JSON.parse(workLog.materials);
+                        if (Array.isArray(positions) && positions.length > 0) {
+                          return (
+                            <ul className="mt-1 space-y-1 text-slate-700">
+                              {positions.map((pos: any, idx: number) => (
+                                <li key={idx}>
+                                  • {pos.name}: <strong>{pos.actual_quantity}</strong> {pos.unit}
+                                </li>
+                              ))}
+                            </ul>
+                          );
+                        }
+                        return <span className="ml-1 text-slate-700">{workLog.materials}</span>;
+                      } catch {
+                        return <span className="ml-1 text-slate-700">{workLog.materials}</span>;
+                      }
+                    })()}
+                  </div>
                 </div>
               )}
             </div>
