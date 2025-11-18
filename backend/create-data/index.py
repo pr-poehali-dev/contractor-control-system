@@ -235,6 +235,8 @@ def handler(event, context):
                     VALUES ({placeholders_str})
                     RETURNING id, work_id, description, volume, materials, photo_urls, created_at, created_by
                 """
+                print(f"DEBUG: SQL Query: {sql_query}")
+                print(f"DEBUG: Values: {values_list}")
                 print(f"DEBUG: Executing SQL with {len(values_list)} parameters")
                 
                 cur.execute(sql_query, tuple(values_list))
