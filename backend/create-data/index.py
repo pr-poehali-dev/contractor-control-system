@@ -10,7 +10,7 @@ import jwt
 from psycopg2.extras import RealDictCursor
 
 JWT_SECRET = os.environ.get('JWT_SECRET', 'default-secret-change-in-production')
-SCHEMA = os.environ.get('DB_SCHEMA', 't_p8942561_contractor_control_s')
+SCHEMA = 't_p8942561_contractor_control_s'
 
 def verify_jwt_token(token):
     try:
@@ -223,11 +223,14 @@ def handler(event, context):
                 fields_str = ', '.join(fields)
                 values_str = ', '.join(values)
                 
-                cur.execute(f"""
+                sql_query = f"""
                     INSERT INTO {SCHEMA}.work_logs ({fields_str})
                     VALUES ({values_str})
                     RETURNING id, work_id, description, volume, materials, photo_urls, created_at, created_by
-                """)
+                """
+                print(f"DEBUG: Executing SQL: {sql_query[:200]}...")
+                
+                cur.execute(sql_query)
                 result = cur.fetchone()
                 conn.commit()
                 
