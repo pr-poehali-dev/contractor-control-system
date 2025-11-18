@@ -77,7 +77,7 @@ export default function AnalyticsTab({ workId, estimatePositions = [], workLogs 
             });
           }
         } catch (e) {
-          console.error('Failed to parse materials JSON:', e);
+          // Игнорируем старые записи с невалидным JSON
         }
       });
 
