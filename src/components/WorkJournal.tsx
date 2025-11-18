@@ -87,7 +87,6 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
   const [activeTab, setActiveTab] = useState('journal');
   const [workTemplates, setWorkTemplates] = useState<any[]>([]);
   const [estimatePositions] = useState(mockEstimatePositions);
-  const [workReports] = useState(mockWorkReports);
 
   useEffect(() => {
     const loadWorkTemplates = async () => {
@@ -356,7 +355,7 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
                   <AnalyticsTab 
                     workId={selectedWork || 0}
                     estimatePositions={estimatePositions}
-                    workReports={workReports}
+                    workLogs={workLogs}
                   />
                 )}
               </div>

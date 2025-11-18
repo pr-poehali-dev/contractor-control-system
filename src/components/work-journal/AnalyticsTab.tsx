@@ -16,7 +16,7 @@ import type { EstimatePosition, WorkReport } from '@/types/estimate';
 interface AnalyticsTabProps {
   workId: number;
   estimatePositions?: EstimatePosition[];
-  workReports?: WorkReport[];
+  workLogs?: any[];
 }
 
 interface MaterialItem {
@@ -45,7 +45,7 @@ const mockMaterials: MaterialItem[] = [
   { id: 11, name: 'Электроэнергия', planned: 32450, actual: 3000, deviation: 29450, deviationPercent: 90.76 },
 ];
 
-export default function AnalyticsTab({ workId, estimatePositions = [], workReports = [] }: AnalyticsTabProps) {
+export default function AnalyticsTab({ workId, estimatePositions = [], workLogs = [] }: AnalyticsTabProps) {
   const materials = useMemo(() => {
     if (estimatePositions.length === 0) return mockMaterials;
 
@@ -60,16 +60,26 @@ export default function AnalyticsTab({ workId, estimatePositions = [], workRepor
       });
     });
 
-    workReports.forEach(report => {
-      report.positions.forEach(rp => {
-        if (rp.estimate_position_id) {
-          const existing = positionMap.get(rp.estimate_position_id);
-          if (existing) {
-            existing.actual += rp.actual_quantity;
+    // Обрабатываем реальные workLogs из БД
+    workLogs
+      .filter(log => log.work_id === workId && log.materials)
+      .forEach(log => {
+        try {
+          const positions = JSON.parse(log.materials);
+          if (Array.isArray(positions)) {
+            positions.forEach((pos: any) => {
+              if (pos.estimate_position_id) {
+                const existing = positionMap.get(pos.estimate_position_id);
+                if (existing) {
+                  existing.actual += pos.actual_quantity || 0;
+                }
+              }
+            });
           }
+        } catch (e) {
+          console.error('Failed to parse materials JSON:', e);
         }
       });
-    });
 
     return Array.from(positionMap.entries()).map(([id, data]) => ({
       id,
@@ -79,7 +89,7 @@ export default function AnalyticsTab({ workId, estimatePositions = [], workRepor
       deviation: data.planned - data.actual,
       deviationPercent: data.planned > 0 ? ((data.planned - data.actual) / data.planned) * 100 : 0,
     }));
-  }, [estimatePositions, workReports]);
+  }, [estimatePositions, workLogs, workId]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
