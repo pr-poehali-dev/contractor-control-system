@@ -474,7 +474,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         return {
             'statusCode': 200,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'body': json.dumps({
                 'objects': objects_with_works,
                 'contractors': [dict(c) for c in contractors],
@@ -494,7 +494,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'organization_id': user.get('organization_id'),
                     'created_at': user.get('created_at').isoformat() if user.get('created_at') else None
                 }
-            }, default=str)
+            }, ensure_ascii=False, default=str)
         }
     
     except Exception as e:
@@ -503,6 +503,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         print(f"ERROR in user-data: {error_trace}")
         return {
             'statusCode': 500,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': str(e)})
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': str(e)}, ensure_ascii=False)
         }
