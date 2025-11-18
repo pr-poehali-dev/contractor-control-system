@@ -185,7 +185,6 @@ def handler(event, context):
                 is_work_start = data.get('is_work_start', False)
                 inspection_id = data.get('inspection_id')
                 defects_count = data.get('defects_count')
-                progress = data.get('progress')
                 
                 # Build SQL dynamically with parameterized query
                 fields = ['work_id', 'description', 'created_by', 'created_at']
@@ -221,11 +220,6 @@ def handler(event, context):
                     fields.append('defects_count')
                     placeholders.append('%s')
                     values_list.append(int(defects_count))
-                
-                if progress is not None:
-                    fields.append('progress')
-                    placeholders.append('%s')
-                    values_list.append(int(progress))
                 
                 fields_str = ', '.join(fields)
                 placeholders_str = ', '.join(placeholders)

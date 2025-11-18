@@ -157,7 +157,6 @@ export function useWorkJournalHandlers(selectedWork: number | null) {
       await dispatch(createWorkLog({
         work_id: selectedWork,
         description: data.description,
-        progress: 0,
         volume: null,
         materials: positionsJson,
         photo_urls: data.photo_urls.join(',') || null,
