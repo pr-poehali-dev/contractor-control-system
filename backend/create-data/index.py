@@ -10,7 +10,7 @@ import jwt
 from psycopg2.extras import RealDictCursor
 
 JWT_SECRET = os.environ.get('JWT_SECRET', 'default-secret-change-in-production')
-SCHEMA = 't_p8942561_contractor_control_s'
+SCHEMA = os.environ.get('DB_SCHEMA', 't_p8942561_contractor_control_s')
 
 def verify_jwt_token(token):
     try:
