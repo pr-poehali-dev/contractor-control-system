@@ -166,6 +166,23 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
     const reportNumber = workEntries.length - index;
     const workLogNumber = `${log.work_id}-${reportNumber}`;
     
+    let positions: Array<{ name: string; unit: string; quantity: number; is_manual: boolean }> = [];
+    if (log.materials) {
+      try {
+        const parsed = JSON.parse(log.materials);
+        if (Array.isArray(parsed)) {
+          positions = parsed.map((p: any) => ({
+            name: p.name || '',
+            unit: p.unit || '',
+            quantity: p.actual_quantity || 0,
+            is_manual: p.is_manual || false,
+          }));
+        }
+      } catch (e) {
+        positions = [];
+      }
+    }
+    
     return {
       id: log.id,
       type: eventType,
@@ -178,11 +195,12 @@ export default function WorkJournal({ objectId, selectedWorkId }: WorkJournalPro
       work_data: {
         volume: log.volume,
         unit: log.unit,
-        materials: log.materials ? log.materials.split(',').map(m => m.trim()) : [],
+        materials: [],
         photos: log.photo_urls ? log.photo_urls.split(',').filter(url => url.trim()) : [],
         progress: log.progress,
         completion_percentage: log.completion_percentage,
         workLogNumber: workLogNumber,
+        positions: positions,
       },
       inspection_data: (isInspectionStart || isInspectionCompleted) ? {
         inspection_id: log.inspection_id,
