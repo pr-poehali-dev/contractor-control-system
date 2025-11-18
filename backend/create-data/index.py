@@ -178,59 +178,66 @@ def handler(event, context):
                 
             elif item_type == 'work_log':
                 work_id = int(data.get('work_id', 0))
-                description = data.get('description', '').replace("'", "''")
-                volume = data.get('volume', '').replace("'", "''") if data.get('volume') else None
-                materials = data.get('materials', '').replace("'", "''") if data.get('materials') else None
-                photo_urls_raw = data.get('photo_urls', '')
-                photo_urls = photo_urls_raw.replace("'", "''") if photo_urls_raw else None
+                description = data.get('description', '')
+                volume = data.get('volume') if data.get('volume') else None
+                materials = data.get('materials') if data.get('materials') else None
+                photo_urls = data.get('photo_urls') if data.get('photo_urls') else None
                 is_work_start = data.get('is_work_start', False)
                 inspection_id = data.get('inspection_id')
                 defects_count = data.get('defects_count')
                 progress = data.get('progress')
                 
-                # Build SQL dynamically based on available fields
+                # Build SQL dynamically with parameterized query
                 fields = ['work_id', 'description', 'created_by', 'created_at']
-                values = [str(work_id), f"'{description}'", str(user_id_int), 'NOW()']
+                placeholders = ['%s', '%s', '%s', 'NOW()']
+                values_list = [work_id, description, user_id_int]
                 
                 if volume:
                     fields.append('volume')
-                    values.append(f"'{volume}'")
+                    placeholders.append('%s')
+                    values_list.append(volume)
                 
                 if materials:
                     fields.append('materials')
-                    values.append(f"'{materials}'")
+                    placeholders.append('%s')
+                    values_list.append(materials)
                 
                 if photo_urls:
                     fields.append('photo_urls')
-                    values.append(f"'{photo_urls}'")
+                    placeholders.append('%s')
+                    values_list.append(photo_urls)
                 
                 if is_work_start:
                     fields.append('is_work_start')
-                    values.append('TRUE')
+                    placeholders.append('%s')
+                    values_list.append(True)
                 
                 if inspection_id:
                     fields.append('inspection_id')
-                    values.append(str(int(inspection_id)))
+                    placeholders.append('%s')
+                    values_list.append(int(inspection_id))
                 
                 if defects_count is not None:
                     fields.append('defects_count')
-                    values.append(str(int(defects_count)))
+                    placeholders.append('%s')
+                    values_list.append(int(defects_count))
                 
                 if progress is not None:
                     fields.append('progress')
-                    values.append(str(int(progress)))
+                    placeholders.append('%s')
+                    values_list.append(int(progress))
                 
                 fields_str = ', '.join(fields)
-                values_str = ', '.join(values)
+                placeholders_str = ', '.join(placeholders)
                 
                 sql_query = f"""
                     INSERT INTO {SCHEMA}.work_logs ({fields_str})
-                    VALUES ({values_str})
+                    VALUES ({placeholders_str})
                     RETURNING id, work_id, description, volume, materials, photo_urls, created_at, created_by
                 """
-                print(f"DEBUG: Executing SQL: {sql_query[:200]}...")
+                print(f"DEBUG: Executing SQL with {len(values_list)} parameters")
                 
-                cur.execute(sql_query)
+                cur.execute(sql_query, tuple(values_list))
                 result = cur.fetchone()
                 conn.commit()
                 
