@@ -118,21 +118,46 @@ const MyTasks = () => {
     }
   };
 
+  const getSeverityLabel = (severity?: string) => {
+    if (!severity) return 'Не указано';
+    
+    switch (severity.toLowerCase()) {
+      case 'critical':
+      case 'критическое':
+        return 'Критическое';
+      case 'high':
+      case 'высокое':
+        return 'Высокое';
+      case 'medium':
+      case 'среднее':
+        return 'Среднее';
+      case 'low':
+      case 'низкое':
+        return 'Низкое';
+      default:
+        return severity;
+    }
+  };
+
   const getSeverityColor = (severity?: string) => {
     if (!severity) return 'bg-slate-100 text-slate-700';
     
-    switch (severity.toLowerCase()) {
-      case 'критическое':
-        return 'bg-red-100 text-red-700';
-      case 'высокое':
-        return 'bg-orange-100 text-orange-700';
-      case 'среднее':
-        return 'bg-yellow-100 text-yellow-700';
-      case 'низкое':
-        return 'bg-green-100 text-green-700';
-      default:
-        return 'bg-slate-100 text-slate-700';
+    const severityLower = severity.toLowerCase();
+    
+    if (severityLower === 'critical' || severityLower === 'критическое') {
+      return 'bg-red-100 text-red-700';
     }
+    if (severityLower === 'high' || severityLower === 'высокое') {
+      return 'bg-orange-100 text-orange-700';
+    }
+    if (severityLower === 'medium' || severityLower === 'среднее') {
+      return 'bg-yellow-100 text-yellow-700';
+    }
+    if (severityLower === 'low' || severityLower === 'низкое') {
+      return 'bg-green-100 text-green-700';
+    }
+    
+    return 'bg-slate-100 text-slate-700';
   };
 
   const getStatusInfo = (status: string) => {
@@ -247,7 +272,7 @@ const MyTasks = () => {
                             Проверка: {task.inspection_number}
                           </span>
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(task.defect_severity)}`}>
-                            {task.defect_severity || 'Не указано'}
+                            {getSeverityLabel(task.defect_severity)}
                           </span>
                           <div className={`flex items-center gap-1 text-xs font-medium ${statusInfo.color}`}>
                             <Icon name={statusInfo.icon as any} size={14} />
