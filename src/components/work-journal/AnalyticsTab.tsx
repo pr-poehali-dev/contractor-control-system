@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import Icon from '@/components/ui/icon';
 import {
@@ -26,6 +27,7 @@ interface MaterialItem {
   actual: number;
   deviation: number;
   deviationPercent: number;
+  isManual?: boolean;
 }
 
 type SortField = 'name' | 'planned' | 'actual' | 'deviation' | 'deviationPercent';
@@ -49,7 +51,8 @@ export default function AnalyticsTab({ workId, estimatePositions = [], workLogs 
   const materials = useMemo(() => {
     if (estimatePositions.length === 0) return mockMaterials;
 
-    const positionMap = new Map<number, { name: string; planned: number; actual: number; unit: string }>();
+    const positionMap = new Map<number, { name: string; planned: number; actual: number; unit: string; isManual: boolean }>();
+    let manualIdCounter = 100000;
 
     estimatePositions.forEach(ep => {
       positionMap.set(ep.id, {
@@ -57,6 +60,7 @@ export default function AnalyticsTab({ workId, estimatePositions = [], workLogs 
         planned: ep.planned_quantity,
         actual: 0,
         unit: ep.unit,
+        isManual: false,
       });
     });
 
@@ -73,6 +77,23 @@ export default function AnalyticsTab({ workId, estimatePositions = [], workLogs 
                 if (existing) {
                   existing.actual += pos.actual_quantity || 0;
                 }
+              } else if (pos.is_manual) {
+                // Ручная позиция, которой не было в плане
+                const manualKey = manualIdCounter++;
+                const existingManual = Array.from(positionMap.values()).find(
+                  p => p.name === pos.name && p.isManual
+                );
+                if (existingManual) {
+                  existingManual.actual += pos.actual_quantity || 0;
+                } else {
+                  positionMap.set(manualKey, {
+                    name: pos.name,
+                    planned: 0,
+                    actual: pos.actual_quantity || 0,
+                    unit: pos.unit,
+                    isManual: true,
+                  });
+                }
               }
             });
           }
@@ -86,8 +107,9 @@ export default function AnalyticsTab({ workId, estimatePositions = [], workLogs 
       name: data.name,
       planned: data.planned,
       actual: data.actual,
-      deviation: data.planned - data.actual,
-      deviationPercent: data.planned > 0 ? ((data.planned - data.actual) / data.planned) * 100 : 0,
+      deviation: data.actual - data.planned,
+      deviationPercent: data.planned > 0 ? ((data.actual - data.planned) / data.planned) * 100 : (data.actual > 0 ? 100 : 0),
+      isManual: data.isManual,
     }));
   }, [estimatePositions, workLogs, workId]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -134,7 +156,7 @@ export default function AnalyticsTab({ workId, estimatePositions = [], workLogs 
   const summary = useMemo(() => {
     const planned = filteredAndSortedMaterials.reduce((sum, item) => sum + item.planned, 0);
     const actual = filteredAndSortedMaterials.reduce((sum, item) => sum + item.actual, 0);
-    const deviation = planned - actual;
+    const deviation = actual - planned;
     const deviationPercent = planned > 0 ? (deviation / planned) * 100 : 0;
 
     return { planned, actual, deviation, deviationPercent };
@@ -283,9 +305,22 @@ export default function AnalyticsTab({ workId, estimatePositions = [], workLogs 
                     </tr>
                   ) : (
                     filteredAndSortedMaterials.map((item) => (
-                      <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                        <td className="p-2 md:p-4 sticky left-0 bg-white hover:bg-slate-50 z-10">
-                          {item.name}
+                      <tr key={item.id} className={cn(
+                        "border-b border-slate-100 hover:bg-slate-50 transition-colors",
+                        item.isManual && "bg-blue-50/50"
+                      )}>
+                        <td className={cn(
+                          "p-2 md:p-4 sticky left-0 z-10",
+                          item.isManual ? "bg-blue-50/50 hover:bg-blue-100/50" : "bg-white hover:bg-slate-50"
+                        )}>
+                          <div className="flex items-center gap-2">
+                            {item.name}
+                            {item.isManual && (
+                              <Badge variant="outline" className="text-xs px-1.5 py-0 bg-blue-100 text-blue-700 border-blue-300">
+                                ручная
+                              </Badge>
+                            )}
+                          </div>
                         </td>
                         <td className="p-2 md:p-4 text-right font-medium whitespace-nowrap">
                           {item.planned.toLocaleString('ru-RU')}
@@ -295,16 +330,17 @@ export default function AnalyticsTab({ workId, estimatePositions = [], workLogs 
                         </td>
                         <td className={cn(
                           'p-2 md:p-4 text-right font-semibold whitespace-nowrap',
-                          item.deviation > 0 ? 'text-slate-600' : item.deviation < 0 ? 'text-red-600' : 'text-slate-400'
+                          item.deviation > 0 ? 'text-purple-600' : item.deviation < 0 ? 'text-red-600' : 'text-slate-400'
                         )}>
+                          {item.deviation > 0 && '+'}
                           {item.deviation.toLocaleString('ru-RU')}
                         </td>
                         <td className={cn(
                           'p-2 md:p-4 text-right font-semibold whitespace-nowrap',
-                          item.deviationPercent === 100 ? 'text-slate-600' :
-                          item.deviationPercent > 0 ? 'text-slate-600' : 
-                          item.deviationPercent < 0 ? 'text-red-600' : 'text-slate-400'
+                          item.deviation > 0 ? 'text-purple-600' : 
+                          item.deviation < 0 ? 'text-red-600' : 'text-slate-400'
                         )}>
+                          {item.deviation > 0 && '+'}
                           {item.deviationPercent.toFixed(2).replace('.', ',')}
                         </td>
                       </tr>
@@ -322,10 +358,18 @@ export default function AnalyticsTab({ workId, estimatePositions = [], workLogs 
                     <td className="p-2 md:p-4 text-right font-bold text-base whitespace-nowrap">
                       {summary.actual.toLocaleString('ru-RU')}
                     </td>
-                    <td className="p-2 md:p-4 text-right font-bold text-base text-slate-700 whitespace-nowrap">
+                    <td className={cn(
+                      "p-2 md:p-4 text-right font-bold text-base whitespace-nowrap",
+                      summary.deviation > 0 ? 'text-purple-600' : summary.deviation < 0 ? 'text-red-600' : 'text-slate-700'
+                    )}>
+                      {summary.deviation > 0 && '+'}
                       {summary.deviation.toLocaleString('ru-RU')}
                     </td>
-                    <td className="p-2 md:p-4 text-right font-bold text-base text-slate-700 whitespace-nowrap">
+                    <td className={cn(
+                      "p-2 md:p-4 text-right font-bold text-base whitespace-nowrap",
+                      summary.deviation > 0 ? 'text-purple-600' : summary.deviation < 0 ? 'text-red-600' : 'text-slate-700'
+                    )}>
+                      {summary.deviation > 0 && '+'}
                       {summary.deviationPercent.toFixed(2).replace('.', ',')}
                     </td>
                   </tr>
@@ -343,9 +387,11 @@ export default function AnalyticsTab({ workId, estimatePositions = [], workLogs 
               <ul className="space-y-1 text-slate-600">
                 <li>• <strong>ПЛАН</strong> — запланированный расход материала</li>
                 <li>• <strong>ФАКТ</strong> — фактический расход материала</li>
-                <li>• <strong>Откл. (абс.)</strong> — абсолютное отклонение (план - факт)</li>
+                <li>• <strong>Откл. (абс.)</strong> — абсолютное отклонение (факт - план)</li>
                 <li>• <strong>Откл. (%)</strong> — процентное отклонение от плана</li>
-                <li>• Красным цветом выделен перерасход материалов</li>
+                <li>• <span className="text-purple-600 font-semibold">Фиолетовым цветом (+)</span> выделен перерасход материалов (факт &gt; план)</li>
+                <li>• <span className="text-red-600 font-semibold">Красным цветом (−)</span> выделено недовыполнение (факт &lt; план)</li>
+                <li>• <span className="bg-blue-50 px-2 py-0.5 rounded border border-blue-200">Голубым фоном</span> выделены ручные позиции (не из плана)</li>
               </ul>
             </div>
           </div>

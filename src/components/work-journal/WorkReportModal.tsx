@@ -327,13 +327,27 @@ export default function WorkReportModal({
                           <Label htmlFor={`unit-${position.tempId}`} className="text-xs">
                             Единица измерения
                           </Label>
-                          <Input
-                            id={`unit-${position.tempId}`}
-                            placeholder="шт, м², м³, кг"
+                          <Select
                             value={position.unit}
-                            onChange={(e) => handlePositionFieldChange(position.tempId, 'unit', e.target.value)}
-                            className="mt-1"
-                          />
+                            onValueChange={(value) => handlePositionFieldChange(position.tempId, 'unit', value)}
+                          >
+                            <SelectTrigger id={`unit-${position.tempId}`} className="mt-1">
+                              <SelectValue placeholder="Выберите единицу..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="шт">шт (штуки)</SelectItem>
+                              <SelectItem value="м">м (метры)</SelectItem>
+                              <SelectItem value="м²">м² (квадратные метры)</SelectItem>
+                              <SelectItem value="м³">м³ (кубические метры)</SelectItem>
+                              <SelectItem value="кг">кг (килограммы)</SelectItem>
+                              <SelectItem value="т">т (тонны)</SelectItem>
+                              <SelectItem value="л">л (литры)</SelectItem>
+                              <SelectItem value="смена">смена</SelectItem>
+                              <SelectItem value="час">час</SelectItem>
+                              <SelectItem value="компл">компл (комплект)</SelectItem>
+                              <SelectItem value="уп">уп (упаковка)</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </>
                     )}
