@@ -37,7 +37,7 @@ def handler(event: dict, context: any) -> dict:
     if not user_id:
         return {
             'statusCode': 401,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'Unauthorized'})
         }
@@ -61,7 +61,7 @@ def handler(event: dict, context: any) -> dict:
         else:
             return {
                 'statusCode': 405,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
                 'isBase64Encoded': False,
                 'body': json.dumps({'error': 'Method not allowed'})
             }
@@ -84,7 +84,7 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
     if not name or not inn:
         return {
             'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'Name and INN are required'})
         }
@@ -115,7 +115,7 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
             # Организация уже добавлена в подрядчики
             return {
                 'statusCode': 409,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
                 'isBase64Encoded': False,
                 'body': json.dumps({
                     'error': 'Organization already in your contractors list',
@@ -127,7 +127,7 @@ def create_organization(cursor, conn, user_id: str, event: dict) -> dict:
             # Организация существует, но не добавлена - предлагаем добавить
             return {
                 'statusCode': 409,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
                 'isBase64Encoded': False,
                 'body': json.dumps({
                     'error': 'Organization with this INN already exists',
@@ -259,7 +259,7 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
         if not organization:
             return {
                 'statusCode': 404,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
                 'isBase64Encoded': False,
                 'body': json.dumps({'error': 'Organization not found'})
             }
@@ -302,7 +302,7 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
         
         return {
             'statusCode': 200,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'organization': organization}, default=str)
         }
@@ -347,7 +347,7 @@ def get_organizations(cursor, user_id: str, event: dict) -> dict:
         
         return {
             'statusCode': 200,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'organizations': [dict(org) for org in organizations]}, default=str)
         }
@@ -359,7 +359,7 @@ def update_organization(cursor, conn, user_id: str, event: dict) -> dict:
     if not org_id:
         return {
             'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'Organization ID is required'})
         }
@@ -372,7 +372,7 @@ def update_organization(cursor, conn, user_id: str, event: dict) -> dict:
     if not organization:
         return {
             'statusCode': 404,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'Organization not found'})
         }
@@ -386,7 +386,7 @@ def update_organization(cursor, conn, user_id: str, event: dict) -> dict:
     if not user_org_role or user_org_role['role'] != 'admin':
         return {
             'statusCode': 403,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'Only organization admin can update'})
         }
@@ -424,7 +424,7 @@ def update_organization(cursor, conn, user_id: str, event: dict) -> dict:
     if not updates:
         return {
             'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'No fields to update'})
         }
@@ -458,7 +458,7 @@ def link_organization(cursor, conn, user_id: str, event: dict) -> dict:
     if not org_id:
         return {
             'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'organization_id is required'})
         }
@@ -472,7 +472,7 @@ def link_organization(cursor, conn, user_id: str, event: dict) -> dict:
     if not organization:
         return {
             'statusCode': 404,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'Organization not found'})
         }

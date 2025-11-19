@@ -41,7 +41,7 @@ def handler(event, context):
     if not auth_token:
         return {
             'statusCode': 401,
-            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
             'body': json.dumps({'success': False, 'error': 'Auth token required'})
         }
     
@@ -52,13 +52,13 @@ def handler(event, context):
     except ValueError as e:
         return {
             'statusCode': 401,
-            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
             'body': json.dumps({'success': False, 'error': str(e)})
         }
     except Exception as e:
         return {
             'statusCode': 401,
-            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
             'body': json.dumps({'success': False, 'error': 'Invalid token'})
         }
     
@@ -69,7 +69,7 @@ def handler(event, context):
     if not item_type or not item_id:
         return {
             'statusCode': 400,
-            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
             'body': json.dumps({'success': False, 'error': 'Type and id required'})
         }
     
@@ -107,7 +107,7 @@ def handler(event, context):
                 conn.close()
                 return {
                     'statusCode': 400,
-                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
                     'body': json.dumps({'success': False, 'error': 'No fields to update'})
                 }
             
@@ -121,7 +121,7 @@ def handler(event, context):
             
             return {
                 'statusCode': 200,
-                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
                 'body': json.dumps({'success': True, 'data': {'user': dict(updated_user)}}, default=str)
             }
         
@@ -218,7 +218,7 @@ def handler(event, context):
                 conn.close()
                 return {
                     'statusCode': 400,
-                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
                     'body': json.dumps({'success': False, 'error': f'Unknown type: {item_type}'})
                 }
             
@@ -252,7 +252,7 @@ def handler(event, context):
                 if not result_row:
                     return {
                         'statusCode': 404,
-                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
                         'body': json.dumps({'success': False, 'error': 'Project not found or access denied'})
                     }
                 
@@ -278,7 +278,7 @@ def handler(event, context):
                 if not result_row:
                     return {
                         'statusCode': 404,
-                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
                         'body': json.dumps({'success': False, 'error': 'Object not found or access denied'})
                     }
                 
@@ -328,7 +328,7 @@ def handler(event, context):
                 if not result_row:
                     return {
                         'statusCode': 404,
-                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
                         'body': json.dumps({'success': False, 'error': 'Work not found or access denied'})
                     }
                 
@@ -372,7 +372,7 @@ def handler(event, context):
                     conn.close()
                     return {
                         'statusCode': 400,
-                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
                         'body': json.dumps({'success': False, 'error': 'No fields to update'})
                     }
                 
@@ -389,7 +389,7 @@ def handler(event, context):
                 if not result_row:
                     return {
                         'statusCode': 404,
-                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
                         'body': json.dumps({'success': False, 'error': 'Inspection not found'})
                     }
                 
@@ -401,14 +401,14 @@ def handler(event, context):
                 conn.close()
                 return {
                     'statusCode': 400,
-                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
                     'body': json.dumps({'success': False, 'error': f'Unknown type: {item_type}'})
                 }
         
         else:
             return {
                 'statusCode': 405,
-                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
                 'body': json.dumps({'success': False, 'error': 'Method not allowed'})
             }
         
@@ -423,7 +423,7 @@ def handler(event, context):
         
         return {
             'statusCode': 200,
-            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
             'body': json.dumps(result)
         }
         
@@ -442,6 +442,6 @@ def handler(event, context):
             pass
         return {
             'statusCode': 500,
-            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
             'body': json.dumps({'success': False, 'error': str(e)})
         }
