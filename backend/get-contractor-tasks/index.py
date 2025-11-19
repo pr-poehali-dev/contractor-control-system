@@ -28,8 +28,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     if method != 'GET':
         return {
             'statusCode': 405,
-            'headers': {'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Method not allowed'}),
+            'headers': {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({'error': 'Method not allowed'}, ensure_ascii=False),
             'isBase64Encoded': False
         }
     
@@ -43,7 +46,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'Content-Type': 'application/json; charset=utf-8',
                 'Access-Control-Allow-Origin': '*'
             },
-            'body': json.dumps({'error': 'contractor_id is required'}),
+            'body': json.dumps({'error': 'contractor_id is required'}, ensure_ascii=False),
             'isBase64Encoded': False
         }
     
@@ -51,8 +54,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     if not dsn:
         return {
             'statusCode': 500,
-            'headers': {'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Database configuration error'}),
+            'headers': {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({'error': 'Database configuration error'}, ensure_ascii=False),
             'isBase64Encoded': False
         }
     
@@ -120,9 +126,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     return {
         'statusCode': 200,
         'headers': {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json; charset=utf-8',
             'Access-Control-Allow-Origin': '*'
         },
-        'body': json.dumps({'tasks': tasks}),
+        'body': json.dumps({'tasks': tasks}, ensure_ascii=False),
         'isBase64Encoded': False
     }

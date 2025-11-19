@@ -152,6 +152,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     return {
         'statusCode': 405,
-        'headers': {'Access-Control-Allow-Origin': '*'},
-        'body': json.dumps({'error': 'Method not allowed'})
+        'headers': {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Access-Control-Allow-Origin': '*'
+        },
+        'isBase64Encoded': False,
+        'body': json.dumps({'error': 'Method not allowed'}, ensure_ascii=False)
     }

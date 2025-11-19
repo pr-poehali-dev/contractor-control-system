@@ -64,7 +64,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return {
                 'statusCode': 200,
                 'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'work_types': work_types_list}),
+                'body': json.dumps({'work_types': work_types_list}, ensure_ascii=False),
                 'isBase64Encoded': False
             }
         
@@ -116,7 +116,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return {
                 'statusCode': 201,
                 'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps(work_type_data),
+                'body': json.dumps(work_type_data, ensure_ascii=False),
                 'isBase64Encoded': False
             }
         
@@ -128,7 +128,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Missing work type id'}),
+                    'body': json.dumps({'error': 'Missing work type id'}, ensure_ascii=False),
                     'isBase64Encoded': False
                 }
             
@@ -164,7 +164,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 404,
                     'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Work type not found'}),
+                    'body': json.dumps({'error': 'Work type not found'}, ensure_ascii=False),
                     'isBase64Encoded': False
                 }
             
@@ -188,7 +188,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return {
                 'statusCode': 200,
                 'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps(work_type_data),
+                'body': json.dumps(work_type_data, ensure_ascii=False),
                 'isBase64Encoded': False
             }
         
@@ -200,7 +200,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Missing work type id'}),
+                    'body': json.dumps({'error': 'Missing work type id'}, ensure_ascii=False),
                     'isBase64Encoded': False
                 }
             
@@ -214,7 +214,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 404,
                     'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Work type not found'}),
+                    'body': json.dumps({'error': 'Work type not found'}, ensure_ascii=False),
                     'isBase64Encoded': False
                 }
             
@@ -233,7 +233,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return {
                 'statusCode': 405,
                 'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Method not allowed'}),
+                'body': json.dumps({'error': 'Method not allowed'}, ensure_ascii=False),
                 'isBase64Encoded': False
             }
     
