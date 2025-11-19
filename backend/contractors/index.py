@@ -50,7 +50,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 400,
                         'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'success': False, 'error': 'INN is required'})
+                        'body': json.dumps({'success': False, 'error': 'INN is required'}, ensure_ascii=False)
                     }
                 
                 cur.execute(
@@ -92,7 +92,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 200,
                     'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'success': True, 'data': contractor_data})
+                    'body': json.dumps({'success': True, 'data': contractor_data}, ensure_ascii=False)
                 }
             
             elif action == 'invite':
@@ -107,7 +107,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 400,
                         'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'success': False, 'error': 'client_id, inn, and name are required'})
+                        'body': json.dumps({'success': False, 'error': 'client_id, inn, and name are required'}, ensure_ascii=False)
                     }
                 
                 cur.execute("SELECT id, user_id FROM t_p8942561_contractor_control_s.contractors WHERE inn = %s", (inn,))
@@ -142,7 +142,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                                 'contractor_id': contractor_id,
                                 'newly_added': result is not None
                             }
-                        })
+                        }, ensure_ascii=False)
                     }
                 else:
                     temp_password = generate_temp_password()
@@ -207,7 +207,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                                 'email': email,
                                 'phone': phone
                             }
-                        })
+                        }, ensure_ascii=False)
                     }
             
             elif action == 'link':
@@ -218,7 +218,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 400,
                         'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'success': False, 'error': 'client_id and contractor_id are required'}),
+                        'body': json.dumps({'success': False, 'error': 'client_id and contractor_id are required'}, ensure_ascii=False),
                         'isBase64Encoded': False
                     }
                 
@@ -233,7 +233,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 200,
                         'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'success': True, 'message': 'Already linked'}),
+                        'body': json.dumps({'success': True, 'message': 'Already linked'}, ensure_ascii=False),
                         'isBase64Encoded': False
                     }
                 
@@ -248,7 +248,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 200,
                     'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'success': True, 'message': 'Contractor linked successfully'}),
+                    'body': json.dumps({'success': True, 'message': 'Contractor linked successfully'}, ensure_ascii=False),
                     'isBase64Encoded': False
                 }
         
@@ -299,14 +299,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 200,
                     'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'success': True, 'data': {'assignments': assignments}})
+                    'body': json.dumps({'success': True, 'data': {'assignments': assignments}}, ensure_ascii=False)
                 }
             
             if not client_id:
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'success': False, 'error': 'client_id is required'})
+                    'body': json.dumps({'success': False, 'error': 'client_id is required'}, ensure_ascii=False)
                 }
             
             cur.execute(
@@ -356,20 +356,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             return {
                 'statusCode': 200,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'success': True, 'data': {'contractors': contractors_list}})
+                'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'success': True, 'data': {'contractors': contractors_list}}, ensure_ascii=False)
             }
         
         else:
             return {
                 'statusCode': 405,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'success': False, 'error': 'Method not allowed'})
+                'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'success': False, 'error': 'Method not allowed'}, ensure_ascii=False)
             }
     
     except Exception as e:
         return {
             'statusCode': 500,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'success': False, 'error': str(e)})
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'success': False, 'error': str(e)}, ensure_ascii=False)
         }

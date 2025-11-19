@@ -39,7 +39,7 @@ def handler(event: dict, context: any) -> dict:
             'statusCode': 401,
             'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
-            'body': json.dumps({'error': 'Unauthorized'})
+            'body': json.dumps({'error': 'Unauthorized'}, ensure_ascii=False)
         }
     
     conn = psycopg2.connect(DSN)
