@@ -35,7 +35,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'Content-Type': 'application/json; charset=utf-8',
                 'Access-Control-Allow-Origin': '*'
             },
-            'body': json.dumps({'error': 'Method not allowed'}),
+            'body': json.dumps({'error': 'Method not allowed'}, ensure_ascii=False),
             'isBase64Encoded': False
         }
     
@@ -65,7 +65,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'Content-Type': 'application/json; charset=utf-8',
                 'Access-Control-Allow-Origin': '*'
             },
-            'body': json.dumps({'error': 'user_id is required'}),
+            'body': json.dumps({'error': 'user_id is required'}, ensure_ascii=False),
             'isBase64Encoded': False
         }
     
@@ -77,7 +77,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'Content-Type': 'application/json; charset=utf-8',
                 'Access-Control-Allow-Origin': '*'
             },
-            'body': json.dumps({'error': 'Database connection not configured'}),
+            'body': json.dumps({'error': 'Database connection not configured'}, ensure_ascii=False),
             'isBase64Encoded': False
         }
     
@@ -97,7 +97,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'Content-Type': 'application/json; charset=utf-8',
                 'Access-Control-Allow-Origin': '*'
             },
-            'body': json.dumps({'error': 'User not found'}),
+            'body': json.dumps({'error': 'User not found'}, ensure_ascii=False),
             'isBase64Encoded': False
         }
     
@@ -401,9 +401,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     return {
         'statusCode': 200,
         'headers': {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json; charset=utf-8',
             'Access-Control-Allow-Origin': '*'
         },
-        'body': json.dumps({'events': events}, default=str),
+        'body': json.dumps({'events': events}, ensure_ascii=False, default=str),
         'isBase64Encoded': False
     }

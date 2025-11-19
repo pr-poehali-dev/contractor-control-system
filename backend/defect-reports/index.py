@@ -55,7 +55,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         return {
             'statusCode': 401,
             'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'success': False, 'error': 'Unauthorized'}),
+            'body': json.dumps({'success': False, 'error': 'Unauthorized'}, ensure_ascii=False),
             'isBase64Encoded': False
         }
     
@@ -75,7 +75,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'success': False, 'error': 'inspection_id is required'}),
+                    'body': json.dumps({'success': False, 'error': 'inspection_id is required'}, ensure_ascii=False),
                     'isBase64Encoded': False
                 }
             
@@ -98,7 +98,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 404,
                     'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'success': False, 'error': 'Inspection not found'}),
+                    'body': json.dumps({'success': False, 'error': 'Inspection not found'}, ensure_ascii=False),
                     'isBase64Encoded': False
                 }
             
@@ -124,7 +124,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'success': False, 'error': 'No defects found in inspection'}),
+                    'body': json.dumps({'success': False, 'error': 'No defects found in inspection'}, ensure_ascii=False),
                     'isBase64Encoded': False
                 }
             
@@ -202,7 +202,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return {
                 'statusCode': 201,
                 'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'success': True, 'data': report}),
+                'body': json.dumps({'success': True, 'data': report}, ensure_ascii=False),
                 'isBase64Encoded': False
             }
         
@@ -230,7 +230,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 404,
                         'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'success': False, 'error': 'Report not found'}),
+                        'body': json.dumps({'success': False, 'error': 'Report not found'}, ensure_ascii=False),
                         'isBase64Encoded': False
                     }
                 
@@ -254,7 +254,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 200,
                     'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'success': True, 'data': report}, default=str),
+                    'body': json.dumps({'success': True, 'data': report}, ensure_ascii=False, default=str),
                     'isBase64Encoded': False
                 }
             
@@ -292,21 +292,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 200,
                     'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'success': True, 'data': reports}, default=str),
+                    'body': json.dumps({'success': True, 'data': reports}, ensure_ascii=False, default=str),
                     'isBase64Encoded': False
                 }
             
             return {
                 'statusCode': 400,
                 'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'success': False, 'error': 'id, work_id or inspection_id required'}),
+                'body': json.dumps({'success': False, 'error': 'id, work_id or inspection_id required'}, ensure_ascii=False),
                 'isBase64Encoded': False
             }
         
         return {
             'statusCode': 405,
             'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Method not allowed'}),
+            'body': json.dumps({'error': 'Method not allowed'}, ensure_ascii=False),
             'isBase64Encoded': False
         }
     
@@ -318,7 +318,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'success': False, 'error': str(e)}),
+            'body': json.dumps({'success': False, 'error': str(e)}, ensure_ascii=False),
             'isBase64Encoded': False
         }
     finally:

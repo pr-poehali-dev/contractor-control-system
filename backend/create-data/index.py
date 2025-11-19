@@ -46,7 +46,7 @@ def handler(event, context):
             return {
                 'statusCode': 401,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
-                'body': json.dumps({'success': False, 'error': 'Auth token required'})
+                'body': json.dumps({'success': False, 'error': 'Auth token required'}, ensure_ascii=False)
             }
         
         try:

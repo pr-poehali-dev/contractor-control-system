@@ -84,15 +84,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if not password or not name or not (email or phone):
                 return {
                     'statusCode': 400,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Missing required fields'})
+                    'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Missing required fields'}, ensure_ascii=False)
                 }
             
             if role not in ['client', 'contractor', 'admin']:
                 return {
                     'statusCode': 400,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Invalid role'})
+                    'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Invalid role'}, ensure_ascii=False)
                 }
             
             email_check = f"'{email}'" if email else 'NULL'
@@ -104,8 +104,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if cur.fetchone():
                 return {
                     'statusCode': 400,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'User already exists'})
+                    'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'User already exists'}, ensure_ascii=False)
                 }
             
             password_hash = hash_password(password).replace("'", "''")
@@ -141,14 +141,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             return {
                 'statusCode': 201,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
                 'body': json.dumps({
                     'success': True,
                     'data': {
                         'token': token,
                         'user': user_data
                     }
-                })
+                }, ensure_ascii=False)
             }
         
         elif method == 'POST' and path == 'login':
@@ -162,8 +162,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if not password or not (email or phone):
                 return {
                     'statusCode': 400,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Missing email/phone or password'})
+                    'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Missing email/phone or password'}, ensure_ascii=False)
                 }
             
             email_cond = f"email = '{email}'" if email else "1=0"
@@ -185,8 +185,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if not user:
                 return {
                     'statusCode': 401,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Invalid credentials'})
+                    'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Invalid credentials'}, ensure_ascii=False)
                 }
             
             user_id, user_email, user_phone, user_name, user_role, user_org, password_hash, is_active, user_created_at, onboarding_completed, organization_id = user
@@ -196,8 +196,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if not is_active:
                 return {
                     'statusCode': 403,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Account is inactive'})
+                    'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Account is inactive'}, ensure_ascii=False)
                 }
             
             password_match = verify_password(password, password_hash)
@@ -206,8 +206,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if not password_match:
                 return {
                     'statusCode': 401,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Invalid credentials'})
+                    'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Invalid credentials'}, ensure_ascii=False)
                 }
             
             cur.execute(
@@ -234,14 +234,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             return {
                 'statusCode': 200,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
                 'body': json.dumps({
                     'success': True,
                     'data': {
                         'token': token,
                         'user': user_data
                     }
-                })
+                }, ensure_ascii=False)
             }
         
         elif method == 'GET' and path == 'verify':
@@ -250,8 +250,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if not auth_header:
                 return {
                     'statusCode': 401,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'No token provided'})
+                    'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'No token provided'}, ensure_ascii=False)
                 }
             
             try:
@@ -271,8 +271,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 if not user or not user[6]:  # is_active
                     return {
                         'statusCode': 401,
-                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'User not found or inactive'})
+                        'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'User not found or inactive'}, ensure_ascii=False)
                     }
                 
                 user_data = {
@@ -292,27 +292,27 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 return {
                     'statusCode': 200,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
                     'body': json.dumps({
                         'success': True,
                         'data': {
                             'user': user_data
                         }
-                    })
+                    }, ensure_ascii=False)
                 }
                 
             except ValueError as e:
                 return {
                     'statusCode': 401,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': str(e)})
+                    'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': str(e)}, ensure_ascii=False)
                 }
         
         else:
             return {
                 'statusCode': 404,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Endpoint not found'})
+                'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Endpoint not found'}, ensure_ascii=False)
             }
     
     except Exception as e:
@@ -322,5 +322,5 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': str(e)})
+            'body': json.dumps({'error': str(e)}, ensure_ascii=False)
         }
