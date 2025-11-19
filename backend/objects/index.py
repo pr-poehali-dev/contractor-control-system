@@ -18,7 +18,7 @@ def verify_user(event: Dict[str, Any]) -> tuple:
     auth_token = event.get('headers', {}).get('X-Auth-Token') or event.get('headers', {}).get('x-auth-token')
     
     if not auth_token:
-        return None, {'statusCode': 401, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'success': False, 'error': 'Authentication required'})}
+        return None, {'statusCode': 401, 'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'success': False, 'error': 'Authentication required'}, ensure_ascii=False)}
     
     try:
         import jwt
@@ -26,7 +26,7 @@ def verify_user(event: Dict[str, Any]) -> tuple:
         payload = jwt.decode(auth_token, JWT_SECRET, algorithms=['HS256'])
         return payload, None
     except Exception as e:
-        return None, {'statusCode': 401, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'success': False, 'error': 'Invalid token'})}
+        return None, {'statusCode': 401, 'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'success': False, 'error': 'Invalid token'}, ensure_ascii=False)}
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method = event.get('httpMethod', 'GET')

@@ -42,7 +42,7 @@ def handler(event, context):
         return {
             'statusCode': 401,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
-            'body': json.dumps({'success': False, 'error': 'Auth token required'})
+            'body': json.dumps({'success': False, 'error': 'Auth token required'}, ensure_ascii=False)
         }
     
     try:
@@ -53,13 +53,13 @@ def handler(event, context):
         return {
             'statusCode': 401,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
-            'body': json.dumps({'success': False, 'error': str(e)})
+            'body': json.dumps({'success': False, 'error': str(e)}, ensure_ascii=False)
         }
     except Exception as e:
         return {
             'statusCode': 401,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
-            'body': json.dumps({'success': False, 'error': 'Invalid token'})
+            'body': json.dumps({'success': False, 'error': 'Invalid token'}, ensure_ascii=False)
         }
     
     body = json.loads(event.get('body', '{}'))
@@ -443,5 +443,5 @@ def handler(event, context):
         return {
             'statusCode': 500,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
-            'body': json.dumps({'success': False, 'error': str(e)})
+            'body': json.dumps({'success': False, 'error': str(e)}, ensure_ascii=False)
         }
