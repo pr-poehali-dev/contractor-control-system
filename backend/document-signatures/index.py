@@ -35,7 +35,7 @@ def handler(event: dict, context: any) -> dict:
     if not user_id:
         return {
             'statusCode': 401,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'Unauthorized'})
         }
@@ -53,7 +53,7 @@ def handler(event: dict, context: any) -> dict:
         else:
             return {
                 'statusCode': 405,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
                 'isBase64Encoded': False,
                 'body': json.dumps({'error': 'Method not allowed'})
             }
@@ -71,7 +71,7 @@ def create_signature_request(cursor, conn, user_id: str, event: dict) -> dict:
     if not document_id or not signer_id:
         return {
             'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'document_id and signer_id are required'})
         }
@@ -87,7 +87,7 @@ def create_signature_request(cursor, conn, user_id: str, event: dict) -> dict:
     if not document:
         return {
             'statusCode': 404,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'Document not found'})
         }
@@ -135,7 +135,7 @@ def sign_document(cursor, conn, user_id: str, event: dict) -> dict:
     if not signature_id or action not in ['sign', 'reject']:
         return {
             'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'signature_id and valid action are required'})
         }
@@ -148,7 +148,7 @@ def sign_document(cursor, conn, user_id: str, event: dict) -> dict:
     if not signature:
         return {
             'statusCode': 404,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'Signature request not found'})
         }
@@ -156,7 +156,7 @@ def sign_document(cursor, conn, user_id: str, event: dict) -> dict:
     if signature['signer_id'] != int(user_id):
         return {
             'statusCode': 403,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'Only assigned signer can perform this action'})
         }
@@ -164,7 +164,7 @@ def sign_document(cursor, conn, user_id: str, event: dict) -> dict:
     if signature['status'] != 'pending':
         return {
             'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'Signature already processed'})
         }

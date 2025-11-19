@@ -43,7 +43,7 @@ def handler(event: dict, context: any) -> dict:
         else:
             return {
                 'statusCode': 405,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
                 'isBase64Encoded': False,
                 'body': json.dumps({'error': 'Method not allowed'})
             }

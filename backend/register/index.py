@@ -34,14 +34,14 @@ def handler(event, context):
     if not phone or not name:
         return {
             'statusCode': 400,
-            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
             'body': json.dumps({'success': False, 'error': 'Phone and name required'})
         }
     
     if role not in ['client', 'contractor']:
         return {
             'statusCode': 400,
-            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
             'body': json.dumps({'success': False, 'error': 'Role must be client or contractor'})
         }
     
@@ -59,7 +59,7 @@ def handler(event, context):
             conn.close()
             return {
                 'statusCode': 409,
-                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
                 'body': json.dumps({'success': False, 'error': 'User already exists'})
             }
         
@@ -137,7 +137,7 @@ def handler(event, context):
         
         return {
             'statusCode': 201,
-            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
             'body': json.dumps({'success': True, 'data': {'user': result}})
         }
         
@@ -147,6 +147,6 @@ def handler(event, context):
         conn.close()
         return {
             'statusCode': 500,
-            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json; charset=utf-8'},
             'body': json.dumps({'success': False, 'error': str(e)})
         }

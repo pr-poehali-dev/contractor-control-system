@@ -35,7 +35,7 @@ def handler(event: dict, context: any) -> dict:
     if not user_id:
         return {
             'statusCode': 401,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'Unauthorized'})
         }
@@ -53,7 +53,7 @@ def handler(event: dict, context: any) -> dict:
         else:
             return {
                 'statusCode': 405,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
                 'isBase64Encoded': False,
                 'body': json.dumps({'error': 'Method not allowed'})
             }
@@ -73,7 +73,7 @@ def create_template(cursor, conn, user_id: str, event: dict) -> dict:
     if not name or not template_type:
         return {
             'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'name and template_type are required'})
         }
@@ -121,7 +121,7 @@ def get_templates(cursor, user_id: str, event: dict) -> dict:
         if not template:
             return {
                 'statusCode': 404,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
                 'isBase64Encoded': False,
                 'body': json.dumps({'error': 'Template not found'})
             }
@@ -140,7 +140,7 @@ def get_templates(cursor, user_id: str, event: dict) -> dict:
         
         return {
             'statusCode': 200,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'template': template}, default=str)
         }
@@ -171,7 +171,7 @@ def get_templates(cursor, user_id: str, event: dict) -> dict:
         
         return {
             'statusCode': 200,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'templates': templates_list}, default=str)
         }
@@ -183,7 +183,7 @@ def update_template(cursor, conn, user_id: str, event: dict) -> dict:
     if not template_id:
         return {
             'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'Template ID is required'})
         }
@@ -197,7 +197,7 @@ def update_template(cursor, conn, user_id: str, event: dict) -> dict:
     if not template:
         return {
             'statusCode': 404,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'Template not found or access denied'})
         }
@@ -223,7 +223,7 @@ def update_template(cursor, conn, user_id: str, event: dict) -> dict:
     if not updates:
         return {
             'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({'error': 'No fields to update'})
         }

@@ -26,7 +26,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     if method != 'POST':
         return {
             'statusCode': 405,
-            'headers': {'Content-Type': 'application/json'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8'},
             'body': json.dumps({'error': 'Method not allowed'})
         }
     
@@ -36,7 +36,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     if not user_id:
         return {
             'statusCode': 400,
-            'headers': {'Content-Type': 'application/json'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8'},
             'body': json.dumps({'error': 'user_id is required'})
         }
     
@@ -44,7 +44,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     if not dsn:
         return {
             'statusCode': 500,
-            'headers': {'Content-Type': 'application/json'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8'},
             'body': json.dumps({'error': 'Database not configured'})
         }
     
@@ -205,7 +205,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         conn.close()
         return {
             'statusCode': 404,
-            'headers': {'Content-Type': 'application/json'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8'},
             'body': json.dumps({'error': 'User not found'})
         }
     
